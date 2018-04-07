@@ -3,6 +3,7 @@ local scripts = {
 	"scripts/sdlext/extensions",
 	"scripts/ui/scripts",
 	"scripts/sdlext/uieventloop",
+	"scripts/sdlext/errorwarning",
 	"scripts/sdlext/modcontent",
 	"scripts/sdlext/modconfiguration",
 	"scripts/sdlext/pilotarrange",

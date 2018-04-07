@@ -94,6 +94,7 @@ local function createUi(screen)
 	end
 end
 
+local errorFrameShown = false
 
 AUTO_HOOK_Mod_Content_Draw = sdl.drawHook(function(screen)
 	isInMainMenu = bgRobot:wasDrawn() and bgRobot.x < screen:w() and not hangar:wasDrawn()
@@ -108,6 +109,16 @@ AUTO_HOOK_Mod_Content_Draw = sdl.drawHook(function(screen)
 		end
 
 		ui:draw(screen)
+
+		if not errorFrameShown then
+			errorFrameShown = true
+			for id, modtable in pairs(mod_loader.mods) do
+				if not modtable.installed then
+					showErrorFrame(modtable.error)
+					break
+				end
+			end
+		end
 	elseif isInHangar then
 		buttonModContent.visible = false
 	end
