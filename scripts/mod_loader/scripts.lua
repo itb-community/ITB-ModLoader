@@ -1,5 +1,5 @@
 local scripts = {
-	"scripts/sdlext/serizalize",
+	"scripts/sdlext/serialize",
 	"scripts/sdlext/extensions",
 	"scripts/ui/ui",
 	"scripts/sdlext/uieventloop",
