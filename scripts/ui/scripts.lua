@@ -17,4 +17,5 @@ if sdl then
 	require("ui/widgets/scrollarea")
 	require("ui/widgets/checkbox")
 	require("ui/widgets/dropdown")
+	require("ui/widgets/boxlayout")
 end
