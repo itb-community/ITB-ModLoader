@@ -29,12 +29,12 @@ end
 
 
 DecoRAlignedText = Class.inherit(DecoText)
-function DecoRAlignedText:new(text, font, textset,rSpace)
+function DecoRAlignedText:new(text, font, textset, rSpace)
 	DecoText.new(self, text, font, textset)
 	self.rSpace = rSpace or 0
 end
 
-function DecoRAlignedText:draw(screen,widget)
+function DecoRAlignedText:draw(screen, widget)
 	if self.surface == nil then return end
 	local r = widget.rect
 

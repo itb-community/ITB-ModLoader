@@ -1,13 +1,13 @@
 -- adds a "Mod Content" button to the main menu as wee as API for
 -- adding items to the menu it opens
 
-
 local bg0 = sdlext.surface("img/main_menus/bg0.png")
 local bgRobot = sdlext.surface("img/main_menus/bg3.png")
 local loading = sdlext.surface("img/main_menus/Loading_main.png")
 local hangar = sdlext.surface("img/strategy/hangar_main.png")
 local cursor = sdl.surface("resources/mods/ui/pointer-noshadow.png")
 local menuFont = sdlext.font("fonts/JustinFont11Bold.ttf", 24)
+
 
 modContent = {}
 function sdlext.addModContent(text, func, tip)
@@ -35,6 +35,13 @@ local function createUi(screen)
 		:caption("Mod Content")
 		:addTo(ui)
 	buttonModContent.visible = false
+
+	local versionText = Ui()
+		:pospx(screen:w() - 200, screen:h() - 50)
+		:widthpx(200):heightpx(20)
+		:decorate({ DecoRAlignedText("Mod loader version: " .. modApi.version) })
+		:addTo(ui)
+	versionText.decorations[1].rSpace = 8
 
 	buttonModContent.onclicked = function()
 		sdlext.uiEventLoop(function(ui,quit)
