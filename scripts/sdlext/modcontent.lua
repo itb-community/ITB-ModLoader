@@ -55,22 +55,23 @@ local function createUi(screen)
 				:padding(16)
 				:decorate({ DecoSolid(deco.colors.buttoncolor) })
 				:addTo(frame)
+
+			local holder = UiBoxLayout()
+				:vgap(12)
+				:width(1)
+				:addTo(scrollarea)
 			
 			local buttonHeight = 42
-			local offset = 0
 			for i = 1,#modContent do
 				local obj = modContent[i]
 				local buttongo = Ui()
-					:pospx(0, offset)
 					:width(1)
 					:heightpx(buttonHeight)
 					:caption(obj.caption)
 					:settooltip(obj.tip)
 					:decorate({ DecoButton(),DecoCaption() })
-					:addTo(scrollarea)
+					:addTo(holder)
 
-				offset = offset + buttonHeight + 12
-				
 				if obj.disabled then buttongo.disabled = true end
 				
 				buttongo.onclicked = function()
@@ -98,7 +99,7 @@ AUTO_HOOK_Mod_Content_Draw = sdl.drawHook(function(screen)
 			buttonModContent.visible = true
 			buttonModContent.animations.slideIn:start()
 		end
-		
+
 		ui:draw(screen)
 	elseif isInHangar then
 		buttonModContent.visible = false
@@ -110,7 +111,9 @@ AUTO_HOOK_Mod_Content_Draw = sdl.drawHook(function(screen)
 end)
 
 AUTO_HOOK_Mod_Content_Event = sdl.eventHook(function(event)
-	if ui == nil or not sdlext.isMainMenu() then return false end
+	if ui == nil or not sdlext.isMainMenu() then
+		return false
+	end
 	
 	return ui:event(event)
 end)
