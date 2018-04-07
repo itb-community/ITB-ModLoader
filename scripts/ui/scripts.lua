@@ -18,4 +18,5 @@ if sdl then
 	require("ui/widgets/checkbox")
 	require("ui/widgets/dropdown")
 	require("ui/widgets/boxlayout")
+	require("ui/widgets/wrappedtext")
 end
