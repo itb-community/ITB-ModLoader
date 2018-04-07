@@ -29,6 +29,8 @@ function UiScrollArea:new()
 	self.padr = self.padr + self.scrollwidth
 	
 	self.nofity = true
+
+	self.scrollPressed = false
 end
 
 function UiScrollArea:draw(screen)
@@ -76,8 +78,16 @@ function UiScrollArea:mousedown(x, y)
 	if ratio > 1 then ratio = 1 end
 	
 	self.dy = ratio * (self.innerHeight - self.h)
+
+	self.scrollPressed = true
 	
 	return true
+end
+
+function UiScrollArea:mouseup(x, y)
+	self.scrollPressed = false
+
+	return Ui.mouseup(self, x, y)
 end
 
 function UiScrollArea:wheel(mx,my,y)
@@ -89,6 +99,22 @@ function UiScrollArea:wheel(mx,my,y)
 	if self.h > self.innerHeight then self.dy=0 end
 
 	return true
+end
+
+function UiScrollArea:mousemove(x, y)
+	if self.scrollPressed then
+		self:relayout()
+
+		local ratio = (y - self.screeny - self.buttonheight/2) / (self.h-self.buttonheight)
+		if ratio < 0 then ratio = 0 end
+		if ratio > 1 then ratio = 1 end
+		
+		self.dy = ratio * (self.innerHeight - self.h)
+
+		return true
+	end
+
+	return Ui.mousemove(self, x, y)
 end
 
 UiDropDown = Class.inherit(Ui)
