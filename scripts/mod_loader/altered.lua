@@ -52,7 +52,7 @@ function Mission:MissionEnd()
 	CurrentMission = self
 	EndingMission = true
 	self.delayToAdd = 4
-	for i, hook in ipairs(modApi.MissionEndHooks) do
+	for i, hook in ipairs(modApi.missionEndHooks) do
 		hook(self,ret)
 	end
 	ret:AddDelay(self:GetEndDelay())

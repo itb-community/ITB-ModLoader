@@ -133,10 +133,8 @@ function modApi:resetModContent()
 		"Steel Judoka",
 		"These Mechs specialize in positional manipulation to turn the Vek against each other.",
 		
-		
 		"Flame Behemoths",
 		"Invincible to flames, these Mechs aim to burn any threat to ashes.",
-		
 		
 		"Frozen Titans",
 		"These Titans rely on the Cryo Launcher, a powerful weapon that takes an experienced Pilot to master.",
@@ -163,7 +161,7 @@ function modApi:resetModContent()
 	self.postEnvironmentHooks = {}
 	self.currentModSquads = {}
 	self.currentModSquadText = {}
-	self.MissionEndHooks = {
+	self.missionEndHooks = {
 		--Pilot Message
 		function(mission,ret)
 			ret:AddScript([[local ret = SkillEffect()
@@ -323,7 +321,7 @@ function modApi:addMissionEndHook(fn,i)
 		assert(type(i) == "number")
 		assert(i > 0)
 		assert(math.floor(i) == i)
-		table.insert(self.MissionEndHooks,i,fn)
+		table.insert(self.missionEndHooks,i,fn)
 		if i <= self.iMePilotMessage then
 			self.iMePilotMessage = self.iMePilotMessage + 1
 		end
@@ -337,7 +335,7 @@ function modApi:addMissionEndHook(fn,i)
 			self.iMeDelay = self.iMeDelay + 1
 		end
 	else
-		table.insert(self.MissionEndHooks,fn)
+		table.insert(self.missionEndHooks,fn)
 	end
 end
 
