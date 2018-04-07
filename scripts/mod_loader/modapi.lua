@@ -181,6 +181,8 @@ function modApi:resetModContent()
 	self.preMissionStartHooks = {}
 	self.preEnvironmentHooks = {}
 	self.postEnvironmentHooks = {}
+	self.preLoadGameHooks = {}
+	self.preSaveGameHooks = {}
 	self.currentModSquads = {}
 	self.currentModSquadText = {}
 	self.missionEndHooks = {
@@ -359,6 +361,16 @@ function modApi:addMissionEndHook(fn,i)
 	else
 		table.insert(self.missionEndHooks,fn)
 	end
+end
+
+function modApi:addPreLoadGameHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.preLoadGameHooks,fn)
+end
+
+function modApi:addPreSaveGameHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.preSaveGameHooks,fn)
 end
 
 function modApi:addWeapon_Texts(tbl)

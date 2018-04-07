@@ -9,6 +9,7 @@ local oldApplyEnvironmentEffect = Mission.ApplyEnvironmentEffect
 local oldGetText = GetText
 local oldStartNewGame = startNewGame
 local oldLoadGame = LoadGame
+local oldSaveGame = SaveGame
 
 function getStartingSquad(choice)
 	if choice==0 then
@@ -202,5 +203,17 @@ function LoadGame()
 		end
 	end
 
+	for i, hook in ipairs(modApi.preLoadGameHooks) do
+		hook()
+	end
+
 	oldLoadGame()
+end
+
+function SaveGame()
+	for i, hook in ipairs(modApi.preSaveGameHooks) do
+		hook()
+	end
+
+	return oldSaveGame()
 end
