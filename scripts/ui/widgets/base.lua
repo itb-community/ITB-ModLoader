@@ -21,6 +21,7 @@ function Ui:new()
 	self.bgcolor = nil
 	self.rect = sdl.rect(0,0,0,0)
 	self.decorations = {}
+	self.animations = {}
 	self.pressed = false
 	self.hovered = false
 	self.disabled = false
@@ -47,6 +48,24 @@ function Ui:add(child)
 		end
 	end
 	
+	return self
+end
+
+function Ui:remove(child)
+	if not child then return self end
+
+	child:setroot(nil)
+	remove_element(child, self.children)
+	child.parent = nil
+
+	return self
+end
+
+function Ui:detach()
+	if not self.parent then return self end
+
+	self.parent:remove(self)
+
 	return self
 end
 
@@ -305,6 +324,12 @@ end
 
 function Ui:draw(screen)
 	if not self.visible then return end
+	
+	if self.animations then
+		for _, anim in pairs(self.animations) do
+			anim:update(modApi:deltaTime())
+		end
+	end
 	
 	self.decorationx = 0
 	self.decorationy = 0

@@ -5,7 +5,7 @@ local buttonbordercolor = sdl.rgb(73,92,121)
 local buttonhlcolor = sdl.rgb(217,235,200)
 local buttondisabledcolor = sdl.rgb(80,80,80)
 
-local function textset(color,outlineColor,outlineWidth)
+function textset(color,outlineColor,outlineWidth)
 	local res = sdl.textsettings()
 	
 	res.antialias = false
@@ -229,6 +229,19 @@ function DecoText:setsurface(text)
 	end
 end
 
+function DecoText:setcolor(color)
+	if color ~= self.textset.color then
+		self.textset = textset(color, self.textset.outlineColor, self.textset.outlineWidth)
+		self.surface = sdl.text(self.font,self.textset,self.text)
+	end
+end
+
+function DecoText:setfont(font)
+	if font ~= self.textset.font then
+		self.surface = sdl.text(font,self.textset,self.text)
+	end
+end
+
 DecoRAlignedText = Class.inherit(DecoText)
 
 function DecoRAlignedText:new(text, font, textset,rSpace)
@@ -243,6 +256,24 @@ function DecoRAlignedText:draw(screen,widget)
 	screen:blit(self.surface, nil, r.x + r.w - self.rSpace - self.surface:w(), r.y + widget.decorationy + r.h/2 - self.surface:h()/2)
 	
 	widget.decorationx = r.w - self.rSpace
+end
+
+DecoCAlignedText = Class.inherit(DecoText)
+function DecoCAlignedText:new(text, font, textset)
+	DecoText.new(self, text, font, textset)
+end
+
+function DecoCAlignedText:draw(screen, widget)
+	if self.surface == nil then return end
+	local r = widget.rect
+
+	screen:blit(
+		self.surface, nil,
+		r.x + widget.decorationx + r.w/2 - self.surface:w()/2,
+		r.y + widget.decorationy + r.h/2 - self.surface:h()/2
+	)
+
+	widget.decorationx = widget.decorationx + self.surface:w()
 end
 
 DecoDropDownText = Class.inherit(DecoRAlignedText)

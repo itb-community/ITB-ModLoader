@@ -11,6 +11,7 @@ function UiCheckbox:clicked()
 	return Ui.clicked(self)
 end
 
+-- //////////////////////////////////////////////////////////////////////////
 
 UiScrollArea = Class.inherit(Ui)
 
@@ -116,6 +117,8 @@ function UiScrollArea:mousemove(x, y)
 
 	return Ui.mousemove(self, x, y)
 end
+
+-- //////////////////////////////////////////////////////////////////////////
 
 UiDropDown = Class.inherit(Ui)
 

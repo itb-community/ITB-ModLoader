@@ -1,8 +1,8 @@
 if sdl then
 	require("ui/classes")
-	require("ui/decoration")
-	require("ui/base")
-	require("ui/tooltip")
-	require("ui/root")
-	require("ui/basic")
+	require("ui/decorations/decoration")
+	require("ui/widgets/base")
+	require("ui/widgets/tooltip")
+	require("ui/widgets/root")
+	require("ui/widgets/basic")
 end
