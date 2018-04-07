@@ -1,6 +1,16 @@
 if sdl then
 	require("ui/classes")
 	require("ui/decorations/decoration")
+	require("ui/decorations/ui_deco")
+	require("ui/decorations/deco_align")
+	require("ui/decorations/deco_surface")
+	require("ui/decorations/deco_solid")
+	require("ui/decorations/deco_text")
+	require("ui/decorations/deco_frame")
+	require("ui/decorations/deco_button")
+	require("ui/decorations/deco_checkbox")
+	require("ui/decorations/deco_dropdown")
+
 	require("ui/widgets/base")
 	require("ui/widgets/tooltip")
 	require("ui/widgets/root")
