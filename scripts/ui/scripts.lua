@@ -1,5 +1,7 @@
 if sdl then
 	require("ui/classes")
+	require("ui/ui_anim")
+	
 	require("ui/decorations/decoration")
 	require("ui/decorations/ui_deco")
 	require("ui/decorations/deco_align")
@@ -19,4 +21,5 @@ if sdl then
 	require("ui/widgets/dropdown")
 	require("ui/widgets/boxlayout")
 	require("ui/widgets/wrappedtext")
+	require("ui/widgets/mainmenubutton")
 end
