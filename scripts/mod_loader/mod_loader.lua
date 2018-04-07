@@ -111,6 +111,7 @@ function mod_loader:initMod(id)
 		LOG(string.format("Initialized mod [%s] with id [%s] successfully!",mod.name,id))
 	else
 		mod.installed = false
+		mod.error = err
 		LOG(err)
 	end
 end
@@ -256,6 +257,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 			LOG(string.format("Loaded mod [%s] with id [%s] successfully!",mod.name,id))
 		else
 			mod.installed = false
+			mod.error = err
 			LOG(err)
 		end
 	end
