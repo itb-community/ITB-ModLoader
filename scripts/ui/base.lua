@@ -24,10 +24,10 @@ function Ui:new()
 	self.pressed = false
 	self.hovered = false
 	self.disabled = false
+	self.containsMouse = false
 	self.visible = true
 	self.root = self
 	self.parent = nil
-
 end
 
 function Ui:add(child)
@@ -239,10 +239,10 @@ function Ui:mousemove(mx, my)
 	for i=1,#self.children do
 		local child = self.children[i]
 		if
-			mx>=child.screenx and
-			mx<child.screenx+child.w and
-			my>=child.screeny and
-			my<child.screeny+child.h and
+			mx >= child.screenx           and
+			mx <  child.screenx + child.w and
+			my >= child.screeny           and
+			my <  child.screeny + child.h and
 			child ~= self.root.pressedchild
 		then
 			if not child.containsMouse then
@@ -333,6 +333,14 @@ function Ui:mouseEntered()
 end
 
 function Ui:mouseExited()
+	for i=1,#self.children do
+		local child = self.children[i]
+		if child.containsMouse then
+			child.containsMouse = false
+			child:mouseExited()
+		end
+	end
+
 	if self.onMouseExit ~= nil then
 		self:onMouseExit()
 	end
