@@ -66,6 +66,28 @@ function modApi:init()
 		"Pinnacle_B",
 		"Detritus_B",
 	}
+
+	self.timer = sdl.timer()
+	self.msDeltaTime = 0
+	self.msLastElapsed = 0
+	MODAPI_HOOK_draw = sdl.drawHook(function(screen)
+		local t = modApi.timer:elapsed()
+		if t > modApi.msLastElapsed then
+			modApi.msDeltaTime = t - modApi.msLastElapsed
+			modApi.msLastElapsed = t
+		end
+	end)
+end
+
+function modApi:deltaTime()
+	return self.msDeltaTime
+end
+
+function modApi:elapsedTime()
+	-- return cached time, so that mods don't get different
+	-- timings depending on when in the frame they called
+	-- this function.
+	return self.msLastElapsed
 end
 
 function modApi:splitString(test,sep)
