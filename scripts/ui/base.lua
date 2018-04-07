@@ -205,8 +205,7 @@ function Ui:mouseup(mx, my)
 	if not self.visible then return false end
 	
 	if self.root.pressedchild == self and not self.disabled then
-		self:clicked()
-		return true
+		if self:clicked() then return true end
 	end
 
 	for i=1,#self.children do
@@ -322,8 +321,15 @@ end
 
 function Ui:clicked()
 	if self.onclicked ~= nil then
-		self:onclicked()
+		local ret = self:onclicked()
+		-- Make sure we bug people to update their code to return
+		-- either `true` or `false`, depending on whether they actually
+		-- ended up handling the click.
+		assert(ret ~= nil)
+		return ret
 	end
+
+	return false
 end
 
 function Ui:mouseEntered()

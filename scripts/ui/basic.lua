@@ -8,7 +8,7 @@ end
 function UiCheckbox:clicked()
 	self.checked = not self.checked
 	
-	Ui.clicked(self)
+	return Ui.clicked(self)
 end
 
 
@@ -189,5 +189,5 @@ function UiDropDown:clicked()
 		self:createDropDown()
 	end
 	
-	Ui.clicked(self)
+	return Ui.clicked(self)
 end

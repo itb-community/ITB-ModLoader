@@ -37,6 +37,7 @@ function showArrangePilotsUi()
 	sdlext.uiEventLoop(function(ui,quit)
 		ui.onclicked = function()
 			quit()
+			return true
 		end
 		
 		local frametop = Ui():width(0.8):height(0.8):pos(0.1,0.1):caption("Rearrange pilots"):decorate({DecoFrame(), DecoFrameCaption()}):addTo(ui)

@@ -33,6 +33,8 @@ function UiRoot:dropdownEvent(x,y)
 		self:relayout()
 		return true
 	end
+
+	return false
 end
 
 function UiRoot:event(eventloop)
@@ -99,5 +101,7 @@ function UiRoot:event(eventloop)
 		end
 		return false
 	end
+
+	return false
 end
 

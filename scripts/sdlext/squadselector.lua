@@ -51,6 +51,7 @@ function selectSquads()
 	sdlext.uiEventLoop(function(ui,quit)
 		ui.onclicked = function()
 			quit()
+			return true
 		end
 
 		local labelcount = Ui():pos(0.71,0.83):width(0.3):height(0.075):caption(""):decorate({DecoCaption(largefont)}):addTo(ui)
@@ -95,6 +96,7 @@ function selectSquads()
 			
 			checkbox.onclicked = function()
 				updatecount()
+				return true
 			end
 			
 			table.insert(checkboxes, checkbox)

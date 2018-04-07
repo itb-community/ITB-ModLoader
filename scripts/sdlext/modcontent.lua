@@ -36,6 +36,7 @@ local function createUi(screen)
 		sdlext.uiEventLoop(function(ui,quit)
 			ui.onclicked = function()
 				quit()
+				return true
 			end
 
 			local frame = Ui():width(0.4):height(0.8):pos(0.3,0.1):caption("Mod content"):decorate({DecoFrame(), DecoFrameCaption()}):addTo(ui)
@@ -53,9 +54,11 @@ local function createUi(screen)
 				buttongo.onclicked = function()
 					quit()
 					obj.func()
+					return true
 				end
 			end
 		end)
+		return true
 	end
 end
 

@@ -17,6 +17,7 @@ function configureMods()
 	sdlext.uiEventLoop(function(ui,quit)
 		ui.onclicked = function()
 			quit()
+			return true
 		end
 
 		local frametop = Ui():width(0.6):height(0.575):pos(0.2,0.1):caption("Mod Configuration"):decorate({DecoFrame(), DecoSolid(sdl.rgb(73,92,121)), DecoFrameCaption()}):addTo(ui)
@@ -65,6 +66,7 @@ function configureMods()
 			end
 			
 			scrollarea:relayout()
+			return true
 		end
 		
 		for id, option in pairs(mod_options) do
