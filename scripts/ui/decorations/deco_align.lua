@@ -8,3 +8,15 @@ function DecoRAlign:draw(screen, widget)
 	local r = widget.rect
 	widget.decorationx = r.w - self.rSpace
 end
+
+
+DecoCAlign = Class.inherit(UiDeco)
+function DecoCAlign:new(cOffset)
+	UiDeco.new(self)
+	self.cOffset = cOffset or 0
+end
+
+function DecoCAlign:draw(screen, widget)
+	local r = widget.rect
+	widget.decorationx = r.w/2 + self.cOffset
+end
