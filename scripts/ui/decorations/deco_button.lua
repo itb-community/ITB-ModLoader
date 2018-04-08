@@ -1,62 +1,54 @@
-deco.colors.mainMenuButtonColor           = sdl.rgba(7 , 10, 18, 187)
-deco.colors.mainMenuButtonColorDisabled   = sdl.rgba(7 , 10, 18, 84 )
-deco.colors.mainMenuButtonColorHighlight  = sdl.rgba(24, 26, 34, 255)
-
-
 DecoButton = Class.inherit(UiDeco)
-function DecoButton:new(color, bordercolor, hlcolor)
+function DecoButton:new(color, bordercolor, hlcolor, borderhlcolor)
 	self.color = color or deco.colors.buttoncolor
 	self.bordercolor = bordercolor or deco.colors.buttonbordercolor
 	self.hlcolor = hlcolor or deco.colors.buttonhlcolor
+	self.borderhlcolor = borderhlcolor or deco.colors.buttonborderhlcolor
 	self.disabledcolor = deco.colors.buttondisabledcolor
+	self.disabledbordercolor = deco.colors.buttondisabledbordercolor
 	
-	self.rect = sdl.rect(0,0,0,0)
+	self.rect = sdl.rect(0, 0, 0, 0)
 end
 
 function DecoButton:draw(screen, widget)
 	local r = widget.rect
 
-	screen:drawrect(self.color, r)
-	
-	local color = self.bordercolor
+	local basecolor = self.color
+	local bordercolor = self.bordercolor
+
 	if widget.hovered then
-		color = self.hlcolor
+		basecolor = self.hlcolor
+		bordercolor = self.borderhlcolor
 	end
 	if widget.disabled then
-		color = self.disabledcolor
+		basecolor = self.disabledcolor
 	end
 	
-	self.rect.x=r.x
-	self.rect.y=r.y
-	self.rect.w=1
-	self.rect.h=r.h
-	screen:drawrect(color, self.rect)
-	self.rect.x=r.x+r.w-1
-	screen:drawrect(color, self.rect)
-	
-	self.rect.x=r.x
-	self.rect.y=r.y
-	self.rect.w=r.w
-	self.rect.h=1
-	screen:drawrect(color, self.rect)
-	self.rect.y=r.y+r.h-1
-	screen:drawrect(color, self.rect)
+	self.rect.x = r.x
+	self.rect.y = r.y
+	self.rect.w = r.w
+	self.rect.h = r.h
+	screen:drawrect(bordercolor, self.rect)
 
-	self.rect.x=r.x+2
-	self.rect.y=r.y+2
-	self.rect.w=2
-	self.rect.h=r.h-4
-	screen:drawrect(color, self.rect)
-	self.rect.x=r.x+r.w-4
-	screen:drawrect(color, self.rect)
+	self.rect.x = r.x + 1
+	self.rect.y = r.y + 1
+	self.rect.w = r.w - 2
+	self.rect.h = r.h - 2
+	screen:drawrect(basecolor, self.rect)
 	
-	self.rect.x=r.x+2
-	self.rect.y=r.y+2
-	self.rect.w=r.w-4
-	self.rect.h=2
-	screen:drawrect(color, self.rect)
-	self.rect.y=r.y+r.h-4
-	screen:drawrect(color, self.rect)
+	if not widget.disabled then
+		self.rect.x = r.x + 2
+		self.rect.y = r.y + 2
+		self.rect.w = r.w - 4
+		self.rect.h = r.h - 4
+		screen:drawrect(bordercolor, self.rect)
+
+		self.rect.x = r.x + 4
+		self.rect.y = r.y + 4
+		self.rect.w = r.w - 8
+		self.rect.h = r.h - 8
+		screen:drawrect(basecolor, self.rect)
+	end
 	
 	widget.decorationx = widget.decorationx + 8
 end

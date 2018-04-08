@@ -32,7 +32,7 @@ function DecoSurfaceOutlined:new(surface, levels, bordercolor, hlcolor, scale)
 		sdl.outlined(
 			surface,
 			levels or 1,
-			hlcolor or deco.colors.buttonhlcolor
+			hlcolor or deco.colors.buttonborderhlcolor
 		)
 	)
 end
