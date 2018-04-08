@@ -211,7 +211,7 @@ function LoadGame()
 end
 
 function SaveGame()
-	for i, hook in ipairs(modApi.preSaveGameHooks) do
+	for i, hook in ipairs(modApi.saveGameHooks) do
 		hook()
 	end
 
