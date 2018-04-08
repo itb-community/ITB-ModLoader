@@ -63,13 +63,13 @@ function Mission:MissionEnd()
 end
 
 function Mission:BaseStart()
-	for i, hook in ipairs(modApi.preMissionStartHooks) do
+	for i, hook in ipairs(modApi.preMissionAvailableHooks) do
 		hook(self)
 	end
 	
 	oldBaseStart(self)
 	
-	for i, hook in ipairs(modApi.missionStartHooks) do
+	for i, hook in ipairs(modApi.missionAvailableHooks) do
 		hook(self)
 	end
 end

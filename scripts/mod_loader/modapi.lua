@@ -178,7 +178,8 @@ function modApi:resetModContent()
 	self.nextTurnHooks = {}
 	self.missionUpdateHooks = {}
 	self.missionStartHooks = {}
-	self.preMissionStartHooks = {}
+	self.preMissionAvailableHooks = {}
+	self.missionAvailableHooks = {}
 	self.preEnvironmentHooks = {}
 	self.postEnvironmentHooks = {}
 	self.preLoadGameHooks = {}
@@ -310,14 +311,14 @@ function modApi:overwriteText(id,str)
 	self.textOverrides[id] = str
 end
 
-function modApi:addPreMissionStartHook(fn)
+function modApi:addPreMissionAvailableHook(fn)
 	assert(type(fn) == "function")
-	table.insert(self.preMissionStartHooks,fn)
+	table.insert(self.preMissionAvailableHooks,fn)
 end
 
-function modApi:addMissionStartHook(fn)
+function modApi:addMissionAvailableHook(fn)
 	assert(type(fn) == "function")
-	table.insert(self.missionStartHooks,fn)
+	table.insert(self.missionAvailableHooks,fn)
 end
 
 function modApi:addPreEnvironmentHook(fn)
