@@ -341,6 +341,11 @@ function modApi:addMissionUpdateHook(fn)
 	table.insert(self.missionUpdateHooks,fn)
 end
 
+function modApi:addMissionStartHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.missionStartHooks,fn)
+end
+
 function modApi:addMissionEndHook(fn,i)
 	assert(type(fn) == "function")
 	if i ~= nil then

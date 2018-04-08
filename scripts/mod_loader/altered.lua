@@ -41,6 +41,13 @@ end
 
 function Mission:BaseUpdate()
 	oldBaseUpdate(self)
+
+	if not GAME.modApi_MissionStarted then
+		GAME.modApi_MissionStarted = true
+		for i, hook in ipairs(modApi.missionStartHooks) do
+			hook(self)
+		end	
+	end
 	
 	for i, hook in ipairs(modApi.missionUpdateHooks) do
 		hook(self)
@@ -60,6 +67,9 @@ function Mission:MissionEnd()
 	EndingMission = false
 		
 	Board:AddEffect(ret)
+
+	LOG("Mission End")
+	GAME.modApi_MissionStarted = false
 end
 
 function Mission:BaseStart()
