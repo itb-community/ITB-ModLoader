@@ -18,13 +18,13 @@ function UiTooltip:draw(screen)
 	
 	local x = sdl.mouse.x()
 	local y = sdl.mouse.y()
-	if x <= screen:w() / 2 then
-		self.x = x
+	if x + 20 + self.w <= screen:w() then
+		self.x = x + 20
 	else
 		self.x = x - self.w
 	end
 	
-	if y <= screen:h() / 2 then
+	if y + self.h <= screen:h() then
 		self.y = y
 	else
 		self.y = y - self.h
