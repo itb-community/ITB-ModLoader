@@ -168,6 +168,10 @@ function startNewGame()
 	local modOptions = mod_loader:getCurrentModContent()
 	local savedOrder = mod_loader:getCurrentModOrder()
 
+	for i, hook in ipairs(modApi.preStartGameHooks) do
+		hook()
+	end
+
 	oldStartNewGame()
 	
 	GAME.modOptions = modOptions
@@ -176,6 +180,10 @@ function startNewGame()
 	
 	for i, key in ipairs(modApi.squadKeys) do
 		GAME.squadTitles["TipTitle_"..key] = GetText("TipTitle_"..key)
+	end
+
+	for i, hook in ipairs(modApi.postStartGameHooks) do
+		hook()
 	end
 end
 
