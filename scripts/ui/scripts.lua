@@ -14,12 +14,12 @@ if sdl then
 	require("ui/decorations/deco_dropdown")
 
 	require("ui/widgets/base")
+	require("ui/widgets/boxlayout")
+	require("ui/widgets/wrappedtext")
 	require("ui/widgets/tooltip")
 	require("ui/widgets/root")
 	require("ui/widgets/scrollarea")
 	require("ui/widgets/checkbox")
 	require("ui/widgets/dropdown")
-	require("ui/widgets/boxlayout")
-	require("ui/widgets/wrappedtext")
 	require("ui/widgets/mainmenubutton")
 end
