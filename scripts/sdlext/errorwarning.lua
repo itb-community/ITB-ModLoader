@@ -5,7 +5,7 @@ function showErrorFrame(text)
 			return true
 		end
 
-		local w = 650
+		local w = 700
 		local h = 400
 		local frame = Ui()
 			:widthpx(w):heightpx(h)

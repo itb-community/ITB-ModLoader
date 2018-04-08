@@ -112,6 +112,14 @@ AUTO_HOOK_Mod_Content_Draw = sdl.drawHook(function(screen)
 
 		if not errorFrameShown then
 			errorFrameShown = true
+
+			-- could show all errors one after another, but let's not...
+			for dir, err in pairs(mod_loader.unmountedMods) do
+				showErrorFrame(string.format("Unable to mount mod at [%s]:\n%s",dir,err))
+				break
+			end
+			mod_loader.unmountedMods = {}
+
 			for id, modtable in pairs(mod_loader.mods) do
 				if not modtable.installed then
 					showErrorFrame(modtable.error)

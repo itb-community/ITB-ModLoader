@@ -4,6 +4,7 @@ mod_loader = {}
 function mod_loader:init()
 	self.mod_dirs = {}
 	self.mods = {}
+	self.unmountedMods = {} -- mods which had malformed init.lua
 	self.mod_options = {}
 	
 	self:enumerateMods()
@@ -96,6 +97,7 @@ function mod_loader:enumerateMods()
 		
 		if not ok then
 			LOG(string.format("Unable to mount mod at [%s]: %s",dir,err))
+			self.unmountedMods[dir] = err
 		end
 	end
 end
