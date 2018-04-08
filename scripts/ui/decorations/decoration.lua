@@ -37,7 +37,7 @@ deco.uifont = {
 	},
 	title = {
 		font = deco.fonts.menufont,
-		set = deco.textset(deco.colors.white, sdl.rgb(35, 42, 59), 2),
+		set = deco.textset(deco.colors.white, deco.colors.buttonhlcolor, 2),
 	},
 }
 
