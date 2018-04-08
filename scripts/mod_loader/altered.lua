@@ -208,6 +208,10 @@ function LoadGame()
 	end
 
 	oldLoadGame()
+
+	for i, hook in ipairs(modApi.postLoadGameHooks) do
+		hook()
+	end
 end
 
 function SaveGame()
