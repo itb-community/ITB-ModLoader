@@ -28,12 +28,11 @@ function UiWrappedText:new(text, font, textset)
 end
 
 function UiWrappedText:setText(text)
-	if not text or self.text == text then return end
+	if self.text == text then return end
+	text = text or ""
 
 	assert(type(text) == "string")
 	self.text = text
-
-	if self.text:len() == 0 then return end
 
 	local lines = modApi:splitString(text, "\n")
 	local allLines = {}
