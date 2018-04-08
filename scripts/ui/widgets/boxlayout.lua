@@ -38,10 +38,8 @@ function UiBoxLayout:isVBox()
 	return self.gapVertical and not self.gapHorizontal
 end
 
-function UiBoxLayout:relayout()
-	local lastChild = nil
-	local nextOffset = 0 -- position of the next child
-	local maxSize = 0 -- TODO: remove this
+function UiBoxLayout:maxChildSize()
+	local maxSize = 0
 
 	for i = 1, #self.children do
 		local child = self.children[i]
@@ -57,6 +55,28 @@ function UiBoxLayout:relayout()
 
 			local t = self:isHBox() and child.h or child.w
 			maxSize = math.max(maxSize, t)
+		end
+	end
+
+	return maxSize
+end
+
+function UiBoxLayout:relayout()
+	local lastChild = nil
+	local nextOffset = 0 -- position of the next child
+
+	for i = 1, #self.children do
+		local child = self.children[i]
+		if child.visible then
+			if child.wPercent ~= nil then
+				child.w = (self.w - self.padl - self.padr) * child.wPercent
+				child.wPercent = nil
+			end
+			if child.hPercent ~= nil then
+				child.h = (self.h - self.padt - self.padb) * child.hPercent
+				child.hPercent = nil
+			end
+
 			lastChild = child
 		end
 	end
@@ -68,9 +88,9 @@ function UiBoxLayout:relayout()
 				if not child.alignV or child.alignV == "top" then
 					child.y = 0
 				elseif child.alignV == "center" then
-					child.y = (maxSize - child.h)/2
+					child.y = (self.h - child.h)/2
 				elseif child.alignV == "bottom" then
-					child.y = maxSize - child.h
+					child.y = self.h - child.h
 				end
 
 				child.x = nextOffset
@@ -79,9 +99,9 @@ function UiBoxLayout:relayout()
 				if not child.alignH or child.alignH == "left" then
 					child.x = 0
 				elseif child.alignH == "center" then
-					child.x = (maxSize - child.w)/2
+					child.x = (self.w - child.w)/2
 				elseif child.alignH == "right" then
-					child.x = maxSize - child.w
+					child.x = self.w - child.w
 				end
 
 				child.y = nextOffset
