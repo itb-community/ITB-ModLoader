@@ -6,14 +6,13 @@ function UiRoot:new()
 	self.hoveredchild = nil
 	self.pressedchild = nil
 	self.translucent = true
-	self.tooltipUi = UiTooltip():setroot(self)
+	self.tooltipUi = UiTooltip():addTo(self)
 end
 
 function UiRoot:draw(screen)
 	self:relayout()
 
 	Ui.draw(self, screen)
-	self.tooltipUi:draw(screen)
 	
 	if self.currentDropDown then
 		self:add(self.currentDropDown)
