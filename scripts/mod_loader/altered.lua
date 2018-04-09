@@ -216,11 +216,18 @@ function startNewGame()
 		GAME.squadTitles["TipTitle_"..key] = GetText("TipTitle_"..key)
 	end
 
+	-- Schedule execution to happen in 20ms
+	-- After new game is started, the game saves game state twice,
+	-- but the first state saved is still the old one?
+	-- So we can't restore game vars there, cause then we'll have
+	-- competely wrong data.
 	modApi:scheduleHook(20, function()
 		if not GameData or not RegionData or not SquadData then
 			restoreGameVariables()
 		end
 
+		-- Execute hook in the deferred callback, since we want
+		-- postStartGameHook to have access to the savegame data
 		for i, hook in ipairs(modApi.postStartGameHooks) do
 			hook()
 		end
