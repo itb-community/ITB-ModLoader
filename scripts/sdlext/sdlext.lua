@@ -15,3 +15,9 @@ arrangePilotsButton = sdlext.addModContent(
 	showArrangePilotsUi,
 	"Select which pilots will be available to pick."
 )
+
+sdlext.addModContent(
+	"Configure Logger",
+	configureLogger,
+	"Select where log messages should be printed."
+)
