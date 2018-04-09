@@ -1,7 +1,7 @@
-deco.surfaces.dropdownOpen = sdl.surface("resources/mods/ui/dropdown-arrow.png")
-deco.surfaces.dropdownClosed = sdl.surface("resources/mods/ui/dropdown-arrow.png")
-deco.surfaces.dropdownOpenHovered = sdl.surface("resources/mods/ui/dropdown-arrow-hovered.png")
-deco.surfaces.dropdownClosedHovered = sdl.surface("resources/mods/ui/dropdown-arrow-hovered.png")
+deco.surfaces.dropdownOpen = sdl.surface("resources/mods/ui/dropdown-arrow-opened.png")
+deco.surfaces.dropdownClosed = sdl.surface("resources/mods/ui/dropdown-arrow-closed.png")
+deco.surfaces.dropdownOpenHovered = sdl.surface("resources/mods/ui/dropdown-arrow-opened-hovered.png")
+deco.surfaces.dropdownClosedHovered = sdl.surface("resources/mods/ui/dropdown-arrow-closed-hovered.png")
 
 
 DecoDropDown = Class.inherit(DecoSurface)
