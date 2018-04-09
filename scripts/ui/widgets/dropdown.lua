@@ -22,9 +22,6 @@ function UiDropDown:new(values,strings,value)
 		self.value = values[1]
 	end
 	self.open = false
-	
-	self.dropcolor = sdl.rgba(128,128,128,128)
-	self.droprect = sdl.rect(0,0,0,0)
 end
 
 function UiDropDown:destroyDropDown()
@@ -44,29 +41,52 @@ function UiDropDown:createDropDown()
 	local texts = {}
 	
 	local max_w = 32
-	for i,v in ipairs(self.values) do
+	for i, v in ipairs(self.values) do
 		local txt = DecoRAlignedText(self.strings[i] or tostring(v))
 		
 		if txt.surface:w() > max_w then
 			max_w = txt.surface:w()
 		end
 		
-		local object = Ui():width(1):heightpx(40):pospx(0, (i-1) * 40):decorate({DecoSolidHoverable(sdl.rgba(40,40,40,192),sdl.rgba(60,140,150,192)),txt})
-		table.insert(texts,object)
+		local object = Ui()
+			:width(1):heightpx(40)
+			:decorate({
+				DecoSolidHoverable(deco.colors.buttoncolor, deco.colors.buttonbordercolor),
+				txt
+			})
+		table.insert(texts, object)
 		
 		object.onclicked = function()
 			self.choice = i
 			self.value = self.values[i]
 			
 			self:destroyDropDown()
+			self.hovered = false
 			return true
 		end
 	end
 	
-	self.dropDown = UiScrollArea():pospx(self.rect.x + self.w - math.max(max_w + 8, 210) - 60, self.rect.y + 48):widthpx(math.max(max_w + 8, 210)):heightpx(math.min(#self.values * 40,210)):padding(0)
+	local ddw = math.max(max_w + 8, 210)
+	self.dropDown = Ui()
+		:pospx(
+			self.rect.x + self.w - ddw,
+			self.rect.y + self.h + 2
+		)
+		:widthpx(ddw)
+		:heightpx(math.min(2 + #self.values * 40, 210))
+		:decorate({ DecoFrame(nil, nil, 1) })
+
+	local scrollarea = UiScrollArea()
+		:width(1):height(1)
+		:addTo(self.dropDown)
+
+	local layout = UiBoxLayout()
+		:vgap(0)
+		:width(1)
+		:addTo(scrollarea)
 	
 	for i, object in ipairs(texts) do
-		self.dropDown:add(object)
+		layout:add(object)
 	end
 	
 	self.root.currentDropDownOwner = self
@@ -75,6 +95,10 @@ end
 
 function UiDropDown:draw(screen)
 	if self.open then
+		-- keep the dropdown owner highlighted as long as
+		-- the dropdown is open for additional clarity
+		self.hovered = true
+
 		local oldClip = self.root.clippingrect
 		self.root.clippingrect = nil
 		--We don't want our dropdown to be clipped
