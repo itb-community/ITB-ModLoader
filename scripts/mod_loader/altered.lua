@@ -164,7 +164,41 @@ function GetPopulationTexts(event, count)
 	return ret
 end
 
+local function file_exists(name)
+   local f = io.open(name, "r")
+   if f ~= nil then io.close(f) return true else return false end
+end
+
+local function restoreGameVariables()
+	-- reload data from the save file to obtain up-to-date
+	-- instances of GameData, RegionData and SquadData
+	local path = os.getKnownFolder(5).."/My Games/Into The Breach/"
+
+	-- Grab the last profile from settings. It's updated as soon
+	-- as the player switches the profile, so it should be okay.
+	local settingsFile = path.."settings.lua"
+	if file_exists(settingsFile) then
+		-- Load the Settings table into global namespace
+		-- kinda bad, but no other way around it
+		dofile(path.."settings.lua")
+
+		-- Load the current save file
+		local saveFile = path.."profile_"..Settings.last_profile.."/saveData.lua"
+		if file_exists(saveFile) then
+			-- store old GAME table, load the file, and restore old table
+			local oldGAME = GAME
+			dofile(saveFile)
+			GAME = oldGAME
+			LOG("Restored game variables.")
+		end
+	end
+end
+
 function startNewGame()
+	GameData = nil
+	RegionData = nil
+	SquadData = nil
+
 	local modOptions = mod_loader:getCurrentModContent()
 	local savedOrder = mod_loader:getCurrentModOrder()
 
@@ -184,6 +218,12 @@ function startNewGame()
 
 	for i, hook in ipairs(modApi.postStartGameHooks) do
 		hook()
+	end
+
+	if not GameData or not RegionData or not SquadData then
+		modApi:scheduleHook(20, function()
+			restoreGameVariables()
+		end)
 	end
 end
 
