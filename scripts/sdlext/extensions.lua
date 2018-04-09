@@ -64,3 +64,36 @@ function sdlext.config(filename,func)
 	
 	persistence.store(path.."/"..filename, obj)
 end
+
+function drawborder(screen, color, rect, borderwidth, temprect)
+	if not temprect then temprect = sdl.rect(0,0,0,0) end
+
+	-- left side
+	temprect.x = rect.x
+	temprect.y = rect.y
+	temprect.w = borderwidth
+	temprect.h = rect.h
+	screen:drawrect(color, temprect)
+
+	-- right side
+	temprect.x = rect.x + rect.w - borderwidth
+	screen:drawrect(color, temprect)
+
+	-- top side
+	temprect.x = rect.x
+	temprect.y = rect.y
+	temprect.w = rect.w
+	temprect.h = borderwidth
+	screen:drawrect(color, temprect)
+
+	-- bottom side
+	temprect.y = rect.y + rect.h - borderwidth
+	screen:drawrect(color, temprect)
+end
+
+function rect_contains(rect, x, y)
+	return x >= rect.x          and
+	       x <  rect.x + rect.w and
+	       y >= rect.y          and
+	       y <  rect.y + rect.h
+end
