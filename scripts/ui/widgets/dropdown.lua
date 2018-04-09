@@ -59,6 +59,7 @@ function UiDropDown:createDropDown()
 			self.value = self.values[i]
 			
 			self:destroyDropDown()
+			return true
 		end
 	end
 	
