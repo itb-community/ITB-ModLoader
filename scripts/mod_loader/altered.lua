@@ -216,15 +216,15 @@ function startNewGame()
 		GAME.squadTitles["TipTitle_"..key] = GetText("TipTitle_"..key)
 	end
 
-	for i, hook in ipairs(modApi.postStartGameHooks) do
-		hook()
-	end
-
-	if not GameData or not RegionData or not SquadData then
-		modApi:scheduleHook(20, function()
+	modApi:scheduleHook(20, function()
+		if not GameData or not RegionData or not SquadData then
 			restoreGameVariables()
-		end)
-	end
+		end
+
+		for i, hook in ipairs(modApi.postStartGameHooks) do
+			hook()
+		end
+	end)
 end
 
 local originalGetTargetArea = Move.GetTargetArea
