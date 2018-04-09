@@ -350,7 +350,12 @@ function Ui:clicked()
 		-- Make sure we bug people to update their code to return
 		-- either `true` or `false`, depending on whether they actually
 		-- ended up handling the click.
-		assert(ret ~= nil)
+		if ret == nil then
+			error(
+				"'onclicked' function must return a value.\n"
+				.."True if your function handled the click, false if it ignored it."
+			)
+		end
 		return ret
 	end
 
