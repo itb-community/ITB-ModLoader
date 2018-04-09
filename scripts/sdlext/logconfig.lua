@@ -44,8 +44,8 @@ function configureLogger()
 		end
 
 		local frame = Ui()
-			:width(0.5):height(0.2)
-			:pos(0.25, 0.4)
+			:width(0.5):height(0.4)
+			:pos(0.25, 0.3)
 			:caption("Logger Configuration")
 			:decorate({
 				DecoFrame(),

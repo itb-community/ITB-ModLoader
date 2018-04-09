@@ -1,19 +1,19 @@
 deco = {}
 
 deco.colors = {}
-deco.colors.white               = sdl.rgb(255, 255, 255)
-deco.colors.black               = sdl.rgb(0, 0, 0)
-deco.colors.framebg             = sdl.rgb(13, 15, 23)
-deco.colors.framebglight        = sdl.rgb(30, 36, 50)
-deco.colors.buttoncolor         = sdl.rgb(24, 28, 41)
-deco.colors.buttonhlcolor       = sdl.rgb(35, 42, 59)
-deco.colors.buttonbordercolor   = sdl.rgb(73, 92, 121)
-deco.colors.buttonborderhlcolor = sdl.rgb(217, 235, 200)
-deco.colors.buttondisabledcolor = deco.colors.framebg
-deco.colors.buttonborderdisabledcolor = sdl.rgb(43, 53, 72)
-deco.colors.mainMenuButtonColor           = sdl.rgba(7 , 10, 18, 187)
-deco.colors.mainMenuButtonColorDisabled   = sdl.rgba(7 , 10, 18, 84 )
-deco.colors.mainMenuButtonColorHighlight  = sdl.rgba(24, 26, 34, 255)
+deco.colors.white =                         sdl.rgb(255, 255, 255)
+deco.colors.black =                         sdl.rgb(0, 0, 0)
+deco.colors.framebg =                       sdl.rgb(13, 15, 23)
+deco.colors.framebglight =                  sdl.rgb(30, 36, 50)
+deco.colors.buttoncolor =                   sdl.rgb(24, 28, 41)
+deco.colors.buttonhlcolor =                 sdl.rgb(35, 42, 59)
+deco.colors.buttonbordercolor =             sdl.rgb(73, 92, 121)
+deco.colors.buttonborderhlcolor =           sdl.rgb(217, 235, 200)
+deco.colors.buttondisabledcolor =           deco.colors.framebg
+deco.colors.buttonborderdisabledcolor =     sdl.rgb(43, 53, 72)
+deco.colors.mainMenuButtonColor =           sdl.rgba(7 , 10, 18, 187)
+deco.colors.mainMenuButtonColorDisabled =   sdl.rgba(7 , 10, 18, 84 )
+deco.colors.mainMenuButtonColorHighlight =  sdl.rgba(24, 26, 34, 255)
 
 deco.textset = function(color, outlineColor, outlineWidth)
 	local res = sdl.textsettings()
