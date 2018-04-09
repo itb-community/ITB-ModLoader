@@ -4,32 +4,35 @@ UiScrollArea = Class.inherit(Ui)
 function UiScrollArea:new()
 	Ui.new(self)
 
-	self.scrollcolor = sdl.rgb(64,64,64)
 	self.scrollrect = sdl.rect(0,0,0,0)
-
-	self.scrollbuttoncolor = sdl.rgb(128,128,128)
 	self.scrollbuttonrect = sdl.rect(0,0,0,0)
 
 	self.scrollwidth = 16
 	self.buttonheight = 0
 	
 	self.padr = self.padr + self.scrollwidth
-	
 	self.nofity = true
 
 	self.scrollPressed = false
+	self.clipRect = sdl.rect(0,0,0,0)
 end
 
 function UiScrollArea:draw(screen)
 	--[[local oldClip = self.root.clippingrect
 	self.root.clippingrect = sdl.rect(self.screenx,self.screeny,self.w,self.h)
 	screen:clip(self.root.clippingrect)]]
-	screen:clip(sdl.rect(self.screenx,self.screeny,self.w,self.h))
+	screen:clip(self.clipRect)
 	Ui.draw(self, screen)
 	
 	if self.innerHeight > self.h then
-		screen:drawrect(self.scrollcolor,self.scrollrect)
-		screen:drawrect(self.scrollbuttoncolor,self.scrollbuttonrect)
+		screen:drawrect(deco.colors.black, self.scrollrect)
+		drawborder(screen, deco.colors.white, self.scrollrect, 2)
+
+		if self.scrollPressed then
+			screen:drawrect(deco.colors.buttonborderhlcolor, self.scrollbuttonrect)
+		else
+			screen:drawrect(deco.colors.white, self.scrollbuttonrect)
+		end
 	end
 	
 	screen:unclip()
@@ -55,6 +58,11 @@ function UiScrollArea:relayout()
 	self.scrollbuttonrect.y = self.screeny + offset * (self.h - self.buttonheight)
 	self.scrollbuttonrect.w = self.scrollwidth
 	self.scrollbuttonrect.h = self.buttonheight
+
+	self.clipRect.x = self.screenx
+	self.clipRect.y = self.screeny
+	self.clipRect.w = self.w
+	self.clipRect.h = self.h
 end
 
 function UiScrollArea:mousedown(x, y)
