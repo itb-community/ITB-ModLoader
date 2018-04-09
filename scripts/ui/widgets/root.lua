@@ -23,11 +23,13 @@ function UiRoot:draw(screen)
 end
 
 function UiRoot:dropdownEvent(x,y)
-	if self.currentDropDown
-	 and x>=self.currentDropDown.screenx
-	 and x<self.currentDropDown.screenx+self.currentDropDown.w
-	 and y>=self.currentDropDown.screeny
-	 and y<self.currentDropDown.screeny+self.currentDropDown.h then
+	if
+		self.currentDropDown
+		and x >= self.currentDropDown.screenx
+		and x <  self.currentDropDown.screenx + self.currentDropDown.w
+		and y >= self.currentDropDown.screeny
+		and y <  self.currentDropDown.screeny + self.currentDropDown.h
+	then
 		self:add(self.currentDropDown)
 		self:relayout()
 		return true
@@ -87,18 +89,17 @@ function UiRoot:event(eventloop)
 
 		if self.pressedchild ~= nil then
 			if self.pressedchild:mousemove(mx, my) then
-				return false
+				return true
 			end
 		end
-		
-		-- XXX
-		self:mousemove(mx, my)
 		
 		if self:dropdownEvent(mx,my) then
 			self.currentDropDown:mousemove(mx, my)
 			table.remove(self.children)
+			return true
 		end
-		return false
+		
+		return self:mousemove(mx, my)
 	end
 
 	return false
