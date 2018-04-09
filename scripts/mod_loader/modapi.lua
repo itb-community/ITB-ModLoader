@@ -67,6 +67,9 @@ function modApi:init()
 		"Detritus_B",
 	}
 
+	self.compareScheduledHooks = function(a, b)
+		return a.triggerTime < b.triggerTime
+	end
 	self.timer = sdl.timer()
 	self.msDeltaTime = 0
 	self.msLastElapsed = 0
@@ -76,6 +79,8 @@ function modApi:init()
 			modApi.msDeltaTime = t - modApi.msLastElapsed
 			modApi.msLastElapsed = t
 		end
+
+		modApi:updateScheduledHooks()
 	end)
 end
 
@@ -175,6 +180,7 @@ function modApi:resetModContent()
 		"img/units/player/mech_leap_ns.png",
 	}
 	self.resourceDat = sdl.resourceDat("resources/resource.dat")
+	self.scheduledHooks = {}
 	self.nextTurnHooks = {}
 	self.missionUpdateHooks = {}
 	self.missionStartHooks = {}
@@ -395,6 +401,36 @@ end
 function modApi:addSaveGameHook(fn)
 	assert(type(fn) == "function")
 	table.insert(self.saveGameHooks,fn)
+end
+
+--[[
+	Schedules an argumentless function to be executed
+	in msTime milliseconds.
+--]]
+function modApi:scheduleHook(msTime, fn)
+	assert(type(msTime) == "number")
+	assert(type(fn) == "function")
+
+	table.insert(self.scheduledHooks, {
+		triggerTime = self:elapsedTime() + msTime,
+		hook = fn
+	})
+
+	-- sort the table according to triggerTime field, so hooks
+	-- that are scheduled sooner are executed first, even if
+	-- both hooks are processed during the same update step.
+	table.sort(self.scheduledHooks, self.compareScheduledHooks)
+end
+
+function modApi:updateScheduledHooks()
+	local t = self:elapsedTime()
+
+	for i, tbl in ipairs(self.scheduledHooks) do
+		if tbl.triggerTime <= t then
+			table.remove(self.scheduledHooks, i)
+			tbl.hook()
+		end
+	end
 end
 
 function modApi:addWeapon_Texts(tbl)
