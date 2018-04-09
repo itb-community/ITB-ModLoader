@@ -2,6 +2,7 @@ local function saveLogConfig()
 	local data = {}
 	data.logLevel = modApi.logger.logLevel
 	data.outputFile = modApi.logger.logFile
+	data.printCallerInfo = modApi.logger.printCallerInfo
 
 	sdlext.config("modcontent.lua",function(obj)
 		obj.loggerConfig = data
@@ -11,7 +12,8 @@ end
 function loadLogConfig()
 	local data = {
 		logLevel = 1, -- log to console by default
-		outputFile = "log.txt"
+		outputFile = "log.txt",
+		printCallerInfo = true
 	}
 
 	sdlext.config("modcontent.lua", function(obj)
@@ -23,12 +25,17 @@ function loadLogConfig()
 	return data
 end
 
-function configureLogger()
-	local logConfig = loadLogConfig()
-	modApi.logger.logLevel = logConfig.logLevel
-	modApi.logger.logFile = logConfig.outputFile
+function applyLogConfig(config)
+	modApi.logger.logLevel = config.logLevel
+	modApi.logger.logFile = config.outputFile
+	modApi.logger.printCallerInfo = config.printCallerInfo
+end
 
-	local dropdown = nil
+function configureLogger()
+	applyLogConfig(loadLogConfig())
+
+	local ddLogLevel = nil
+	local cboxCaller = nil
 
 	sdlext.uiEventLoop(function(ui, quit)
 		ui.onclicked = function()
@@ -58,22 +65,39 @@ function configureLogger()
 			:width(1)
 			:addTo(scrollarea)
 
-		dropdown = UiDropDown(
+		ddLogLevel = UiDropDown(
 				{ 0, 1, 2 },
-				{ "None", "Only Console", "File and console" },
+				{ "None", "Only console", "File and console" },
 				modApi.logger.logLevel
 			)
 			:width(1):heightpx(41)
 			:decorate({
 				DecoButton(),
-				DecoText("Logging Level"),
-				DecoDropDownText(nil, nil, nil, 43),
+				DecoText("Logging level"),
+				DecoDropDownText(nil, nil, nil, 41),
 				DecoDropDown()
 			})
 			:addTo(layout)
+
+		cboxCaller = UiCheckbox()
+			:width(1):heightpx(41)
+			:settooltip(
+				"Include timestamp and stacktrace when printing to console."
+			)
+			:decorate({
+				DecoButton(),
+				DecoText("Print caller information"),
+				DecoRAlign(41),
+				DecoCheckbox()
+			})
+
+		cboxCaller.checked = modApi.logger.printCallerInfo
+		cboxCaller:addTo(layout)
 	end)
 
-	modApi.logger.logLevel = dropdown.value
+	modApi.logger.logLevel = ddLogLevel.value
+	--modApi.logger.logFile = ... -- TODO
+	modApi.logger.printCallerInfo = cboxCaller.checked
 
 	saveLogConfig()
 end

@@ -5,6 +5,7 @@ local Logger = {
 
   logLevel = 0,
   logFile = nil,
+  printCallerInfo = true,
 }
 
 function Logger.logNothing()
@@ -50,8 +51,12 @@ function Logger.log(...)
     Logger.logFile:flush()
   end
 
-  ConsolePrint(caller)
-  print(caller)
+  if Logger.printCallerInfo then
+  	-- apply this setting only to console printing
+  	-- for logfiles this information is good to have
+    ConsolePrint(caller)
+    print(caller)
+  end
 
   ConsolePrint(message)
   print(message)

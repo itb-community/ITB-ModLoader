@@ -14,10 +14,8 @@ end
 
 function modApi:init()
 	--package.path = prev_path..package.path
-	local logConfig = loadLogConfig()
 	self.logger = require("scripts/mod_loader/logger")
-	self.logger.logLevel = logConfig.logLevel
-	self.logger.logFile = logConfig.outputFile
+	applyLogConfig(loadLogConfig())
 
 	self.version = "2.1.0"
 	LOG("MOD-API VERSION "..self.version)
