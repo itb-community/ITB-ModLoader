@@ -89,17 +89,18 @@ function UiRoot:event(eventloop)
 
 		if self.pressedchild ~= nil then
 			if self.pressedchild:mousemove(mx, my) then
-				return true
+				return false
 			end
 		end
 		
 		if self:dropdownEvent(mx,my) then
 			self.currentDropDown:mousemove(mx, my)
 			table.remove(self.children)
-			return true
+			return false
 		end
 		
-		return self:mousemove(mx, my)
+		self:mousemove(mx, my)
+		return false
 	end
 
 	return false
