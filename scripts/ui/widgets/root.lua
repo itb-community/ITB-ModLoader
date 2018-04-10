@@ -46,19 +46,19 @@ function UiRoot:event(eventloop)
 	local my = sdl.mouse.y()
 	
 	if type == sdl.events.mousewheel then
-		if self:dropdownEvent(mx,my) then
+		if self:dropdownEvent(mx, my) then
 			local done = self.currentDropDown:wheel(mx, my,eventloop:wheel())
 			table.remove(self.children)
 			if done then
 				return done
 			end
 		end
-		return self:wheel(mx,my,eventloop:wheel())
+		return self:wheel(mx, my, eventloop:wheel())
 	end
 
 	if type == sdl.events.mousebuttondown then
 		local done = self:mousedown(mx, my)
-		if self:dropdownEvent(mx,my) then
+		if self:dropdownEvent(mx, my) then
 			done = self.currentDropDown:mousedown(mx, my) or done
 			table.remove(self.children)
 		end
@@ -67,7 +67,23 @@ function UiRoot:event(eventloop)
 	
 	if type == sdl.events.mousebuttonup then
 		local child = self.pressedchild
-		if child ~= nil and mx>=child.screenx and mx<child.screenx+child.w and my>=child.screeny and my<child.screeny+child.h then
+
+		if
+			self.currentDropDown and self.currentDropDownOwner ~= child and
+			not self:dropdownEvent(mx, my)
+		then
+			-- destroy the dropdown if we click somewhere away from it
+			self.currentDropDownOwner.hovered = false
+			self.currentDropDownOwner:destroyDropDown()
+		end
+
+		if 
+			child ~= nil                  and
+			mx >= child.screenx           and
+			mx <  child.screenx + child.w and
+			my >= child.screeny           and
+			my <  child.screeny + child.h
+		then
 			if child:mouseup(mx, my) then
 				self.pressedchild = nil
 				child.pressed = false
