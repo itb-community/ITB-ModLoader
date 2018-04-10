@@ -74,13 +74,23 @@ function UiWrappedText:buildText(text)
 		skip = true
 	end
 
-	-- TODO: Need a way to find out character height and width.
-	-- For now, hardcode them.
-	uitext:widthpx(9.5 * string.len(text)):heightpx(20)
+	uitext:widthpx(self:computeWidth(text)):heightpx(self:computeHeight(text))
 	if not skip then uitext.decorations[1]:setsurface(text) end
 	uitext.alignH = self.textAlign
 
 	return uitext
+end
+
+function UiWrappedText:computeWidth(text)
+	-- TODO: Need a way to find out character height and width.
+	-- For now, hardcode them.
+	return 9.5 * string.len(text)
+end
+
+function UiWrappedText:computeHeight(text)
+	-- TODO: Need a way to find out character height and width.
+	-- For now, hardcode them.
+	return 20
 end
 
 function UiWrappedText:rebuild(lines)
@@ -100,9 +110,11 @@ end
 
 function UiWrappedText:relayout()
 	for i, child in pairs(self.children) do
+		local d = child.decorations[1]
 		child.alignH = self.textAlign
-		child.decorations[1].font = self.font
-		child.decorations[1].textset = self.textset
+		d.font = self.font
+		d.textset = self.textset
+		child:widthpx(self:computeWidth(d.text)):heightpx(self:computeHeight(d.text))
 	end
 
 	UiBoxLayout.relayout(self)

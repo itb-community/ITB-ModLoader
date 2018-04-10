@@ -38,7 +38,11 @@ function UiBoxLayout:isVBox()
 	return self.gapVertical and not self.gapHorizontal
 end
 
-function UiBoxLayout:maxChildSize()
+function UiBoxLayout:maxChildSize(dim)
+	dim = dim or (self:isVBox() and "width" or "height")
+	assert(type(dim) == "string", "Not a string: "..tostring(dim))
+	assert(dim == "width" or dim == "height", "Neither 'width' nor 'height': "..tostring(dim))
+
 	local maxSize = 0
 
 	for i = 1, #self.children do
@@ -53,7 +57,7 @@ function UiBoxLayout:maxChildSize()
 				child.hPercent = nil
 			end
 
-			local t = self:isHBox() and child.h or child.w
+			local t = dim == "width" and child.w or child.h
 			maxSize = math.max(maxSize, t)
 		end
 	end
