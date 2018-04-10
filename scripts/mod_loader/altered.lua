@@ -205,8 +205,6 @@ local function restoreGameVariables()
 			dofile(saveFile)
 			GAME = oldGAME
 			oldGAME = nil -- don't hog memory
-
-			LOG("Restored game variables.")
 		end
 	end
 end
@@ -239,10 +237,7 @@ function startNewGame()
 	-- So we can't restore game vars there, cause then we'll have
 	-- competely wrong data.
 	modApi:scheduleHook(50, function()
-		if not GameData or not RegionData or not SquadData then
-			restoreGameVariables()
-		end
-
+		restoreGameVariables()
 		-- Execute hook in the deferred callback, since we want
 		-- postStartGameHook to have access to the savegame data
 		for i, hook in ipairs(modApi.postStartGameHooks) do
@@ -279,6 +274,16 @@ end
 function SaveGame()
 	for i, hook in ipairs(modApi.saveGameHooks) do
 		hook()
+	end
+
+	if Game and GameData then
+		-- Reload the save, since sometimes the savefile
+		-- has more recent data than the global variables (?!)
+		-- But only do that if we already have those vars
+		-- defined, to prevent grabbing stale data.
+		modApi:scheduleHook(50, function()
+			restoreGameVariables()
+		end)
 	end
 
 	return oldSaveGame()
