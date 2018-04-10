@@ -24,6 +24,7 @@ function sdlext.isMainMenu()
 end
 
 local buttonModContent
+local versionText
 local ui
 local function createUi(screen)
 	if ui ~= nil then return end
@@ -36,7 +37,7 @@ local function createUi(screen)
 		:addTo(ui)
 	buttonModContent.visible = false
 
-	local versionText = Ui()
+	versionText = Ui()
 		:pospx(screen:w() - 200, screen:h() - 50)
 		:widthpx(200):heightpx(20)
 		:decorate({ DecoRAlignedText("Mod loader version: " .. modApi.version) })
@@ -109,6 +110,10 @@ AUTO_HOOK_Mod_Content_Draw = sdl.drawHook(function(screen)
 			buttonModContent.animations.slideIn:start()
 		end
 
+		-- update position of the version text in case the window is resized
+		versionText
+			:pospx(screen:w() - 200, screen:h() - 50)
+			
 		ui:draw(screen)
 
 		if not errorFrameShown then
