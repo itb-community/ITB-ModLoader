@@ -95,6 +95,7 @@ local function createUi(screen)
 end
 
 local errorFrameShown = false
+local wasGame = false
 
 AUTO_HOOK_Mod_Content_Draw = sdl.drawHook(function(screen)
 	isInMainMenu = bgRobot:wasDrawn() and bgRobot.x < screen:w() and not hangar:wasDrawn()
@@ -103,7 +104,7 @@ AUTO_HOOK_Mod_Content_Draw = sdl.drawHook(function(screen)
 	if sdlext.isMainMenu() then
 		createUi(screen)
 
-		if not buttonModContent.visible then
+		if not buttonModContent.visible or wasGame then
 			buttonModContent.visible = true
 			buttonModContent.animations.slideIn:start()
 		end
@@ -134,6 +135,8 @@ AUTO_HOOK_Mod_Content_Draw = sdl.drawHook(function(screen)
 	if not loading:wasDrawn() then
 		screen:blit(cursor,nil,sdl.mouse.x(),sdl.mouse.y())
 	end
+
+	wasGame = Game ~= nil
 end)
 
 AUTO_HOOK_Mod_Content_Event = sdl.eventHook(function(event)
