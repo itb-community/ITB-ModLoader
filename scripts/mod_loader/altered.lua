@@ -164,31 +164,48 @@ function GetPopulationTexts(event, count)
 	return ret
 end
 
+-- ///////////////////////////////////////////////////////////////////
+
 local function file_exists(name)
-   local f = io.open(name, "r")
-   if f ~= nil then io.close(f) return true else return false end
+	assert(name ~= nil, "File is nil")
+	assert(type(name) == "string", "Not a string")
+	local f = io.open(name, "r")
+	if f ~= nil then io.close(f) return true else return false end
 end
 
+--[[
+	Reload the settings file to have access to selected settings
+	from in-game lua scripts.
+--]]
+local function loadSettings()
+	local path = os.getKnownFolder(5).."/My Games/Into The Breach/settings.lua"
+	if file_exists(path) then
+		-- Load the Settings table into global namespace
+		dofile(path)
+	end
+end
+
+--[[
+	Reload data from the save file to obtain up-to-date
+	instances of GameData, RegionData, and SquadData
+--]]
 local function restoreGameVariables()
-	-- reload data from the save file to obtain up-to-date
-	-- instances of GameData, RegionData and SquadData
-	local path = os.getKnownFolder(5).."/My Games/Into The Breach/"
+	loadSettings() -- make sure it's up-to-date
 
 	-- Grab the last profile from settings. It's updated as soon
 	-- as the player switches the profile, so it should be okay.
-	local settingsFile = path.."settings.lua"
-	if file_exists(settingsFile) then
-		-- Load the Settings table into global namespace
-		-- kinda bad, but no other way around it
-		dofile(path.."settings.lua")
-
-		-- Load the current save file
+	if Settings then
+		local path = os.getKnownFolder(5).."/My Games/Into The Breach/"
 		local saveFile = path.."profile_"..Settings.last_profile.."/saveData.lua"
+		
 		if file_exists(saveFile) then
-			-- store old GAME table, load the file, and restore old table
+			-- Load the current save file
+			-- Store old GAME table, load the file, and restore old table
 			local oldGAME = GAME
 			dofile(saveFile)
 			GAME = oldGAME
+			oldGAME = nil -- don't hog memory
+
 			LOG("Restored game variables.")
 		end
 	end
@@ -216,12 +233,12 @@ function startNewGame()
 		GAME.squadTitles["TipTitle_"..key] = GetText("TipTitle_"..key)
 	end
 
-	-- Schedule execution to happen in 20ms
+	-- Schedule execution to happen in 50ms
 	-- After new game is started, the game saves game state twice,
 	-- but the first state saved is still the old one?
 	-- So we can't restore game vars there, cause then we'll have
 	-- competely wrong data.
-	modApi:scheduleHook(20, function()
+	modApi:scheduleHook(50, function()
 		if not GameData or not RegionData or not SquadData then
 			restoreGameVariables()
 		end
@@ -234,29 +251,9 @@ function startNewGame()
 	end)
 end
 
-local originalGetTargetArea = Move.GetTargetArea
-function Move:GetTargetArea(point)
-    local moveSkill = _G[Pawn:GetType()].MoveSkill
-	
-	if moveSkill ~= nil and moveSkill.GetTargetArea ~= nil then
-		return moveSkill:GetTargetArea(point)
-    end
-
-    return originalGetTargetArea(self, point)
-end
-
-local originalGetSkillEffect = Move.GetSkillEffect
-function Move:GetSkillEffect(p1, p2)
-    local moveSkill = _G[Pawn:GetType()].MoveSkill
-
-    if moveSkill ~= nil and moveSkill.GetSkillEffect ~= nil then
-		return moveSkill:GetSkillEffect(p1, p2)
-    end
-    
-    return originalGetSkillEffect(self, p1, p2)
-end
-
 function LoadGame()
+	loadSettings()
+
 	GAME.modOptions = GAME.modOptions or mod_loader:getModConfig()
 	GAME.modLoadOrder = GAME.modLoadOrder or mod_loader:getSavedModOrder()
 
@@ -285,4 +282,28 @@ function SaveGame()
 	end
 
 	return oldSaveGame()
+end
+
+-- ///////////////////////////////////////////////////////////////////
+
+local originalGetTargetArea = Move.GetTargetArea
+function Move:GetTargetArea(point)
+    local moveSkill = _G[Pawn:GetType()].MoveSkill
+	
+	if moveSkill ~= nil and moveSkill.GetTargetArea ~= nil then
+		return moveSkill:GetTargetArea(point)
+    end
+
+    return originalGetTargetArea(self, point)
+end
+
+local originalGetSkillEffect = Move.GetSkillEffect
+function Move:GetSkillEffect(p1, p2)
+    local moveSkill = _G[Pawn:GetType()].MoveSkill
+
+    if moveSkill ~= nil and moveSkill.GetSkillEffect ~= nil then
+		return moveSkill:GetSkillEffect(p1, p2)
+    end
+    
+    return originalGetSkillEffect(self, p1, p2)
 end
