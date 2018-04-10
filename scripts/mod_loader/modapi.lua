@@ -17,7 +17,7 @@ function modApi:init()
 	self.logger = require("scripts/mod_loader/logger")
 	applyModLoaderConfig(loadModLoaderConfig())
 
-	self.version = "2.1.0"
+	self.version = "2.1.1"
 	LOG("MOD-API VERSION "..self.version)
 	self.currentModSquads = {}
 	self.currentModSquadText = {}
