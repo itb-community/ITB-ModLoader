@@ -8,7 +8,7 @@ local scripts = {
 	"scripts/sdlext/modconfiguration",
 	"scripts/sdlext/pilotarrange",
 	"scripts/sdlext/squadselector",
-	"scripts/sdlext/logconfig",
+	"scripts/sdlext/modloaderconfiguration",
 	"scripts/sdlext/sdlext",
 	
 	"scripts/mod_loader/modapi",

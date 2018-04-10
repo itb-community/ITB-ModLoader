@@ -17,7 +17,7 @@ arrangePilotsButton = sdlext.addModContent(
 )
 
 sdlext.addModContent(
-	"Configure Logger",
-	configureLogger,
-	"Select where and how log messages should be printed."
+	"Configure Mod Loader",
+	configureModLoader,
+	"Configure some features of the mod loader."
 )

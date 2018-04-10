@@ -1,41 +1,45 @@
-local function saveLogConfig()
+local function saveModLoaderConfig()
 	local data = {}
 	data.logLevel = modApi.logger.logLevel
 	data.outputFile = modApi.logger.logFile
 	data.printCallerInfo = modApi.logger.printCallerInfo
+	data.showErrorFrame = modApi.showErrorFrame
 
 	sdlext.config("modcontent.lua",function(obj)
-		obj.loggerConfig = data
+		obj.modLoaderConfig = data
 	end)
 end
 
-function loadLogConfig()
+function loadModLoaderConfig()
 	local data = {
 		logLevel = 1, -- log to console by default
 		outputFile = "log.txt",
-		printCallerInfo = true
+		printCallerInfo = true,
+		showErrorFrame = true
 	}
 
 	sdlext.config("modcontent.lua", function(obj)
-		if not obj.loggerConfig then return end
+		if not obj.modLoaderConfig then return end
 
-		data = obj.loggerConfig
+		data = obj.modLoaderConfig
 	end)
 
 	return data
 end
 
-function applyLogConfig(config)
+function applyModLoaderConfig(config)
 	modApi.logger.logLevel = config.logLevel
 	modApi.logger.logFile = config.outputFile
 	modApi.logger.printCallerInfo = config.printCallerInfo
+	modApi.showErrorFrame = config.showErrorFrame
 end
 
-function configureLogger()
-	applyLogConfig(loadLogConfig())
+function configureModLoader()
+	applyModLoaderConfig(loadModLoaderConfig())
 
 	local ddLogLevel = nil
 	local cboxCaller = nil
+	local cboxErrorFrame = nil
 
 	sdlext.uiEventLoop(function(ui, quit)
 		ui.onclicked = function()
@@ -46,7 +50,7 @@ function configureLogger()
 		local frame = Ui()
 			:width(0.5):height(0.4)
 			:pos(0.25, 0.3)
-			:caption("Logger Configuration")
+			:caption("Mod Loader Configuration")
 			:decorate({
 				DecoFrame(),
 				DecoSolid(deco.colors.buttonbordercolor),
@@ -93,11 +97,27 @@ function configureLogger()
 
 		cboxCaller.checked = modApi.logger.printCallerInfo
 		cboxCaller:addTo(layout)
+
+		cboxErrorFrame = UiCheckbox()
+			:width(1):heightpx(41)
+			:settooltip(
+				"Show an error popup at startup when a mod fails to mount, init, or load."
+			)
+			:decorate({
+				DecoButton(),
+				DecoText("Show error popup"),
+				DecoRAlign(41),
+				DecoCheckbox()
+			})
+
+		cboxErrorFrame.checked = modApi.showErrorFrame
+		cboxErrorFrame:addTo(layout)
 	end)
 
 	modApi.logger.logLevel = ddLogLevel.value
 	--modApi.logger.logFile = ... -- TODO
 	modApi.logger.printCallerInfo = cboxCaller.checked
+	modApi.showErrorFrame = cboxErrorFrame.checked
 
-	saveLogConfig()
+	saveModLoaderConfig()
 end
