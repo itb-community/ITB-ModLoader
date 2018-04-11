@@ -67,7 +67,7 @@ function UiDropDown:createDropDown()
 	end
 	
 	local ddw = math.max(max_w + 8, 210)
-	self.dropDown = Ui()
+	local dropDown = Ui()
 		:pospx(
 			self.rect.x + self.w - ddw,
 			self.rect.y + self.h + 2
@@ -78,7 +78,7 @@ function UiDropDown:createDropDown()
 
 	local scrollarea = UiScrollArea()
 		:width(1):height(1)
-		:addTo(self.dropDown)
+		:addTo(dropDown)
 
 	local layout = UiBoxLayout()
 		:vgap(0)
@@ -90,7 +90,7 @@ function UiDropDown:createDropDown()
 	end
 	
 	self.root.currentDropDownOwner = self
-	self.root.currentDropDown = self.dropDown
+	self.root.currentDropDown = dropDown
 end
 
 function UiDropDown:draw(screen)

@@ -68,14 +68,16 @@ function UiRoot:event(eventloop)
 	if type == sdl.events.mousebuttonup then
 		local child = self.pressedchild
 
+		local dEvent = self:dropdownEvent(mx, my)
 		if
 			self.currentDropDown and self.currentDropDownOwner ~= child and
-			not self:dropdownEvent(mx, my)
+			not dEvent
 		then
 			-- destroy the dropdown if we click somewhere away from it
 			self.currentDropDownOwner.hovered = false
 			self.currentDropDownOwner:destroyDropDown()
 		end
+		if dEvent then table.remove(self.children) end
 
 		if 
 			child ~= nil                  and
