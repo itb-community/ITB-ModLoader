@@ -1,7 +1,6 @@
 local function saveModLoaderConfig()
 	local data = {}
 	data.logLevel = modApi.logger.logLevel
-	data.outputFile = modApi.logger.logFile
 	data.printCallerInfo = modApi.logger.printCallerInfo
 	data.showErrorFrame = modApi.showErrorFrame
 
@@ -13,7 +12,6 @@ end
 function loadModLoaderConfig()
 	local data = {
 		logLevel = 1, -- log to console by default
-		outputFile = "log.txt",
 		printCallerInfo = true,
 		showErrorFrame = true
 	}
@@ -29,7 +27,6 @@ end
 
 function applyModLoaderConfig(config)
 	modApi.logger.logLevel = config.logLevel
-	modApi.logger.logFile = io.open(config.outputFile, "a+")
 	modApi.logger.printCallerInfo = config.printCallerInfo
 	modApi.showErrorFrame = config.showErrorFrame
 end
@@ -115,7 +112,6 @@ function configureModLoader()
 	end)
 
 	modApi.logger.logLevel = ddLogLevel.value
-	--modApi.logger.logFile = ... -- TODO
 	modApi.logger.printCallerInfo = cboxCaller.checked
 	modApi.showErrorFrame = cboxErrorFrame.checked
 
