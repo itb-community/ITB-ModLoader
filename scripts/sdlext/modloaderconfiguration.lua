@@ -29,7 +29,7 @@ end
 
 function applyModLoaderConfig(config)
 	modApi.logger.logLevel = config.logLevel
-	modApi.logger.logFile = config.outputFile
+	modApi.logger.logFile = io.open(config.outputFile, "a+")
 	modApi.logger.printCallerInfo = config.printCallerInfo
 	modApi.showErrorFrame = config.showErrorFrame
 end
