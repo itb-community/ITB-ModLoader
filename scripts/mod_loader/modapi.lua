@@ -18,7 +18,7 @@ function modApi:init()
 	applyModLoaderConfig(loadModLoaderConfig())
 	self.logger.logToFile("log.txt")
 
-	self.version = "2.1.1"
+	self.version = "2.1.2"
 	LOG("MOD-API VERSION "..self.version)
 	self.currentModSquads = {}
 	self.currentModSquadText = {}
