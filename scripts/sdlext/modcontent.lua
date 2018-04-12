@@ -31,7 +31,7 @@ local function createUi(screen)
 	
 	ui = UiRoot():widthpx(screen:w()):heightpx(screen:h())
 	
-	buttonModContent = MainMenuButton("long")
+	buttonModContent = MainMenuButton("short")
 		:pospx(0, screen:h() - 186)
 		:caption("Mod Content")
 		:addTo(ui)
