@@ -9,12 +9,13 @@ function UiTooltip:new()
 	self.translucent = true
 	self.limit = 28
 
-	self.text = ""
+	self.text = nil
+	self.visible = false
 end
 
 function UiTooltip:draw(screen)
 	self:updateText()
-	if self.text == "" then return end
+	if not self.visible then return end
 	
 	local x = sdl.mouse.x()
 	local y = sdl.mouse.y()
@@ -41,5 +42,9 @@ function UiTooltip:updateText()
 		self.w = 0
 		self:setText(self.root.tooltip)
 		self.w = self:maxChildSize() + self.padl + self.padr
+		
+		self:relayout()
 	end
+	
+	self.visible = self.text and self.text ~= ""
 end

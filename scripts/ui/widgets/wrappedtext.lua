@@ -24,7 +24,6 @@ function UiWrappedText:new(text, font, textset)
 	self.textAlign = "left"
 
 	self.text = nil
-	self:setText(text)
 end
 
 function UiWrappedText:setText(text)
@@ -33,13 +32,15 @@ function UiWrappedText:setText(text)
 
 	assert(type(text) == "string")
 	self.text = text
-
-	local lines = modApi:splitString(text, "\n")
 	local allLines = {}
-	for i = 1, #lines do
-		local wrappedLines = modApi:splitString(self:wrap(lines[i], self.limit), "\n")
-		for j = 1, #wrappedLines do
-			table.insert(allLines, wrappedLines[j])
+
+	if self.text and self.text ~= "" then
+		local lines = modApi:splitString(text, "\n")
+		for i = 1, #lines do
+			local wrappedLines = modApi:splitString(self:wrap(lines[i], self.limit), "\n")
+			for j = 1, #wrappedLines do
+				table.insert(allLines, wrappedLines[j])
+			end
 		end
 	end
 
