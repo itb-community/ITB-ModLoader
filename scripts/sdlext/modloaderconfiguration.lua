@@ -13,7 +13,7 @@ function loadModLoaderConfig()
 	local data = {
 		logLevel = 1, -- log to console by default
 		printCallerInfo = true,
-		showErrorFrame = true
+		showErrorFrame = false
 	}
 
 	sdlext.config("modcontent.lua", function(obj)
