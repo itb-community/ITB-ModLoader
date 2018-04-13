@@ -186,26 +186,29 @@ function mod_loader:getCurrentModOrder()
 	return copy_table(self.currentModOrder)
 end
 
---This allows a mod to specify requirements = {"mod_id"} which will force the mod with the id "mod_id" to load before your mod
---Partially based off Lemonymous/Lemonhead's Sequential Mod Loader library for Invisible, Inc.
-local function requireMod(self,options,ordered,traversed,id)
+--[[
+	This allows a mod to specify requirements = {"mod_id"} which will
+	force the mod with the id "mod_id" to load before your mod.
+	Partially based off Lemonymous/Lemonhead's Sequential Mod Loader
+	library for Invisible, Inc.
+--]]
+local function requireMod(self, options, ordered, traversed, id)
 	if not traversed[id] and self:hasMod(id) and options[id] and options[id].enabled then
 		traversed[id] = true
 		
 		if type(self.mods[id].requirements) == "table" then
 			for i, requiredmod in ipairs(self.mods[id].requirements) do
-				requireMod(self,options,ordered,traversed,requiredmod)
+				requireMod(self, options, ordered, traversed, requiredmod)
 			end
 		end
 		
 		options[id] = nil
-		table.insert(ordered,id)
+		table.insert(ordered, id)
 	end
 end
 
 function mod_loader:orderMods(options,savedOrder)
 	local options = shallow_copy(options)
-	
 	
 	local traversed = {}
 	local ordered = {}
