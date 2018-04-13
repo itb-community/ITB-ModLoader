@@ -186,7 +186,13 @@ function Ui:wheel(mx,my,y)
 	for i=1,#self.children do
 		local child = self.children[i]
 		
-		if mx>=child.screenx and mx<child.screenx+child.w and my>=child.screeny and my<child.screeny+child.h then
+		if
+			child.visible                 and
+			mx >= child.screenx           and
+			mx <  child.screenx + child.w and
+			my >= child.screeny           and
+			my <  child.screeny + child.h
+		then
 			if child:wheel(mx,my,y) then
 				return true
 			end
@@ -208,9 +214,14 @@ function Ui:mousedown(mx, my)
 
 	for i=1,#self.children do
 		local child = self.children[i]
-		local match = mx>=child.screenx and mx<child.screenx+child.w and my>=child.screeny and my<child.screeny+child.h
-		
-		if match then
+
+		if
+			child.visible                 and
+			mx >= child.screenx           and
+			mx <  child.screenx + child.w and
+			my >= child.screeny           and
+			my <  child.screeny + child.h
+		then
 			if child:mousedown(mx, my) then
 				return true
 			end
@@ -230,7 +241,14 @@ function Ui:mouseup(mx, my)
 	for i=1,#self.children do
 		local child = self.children[i]
 		
-		if child ~= self.root.pressedchild and mx>=child.screenx and mx<child.screenx+child.w and my>=child.screeny and my<child.screeny+child.h then
+		if
+			child ~= self.root.pressedchild and
+			child.visible                   and
+			mx >= child.screenx             and
+			mx <  child.screenx + child.w   and
+			my >= child.screeny             and
+			my <  child.screeny + child.h
+		then
 			if child:mouseup(mx, my) then
 				return true
 			end
@@ -257,11 +275,12 @@ function Ui:mousemove(mx, my)
 	for i=1,#self.children do
 		local child = self.children[i]
 		if
-			mx >= child.screenx           and
-			mx <  child.screenx + child.w and
-			my >= child.screeny           and
-			my <  child.screeny + child.h and
-			child ~= self.root.pressedchild
+			child ~= self.root.pressedchild and
+			child.visible                   and
+			mx >= child.screenx             and
+			mx <  child.screenx + child.w   and
+			my >= child.screeny             and
+			my <  child.screeny + child.h
 		then
 			if not child.containsMouse then
 				child.containsMouse = true

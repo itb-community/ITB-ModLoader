@@ -68,7 +68,6 @@ function Mission:MissionEnd()
 		
 	Board:AddEffect(ret)
 
-	LOG("Mission End")
 	GAME.modApi_MissionStarted = false
 end
 
