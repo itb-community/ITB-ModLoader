@@ -92,9 +92,9 @@ function UiBoxLayout:relayout()
 				if not child.alignV or child.alignV == "top" then
 					child.y = 0
 				elseif child.alignV == "center" then
-					child.y = (self.h - child.h)/2
+					child.y = (self.h - self.padt - self.padb - child.h)/2
 				elseif child.alignV == "bottom" then
-					child.y = self.h - child.h
+					child.y = self.h - self.padt - self.padb - child.h
 				end
 
 				child.x = nextOffset
@@ -103,9 +103,9 @@ function UiBoxLayout:relayout()
 				if not child.alignH or child.alignH == "left" then
 					child.x = 0
 				elseif child.alignH == "center" then
-					child.x = (self.w - child.w)/2
+					child.x = (self.w - self.padl - self.padr - child.w)/2
 				elseif child.alignH == "right" then
-					child.x = self.w - child.w
+					child.x = self.w - self.padl - self.padr - child.w
 				end
 
 				child.y = nextOffset
