@@ -234,7 +234,16 @@ end
 function Ui:mouseup(mx, my)
 	if not self.visible then return false end
 	
-	if self.root.pressedchild == self and not self.disabled then
+	if
+		self.root.pressedchild == self and
+		self.pressed                   and
+		not self.disabled              and
+		mx >= self.screenx             and
+		mx <  self.screenx + self.w    and
+		my >= self.screeny             and
+		my <  self.screeny + self.h
+	then
+		self.pressed = false
 		if self:clicked() then return true end
 	end
 

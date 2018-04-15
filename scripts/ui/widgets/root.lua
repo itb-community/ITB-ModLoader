@@ -78,6 +78,11 @@ function UiRoot:event(eventloop)
 			self.currentDropDownOwner:destroyDropDown()
 		end
 		if dEvent then table.remove(self.children) end
+		
+		if self.pressedchild and self.pressedchild:mouseup(mx, my) then
+			self.pressedchild = nil
+			return true
+		end
 
 		if 
 			child ~= nil                  and
@@ -92,7 +97,7 @@ function UiRoot:event(eventloop)
 				return true
 			end
 		end
-		
+
 		local res = self:mouseup(mx, my)
 		self.pressedchild = nil
 		return res
