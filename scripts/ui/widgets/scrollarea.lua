@@ -88,10 +88,16 @@ end
 function UiScrollArea:wheel(mx,my,y)
 	self:relayout()
 
-	self.dy = self.dy - y * 20
+	-- Have the scrolling speed scale with the height of the inner area,
+	-- but capped by the height of the viewport.
+	local d = math.max(20, self.innerHeight * 0.1)
+	d = math.min(d, self.h * 0.8)
+	d = d * y
+
+	self.dy = self.dy - d
 	if self.dy < 0 then self.dy = 0 end
 	if self.dy + self.h > self.innerHeight then self.dy = self.innerHeight - self.h end
-	if self.h > self.innerHeight then self.dy=0 end
+	if self.h > self.innerHeight then self.dy = 0 end
 
 	return true
 end
