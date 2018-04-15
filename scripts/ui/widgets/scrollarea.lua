@@ -68,6 +68,13 @@ end
 function UiScrollArea:mousedown(x, y)
 	if x < self.scrollrect.x then return Ui.mousedown(self, x, y) end
 
+	if self.root.pressedchild ~= nil then
+		self.root.pressedchild.pressed = false
+	end
+	
+	self.root.pressedchild = self
+	self.pressed = true
+
 	local ratio = (y - self.screeny - self.buttonheight/2) / (self.h-self.buttonheight)
 	if ratio < 0 then ratio = 0 end
 	if ratio > 1 then ratio = 1 end
