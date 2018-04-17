@@ -127,11 +127,8 @@ AUTO_HOOK_Mod_Content_Draw = sdl.drawHook(function(screen)
 				end
 				mod_loader.unmountedMods = {}
 
-				for id, modtable in pairs(mod_loader.mods) do
-					if not modtable.installed then
-						showErrorFrame(modtable.error)
-						break
-					end
+				if mod_loader.firsterror then
+					showErrorFrame(mod_loader.firsterror)
 				end
 			end
 		end

@@ -4,8 +4,10 @@ mod_loader = {}
 function mod_loader:init()
 	self.mod_dirs = {}
 	self.mods = {}
-	self.unmountedMods = {} -- mods which had malformed init.lua
 	self.mod_options = {}
+
+	self.unmountedMods = {} -- mods which had malformed init.lua
+	self.firsterror = nil
 	
 	self:enumerateMods()
 	
@@ -117,6 +119,7 @@ function mod_loader:initMod(id)
 		mod.initialized = false
 		mod.installed = false
 		mod.error = err
+		if not self.firsterror then self.firsterror = err end
 		LOG(err)
 	end
 end
@@ -267,6 +270,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 		else
 			mod.installed = false
 			mod.error = err
+			if not self.firsterror then self.firsterror = err end
 			LOG(err)
 		end
 	end
