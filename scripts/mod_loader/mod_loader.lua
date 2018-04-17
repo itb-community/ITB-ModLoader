@@ -111,7 +111,7 @@ function mod_loader:initMod(id)
 	local function pinit()
 		mod.init(mod)
 	end
-	local ok, err = xpcall(pinit,function(e) return string.format("Initializing mod [%s] with id [%s] failed: %s, %s",mod.name,id,e,debug.traceback()) end)
+	local ok, err = xpcall(pinit,function(e) return string.format("Initializing mod [%s] with id [%s] failed: %s\n%s",mod.name,id,e,debug.traceback()) end)
 	if ok then
 		mod.initialized = true
 		LOG(string.format("Initialized mod [%s] with id [%s] successfully!",mod.name,id))
@@ -263,7 +263,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 		local function pload()
 			mod.load(mod,mod_options[id].options,mod_options[id].version)
 		end
-		local ok, err = xpcall(pload,function(e) return string.format("Loading mod [%s] with id [%s] failed: %s, %s",mod.name,id,e,debug.traceback()) end)
+		local ok, err = xpcall(pload,function(e) return string.format("Loading mod [%s] with id [%s] failed: %s\n%s",mod.name,id,e,debug.traceback()) end)
 		if ok then
 			mod.installed = true
 			LOG(string.format("Loaded mod [%s] with id [%s] successfully!",mod.name,id))
