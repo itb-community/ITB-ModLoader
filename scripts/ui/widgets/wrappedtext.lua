@@ -24,6 +24,10 @@ function UiWrappedText:new(text, font, textset)
 	self.textAlign = "left"
 
 	self.text = nil
+
+	if text then
+		self:setText(text)
+	end
 end
 
 function UiWrappedText:setText(text)

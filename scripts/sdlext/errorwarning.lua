@@ -22,6 +22,7 @@ function showErrorFrame(text)
 
 		text = text or "Some mods failed to load. Check console for details."
 		UiWrappedText(text)
+			:width(1)
 			:addTo(scroll)
 	end)
 end
