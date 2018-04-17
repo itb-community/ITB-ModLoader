@@ -210,9 +210,28 @@ function configureMods()
 		end
 	end
 	
-	local savedOrder = {}--TODO
+	local savedOrder = mod_loader:getSavedModOrder()
+	local orderedMods = mod_loader:orderMods(modSelection, savedOrder)
+
+	local initializedCount = 0
+	for i, id in ipairs(orderedMods) do
+		if not mod_loader.mods[id].initialized then
+			initializedCount = initializedCount + 1
+		end
+	end
 
 	mod_loader:loadModContent(modSelection, savedOrder)
 	
 	saveModConfig()
+
+	-- If we have any new mods that weren't previously initialized,
+	-- then we need to restart the game to apply them correctly.
+	-- Otherwise they're not gonna work (will be loaded without
+	-- being initialized first)
+	-- We can't initialize mods here, because some required vars
+	-- are gone by this point (eg. Pawn), or the game has already
+	-- compiled cached lists which we can't modify anyway.
+	if initializedCount > 0 then
+		-- TODO display warning frame reminding to restart the game.
+	end
 end
