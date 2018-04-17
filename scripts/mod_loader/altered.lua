@@ -10,6 +10,7 @@ local oldGetText = GetText
 local oldStartNewGame = startNewGame
 local oldLoadGame = LoadGame
 local oldSaveGame = SaveGame
+local oldTriggerVoice = TriggerVoiceEvent
 
 function getStartingSquad(choice)
 	if choice==0 then
@@ -161,6 +162,14 @@ function GetPopulationTexts(event, count)
 	end
 	
 	return ret
+end
+
+function TriggerVoiceEvent(event, custom_odds)
+	for i, hook in ipairs(modApi.voiceEventHooks) do
+		hook(event, custom_odds)
+	end
+
+	oldTriggerVoice(event, custom_odds)
 end
 
 -- ///////////////////////////////////////////////////////////////////

@@ -201,6 +201,7 @@ function modApi:resetModContent()
 	self.saveGameHooks = {}
 	self.currentModSquads = {}
 	self.currentModSquadText = {}
+	self.voiceEventHooks = {}
 	self.missionEndHooks = {
 		--Pilot Message
 		function(mission,ret)
@@ -348,6 +349,11 @@ end
 function modApi:addNextTurnHook(fn)
 	assert(type(fn) == "function")
 	table.insert(self.nextTurnHooks,fn)
+end
+
+function modApi:addVoiceEventHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.voiceEventHooks,fn)
 end
 
 function modApi:addMissionUpdateHook(fn)
