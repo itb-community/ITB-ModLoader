@@ -7,6 +7,7 @@
 [API](#api)
 * [modApi:deltaTime](#modapideltatime)
 * [modApi:elapsedTime](#modapielapsedtime)
+* [modApi:scheduleHook](#modapischedulehook)
 * [modApi:splitString](#modapisplitstring)
 * [modApi:isVersion](#modapiisversion)
 * [modApi:addGenerationOption](#modapiaddgenerationoption)
@@ -19,7 +20,20 @@
 * [modApi:addOnPopEvent](#modapiaddonpopevent)
 
 [Hooks](#hooks)
-
+* [preMissionAvailableHook](#premissionavailablehook)
+* [missionAvailableHook](#missionavailablehook)
+* [preEnvironmentHook](#preenvironmenthook)
+* [postEnvironmentHook](#postenvironmenthook)
+* [nextTurnHook](#nextturnhook)
+* [missionUpdateHook](#missionupdatehook)
+* [missionStartHook](#missionstarthook)
+* [missionEndHook](#missionendhook)
+* [voiceEventHook](#voiceeventhook)
+* [preStartGameHook](#prestartgamehook)
+* [postStartGameHook](#poststartgamehook)
+* [preLoadGameHook](#preloadgamehook)
+* [postLoadGameHook](#postloadgamehook)
+* [saveGameHook](#savegamehook)
 
 ## init.lua
 
