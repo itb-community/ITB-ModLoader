@@ -1,4 +1,4 @@
-local class = require("scripts/kaitai_struct_lua_runtime-master/class")
+local class = require("scripts/mod_loader/ftldat/kaitai_struct_lua_runtime/class")
 
 local FtlDat = class.class(KaitaiStruct)
 local File = class.class(KaitaiStruct)

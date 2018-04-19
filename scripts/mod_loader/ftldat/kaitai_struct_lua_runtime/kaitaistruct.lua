@@ -1,5 +1,5 @@
-local class = require("scripts/kaitai_struct_lua_runtime-master/class")
-local stringstream = require("scripts/kaitai_struct_lua_runtime-master/string_stream")
+local class = require("scripts/mod_loader/ftldat/kaitai_struct_lua_runtime/class")
+local stringstream = require("scripts/mod_loader/ftldat/kaitai_struct_lua_runtime/string_stream")
 
 KaitaiStruct = class.class()
 

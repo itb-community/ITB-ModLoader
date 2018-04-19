@@ -12,8 +12,7 @@ local scripts = {
 	"scripts/sdlext/sdlext",
 	
 	"scripts/mod_loader/modapi",
-	"scripts/mod_loader/lua-struct",
-	"scripts/kaitai_struct_lua_runtime-master/kaitaistruct",
+	"scripts/mod_loader/ftldat/__scripts",
 	"scripts/mod_loader/altered",
 	"scripts/mod_loader/mod_loader",
 }

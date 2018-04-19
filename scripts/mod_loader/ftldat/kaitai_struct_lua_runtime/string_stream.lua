@@ -3,7 +3,7 @@
 -- Inspired by https://gist.github.com/MikuAuahDark/e6428ac49248dd436f67c6c64fcec604
 --
 
-local class = require("scripts/kaitai_struct_lua_runtime-master/class")
+local class = require("scripts/mod_loader/ftldat/kaitai_struct_lua_runtime/class")
 
 local StringStream = class.class()
 

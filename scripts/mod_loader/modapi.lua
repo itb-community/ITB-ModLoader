@@ -1,7 +1,7 @@
 -- This class serves mostly as a self-documenting guide to common mod operations,
 -- as well as an indirection layer to maintain a kind of sanity for compatability purposes
 
-local FtlDat = require("scripts/mod_loader/ftldat")
+local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 
 modApi = {}
 
