@@ -157,7 +157,7 @@ end
 
 -- ...
 
-someModVersion = 1.2
+someModVersion = "1.2"
 if modApi:isVersion("1.1", someModVersion) then
 	LOG("someMod is version 1.1 or higher, we can use stuff added in this version")
 else
@@ -213,7 +213,7 @@ end
 ```
 
 
-### modApi:appendAsset
+### `modApi:appendAsset`
 
 | Argument name | Type | Description |
 |---------------|------|-------------|
