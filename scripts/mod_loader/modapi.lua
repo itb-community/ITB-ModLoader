@@ -110,7 +110,7 @@ function modApi:splitString(test,sep)
 	for str in string.gmatch(test, "([^"..sep.."]+)") do
 		table.insert(t, str)
 	end
-	
+
 	return t
 end
 
@@ -280,7 +280,9 @@ end
 function modApi:addGenerationOption(id,name,tip,data)
 	assert(type(id) == "string" or type(id) == "number")
 	assert(type(name) == "string")
+	tip = tip or nil
 	assert(type(tip) == "string")
+	data = data or {}
 	assert(type(data) == "table")--Misc stuff
 	for i, option in ipairs(mod_loader.mod_options[self.currentMod]) do
 		assert(option.id ~= id)
