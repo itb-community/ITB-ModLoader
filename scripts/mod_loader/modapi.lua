@@ -192,7 +192,7 @@ function modApi:resetModContent()
 	self.missionUpdateHooks = {}
 	self.missionStartHooks = {}
 	self.preMissionAvailableHooks = {}
-	self.missionAvailableHooks = {}
+	self.postMissionAvailableHooks = {}
 	self.preEnvironmentHooks = {}
 	self.postEnvironmentHooks = {}
 	self.preStartGameHooks = {}
@@ -334,9 +334,9 @@ function modApi:addPreMissionAvailableHook(fn)
 	table.insert(self.preMissionAvailableHooks,fn)
 end
 
-function modApi:addMissionAvailableHook(fn)
+function modApi:addPostMissionAvailableHook(fn)
 	assert(type(fn) == "function")
-	table.insert(self.missionAvailableHooks,fn)
+	table.insert(self.postMissionAvailableHooks,fn)
 end
 
 function modApi:addPreEnvironmentHook(fn)

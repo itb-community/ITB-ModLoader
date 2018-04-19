@@ -87,7 +87,7 @@ function Mission:BaseStart()
 	
 	oldBaseStart(self)
 	
-	for i, hook in ipairs(modApi.missionAvailableHooks) do
+	for i, hook in ipairs(modApi.postMissionAvailableHooks) do
 		hook(self)
 	end
 end
