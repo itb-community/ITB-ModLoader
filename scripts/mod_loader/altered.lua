@@ -4,6 +4,7 @@ oldGetPopulationTexts = GetPopulationTexts
 local oldGetStartingSquad = getStartingSquad
 local oldBaseNextTurn = Mission.BaseNextTurn
 local oldBaseUpdate = Mission.BaseUpdate
+local oldBaseDeployment = Mission.BaseDeployment
 local oldBaseStart = Mission.BaseStart
 local oldApplyEnvironmentEffect = Mission.ApplyEnvironmentEffect
 local oldGetText = GetText
@@ -50,17 +51,18 @@ end
 
 function Mission:BaseUpdate()
 	oldBaseUpdate(self)
-
-	if not GAME.modApi_MissionStarted then
-		GAME.modApi_MissionStarted = true
-		for i, hook in ipairs(modApi.missionStartHooks) do
-			hook(self)
-		end	
-	end
 	
 	for i, hook in ipairs(modApi.missionUpdateHooks) do
 		hook(self)
 	end
+end
+
+function Mission:BaseDeployment()
+	oldBaseDeployment(self)
+
+	for i, hook in ipairs(modApi.missionStartHooks) do
+		hook(self)
+	end	
 end
 
 function Mission:MissionEnd()
@@ -76,8 +78,6 @@ function Mission:MissionEnd()
 	EndingMission = false
 		
 	Board:AddEffect(ret)
-
-	GAME.modApi_MissionStarted = false
 end
 
 function Mission:BaseStart()
