@@ -173,11 +173,15 @@ function GetPopulationTexts(event, count)
 end
 
 function TriggerVoiceEvent(event, custom_odds)
+	local suppress = false
+
 	for i, hook in ipairs(modApi.voiceEventHooks) do
-		hook(event, custom_odds)
+		suppress = suppress or hook(event, custom_odds, suppress)
 	end
 
-	oldTriggerVoice(event, custom_odds)
+	if not suppress then
+		oldTriggerVoice(event, custom_odds)
+	end
 end
 
 -- ///////////////////////////////////////////////////////////////////
