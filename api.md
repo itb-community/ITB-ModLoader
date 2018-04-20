@@ -546,7 +546,7 @@ Fired right after the player exits the hangar and right after mods are loaded, b
 
 Example:
 ```lua
-local hook = function(mission)
+local hook = function()
 	LOG("About to start a new game!")
 end
 
@@ -560,7 +560,7 @@ Fired after the player exits the hangar and game variables are set up (`GAME`, `
 
 Example:
 ```lua
-local hook = function(mission)
+local hook = function()
 	LOG("Started a new game!")
 end
 
@@ -574,7 +574,7 @@ Fired after mods are loaded, but before savegame data is loaded. Triggers when p
 
 Example:
 ```lua
-local hook = function(mission)
+local hook = function()
 	LOG("We're about to load a savegame!")
 end
 
@@ -588,7 +588,7 @@ Fired after savegame data is loaded. Triggers when pressing "Continue" and when 
 
 Example:
 ```lua
-local hook = function(mission)
+local hook = function()
 	LOG("We've loaded a savegame!")
 end
 
@@ -602,7 +602,7 @@ Fired before the game is saved.
 
 Example:
 ```lua
-local hook = function(mission)
+local hook = function()
 	LOG("Game is being saved!")
 end
 
