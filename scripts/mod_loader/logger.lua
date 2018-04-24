@@ -60,6 +60,11 @@ function Logger.log(...)
 
 	ConsolePrint(message)
 	print(message)
+
+	local _, newlines = message:gsub("\n", "")
+	for i = 1, newlines do
+		ConsolePrint("")
+	end
 end
 
 -- Override the original LOG(...) function.
