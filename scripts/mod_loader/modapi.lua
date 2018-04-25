@@ -214,6 +214,7 @@ function modApi:resetModContent()
 	self.nextTurnHooks = {}
 	self.missionUpdateHooks = {}
 	self.missionStartHooks = {}
+	self.missionNextPhaseCreatedHooks = {}
 	self.preMissionAvailableHooks = {}
 	self.postMissionAvailableHooks = {}
 	self.preEnvironmentHooks = {}
@@ -414,6 +415,11 @@ function modApi:addMissionEndHook(fn,i)
 	else
 		table.insert(self.missionEndHooks,fn)
 	end
+end
+
+function modApi:addMissionNextPhaseCreatedHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.missionNextPhaseCreatedHooks,fn)
 end
 
 function modApi:addPreStartGameHook(fn)

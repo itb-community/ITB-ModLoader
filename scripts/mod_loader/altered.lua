@@ -125,6 +125,32 @@ function GetText(id)
 	return oldGetText(id)
 end
 
+--[[
+	GAME's class is GameObject, defined in game.lua
+	But that class is local to that file, so we can't access
+	it here. We have to override the function on the instance
+	of the GAME object. Defer this into a function call, since
+	GAME is not available when the modloader is ran.
+--]]
+local function overrideNextPhase()
+	GAME.CreateNextPhase = function(self, mission)
+		local prevMission = self:GetMission(mission)
+		local nxtId = prevMission.NextPhase
+
+		getmetatable(self).CreateNextPhase(self, mission)
+
+		if nxtId ~= "" then
+			-- Set the mission's id, since the game doesn't do it
+			local nextMission = _G[nxtId]
+			nextMission.ID = nxtId
+
+			for i, hook in ipairs(modApi.missionNextPhaseCreatedHooks) do
+				hook(prevMission, nextMission)
+			end
+		end
+	end
+end
+
 function GetPopulationTexts(event, count)
 	local nullReturn = count == 1 and "" or {}
 	
@@ -242,6 +268,8 @@ function startNewGame()
 	end
 
 	oldStartNewGame()
+
+	overrideNextPhase()
 	
 	GAME.modOptions = modOptions
 	GAME.modLoadOrder = savedOrder
@@ -284,7 +312,11 @@ function LoadGame()
 		hook()
 	end
 
+	GAME.CreateNextPhase = nil
+
 	oldLoadGame()
+
+	overrideNextPhase()
 
 	for i, hook in ipairs(modApi.postLoadGameHooks) do
 		hook()
@@ -303,9 +335,11 @@ function SaveGame()
 		-- defined, to prevent grabbing stale data.
 		modApi:scheduleHook(50, function()
 			restoreGameVariables()
+			overrideNextPhase()
 		end)
 	end
 
+	GAME.CreateNextPhase = nil
 	return oldSaveGame()
 end
 
