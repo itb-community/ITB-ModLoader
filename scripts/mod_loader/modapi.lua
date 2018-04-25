@@ -448,6 +448,46 @@ function modApi:addSaveGameHook(fn)
 end
 
 --[[
+	Executes the function on the game's next update step. Only works during missions.
+	
+	Calling this while during game loop (either in a function called from missionUpdate,
+	or as a result of previous runLater) will correctly schedule the function to be
+	invoked during the next update step (not the current one).
+--]]
+function modApi:runLater(fn)
+	assert(type(f) == "function")
+
+	if not self.runLaterQueue then
+		self.runLaterQueue = {}
+	end
+
+	table.insert(self.runLaterQueue, f)
+end
+
+function modApi:processRunLaterQueue(mission)
+	if self.runLaterQueue then
+		local q = self.runLaterQueue
+		local n = #q
+		for i = 1, n do
+			q[i](mission)
+			q[i] = nil
+		end
+
+		-- compact the table, if processed hooks also scheduled
+		-- their own runLater functions (but we will process those
+		-- on the next update step)
+		local i = n + 1
+		local j = 0
+		while q[i] do
+			j = j + 1
+			q[j] = q[i]
+			q[i] = nil
+			i = i + 1
+		end
+	end
+end
+
+--[[
 	Schedules an argumentless function to be executed
 	in msTime milliseconds.
 --]]

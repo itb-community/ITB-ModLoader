@@ -50,6 +50,8 @@ function Mission:BaseNextTurn()
 end
 
 function Mission:BaseUpdate()
+	modApi:processRunLaterQueue(self)
+
 	oldBaseUpdate(self)
 	
 	for i, hook in ipairs(modApi.missionUpdateHooks) do
