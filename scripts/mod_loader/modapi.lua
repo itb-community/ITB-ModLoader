@@ -8,12 +8,11 @@ modApi = {}
 local prev_path = package.path
 
 local function file_exists(name)
-   local f=io.open(name,"rb")
-   if f~=nil then io.close(f) return true else return false end
+   local f = io.open(name,"rb")
+   if f ~= nil then io.close(f) return true else return false end
 end
 
 function modApi:init()
-	--package.path = prev_path..package.path
 	self.logger = require("scripts/mod_loader/logger")
 	applyModLoaderConfig(loadModLoaderConfig())
 	if self.logger.logLevel == self.logger.LOG_LEVEL_FILE then
