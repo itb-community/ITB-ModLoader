@@ -53,3 +53,5 @@ Not that this makes any sense lore-wise, but it'd be a nice option to have. If t
 
 At the moment, attempting to add a third mech pawn crashes the game.
 
+## Ability to change the console keybind from tilde (~) to something else
+
