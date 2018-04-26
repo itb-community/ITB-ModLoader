@@ -2,42 +2,44 @@
 
 ## Table of Contents
 
-[init.lua](#initlua)
+* [init.lua](#initlua)
 
-[API](#api)
-* [modApi:deltaTime](#modapideltatime)
-* [modApi:elapsedTime](#modapielapsedtime)
-* [modApi:scheduleHook](#modapischedulehook)
-* [modApi:runLater](#modapirunlater)
-* [modApi:splitString](#modapisplitstring)
-* [modApi:trimString](#modapitrimstring)
-* [modApi:stringStartsWith](#modapistringstartswith)
-* [modApi:stringEndsWith](#modapistringendswith)
-* [modApi:isVersion](#modapiisversion)
-* [modApi:addGenerationOption](#modapiaddgenerationoption)
-* [modApi:appendAsset](#modapiappendasset)
-* [modApi:addSquad](#modapiaddsquad)
-* [modApi:overwriteText](#modapioverwritetext)
-* [modApi:addWeapon_Texts](#modapiaddweapon_texts)
-* [modApi:addPopEvent](#modapiaddpopevent)
-* [modApi:setPopEventOdds](#modapisetpopeventodds)
-* [modApi:addOnPopEvent](#modapiaddonpopevent)
+* [API](#api)
+	* [modApi:deltaTime](#modapideltatime)
+	* [modApi:elapsedTime](#modapielapsedtime)
+	* [modApi:scheduleHook](#modapischedulehook)
+	* [modApi:runLater](#modapirunlater)
+	* [modApi:splitString](#modapisplitstring)
+	* [modApi:trimString](#modapitrimstring)
+	* [modApi:stringStartsWith](#modapistringstartswith)
+	* [modApi:stringEndsWith](#modapistringendswith)
+	* [modApi:isVersion](#modapiisversion)
+	* [modApi:addGenerationOption](#modapiaddgenerationoption)
+	* [modApi:appendAsset](#modapiappendasset)
+	* [modApi:addSquad](#modapiaddsquad)
+	* [modApi:overwriteText](#modapioverwritetext)
+	* [modApi:addWeapon_Texts](#modapiaddweapon_texts)
+	* [modApi:addPopEvent](#modapiaddpopevent)
+	* [modApi:setPopEventOdds](#modapisetpopeventodds)
+	* [modApi:addOnPopEvent](#modapiaddonpopevent)
 
-[Hooks](#hooks)
-* [preMissionAvailableHook](#premissionavailablehook)
-* [missionAvailableHook](#missionavailablehook)
-* [preEnvironmentHook](#preenvironmenthook)
-* [postEnvironmentHook](#postenvironmenthook)
-* [nextTurnHook](#nextturnhook)
-* [missionUpdateHook](#missionupdatehook)
-* [missionStartHook](#missionstarthook)
-* [missionEndHook](#missionendhook)
-* [voiceEventHook](#voiceeventhook)
-* [preStartGameHook](#prestartgamehook)
-* [postStartGameHook](#poststartgamehook)
-* [preLoadGameHook](#preloadgamehook)
-* [postLoadGameHook](#postloadgamehook)
-* [saveGameHook](#savegamehook)
+* [Hooks](#hooks)
+	* [preMissionAvailableHook](#premissionavailablehook)
+	* [missionAvailableHook](#missionavailablehook)
+	* [preEnvironmentHook](#preenvironmenthook)
+	* [postEnvironmentHook](#postenvironmenthook)
+	* [nextTurnHook](#nextturnhook)
+	* [missionUpdateHook](#missionupdatehook)
+	* [missionStartHook](#missionstarthook)
+	* [missionEndHook](#missionendhook)
+	* [missionNextPhaseCreatedHook](#missionnextphasecreatedhook)
+	* [voiceEventHook](#voiceeventhook)
+	* [preStartGameHook](#prestartgamehook)
+	* [postStartGameHook](#poststartgamehook)
+	* [preLoadGameHook](#preloadgamehook)
+	* [postLoadGameHook](#postloadgamehook)
+	* [saveGameHook](#savegamehook)
+
 
 ## init.lua
 
@@ -595,6 +597,16 @@ end
 
 modApi:addMissionEndHook(hook)
 ```
+
+
+### `missionNextPhaseCreatedHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `prevMission` | table | A table holding information about the previous mission (the one the player just completed) |
+| `nextMission` | table | A table holding information about the next mission (the one the player is now entering) |
+
+Fired when a mission with `NextPhase` defined constructs its next phase mission object. 
 
 
 ### `voiceEventHook`
