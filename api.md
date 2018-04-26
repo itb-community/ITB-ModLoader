@@ -8,7 +8,11 @@
 * [modApi:deltaTime](#modapideltatime)
 * [modApi:elapsedTime](#modapielapsedtime)
 * [modApi:scheduleHook](#modapischedulehook)
+* [modApi:runLater](#modapirunlater)
 * [modApi:splitString](#modapisplitstring)
+* [modApi:trimString](#modapitrimstring)
+* [modApi:stringStartsWith](#modapistringstartswith)
+* [modApi:stringEndsWith](#modapistringendswith)
 * [modApi:isVersion](#modapiisversion)
 * [modApi:addGenerationOption](#modapiaddgenerationoption)
 * [modApi:appendAsset](#modapiappendasset)
@@ -130,6 +134,36 @@ end)
 ```
 
 
+### `modApi:runLater`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `fn` | function | Argumentless function which will be invoked on game's next update step. |
+
+Executes the function on the game's next update step. Only works during missions.
+
+Calling this during game loop (either in a function called from `missionUpdate`, `missionUpdateHook`, or as a result of previous `runLater`) will correctly schedule the function to be invoked during the next update step (not the current one).
+
+Example:
+```lua
+local pawn = Board:GetPawn(Point(0, 0))
+
+local d = SpaceDamage(Point(0, 0))
+d.iFire = EFFECT_CREATE
+Board:DamageSpace(d)
+
+LOG(pawn:IsFire()) -- prints false, the tile's Fire status was
+                   -- not applied to the pawn yet (this happens
+                   -- during the game's update step)
+
+modApi:runLater(function()
+	LOG(pawn:IsFire()) -- prints true, the game already went
+	                   -- through its update step and applied
+	                   -- the Fire status to the pawn
+end)
+```
+
+
 ### `modApi:splitString`
 
 | Argument name | Type | Description |
@@ -138,6 +172,56 @@ end)
 | `separator` | string | The string to split by. Defaults to whitespace if omitted |
 
 Splits the input string around the provided separator string, and returns a table holding the split string.
+
+
+### `modApi:trimString`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `input` | string | The string to be trimmed |
+
+Trims leading and trailing whitespace from the string.
+
+Example:
+```lua
+LOG(modApi:trimString("   some text !   ")) -- prints 'some text !'
+```
+
+
+### `modApi:stringStartsWith`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `input` | string | The string to test |
+| `prefix` | string | The prefix string that the `input` string should be starting with |
+
+Returns true if the `input` string starts with the `prefix` string.
+
+Example:
+```lua
+local string = "PunchMech"
+if modApi:stringStartsWith(string, "Punch") then
+	LOG("It does")
+end
+```
+
+
+### `modApi:stringEndsWith`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `input` | string | The string to test |
+| `suffix` | string | The suffix string that the `input` string should be ending with |
+
+Returns true if the `input` string ends with the `suffix` string.
+
+Example:
+```lua
+local string = "PunchMech"
+if modApi:stringEndsWith(string, "Mech") then
+	LOG("It does")
+end
+```
 
 
 ### `modApi:isVersion`
