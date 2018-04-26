@@ -43,6 +43,13 @@ Things that are interesting from a modder's perspective that are present in the 
 - Plenty of other things I'm forgetting right now
 
 
+## Savedata storage format
+
+The way savedata file is serialized and formatted makes its manual inspection an absolute pain.
+
+Currently, only the `GAME` table is serialized through the `save_table()` function in `global.lua`. Either making the default serializer use prettier formatting, or handling all serialization (where possible, userdata and functions are obviously out of the question) though that function would be a great addition.
+
+
 ## Enemies using the `Move` skill, like player mechs do
 
 Currently mods are unable to easily detect movement of enemies, because unlike player mechs, they do not use a Move skill that is exposed to lua. Making enemies use a skill to move (not necessarily the same one as player mechs, though it would be nice) would allow mods to detect their movement.
