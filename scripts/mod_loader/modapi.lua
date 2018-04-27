@@ -363,6 +363,10 @@ function modApi:addPostMissionAvailableHook(fn)
 	table.insert(self.postMissionAvailableHooks,fn)
 end
 
+function modApi:addMissionAvailableHook(fn)
+	self:addPostMissionAvailableHook(fn)
+end
+
 function modApi:addPreEnvironmentHook(fn)
 	assert(type(fn) == "function")
 	table.insert(self.preEnvironmentHooks,fn)
