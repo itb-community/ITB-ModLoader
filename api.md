@@ -608,6 +608,15 @@ modApi:addMissionEndHook(hook)
 
 Fired when a mission with `NextPhase` defined constructs its next phase mission object. 
 
+Example:
+```lua
+local hook = function(prevMission, nextMission)
+	LOG("Left mission " .. prevMission.ID .. ", going into " .. nextMission.ID)
+end
+
+modApi:addMissionNextPhaseCreatedHook(hook)
+```
+
 
 ### `voiceEventHook`
 
