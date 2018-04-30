@@ -75,7 +75,11 @@ function configureMods()
 		end
 
 		local getDisplayName = function(mod)
-			return mod.name .. "  v" .. mod.version
+			local r = mod.name
+			if mod.version then
+				r = r .. "  v".. mod.version
+			end
+			return r
 		end
 		
 		for id, option in pairs(mod_options) do
