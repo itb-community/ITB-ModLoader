@@ -22,6 +22,7 @@
 	* [modApi:addPopEvent](#modapiaddpopevent)
 	* [modApi:setPopEventOdds](#modapisetpopeventodds)
 	* [modApi:addOnPopEvent](#modapiaddonpopevent)
+	* [modApi:addMap](#modapiaddmap)
 
 * [Hooks](#hooks)
 	* [preMissionAvailableHook](#premissionavailablehook)
@@ -446,6 +447,24 @@ Example:
 function modApi:addOnPopEvent(function(text, texts, i, event, count)
     return text.."!!!"
 end)
+```
+
+
+### `modApi:addMap`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `mapPath` | string | Path to the map file. |
+
+Copies the specified map to the game's `maps/` directory. Cannot overwrite default (vanilla) maps. **Call in your mod's `init()` function.**
+
+This function ignores the file's parent directories, and only takes the filename into consideration. `some/long/path/to/mymap.map` and `path/mymap.map` will both be copied to `maps/mymap.map`.
+
+Example:
+```lua
+local function init(self)
+	modApi:addMap(self.resourcePath .. "maps/somemap.map")
+end
 ```
 
 
