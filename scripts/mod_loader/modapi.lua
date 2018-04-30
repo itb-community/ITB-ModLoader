@@ -19,7 +19,7 @@ function modApi:init()
 		self.logger.logToFile("log.txt")
 	end
 
-	self.version = "2.1.4"
+	self.version = "2.1.5"
 	LOG("MOD-API VERSION "..self.version)
 	self.currentModSquads = {}
 	self.currentModSquadText = {}
