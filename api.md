@@ -26,7 +26,7 @@
 
 * [Hooks](#hooks)
 	* [preMissionAvailableHook](#premissionavailablehook)
-	* [missionAvailableHook](#missionavailablehook)
+	* [postMissionAvailableHook](#postmissionavailablehook)
 	* [preEnvironmentHook](#preenvironmenthook)
 	* [postEnvironmentHook](#postenvironmenthook)
 	* [nextTurnHook](#nextturnhook)
@@ -488,7 +488,7 @@ modApi:addPreMissionAvailableHook(hook)
 ```
 
 
-### `missionAvailableHook`
+### `postMissionAvailableHook`
 
 | Argument name | Type | Description |
 |---------------|------|-------------|
@@ -502,7 +502,7 @@ local hook = function(mission)
 	LOG("New mission is now available!")
 end
 
-modApi:addMissionAvailableHook(hook)
+modApi:addPostMissionAvailableHook(hook)
 ```
 
 
