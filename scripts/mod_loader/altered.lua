@@ -368,3 +368,13 @@ function Move:GetSkillEffect(p1, p2)
     
     return originalGetSkillEffect(self, p1, p2)
 end
+
+function CreatePilot(data)
+	_G[data.Id] = Pilot:new(data)
+
+	-- Make sure we don't create duplicates if the PilotList
+	-- already contains entry for this pilot
+	if data.Rarity ~= 0 and not list_contains(PilotList, data.Id) then
+		PilotList[#PilotList + 1] = data.Id
+	end
+end
