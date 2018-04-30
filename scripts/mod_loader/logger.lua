@@ -47,13 +47,18 @@ function Logger.log(...)
 	local caller = string.format("%s %s:%d", timestamp, info.short_src , info.currentline)
 
 	if Logger.logLevel == Logger.LOG_LEVEL_FILE and Logger.logFile ~= nil then
-		Logger.logFile:write(string.format("%s\n%s\n", caller, message))
+		local t = ""
+		if Logger.printCallerInfo then
+			t = caller .. "\n"
+		end
+
+		t = t .. message .. "\n"
+
+		Logger.logFile:write(t)
 		Logger.logFile:flush()
 	end
 
 	if Logger.printCallerInfo then
-		-- apply this setting only to console printing
-		-- for logfiles this information is good to have
 		ConsolePrint(caller)
 		print(caller)
 	end

@@ -83,7 +83,7 @@ function configureModLoader()
 		cboxCaller = UiCheckbox()
 			:width(1):heightpx(41)
 			:settooltip(
-				"Include timestamp and stacktrace when printing to console."
+				"Include timestamp and stacktrace in LOG messages."
 			)
 			:decorate({
 				DecoButton(),
