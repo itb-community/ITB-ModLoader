@@ -470,6 +470,18 @@ function modApi:addWeapon_Texts(tbl)
 	end
 end
 
+--[[
+	Reload the settings file to have access to selected settings
+	from in-game lua scripts.
+--]]
+function modApi:loadSettings()
+	local path = os.getKnownFolder(5).."/My Games/Into The Breach/settings.lua"
+	if self:fileExists(path) then
+		-- Load the Settings table into global namespace
+		dofile(path)
+	end
+end
+
 -- //////////////////////////////////////////////////////////////////////////////
 -- Hooks
 
@@ -692,6 +704,9 @@ end
 -- Map handling
 
 function modApi:fileExists(name)
+	assert(name ~= nil, "Filename is nil")
+	assert(type(name) == "string", "Filename is not a string")
+
 	local f = io.open(name, "rb")
 
 	if f ~= nil then

@@ -214,31 +214,12 @@ end
 
 -- ///////////////////////////////////////////////////////////////////
 
-local function file_exists(name)
-	assert(name ~= nil, "File is nil")
-	assert(type(name) == "string", "Not a string")
-	local f = io.open(name, "r")
-	if f ~= nil then io.close(f) return true else return false end
-end
-
---[[
-	Reload the settings file to have access to selected settings
-	from in-game lua scripts.
---]]
-local function loadSettings()
-	local path = os.getKnownFolder(5).."/My Games/Into The Breach/settings.lua"
-	if file_exists(path) then
-		-- Load the Settings table into global namespace
-		dofile(path)
-	end
-end
-
 --[[
 	Reload data from the save file to obtain up-to-date
 	instances of GameData, RegionData, and SquadData
 --]]
 local function restoreGameVariables()
-	loadSettings() -- make sure it's up-to-date
+	modApi:loadSettings() -- make sure it's up-to-date
 
 	-- Grab the last profile from settings. It's updated as soon
 	-- as the player switches the profile, so it should be okay.
@@ -246,7 +227,7 @@ local function restoreGameVariables()
 		local path = os.getKnownFolder(5).."/My Games/Into The Breach/"
 		local saveFile = path.."profile_"..Settings.last_profile.."/saveData.lua"
 		
-		if file_exists(saveFile) then
+		if modApi:fileExists(saveFile) then
 			-- Load the current save file
 			-- Store old GAME table, load the file, and restore old table
 			local oldGAME = GAME
