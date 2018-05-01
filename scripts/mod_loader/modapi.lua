@@ -184,6 +184,7 @@ function modApi:init()
 		end
 
 		modApi:updateScheduledHooks()
+		modApi:evaluateConditionalHooks()
 	end)
 end
 
@@ -308,6 +309,8 @@ function modApi:resetModContent()
 		"img/units/player/mech_leap_ns.png",
 	}
 	self.resourceDat = sdl.resourceDat("resources/resource.dat")
+
+	self.conditionalHooks = {}
 	self.scheduledHooks = {}
 	self.nextTurnHooks = {}
 	self.missionUpdateHooks = {}
@@ -585,6 +588,30 @@ function modApi:processRunLaterQueue(mission)
 			q[j] = q[i]
 			q[i] = nil
 			i = i + 1
+		end
+	end
+end
+
+--[[
+	Registers a conditional hook which will be
+	executed once the condition function associated
+	with it returns true.
+--]]
+function modApi:conditionalHook(conditionFn, fn)
+	assert(type(conditionFn) == "function")
+	assert(type(fn) == "function")
+
+	table.insert(self.conditionalHooks, {
+		condition = conditionFn,
+		hook = fn
+	})
+end
+
+function modApi:evaluateConditionalHooks()
+	for i, tbl in ipairs(self.conditionalHooks) do
+		if tbl.condition() then
+			table.remove(self.conditionalHooks, i)
+			tbl.hook()
 		end
 	end
 end
