@@ -239,6 +239,8 @@ local function restoreGameVariables()
 end
 
 function startNewGame()
+	modApi:loadSettings()
+	
 	GameData = nil
 	RegionData = nil
 	SquadData = nil
@@ -278,12 +280,12 @@ function startNewGame()
 end
 
 function LoadGame()
-	loadSettings()
+	modApi:loadSettings()
 
 	GAME.modOptions = GAME.modOptions or mod_loader:getModConfig()
 	GAME.modLoadOrder = GAME.modLoadOrder or mod_loader:getSavedModOrder()
 
-	mod_loader:loadModContent(GAME.modOptions,GAME.modLoadOrder)
+	mod_loader:loadModContent(GAME.modOptions, GAME.modLoadOrder)
 	
 	if GAME.squadTitles then
 		for k, name in pairs(GAME.squadTitles) do
@@ -299,6 +301,7 @@ function LoadGame()
 
 	oldLoadGame()
 
+	restoreGameVariables()
 	overrideNextPhase()
 
 	for i, hook in ipairs(modApi.postLoadGameHooks) do
