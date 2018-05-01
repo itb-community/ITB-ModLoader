@@ -87,7 +87,7 @@ function mod_loader:enumerateMods()
 			data.resourcePath = string.format("mods/%s/",dir)
 			
 			data.initialized = false
-			data.installed = true
+			data.installed = false
 			
 			self.mods[data.id] = data
 			
@@ -140,7 +140,7 @@ function mod_loader:initMod(id)
 end
 
 function mod_loader:hasMod(id)
-	return self.mods[id] and self.mods[id].installed
+	return self.mods[id] and self.mod_options[id].enabled
 end
 
 function mod_loader:getModContentDefaults()
