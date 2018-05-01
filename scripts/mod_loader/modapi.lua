@@ -7,11 +7,6 @@ modApi = {}
 
 local prev_path = package.path
 
-local function file_exists(name)
-   local f = io.open(name,"rb")
-   if f ~= nil then io.close(f) return true else return false end
-end
-
 function modApi:init()
 	self.logger = require("scripts/mod_loader/logger")
 	applyModLoaderConfig(loadModLoaderConfig())
@@ -24,7 +19,7 @@ function modApi:init()
 	self.currentModSquads = {}
 	self.currentModSquadText = {}
 	
-	if not file_exists("resources/resource.dat.bak") then
+	if not self:fileExists("resources/resource.dat.bak") then
 		LOG("Backing up resource.dat")
 	
 		local from = io.open("resources/resource.dat","rb")
@@ -188,77 +183,6 @@ function modApi:init()
 	end)
 end
 
-function modApi:deltaTime()
-	return self.msDeltaTime
-end
-
-function modApi:elapsedTime()
-	-- return cached time, so that mods don't get different
-	-- timings depending on when in the frame they called
-	-- this function.
-	return self.msLastElapsed
-end
-
---[[
-	Returns true if this string starts with the prefix string
---]]
-function modApi:stringStartsWith(str, prefix)
-	return string.sub(str,1,string.len(prefix)) == prefix
-end
-
---[[
-	Returns true if this string ends with the suffix string
---]]
-function modApi:stringEndsWith(str, suffix)
-	return suffix == "" or string.sub(str,-string.len(suffix)) == suffix
-end
-
---[[
-	Trims leading and trailing whitespace from the string.
-
-	trim11 from: http://lua-users.org/wiki/StringTrim
---]]
-function modApi:trimString(str)
-	local n = str:find"%S"
-	return n and str:match(".*%S", n) or ""
-end
-
-function modApi:splitString(test,sep)
-	if sep == nil then
-		sep = "%s"
-	end
-
-	local t = {}
-	for str in string.gmatch(test, "([^"..sep.."]+)") do
-		table.insert(t, str)
-	end
-
-	return t
-end
-
-function modApi:isVersion(version,comparedTo)
-	assert(type(version) == "string")
-	if not comparedTo then
-		comparedTo = self.version
-	end
-	assert(type(comparedTo) == "string")
-	
-	local v1 = self:splitString(version,"%D")
-	local v2 = self:splitString(comparedTo,"%D")
-	
-	for i = 1, math.min(#v1,#v2) do
-		local n1 = tonumber(v1[i])
-		local n2 = tonumber(v2[i])
-		if n1 > n2 then
-			return false
-		elseif n1 < n2 then
-			return true
-		end
-	end
-	
-	return #v1 <= #v2
-end
-
 --Maintain sanity
 --Update as new API functions are added
 function modApi:resetModContent()
@@ -405,6 +329,80 @@ function modApi:setCurrentMod(mod)
 	self.currentModSquadText[mod] = {}
 end
 
+-- //////////////////////////////////////////////////////////////////////////////
+-- API
+
+function modApi:deltaTime()
+	return self.msDeltaTime
+end
+
+function modApi:elapsedTime()
+	-- return cached time, so that mods don't get different
+	-- timings depending on when in the frame they called
+	-- this function.
+	return self.msLastElapsed
+end
+
+--[[
+	Returns true if this string starts with the prefix string
+--]]
+function modApi:stringStartsWith(str, prefix)
+	return string.sub(str,1,string.len(prefix)) == prefix
+end
+
+--[[
+	Returns true if this string ends with the suffix string
+--]]
+function modApi:stringEndsWith(str, suffix)
+	return suffix == "" or string.sub(str,-string.len(suffix)) == suffix
+end
+
+--[[
+	Trims leading and trailing whitespace from the string.
+
+	trim11 from: http://lua-users.org/wiki/StringTrim
+--]]
+function modApi:trimString(str)
+	local n = str:find"%S"
+	return n and str:match(".*%S", n) or ""
+end
+
+function modApi:splitString(test,sep)
+	if sep == nil then
+		sep = "%s"
+	end
+
+	local t = {}
+	for str in string.gmatch(test, "([^"..sep.."]+)") do
+		table.insert(t, str)
+	end
+
+	return t
+end
+
+function modApi:isVersion(version,comparedTo)
+	assert(type(version) == "string")
+	if not comparedTo then
+		comparedTo = self.version
+	end
+	assert(type(comparedTo) == "string")
+	
+	local v1 = self:splitString(version,"%D")
+	local v2 = self:splitString(comparedTo,"%D")
+	
+	for i = 1, math.min(#v1,#v2) do
+		local n1 = tonumber(v1[i])
+		local n2 = tonumber(v2[i])
+		if n1 > n2 then
+			return false
+		elseif n1 < n2 then
+			return true
+		end
+	end
+	
+	return #v1 <= #v2
+end
+
 function modApi:addGenerationOption(id, name, tip, data)
 	assert(type(id) == "string" or type(id) == "number")
 	assert(type(name) == "string")
@@ -448,7 +446,7 @@ function modApi:addSquad(squad, name, desc, icon)
 	assert(#squad == 4)
 	assert(type(name) == "string")
 	assert(type(desc) == "string")
-	
+
 	table.insert(self.mod_squads, squad)
 	table.insert(self.squad_text, name)
 	table.insert(self.squad_text, desc)
@@ -464,6 +462,16 @@ function modApi:overwriteText(id,str)
 	assert(type(str) == "string")
 	self.textOverrides[id] = str
 end
+
+function modApi:addWeapon_Texts(tbl)
+	assert(type(tbl) == "table")
+	for k,v in pairs(tbl) do
+		Weapon_Texts[k] = v
+	end
+end
+
+-- //////////////////////////////////////////////////////////////////////////////
+-- Hooks
 
 function modApi:addPreMissionAvailableHook(fn)
 	assert(type(fn) == "function")
@@ -509,7 +517,7 @@ function modApi:addMissionStartHook(fn)
 	table.insert(self.missionStartHooks,fn)
 end
 
-function modApi:addMissionEndHook(fn,i)
+function modApi:addMissionEndHook(fn, i)
 	assert(type(fn) == "function")
 	if i ~= nil then
 		assert(type(i) == "number")
@@ -657,14 +665,7 @@ function modApi:updateScheduledHooks()
 	end
 end
 
-function modApi:addWeapon_Texts(tbl)
-	assert(type(tbl) == "table")
-	for k,v in pairs(tbl) do
-		Weapon_Texts[k] = v
-	end
-end
-
-function modApi:addPopEvent(event,msg)
+function modApi:addPopEvent(event, msg)
 	assert(type(event) == "string")
 	assert(type(msg) == "string")
 	if not self.PopEvents[event] then
@@ -674,7 +675,7 @@ function modApi:addPopEvent(event,msg)
 	table.insert(self.PopEvents[event],msg)
 end
 
-function modApi:setPopEventOdds(event,odds)
+function modApi:setPopEventOdds(event, odds)
 	assert(type(event) == "string")
 	assert(self.PopEvents[event])
 	assert(odds == nil or type(odds) == "number")
@@ -687,7 +688,21 @@ function modApi:addOnPopEvent(fn)
 	table.insert(self.onGetPopEvent,fn)
 end
 
-function modApi:copyfile(src, dst)
+-- //////////////////////////////////////////////////////////////////////////////
+-- Map handling
+
+function modApi:fileExists(name)
+	local f = io.open(name, "rb")
+
+	if f ~= nil then
+		io.close(f)
+		return true
+	else
+		return false
+	end
+end
+
+function modApi:copyFile(src, dst)
 	assert(type(src) == "string")
 	assert(type(dst) == "string")
 
@@ -742,11 +757,14 @@ function modApi:addMap(path)
 	if list_contains(self.defaultMaps, mapname) then
 		LOG(string.format("Unable to add map '%s', because it would overwrite a vanilla map.", path))
 	else
-		self:copyfile(path, "maps/"..mapfile)
+		self:copyFile(path, "maps/"..mapfile)
 	end
 end
 
-function modApi:appendAsset(resource,filePath)
+-- //////////////////////////////////////////////////////////////////////////////
+-- Resource.dat handling
+
+function modApi:appendAsset(resource, filePath)
 	assert(type(resource) == "string")
 	local f = io.open(filePath,"rb")
 	assert(f,filePath)
