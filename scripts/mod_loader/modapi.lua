@@ -331,7 +331,8 @@ function modApi:resetModContent()
 	self.missionEndHooks = {
 		--Pilot Message
 		function(mission,ret)
-			ret:AddScript([[local ret = SkillEffect()
+			ret:AddScript([[
+			local ret = SkillEffect()
 			local enemy_count = Board:GetEnemyCount()
 			if enemy_count == 0 then
 				ret:AddVoice("MissionEnd_Dead", -1)
@@ -343,7 +344,8 @@ function modApi:resetModContent()
 		
 		--Population Event
 		function(mission,ret)
-			ret:AddScript([[local ret = SkillEffect()
+			ret:AddScript([[
+			local ret = SkillEffect()
 			local enemy_count = Board:GetEnemyCount()
 			
 			if CurrentMission:GetDamage() == 0 then
@@ -381,7 +383,8 @@ function modApi:resetModContent()
 		
 		--End Delay
 		function(mission,ret)
-			ret:AddScript([[local ret = SkillEffect()
+			ret:AddScript([[
+			local ret = SkillEffect()
 			--ret:AddDelay(CurrentMission:GetEndDelay())
 			Board:AddEffect(ret)]])
 		end,
@@ -402,18 +405,25 @@ function modApi:setCurrentMod(mod)
 	self.currentModSquadText[mod] = {}
 end
 
-function modApi:addGenerationOption(id,name,tip,data)
+function modApi:addGenerationOption(id, name, tip, data)
 	assert(type(id) == "string" or type(id) == "number")
 	assert(type(name) == "string")
 	tip = tip or nil
 	assert(type(tip) == "string")
 	data = data or {}
-	assert(type(data) == "table")--Misc stuff
+	assert(type(data) == "table") -- Misc stuff
 	for i, option in ipairs(mod_loader.mod_options[self.currentMod]) do
 		assert(option.id ~= id)
 	end
 	
-	local option = {id = id, name = name, tip = tip, check = true, enabled = true, data = data}
+	local option = {
+		id = id,
+		name = name,
+		tip = tip,
+		check = true,
+		enabled = true,
+		data = data
+	}
 	
 	if data.values then
 		assert(#data.values > 0)
@@ -426,22 +436,23 @@ function modApi:addGenerationOption(id,name,tip,data)
 		option.enabled = false
 	end
 	
-	table.insert(mod_loader.mod_options[self.currentMod].options,option)
+	table.insert(mod_loader.mod_options[self.currentMod].options, option)
 end
 
-function modApi:addSquadTrue(squad,name,desc,icon)
-	return self:addSquad(squad,name,desc,icon)
+function modApi:addSquadTrue(squad, name, desc, icon)
+	return self:addSquad(squad, name, desc, icon)
 end
 
-function modApi:addSquad(squad,name,desc,icon)
+function modApi:addSquad(squad, name, desc, icon)
 	assert(type(squad) == "table")
 	assert(#squad == 4)
 	assert(type(name) == "string")
 	assert(type(desc) == "string")
-	table.insert(self.mod_squads,squad)
-	table.insert(self.squad_text,name)
-	table.insert(self.squad_text,desc)
-	table.insert(self.squad_icon,icon or "resources/mods/squads/unknown.png")
+	
+	table.insert(self.mod_squads, squad)
+	table.insert(self.squad_text, name)
+	table.insert(self.squad_text, desc)
+	table.insert(self.squad_icon, icon or "resources/mods/squads/unknown.png")
 end
 
 function modApi:overwriteTextTrue(id,str)

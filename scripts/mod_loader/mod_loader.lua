@@ -11,7 +11,7 @@ function mod_loader:init()
 	
 	self:enumerateMods()
 	
-	local orderedMods = self:orderMods(self:getModConfig(),self:getSavedModOrder())
+	local orderedMods = self:orderMods(self:getModConfig(), self:getSavedModOrder())
 	for i, id in ipairs(orderedMods) do
 		modApi:setCurrentMod(id)
 		self:initMod(id)
@@ -19,7 +19,7 @@ function mod_loader:init()
 	
 	modApi:finalize()
 	
-	self:loadModContent(self:getModConfig(),self:getSavedModOrder())
+	self:loadModContent(self:getModConfig(), self:getSavedModOrder())
 end
 
 function mod_loader:enumerateMods()
@@ -108,12 +108,10 @@ end
 function mod_loader:initMod(id)
 	local mod = self.mods[id]
 
-	local function pinit()
-		mod.init(mod)
-	end
-
 	local ok, err = xpcall(
-		pinit,
+		function()
+			mod.init(mod)
+		end,
 		function(e)
 			return string.format(
 				"Initializing mod [%s] with id [%s] failed: %s\n%s",
@@ -227,7 +225,7 @@ local function requireMod(self, options, ordered, traversed, id)
 	end
 end
 
-function mod_loader:orderMods(options,savedOrder)
+function mod_loader:orderMods(options, savedOrder)
 	local options = shallow_copy(options)
 	
 	local traversed = {}
@@ -280,12 +278,14 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 		if mod.initialized then
 			modApi:setCurrentMod(id)
 
-			local function pload()
-				mod.load(mod, mod_options[id].options, mod_options[id].version)
-			end
-
 			local ok, err = xpcall(
-				pload,
+				function()
+					mod.load(
+						mod,
+						mod_options[id].options,
+						mod_options[id].version
+					)
+				end,
 				function(e)
 					return string.format(
 						"Loading mod [%s] with id [%s] failed: %s\n%s",
