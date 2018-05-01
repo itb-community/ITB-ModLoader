@@ -2,38 +2,45 @@
 
 ## Table of Contents
 
-[init.lua](#initlua)
+* [init.lua](#initlua)
 
-[API](#api)
-* [modApi:deltaTime](#modapideltatime)
-* [modApi:elapsedTime](#modapielapsedtime)
-* [modApi:scheduleHook](#modapischedulehook)
-* [modApi:splitString](#modapisplitstring)
-* [modApi:isVersion](#modapiisversion)
-* [modApi:addGenerationOption](#modapiaddgenerationoption)
-* [modApi:appendAsset](#modapiappendasset)
-* [modApi:addSquad](#modapiaddsquad)
-* [modApi:overwriteText](#modapioverwritetext)
-* [modApi:addWeapon_Texts](#modapiaddweapon_texts)
-* [modApi:addPopEvent](#modapiaddpopevent)
-* [modApi:setPopEventOdds](#modapisetpopeventodds)
-* [modApi:addOnPopEvent](#modapiaddonpopevent)
+* [API](#api)
+	* [modApi:deltaTime](#modapideltatime)
+	* [modApi:elapsedTime](#modapielapsedtime)
+	* [modApi:scheduleHook](#modapischedulehook)
+	* [modApi:runLater](#modapirunlater)
+	* [modApi:splitString](#modapisplitstring)
+	* [modApi:trimString](#modapitrimstring)
+	* [modApi:stringStartsWith](#modapistringstartswith)
+	* [modApi:stringEndsWith](#modapistringendswith)
+	* [modApi:isVersion](#modapiisversion)
+	* [modApi:addGenerationOption](#modapiaddgenerationoption)
+	* [modApi:appendAsset](#modapiappendasset)
+	* [modApi:addSquad](#modapiaddsquad)
+	* [modApi:overwriteText](#modapioverwritetext)
+	* [modApi:addWeapon_Texts](#modapiaddweapon_texts)
+	* [modApi:addPopEvent](#modapiaddpopevent)
+	* [modApi:setPopEventOdds](#modapisetpopeventodds)
+	* [modApi:addOnPopEvent](#modapiaddonpopevent)
+	* [modApi:addMap](#modapiaddmap)
 
-[Hooks](#hooks)
-* [preMissionAvailableHook](#premissionavailablehook)
-* [missionAvailableHook](#missionavailablehook)
-* [preEnvironmentHook](#preenvironmenthook)
-* [postEnvironmentHook](#postenvironmenthook)
-* [nextTurnHook](#nextturnhook)
-* [missionUpdateHook](#missionupdatehook)
-* [missionStartHook](#missionstarthook)
-* [missionEndHook](#missionendhook)
-* [voiceEventHook](#voiceeventhook)
-* [preStartGameHook](#prestartgamehook)
-* [postStartGameHook](#poststartgamehook)
-* [preLoadGameHook](#preloadgamehook)
-* [postLoadGameHook](#postloadgamehook)
-* [saveGameHook](#savegamehook)
+* [Hooks](#hooks)
+	* [preMissionAvailableHook](#premissionavailablehook)
+	* [postMissionAvailableHook](#postmissionavailablehook)
+	* [preEnvironmentHook](#preenvironmenthook)
+	* [postEnvironmentHook](#postenvironmenthook)
+	* [nextTurnHook](#nextturnhook)
+	* [missionUpdateHook](#missionupdatehook)
+	* [missionStartHook](#missionstarthook)
+	* [missionEndHook](#missionendhook)
+	* [missionNextPhaseCreatedHook](#missionnextphasecreatedhook)
+	* [voiceEventHook](#voiceeventhook)
+	* [preStartGameHook](#prestartgamehook)
+	* [postStartGameHook](#poststartgamehook)
+	* [preLoadGameHook](#preloadgamehook)
+	* [postLoadGameHook](#postloadgamehook)
+	* [saveGameHook](#savegamehook)
+
 
 ## init.lua
 
@@ -130,6 +137,36 @@ end)
 ```
 
 
+### `modApi:runLater`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `fn` | function | Argumentless function which will be invoked on game's next update step. |
+
+Executes the function on the game's next update step. Only works during missions.
+
+Calling this during game loop (either in a function called from `missionUpdate`, `missionUpdateHook`, or as a result of previous `runLater`) will correctly schedule the function to be invoked during the next update step (not the current one).
+
+Example:
+```lua
+local pawn = Board:GetPawn(Point(0, 0))
+
+local d = SpaceDamage(Point(0, 0))
+d.iFire = EFFECT_CREATE
+Board:DamageSpace(d)
+
+LOG(pawn:IsFire()) -- prints false, the tile's Fire status was
+                   -- not applied to the pawn yet (this happens
+                   -- during the game's update step)
+
+modApi:runLater(function()
+	LOG(pawn:IsFire()) -- prints true, the game already went
+	                   -- through its update step and applied
+	                   -- the Fire status to the pawn
+end)
+```
+
+
 ### `modApi:splitString`
 
 | Argument name | Type | Description |
@@ -138,6 +175,56 @@ end)
 | `separator` | string | The string to split by. Defaults to whitespace if omitted |
 
 Splits the input string around the provided separator string, and returns a table holding the split string.
+
+
+### `modApi:trimString`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `input` | string | The string to be trimmed |
+
+Trims leading and trailing whitespace from the string.
+
+Example:
+```lua
+LOG(modApi:trimString("   some text !   ")) -- prints 'some text !'
+```
+
+
+### `modApi:stringStartsWith`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `input` | string | The string to test |
+| `prefix` | string | The prefix string that the `input` string should be starting with |
+
+Returns true if the `input` string starts with the `prefix` string.
+
+Example:
+```lua
+local string = "PunchMech"
+if modApi:stringStartsWith(string, "Punch") then
+	LOG("It does")
+end
+```
+
+
+### `modApi:stringEndsWith`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `input` | string | The string to test |
+| `suffix` | string | The suffix string that the `input` string should be ending with |
+
+Returns true if the `input` string ends with the `suffix` string.
+
+Example:
+```lua
+local string = "PunchMech"
+if modApi:stringEndsWith(string, "Mech") then
+	LOG("It does")
+end
+```
 
 
 ### `modApi:isVersion`
@@ -363,6 +450,24 @@ end)
 ```
 
 
+### `modApi:addMap`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `mapPath` | string | Path to the map file. |
+
+Copies the specified map to the game's `maps/` directory. Cannot overwrite default (vanilla) maps. **Call in your mod's `init()` function.**
+
+This function ignores the file's parent directories, and only takes the filename into consideration. `some/long/path/to/mymap.map` and `path/mymap.map` will both be copied to `maps/mymap.map`.
+
+Example:
+```lua
+local function init(self)
+	modApi:addMap(self.resourcePath .. "maps/somemap.map")
+end
+```
+
+
 ## Hooks
 
 ### `preMissionAvailableHook`
@@ -383,7 +488,7 @@ modApi:addPreMissionAvailableHook(hook)
 ```
 
 
-### `missionAvailableHook`
+### `postMissionAvailableHook`
 
 | Argument name | Type | Description |
 |---------------|------|-------------|
@@ -397,7 +502,7 @@ local hook = function(mission)
 	LOG("New mission is now available!")
 end
 
-modApi:addMissionAvailableHook(hook)
+modApi:addPostMissionAvailableHook(hook)
 ```
 
 
@@ -513,6 +618,25 @@ modApi:addMissionEndHook(hook)
 ```
 
 
+### `missionNextPhaseCreatedHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `prevMission` | table | A table holding information about the previous mission (the one the player just completed) |
+| `nextMission` | table | A table holding information about the next mission (the one the player is now entering) |
+
+Fired when a mission with `NextPhase` defined constructs its next phase mission object. 
+
+Example:
+```lua
+local hook = function(prevMission, nextMission)
+	LOG("Left mission " .. prevMission.ID .. ", going into " .. nextMission.ID)
+end
+
+modApi:addMissionNextPhaseCreatedHook(hook)
+```
+
+
 ### `voiceEventHook`
 
 | Argument name | Type | Description |
@@ -546,7 +670,7 @@ Fired right after the player exits the hangar and right after mods are loaded, b
 
 Example:
 ```lua
-local hook = function(mission)
+local hook = function()
 	LOG("About to start a new game!")
 end
 
@@ -560,7 +684,7 @@ Fired after the player exits the hangar and game variables are set up (`GAME`, `
 
 Example:
 ```lua
-local hook = function(mission)
+local hook = function()
 	LOG("Started a new game!")
 end
 
@@ -574,7 +698,7 @@ Fired after mods are loaded, but before savegame data is loaded. Triggers when p
 
 Example:
 ```lua
-local hook = function(mission)
+local hook = function()
 	LOG("We're about to load a savegame!")
 end
 
@@ -588,7 +712,7 @@ Fired after savegame data is loaded. Triggers when pressing "Continue" and when 
 
 Example:
 ```lua
-local hook = function(mission)
+local hook = function()
 	LOG("We've loaded a savegame!")
 end
 
@@ -602,7 +726,7 @@ Fired before the game is saved.
 
 Example:
 ```lua
-local hook = function(mission)
+local hook = function()
 	LOG("Game is being saved!")
 end
 

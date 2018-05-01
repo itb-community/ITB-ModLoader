@@ -50,6 +50,8 @@ function Mission:BaseNextTurn()
 end
 
 function Mission:BaseUpdate()
+	modApi:processRunLaterQueue(self)
+
 	oldBaseUpdate(self)
 	
 	for i, hook in ipairs(modApi.missionUpdateHooks) do
@@ -125,6 +127,32 @@ function GetText(id)
 	return oldGetText(id)
 end
 
+--[[
+	GAME's class is GameObject, defined in game.lua
+	But that class is local to that file, so we can't access
+	it here. We have to override the function on the instance
+	of the GAME object. Defer this into a function call, since
+	GAME is not available when the modloader is ran.
+--]]
+local function overrideNextPhase()
+	GAME.CreateNextPhase = function(self, mission)
+		local prevMission = self:GetMission(mission)
+		local nxtId = prevMission.NextPhase
+
+		getmetatable(self).CreateNextPhase(self, mission)
+
+		if nxtId ~= "" then
+			-- Set the mission's id, since the game doesn't do it
+			local nextMission = _G[nxtId]
+			nextMission.ID = nxtId
+
+			for i, hook in ipairs(modApi.missionNextPhaseCreatedHooks) do
+				hook(prevMission, nextMission)
+			end
+		end
+	end
+end
+
 function GetPopulationTexts(event, count)
 	local nullReturn = count == 1 and "" or {}
 	
@@ -186,31 +214,12 @@ end
 
 -- ///////////////////////////////////////////////////////////////////
 
-local function file_exists(name)
-	assert(name ~= nil, "File is nil")
-	assert(type(name) == "string", "Not a string")
-	local f = io.open(name, "r")
-	if f ~= nil then io.close(f) return true else return false end
-end
-
---[[
-	Reload the settings file to have access to selected settings
-	from in-game lua scripts.
---]]
-local function loadSettings()
-	local path = os.getKnownFolder(5).."/My Games/Into The Breach/settings.lua"
-	if file_exists(path) then
-		-- Load the Settings table into global namespace
-		dofile(path)
-	end
-end
-
 --[[
 	Reload data from the save file to obtain up-to-date
 	instances of GameData, RegionData, and SquadData
 --]]
 local function restoreGameVariables()
-	loadSettings() -- make sure it's up-to-date
+	modApi:loadSettings() -- make sure it's up-to-date
 
 	-- Grab the last profile from settings. It's updated as soon
 	-- as the player switches the profile, so it should be okay.
@@ -218,7 +227,7 @@ local function restoreGameVariables()
 		local path = os.getKnownFolder(5).."/My Games/Into The Breach/"
 		local saveFile = path.."profile_"..Settings.last_profile.."/saveData.lua"
 		
-		if file_exists(saveFile) then
+		if modApi:fileExists(saveFile) then
 			-- Load the current save file
 			-- Store old GAME table, load the file, and restore old table
 			local oldGAME = GAME
@@ -230,6 +239,8 @@ local function restoreGameVariables()
 end
 
 function startNewGame()
+	modApi:loadSettings()
+	
 	GameData = nil
 	RegionData = nil
 	SquadData = nil
@@ -242,6 +253,8 @@ function startNewGame()
 	end
 
 	oldStartNewGame()
+
+	overrideNextPhase()
 	
 	GAME.modOptions = modOptions
 	GAME.modLoadOrder = savedOrder
@@ -267,12 +280,12 @@ function startNewGame()
 end
 
 function LoadGame()
-	loadSettings()
+	modApi:loadSettings()
 
 	GAME.modOptions = GAME.modOptions or mod_loader:getModConfig()
 	GAME.modLoadOrder = GAME.modLoadOrder or mod_loader:getSavedModOrder()
 
-	mod_loader:loadModContent(GAME.modOptions,GAME.modLoadOrder)
+	mod_loader:loadModContent(GAME.modOptions, GAME.modLoadOrder)
 	
 	if GAME.squadTitles then
 		for k, name in pairs(GAME.squadTitles) do
@@ -284,7 +297,12 @@ function LoadGame()
 		hook()
 	end
 
+	GAME.CreateNextPhase = nil
+
 	oldLoadGame()
+
+	restoreGameVariables()
+	overrideNextPhase()
 
 	for i, hook in ipairs(modApi.postLoadGameHooks) do
 		hook()
@@ -303,9 +321,11 @@ function SaveGame()
 		-- defined, to prevent grabbing stale data.
 		modApi:scheduleHook(50, function()
 			restoreGameVariables()
+			overrideNextPhase()
 		end)
 	end
 
+	GAME.CreateNextPhase = nil
 	return oldSaveGame()
 end
 
@@ -331,4 +351,14 @@ function Move:GetSkillEffect(p1, p2)
     end
     
     return originalGetSkillEffect(self, p1, p2)
+end
+
+function CreatePilot(data)
+	_G[data.Id] = Pilot:new(data)
+
+	-- Make sure we don't create duplicates if the PilotList
+	-- already contains entry for this pilot
+	if data.Rarity ~= 0 and not list_contains(PilotList, data.Id) then
+		PilotList[#PilotList + 1] = data.Id
+	end
 end

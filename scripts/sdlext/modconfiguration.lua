@@ -73,6 +73,14 @@ function configureMods()
 			scrollarea:relayout()
 			return true
 		end
+
+		local getDisplayName = function(mod)
+			local r = mod.name
+			if mod.version then
+				r = r .. "  v".. mod.version
+			end
+			return r
+		end
 		
 		for id, option in pairs(mod_options) do
 			if mod_loader:hasMod(id) then
@@ -102,7 +110,7 @@ function configureMods()
 								nil,
 								1
 							),
-							DecoText(mod.name)
+							DecoText(getDisplayName(mod))
 						})
 						:addTo(entryHeader)
 					
@@ -164,7 +172,7 @@ function configureMods()
 						optionsHolder:add( optionbox )
 						table.insert(optionboxes[configbox.configi], optionbox)
 					end
-				else	
+				else
 					local checkbox = UiCheckbox()
 						:width(1):heightpx(41)
 						:decorate({
@@ -177,7 +185,7 @@ function configureMods()
 								nil,
 								1
 							),
-							DecoText(mod.name)
+							DecoText(getDisplayName(mod))
 						})
 						:addTo(entryHolder)
 					

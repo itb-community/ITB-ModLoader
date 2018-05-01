@@ -11,7 +11,7 @@ function mod_loader:init()
 	
 	self:enumerateMods()
 	
-	local orderedMods = self:orderMods(self:getModConfig(),self:getSavedModOrder())
+	local orderedMods = self:orderMods(self:getModConfig(), self:getSavedModOrder())
 	for i, id in ipairs(orderedMods) do
 		modApi:setCurrentMod(id)
 		self:initMod(id)
@@ -19,7 +19,7 @@ function mod_loader:init()
 	
 	modApi:finalize()
 	
-	self:loadModContent(self:getModConfig(),self:getSavedModOrder())
+	self:loadModContent(self:getModConfig(), self:getSavedModOrder())
 end
 
 function mod_loader:enumerateMods()
@@ -87,7 +87,7 @@ function mod_loader:enumerateMods()
 			data.resourcePath = string.format("mods/%s/",dir)
 			
 			data.initialized = false
-			data.installed = true
+			data.installed = false
 			
 			self.mods[data.id] = data
 			
@@ -107,14 +107,29 @@ end
 
 function mod_loader:initMod(id)
 	local mod = self.mods[id]
-	
-	local function pinit()
-		mod.init(mod)
-	end
-	local ok, err = xpcall(pinit,function(e) return string.format("Initializing mod [%s] with id [%s] failed: %s\n%s",mod.name,id,e,debug.traceback()) end)
+
+	local ok, err = xpcall(
+		function()
+			mod.init(mod)
+		end,
+		function(e)
+			return string.format(
+				"Initializing mod [%s] with id [%s] failed: %s\n%s",
+				mod.name,
+				id,
+				e,
+				debug.traceback()
+			)
+		end
+	)
+
 	if ok then
 		mod.initialized = true
-		LOG(string.format("Initialized mod [%s] with id [%s] successfully!",mod.name,id))
+		LOG(string.format(
+			"Initialized mod [%s] with id [%s] successfully!",
+			mod.name,
+			id
+		))
 	else
 		mod.initialized = false
 		mod.installed = false
@@ -125,7 +140,7 @@ function mod_loader:initMod(id)
 end
 
 function mod_loader:hasMod(id)
-	return self.mods[id] and self.mods[id].installed
+	return self.mods[id] and self.mod_options[id].enabled
 end
 
 function mod_loader:getModContentDefaults()
@@ -210,7 +225,7 @@ local function requireMod(self, options, ordered, traversed, id)
 	end
 end
 
-function mod_loader:orderMods(options,savedOrder)
+function mod_loader:orderMods(options, savedOrder)
 	local options = shallow_copy(options)
 	
 	local traversed = {}
@@ -254,24 +269,54 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 	--For helping with the standardized mod API--
 	modApi:resetModContent()
 	
-	local orderedMods = self:orderMods(mod_options,savedOrder)
+	local orderedMods = self:orderMods(mod_options, savedOrder)
 	
 	for i, id in ipairs(orderedMods) do
 		local mod = self.mods[id]
-		modApi:setCurrentMod(id)
-		
-		local function pload()
-			mod.load(mod,mod_options[id].options,mod_options[id].version)
-		end
-		local ok, err = xpcall(pload,function(e) return string.format("Loading mod [%s] with id [%s] failed: %s\n%s",mod.name,id,e,debug.traceback()) end)
-		if ok then
-			mod.installed = true
-			LOG(string.format("Loaded mod [%s] with id [%s] successfully!",mod.name,id))
+
+		-- don't try to load mods that were not initialized
+		if mod.initialized then
+			modApi:setCurrentMod(id)
+
+			local ok, err = xpcall(
+				function()
+					mod.load(
+						mod,
+						mod_options[id].options,
+						mod_options[id].version
+					)
+				end,
+				function(e)
+					return string.format(
+						"Loading mod [%s] with id [%s] failed: %s\n%s",
+						mod.name,
+						id,
+						e,
+						debug.traceback()
+					)
+				end
+			)
+
+			if ok then
+				mod.installed = true
+				LOG(string.format(
+					"Loaded mod [%s] with id [%s] successfully!",
+					mod.name,
+					id
+				))
+			else
+				mod.installed = false
+				mod.error = err
+				if not self.firsterror then self.firsterror = err end
+				LOG(err)
+			end
 		else
 			mod.installed = false
-			mod.error = err
-			if not self.firsterror then self.firsterror = err end
-			LOG(err)
+			LOG(string.format(
+				"Failed to load mod [%s] with id [%s], because it was not initialized.",
+				mod.name,
+				id
+			))
 		end
 	end
 end
