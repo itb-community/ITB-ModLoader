@@ -494,22 +494,23 @@ function modApi:loadIntoEnv(scriptPath, envTable)
 end
 
 --[[
-	Reload the settings file to have access to selected settings
+	Reloads the settings file to have access to selected settings
 	from in-game lua scripts.
 --]]
 function modApi:loadSettings()
 	local path = os.getKnownFolder(5).."/My Games/Into The Breach/settings.lua"
 	if self:fileExists(path) then
-		-- Load the Settings table into global namespace
-		dofile(path)
+		return self:loadIntoEnv(path).Settings
 	end
+
+	return nil
 end
 
 function modApi:writeProfileData(id, obj)
-	self:loadSettings()
+	local settings = self:loadSettings()
 
 	sdlext.config(
-		"profile_"..Settings.last_profile.."/modcontent.lua",
+		"profile_"..settings.last_profile.."/modcontent.lua",
 		function(readObj)
 			readObj[id] = obj
 		end
@@ -517,12 +518,12 @@ function modApi:writeProfileData(id, obj)
 end
 
 function modApi:readProfileData(id)
-	self:loadSettings()
+	local settings = self:loadSettings()
 
 	local result = nil
 
 	sdlext.config(
-		"profile_"..Settings.last_profile.."/modcontent.lua",
+		"profile_"..settings.last_profile.."/modcontent.lua",
 		function(readObj)
 			result = readObj[id]
 		end

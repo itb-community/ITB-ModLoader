@@ -218,28 +218,24 @@ end
 	Reload data from the save file to obtain up-to-date
 	instances of GameData, RegionData, and SquadData
 --]]
-local function restoreGameVariables()
-	modApi:loadSettings() -- make sure it's up-to-date
-
+local function restoreGameVariables(settings)
 	-- Grab the last profile from settings. It's updated as soon
 	-- as the player switches the profile, so it should be okay.
-	if Settings then
-		local path = os.getKnownFolder(5).."/My Games/Into The Breach/"
-		local saveFile = path.."profile_"..Settings.last_profile.."/saveData.lua"
-		
-		if modApi:fileExists(saveFile) then
-			-- Load the current save file
-			-- Store old GAME table, load the file, and restore old table
-			local oldGAME = GAME
-			dofile(saveFile)
-			GAME = oldGAME
-			oldGAME = nil -- don't hog memory
-		end
+	local path = os.getKnownFolder(5).."/My Games/Into The Breach/"
+	local saveFile = path.."profile_"..settings.last_profile.."/saveData.lua"
+	
+	if modApi:fileExists(saveFile) then
+		-- Load the current save file
+		-- Store old GAME table, load the file, and restore old table
+		local oldGAME = GAME
+		dofile(saveFile)
+		GAME = oldGAME
+		oldGAME = nil -- don't hog memory
 	end
 end
 
 function startNewGame()
-	modApi:loadSettings()
+	Settings = modApi:loadSettings()
 	
 	GameData = nil
 	RegionData = nil
@@ -270,7 +266,7 @@ function startNewGame()
 	-- So we can't restore game vars there, cause then we'll have
 	-- competely wrong data.
 	modApi:scheduleHook(50, function()
-		restoreGameVariables()
+		restoreGameVariables(Settings)
 		-- Execute hook in the deferred callback, since we want
 		-- postStartGameHook to have access to the savegame data
 		for i, hook in ipairs(modApi.postStartGameHooks) do
@@ -280,7 +276,7 @@ function startNewGame()
 end
 
 function LoadGame()
-	modApi:loadSettings()
+	Settings = modApi:loadSettings()
 
 	GAME.modOptions = GAME.modOptions or mod_loader:getModConfig()
 	GAME.modLoadOrder = GAME.modLoadOrder or mod_loader:getSavedModOrder()
@@ -301,7 +297,7 @@ function LoadGame()
 
 	oldLoadGame()
 
-	restoreGameVariables()
+	restoreGameVariables(Settings)
 	overrideNextPhase()
 
 	for i, hook in ipairs(modApi.postLoadGameHooks) do
@@ -320,7 +316,8 @@ function SaveGame()
 		-- But only do that if we already have those vars
 		-- defined, to prevent grabbing stale data.
 		modApi:scheduleHook(50, function()
-			restoreGameVariables()
+			Settings = modApi:loadSettings()
+			restoreGameVariables(Settings)
 			overrideNextPhase()
 		end)
 	end
