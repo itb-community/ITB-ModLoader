@@ -114,6 +114,6 @@ function GetScripts() return {
 		
 	"user/missionData.lua",
 
-	"scripts/mod_loader/scripts.lua"
+	"scripts/mod_loader/__scripts.lua"
 }
 end
