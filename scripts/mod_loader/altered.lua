@@ -226,11 +226,11 @@ local function restoreGameVariables(settings)
 	
 	if modApi:fileExists(saveFile) then
 		-- Load the current save file
-		-- Store old GAME table, load the file, and restore old table
-		local oldGAME = GAME
-		dofile(saveFile)
-		GAME = oldGAME
-		oldGAME = nil -- don't hog memory
+		local env = modApi:loadIntoEnv(saveFile)
+		
+		GameData = env.GameData
+		RegionData = env.RegionData
+		SquadData = env.SquadData
 	end
 end
 
