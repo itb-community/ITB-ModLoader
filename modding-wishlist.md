@@ -74,3 +74,9 @@ This does not necessarily have to be via the in-game options menu. If casual pla
 ## Modding maps
 
 Currently, the entire `maps/` scripts directory is sandboxed, and completely separate from the `scripts/` directory, making dynamic control of map loading/selection logic fairly challenging, if not downright impossible. Handling maps through the same lua context as the other scripts would be a great addition.
+
+
+## Modding sound
+
+As it stands, modders have no way at all to add new sound files or define new fmod sound events (or it is prohibitively difficult). Perhaps it would be possible to have a `modded.bank` file loaded by the game, whose fmod project is exposed, allowing modification by mods?
+
