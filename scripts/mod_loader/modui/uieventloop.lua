@@ -1,3 +1,8 @@
+local eventLoopCount = 0
+function sdlext.isEventLoop()
+	return eventLoopCount > 0
+end
+
 function sdlext.uiEventLoop(init)
 	local screen = sdl.screen()
 	local eventloop = sdl.eventloop()
@@ -5,16 +10,18 @@ function sdlext.uiEventLoop(init)
 	local h = screen:h()
 	local quit = 0
 	local screenshot = sdl.screenshot()
-	local bg = sdl.rgba(0,0,0,128)
+	local bg = sdl.rgba(0, 0, 0, 128)
 	local ui = UiRoot():widthpx(w):heightpx(h)
 
-	init(ui,function()
+	init(ui, function()
 		quit = 1
 	end)
-	
+
+	eventLoopCount = eventLoopCount + 1
+
 	while quit == 0 do
 		while eventloop:next() do
-			local type = eventloop:type();
+			local type = eventloop:type()
 			
 			ui:event(eventloop)
 			
@@ -31,4 +38,6 @@ function sdlext.uiEventLoop(init)
 		ui:draw(screen)
 		screen:finish()
 	end
+
+	eventLoopCount = eventLoopCount - 1
 end
