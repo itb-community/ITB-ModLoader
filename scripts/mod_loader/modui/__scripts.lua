@@ -1,6 +1,7 @@
 local scripts = {
 	"uieventloop",
 	"root",
+	"versionstring",
 	"errorwarning",
 	"modcontent",
 	"modconfiguration",

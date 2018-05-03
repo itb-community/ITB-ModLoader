@@ -68,10 +68,14 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 		isInGame = Game ~= nil
 
 		if not uiRoot then
-			uiRoot = UiRoot()
+			uiRoot = UiRoot():widthpx(screen:w()):heightpx(screen:h())
+
 			for i, hook in ipairs(uiRootCreatedHooks) do
 				hook(screen, uiRoot)
 			end
+
+			-- clear the list of hooks since we're not gonna call it again
+			uiRootCreatedHooks = nil
 		end
 		uiRoot:widthpx(screen:w()):heightpx(screen:h())
 

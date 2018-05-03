@@ -1,3 +1,9 @@
+--[[
+	Adds a new entry to the "Mod Content" menu, allowing to arrange
+	pilots in a specific order, changing which ones become available
+	for selection in the hangar.
+--]]
+
 local function find(list, value)
 	for k, v in ipairs(list) do
 		if value == v then

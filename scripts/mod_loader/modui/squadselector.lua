@@ -1,3 +1,8 @@
+--[[
+	Adds a new entry to the "Mod Content" menu, allowing to select
+	which squads are available for selection in the hangar.
+--]]
+
 local maxselected = 8
 
 local function saveSquadSelection()

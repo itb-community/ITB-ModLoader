@@ -1,3 +1,9 @@
+--[[
+	Adds a new entry to the "Mod Content" menu, allowing to view a
+	list of all available mods, as well as inspect and modify any
+	options they have defined.
+--]]
+
 local function saveModConfig()
 	sdlext.config("modcontent.lua", function(obj)
 		obj.modOptions = mod_loader:getCurrentModContent()

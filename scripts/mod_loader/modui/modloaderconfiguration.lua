@@ -1,3 +1,8 @@
+--[[
+	Adds a new entry to the "Mod Content" menu, allowing to configure
+	some features of the mod loader itself.
+--]]
+
 local function saveModLoaderConfig()
 	local data = {}
 	data.logLevel = modApi.logger.logLevel
