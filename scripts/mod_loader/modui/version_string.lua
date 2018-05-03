@@ -9,11 +9,14 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 		:decorate({ DecoRAlignedText("Mod loader version: " .. modApi.version) })
 		:addTo(uiRoot)
 	versionText.decorations[1].rSpace = 8
+	versionText.visible = false
 
 	-- override the versionText element's draw() function to also
 	-- update its position
 	versionText.draw = function(self, screen)
 		self:pospx(screen:w() - 200, screen:h() - 50)
+		self.visible = sdlext.isMainMenu()
+		
 		Ui.draw(self, screen)
 	end
 end)
