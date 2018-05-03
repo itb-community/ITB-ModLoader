@@ -1,14 +1,17 @@
 local scripts = {
 	"uieventloop",
 	"root",
-	"versionstring",
-	"errorwarning",
+
+	"version_string",
+	"error_warning",
 	"modcontent",
-	"modconfiguration",
-	"pilotarrange",
-	"squadselector",
-	"modloaderconfiguration",
-	"modui",
+	
+	"mod_configuration",
+	"pilot_arrange",
+	"squad_selector",
+	"modloader_configuration",
+
+	"modcontent_entries",
 }
 
 local rootpath = "scripts/mod_loader/modui/"
