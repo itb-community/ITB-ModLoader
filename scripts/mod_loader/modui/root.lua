@@ -54,6 +54,18 @@ function sdlext.addHangarExitedHook(fn)
 	table.insert(hangarExitedHooks, fn)
 end
 
+local gameEnteredHooks = {}
+function sdlext.addGameEnteredHook(fn)
+	assert(type(fn) == "function")
+	table.insert(gameEnteredHooks, fn)
+end
+
+local gameExitedHooks = {}
+function sdlext.addGameExitedHook(fn)
+	assert(type(fn) == "function")
+	table.insert(gameExitedHooks, fn)
+end
+
 -- //////////////////////////////////////////////////////////////////////
 
 local uiRoot = nil
@@ -61,7 +73,7 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	if not sdlext.isEventLoop() then
 		local wasMainMenu = isInMainMenu
 		local wasHangar = isInHangar
-		local wasGame = isGame
+		local wasGame = isInGame
 
 		isInMainMenu = bgRobot:wasDrawn() and bgRobot.x < screen:w() and not bgHangar:wasDrawn()
 		isInHangar = bgHangar:wasDrawn()
@@ -87,6 +99,10 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 			for i, hook in ipairs(hangarExitedHooks) do
 				hook(screen)
 			end
+		elseif wasGame and not isInGame then
+			for i, hook in ipairs(gameExitedHooks) do
+				hook(screen)
+			end
 		end
 
 		if not wasMainMenu and isInMainMenu then
@@ -95,6 +111,10 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 			end
 		elseif not wasHangar and isInHangar then
 			for i, hook in ipairs(hangarEnteredHooks) do
+				hook(screen)
+			end
+		elseif not wasGame and isInGame then
+			for i, hook in ipairs(gameEnteredHooks) do
 				hook(screen)
 			end
 		end
