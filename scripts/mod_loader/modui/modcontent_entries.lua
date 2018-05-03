@@ -5,13 +5,13 @@ sdlext.addModContent(
 )
 
 sdlext.addModContent(
-	"Edit squads",
+	"Edit Squads",
 	selectSquads,
 	"Select which squads will be available to pick."
 )
 
 arrangePilotsButton = sdlext.addModContent(
-	"Arrange pilots",
+	"Arrange Pilots",
 	showArrangePilotsUi,
 	"Select which pilots will be available to pick."
 )
