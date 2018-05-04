@@ -12,6 +12,12 @@ end
 function UiRoot:draw(screen)
 	self:relayout()
 
+	-- Temporary hack until I figure out how to
+	-- update tooltip frame strata without causing flickering
+	if self.tooltipUi.visible then
+		self.tooltipUi:bringToTop()
+	end
+
 	Ui.draw(self, screen)
 	
 	if self.currentDropDown then
