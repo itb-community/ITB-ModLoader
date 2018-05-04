@@ -199,7 +199,8 @@ function Ui:wheel(mx,my,y)
 		end
 	end
 
-	return false
+	if self.translucent then return false end
+	return true
 end
 
 function Ui:mousedown(mx, my)
@@ -228,7 +229,8 @@ function Ui:mousedown(mx, my)
 		end
 	end
 
-	return false
+	if self.translucent then return false end
+	return true
 end
 
 function Ui:mouseup(mx, my)
@@ -264,7 +266,8 @@ function Ui:mouseup(mx, my)
 		end
 	end
 
-	return false
+	if self.translucent then return false end
+	return true
 end
 
 function Ui:mousemove(mx, my)
