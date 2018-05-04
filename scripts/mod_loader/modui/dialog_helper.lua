@@ -5,6 +5,11 @@ local bg = Ui()
 local dialogStack = {}
 local function popDialog()
 	local ui = table.remove(dialogStack, #dialogStack)
+
+	if ui.onDialogExit then
+		ui:onDialogExit()
+	end
+
 	ui:detach()
 
 	if #dialogStack == 0 then
@@ -15,7 +20,7 @@ local function popDialog()
 end
 
 local function pushDialog(ui)
-	assert(type(ui) == "table")
+	assert(type(ui) == "table", "Expected table, got " .. type(ui))
 
 	local root = sdlext.getUiRoot()
 
@@ -57,11 +62,19 @@ function sdlext.dialogVisible()
 end
 
 function sdlext.showDialog(init)
-	assert(type(init) == "function")
+	assert(type(init) == "function", "Expected function, got " .. type(init))
 
 	local ui = Ui():width(1):height(1)
 	ui.translucent = true
+
+	ui.onDialogExit = function(self)
+	end
+
 	pushDialog(ui)
+	-- Relayout the parent, so that the container ui element
+	-- has its size set to px values, instead of percentage values
+	-- Prevents issues when building ui in client code
+	ui.parent:relayout()
 
 	init(ui, function()
 		popDialog()
