@@ -50,7 +50,7 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 			local buttonHeight = 42
 			for i = 1,#modContent do
 				local obj = modContent[i]
-				local buttongo = Ui()
+				local entryBtn = Ui()
 					:width(1)
 					:heightpx(buttonHeight)
 					:caption(obj.caption)
@@ -58,10 +58,9 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 					:decorate({ DecoButton(),DecoCaption() })
 					:addTo(holder)
 
-				if obj.disabled then buttongo.disabled = true end
+				if obj.disabled then entryBtn.disabled = true end
 				
-				buttongo.onclicked = function()
-					quit()
+				entryBtn.onclicked = function()
 					obj.func()
 
 					return true

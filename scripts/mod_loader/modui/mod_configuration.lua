@@ -11,24 +11,67 @@ local function saveModConfig()
 	end)
 end
 
-function configureMods()
-	loadSquadSelection()
-	
+local function createUi()
 	local checkboxes = {}
 	local configboxes = {}
 	local optionboxes = {}
 	local mod_options = mod_loader.mod_options
 	local modSelection = mod_loader:getModConfig()
-	
-	sdlext.uiEventLoop(function(ui,quit)
-		ui.onclicked = function()
-			quit()
-			return true
+
+	local onExit = function(self)
+		modSelection = {}
+		
+		for i, checkbox in ipairs(checkboxes) do
+			local options = {}
+			modSelection[checkbox.modId] = {
+				enabled = checkbox.checked,
+				options = options,
+				version = mod_options[checkbox.modId].version,
+			}
+			
+			if optionboxes[i] and checkbox.checked then
+				for j, option in ipairs(optionboxes[i]) do
+					if option.data.check then
+						options[option.data.id] = {enabled = option.checked}
+					else
+						options[option.data.id] = {value = option.value}
+					end
+				end
+			end
 		end
+		
+		local savedOrder = mod_loader:getSavedModOrder()
+		local orderedMods = mod_loader:orderMods(modSelection, savedOrder)
+
+		local initializedCount = 0
+		for i, id in ipairs(orderedMods) do
+			if not mod_loader.mods[id].initialized then
+				initializedCount = initializedCount + 1
+			end
+		end
+
+		mod_loader:loadModContent(modSelection, savedOrder)
+		
+		saveModConfig()
+
+		-- If we have any new mods that weren't previously initialized,
+		-- then we need to restart the game to apply them correctly.
+		-- Otherwise they're not gonna work (will be loaded without
+		-- being initialized first)
+		-- We can't initialize mods here, because some required vars
+		-- are gone by this point (eg. Pawn), or the game has already
+		-- compiled cached lists which we can't modify anyway.
+		if initializedCount > 0 then
+			-- TODO display warning frame reminding to restart the game.
+		end
+	end
+
+	sdlext.showDialog(function(ui, quit)
+		ui.onDialogExit = onExit
 
 		local frametop = Ui()
 			:width(0.6):height(0.575)
-			:pos(0.2,0.1)
+			:pos(0.2, 0.1)
 			:caption("Mod Configuration")
 			:decorate({
 				DecoFrame(),
@@ -202,50 +245,10 @@ function configureMods()
 			end
 		end
 	end)
-	
-	modSelection = {}
-	
-	for i, checkbox in ipairs(checkboxes) do
-		local options = {}
-		modSelection[checkbox.modId] = {
-			enabled = checkbox.checked,
-			options = options,
-			version = mod_options[checkbox.modId].version,
-		}
-		
-		if optionboxes[i] and checkbox.checked then
-			for j, option in ipairs(optionboxes[i]) do
-				if option.data.check then
-					options[option.data.id] = {enabled = option.checked}
-				else
-					options[option.data.id] = {value = option.value}
-				end
-			end
-		end
-	end
-	
-	local savedOrder = mod_loader:getSavedModOrder()
-	local orderedMods = mod_loader:orderMods(modSelection, savedOrder)
+end
 
-	local initializedCount = 0
-	for i, id in ipairs(orderedMods) do
-		if not mod_loader.mods[id].initialized then
-			initializedCount = initializedCount + 1
-		end
-	end
-
-	mod_loader:loadModContent(modSelection, savedOrder)
+function configureMods()
+	loadSquadSelection()
 	
-	saveModConfig()
-
-	-- If we have any new mods that weren't previously initialized,
-	-- then we need to restart the game to apply them correctly.
-	-- Otherwise they're not gonna work (will be loaded without
-	-- being initialized first)
-	-- We can't initialize mods here, because some required vars
-	-- are gone by this point (eg. Pawn), or the game has already
-	-- compiled cached lists which we can't modify anyway.
-	if initializedCount > 0 then
-		-- TODO display warning frame reminding to restart the game.
-	end
+	createUi()
 end

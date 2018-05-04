@@ -17,10 +17,6 @@ function getStartingSquad(choice)
 	if choice == 0 then
 		loadPilotsOrder()
 		loadSquadSelection()
-		arrangePilotsButton.disabled = true
-		arrangePilotsButton.tip = 
-			"Pilots can only be arranged before the New Game button is pressed, "
-			.."restart the game to be able to arrange pilots."
 	end
 	
 	if choice >= 0 and choice <= 7 then
