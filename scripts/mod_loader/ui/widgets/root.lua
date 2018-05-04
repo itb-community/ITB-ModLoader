@@ -122,8 +122,7 @@ function UiRoot:event(eventloop)
 			return false
 		end
 		
-		self:mousemove(mx, my)
-		return false
+		return self:mousemove(mx, my)
 	end
 
 	return false
