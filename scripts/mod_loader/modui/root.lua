@@ -69,58 +69,60 @@ end
 -- //////////////////////////////////////////////////////////////////////
 
 local uiRoot = nil
+function sdlext.getUiRoot()
+	return uiRoot
+end
+
 MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
-	if not sdlext.isEventLoop() then
-		local wasMainMenu = isInMainMenu
-		local wasHangar = isInHangar
-		local wasGame = isInGame
+	local wasMainMenu = isInMainMenu
+	local wasHangar = isInHangar
+	local wasGame = isInGame
 
-		isInMainMenu = bgRobot:wasDrawn() and bgRobot.x < screen:w() and not bgHangar:wasDrawn()
-		isInHangar = bgHangar:wasDrawn()
-		isInGame = Game ~= nil
+	isInMainMenu = bgRobot:wasDrawn() and bgRobot.x < screen:w() and not bgHangar:wasDrawn()
+	isInHangar = bgHangar:wasDrawn()
+	isInGame = Game ~= nil
 
-		if not uiRoot then
-			uiRoot = UiRoot():widthpx(screen:w()):heightpx(screen:h())
+	if not uiRoot then
+		uiRoot = UiRoot():widthpx(screen:w()):heightpx(screen:h())
 
-			for i, hook in ipairs(uiRootCreatedHooks) do
-				hook(screen, uiRoot)
-			end
-
-			-- clear the list of hooks since we're not gonna call it again
-			uiRootCreatedHooks = nil
-		end
-		uiRoot:widthpx(screen:w()):heightpx(screen:h())
-
-		if wasMainMenu and not isInMainMenu then
-			for i, hook in ipairs(mainMenuExitedHooks) do
-				hook(screen)
-			end
-		elseif wasHangar and not isInHangar then
-			for i, hook in ipairs(hangarExitedHooks) do
-				hook(screen)
-			end
-		elseif wasGame and not isInGame then
-			for i, hook in ipairs(gameExitedHooks) do
-				hook(screen)
-			end
+		for i, hook in ipairs(uiRootCreatedHooks) do
+			hook(screen, uiRoot)
 		end
 
-		if not wasMainMenu and isInMainMenu then
-			for i, hook in ipairs(mainMenuEnteredHooks) do
-				hook(screen, wasHangar, wasGame)
-			end
-		elseif not wasHangar and isInHangar then
-			for i, hook in ipairs(hangarEnteredHooks) do
-				hook(screen)
-			end
-		elseif not wasGame and isInGame then
-			for i, hook in ipairs(gameEnteredHooks) do
-				hook(screen)
-			end
-		end
-
-		uiRoot:draw(screen)
+		-- clear the list of hooks since we're not gonna call it again
+		uiRootCreatedHooks = nil
 	end
+	uiRoot:widthpx(screen:w()):heightpx(screen:h())
+
+	if wasMainMenu and not isInMainMenu then
+		for i, hook in ipairs(mainMenuExitedHooks) do
+			hook(screen)
+		end
+	elseif wasHangar and not isInHangar then
+		for i, hook in ipairs(hangarExitedHooks) do
+			hook(screen)
+		end
+	elseif wasGame and not isInGame then
+		for i, hook in ipairs(gameExitedHooks) do
+			hook(screen)
+		end
+	end
+
+	if not wasMainMenu and isInMainMenu then
+		for i, hook in ipairs(mainMenuEnteredHooks) do
+			hook(screen, wasHangar, wasGame)
+		end
+	elseif not wasHangar and isInHangar then
+		for i, hook in ipairs(hangarEnteredHooks) do
+			hook(screen)
+		end
+	elseif not wasGame and isInGame then
+		for i, hook in ipairs(gameEnteredHooks) do
+			hook(screen)
+		end
+	end
+
+	uiRoot:draw(screen)
 
 	if not loading:wasDrawn() then
 		screen:blit(cursor, nil, sdl.mouse.x(), sdl.mouse.y())
@@ -128,9 +130,5 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 end)
 
 MOD_API_EVENT_HOOK = sdl.eventHook(function(event)
-	if not sdlext.isEventLoop() then
-		return uiRoot:event(event)
-	end
-
-	return false
+	return uiRoot:event(event)
 end)

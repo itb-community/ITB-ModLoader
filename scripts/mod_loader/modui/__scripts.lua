@@ -1,6 +1,6 @@
 local scripts = {
-	"uieventloop",
 	"root",
+	"dialog_helper",
 
 	"version_string",
 	"error_warning",
