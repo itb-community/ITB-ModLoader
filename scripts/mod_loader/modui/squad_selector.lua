@@ -48,23 +48,69 @@ end
 
 local largefont = sdlext.font("fonts/NunitoSans_Bold.ttf",44)
 local squadPalettes = sdlext.squadPalettes()
-function selectSquads()
-	loadSquadSelection()
-	
+local function createUi()
 	local checkboxes = {}
-	
-	sdlext.uiEventLoop(function(ui,quit)
-		ui.onclicked = function()
-			quit()
-			return true
+
+	local onExit = function(self)
+		modApi.squadIndices = {}
+		local assignIndex = function(n)
+			for i=1,maxselected do
+				if modApi.squadIndices[i] == nil then
+					modApi.squadIndices[i] = n
+					return true
+				end
+			end
+			return false
 		end
 
-		local labelcount = Ui():pos(0.71,0.83):width(0.3):height(0.075):caption(""):decorate({DecoCaption(largefont)}):addTo(ui)
-		Ui():pos(0.7,0.925):width(0.3):height(0.05):caption("Total selected"):decorate({DecoCaption()}):addTo(ui)
+		for i=1,maxselected do
+			if checkboxes[i].checked then
+				modApi.squadIndices[i] = i
+			end
+		end
+		
+		for i=maxselected+1,#checkboxes do
+			if checkboxes[i].checked and not assignIndex(i) then break end
+		end
+		
+		for i=1,maxselected do
+			if modApi.squadIndices[i] == nil then
+				modApi.squadIndices[i] = i
+			end
+		end
+		
+		saveSquadSelection()
+	end
+	
+	sdlext.showDialog(function(ui, quit)
+		ui.onDialogExit = onExit
 
-		local frametop = Ui():width(0.6):height(0.7):pos(0.2,0.1):caption("Choose squads"):decorate({DecoFrame(), DecoFrameCaption()}):addTo(ui)
-		local scrollarea = UiScrollArea():width(1):height(1):padding(24):decorate({DecoSolid(sdl.rgb(24,28,40))})
-		frametop:add(scrollarea)
+		local labelcount = Ui()
+			:width(0.3):height(0.075)
+			:pos(0.71,0.83)
+			:caption("")
+			:decorate({ DecoCaption(largefont) })
+			:addTo(ui)
+
+		Ui()
+			:width(0.3):height(0.05)
+			:pos(0.7,0.925)
+			:caption("Total selected")
+			:decorate({ DecoCaption() })
+			:addTo(ui)
+
+		local frametop = Ui()
+			:width(0.6):height(0.7)
+			:pos(0.2, 0.1)
+			:caption("Choose squads")
+			:decorate({ DecoFrame(), DecoFrameCaption() })
+			:addTo(ui)
+
+		local scrollarea = UiScrollArea()
+			:width(1):height(1)
+			:padding(24)
+			:decorate({ DecoSolid(sdl.rgb(24,28,40)) })
+			:addTo(frametop)
 		
 		local updatecount = function()
 			local count = 0
@@ -116,33 +162,11 @@ function selectSquads()
 		end
 		updatecount()
 	end)
-	
-	modApi.squadIndices = {}
-	local assignIndex = function(n)
-		for i=1,maxselected do
-			if modApi.squadIndices[i] == nil then
-				modApi.squadIndices[i] = n
-				return true
-			end
-		end
-		return false
-	end
+end
 
-	for i=1,maxselected do
-		if checkboxes[i].checked then
-			modApi.squadIndices[i] = i
-		end
-	end
+
+function selectSquads()
+	loadSquadSelection()
 	
-	for i=maxselected+1,#checkboxes do
-		if checkboxes[i].checked and not assignIndex(i) then break end
-	end
-	
-	for i=1,maxselected do
-		if modApi.squadIndices[i] == nil then
-			modApi.squadIndices[i] = i
-		end
-	end
-	
-	saveSquadSelection()
+	createUi()
 end

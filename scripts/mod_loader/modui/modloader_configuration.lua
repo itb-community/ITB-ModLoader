@@ -36,18 +36,21 @@ function applyModLoaderConfig(config)
 	modApi.showErrorFrame = config.showErrorFrame
 end
 
-function configureModLoader()
-	applyModLoaderConfig(loadModLoaderConfig())
-
+local function createUi()
 	local ddLogLevel = nil
 	local cboxCaller = nil
 	local cboxErrorFrame = nil
 
-	sdlext.uiEventLoop(function(ui, quit)
-		ui.onclicked = function()
-			quit()
-			return true
-		end
+	local onExit = function(self)
+		modApi.logger.logLevel = ddLogLevel.value
+		modApi.logger.printCallerInfo = cboxCaller.checked
+		modApi.showErrorFrame = cboxErrorFrame.checked
+
+		saveModLoaderConfig()
+	end
+
+	sdlext.showDialog(function(ui, quit)
+		ui.onDialogExit = onExit
 
 		local frame = Ui()
 			:width(0.5):height(0.4)
@@ -115,10 +118,10 @@ function configureModLoader()
 		cboxErrorFrame.checked = modApi.showErrorFrame
 		cboxErrorFrame:addTo(layout)
 	end)
+end
 
-	modApi.logger.logLevel = ddLogLevel.value
-	modApi.logger.printCallerInfo = cboxCaller.checked
-	modApi.showErrorFrame = cboxErrorFrame.checked
+function configureModLoader()
+	applyModLoaderConfig(loadModLoaderConfig())
 
-	saveModLoaderConfig()
+	createUi()
 end

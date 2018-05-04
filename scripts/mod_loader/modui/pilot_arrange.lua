@@ -49,7 +49,7 @@ local function createUi()
 		savePilotsOrder()
 	end
 
-	sdlext.uiEventLoop(function(ui, quit)
+	sdlext.showDialog(function(ui, quit)
 		ui.onDialogExit = onExit
 		
 		local frametop = Ui()
