@@ -117,12 +117,14 @@ function UiDropDown:draw(screen)
 	end
 end
 
-function UiDropDown:clicked()
-	if self.open then
-		self:destroyDropDown()
-	else
-		self:createDropDown()
+function UiDropDown:clicked(button)
+	if button == 1 then
+		if self.open then
+			self:destroyDropDown()
+		else
+			self:createDropDown()
+		end
 	end
 	
-	return Ui.clicked(self)
+	return Ui.clicked(self, button)
 end

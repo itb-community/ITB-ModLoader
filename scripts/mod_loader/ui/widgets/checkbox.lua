@@ -5,8 +5,10 @@ function UiCheckbox:new()
 	self.checked = false
 end
 
-function UiCheckbox:clicked()
-	self.checked = not self.checked
+function UiCheckbox:clicked(button)
+	if button == 1 then
+		self.checked = not self.checked
+	end
 	
-	return Ui.clicked(self)
+	return Ui.clicked(self, button)
 end
