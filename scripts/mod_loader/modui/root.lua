@@ -2,7 +2,7 @@
 local bgRobot = sdlext.surface("img/main_menus/bg3.png")
 local bgHangar = sdlext.surface("img/strategy/hangar_main.png")
 local loading = sdlext.surface("img/main_menus/Loading_main.png")
-local cursor = sdl.surface("resources/mods/ui/pointer-noshadow.png")
+local cursor = sdl.surface("resources/mods/ui/pointer-large.png")
 
 -- //////////////////////////////////////////////////////////////////////
 

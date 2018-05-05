@@ -143,9 +143,7 @@ function UiRoot:event(eventloop)
 		self.tooltip = ""
 
 		if self.pressedchild ~= nil then
-			if self.pressedchild:mousemove(mx, my) then
-				return false
-			end
+			return self.pressedchild:mousemove(mx, my)
 		end
 		
 		if self:dropdownEvent(mx,my) then
