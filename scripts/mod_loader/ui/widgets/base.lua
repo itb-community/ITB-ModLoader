@@ -25,6 +25,7 @@ function Ui:new()
 	self.pressed = false
 	self.hovered = false
 	self.disabled = false
+	self.focused = false
 	self.containsMouse = false
 	self.visible = true
 	self.root = self
@@ -53,6 +54,10 @@ end
 
 function Ui:remove(child)
 	if not child then return self end
+
+	if self.root.focuschild == child then
+		self:setfocus()
+	end
 
 	child:setroot(nil)
 	remove_element(child, self.children)
@@ -117,6 +122,23 @@ function Ui:hide()
 	self.visible = false
 	
 	return self
+end
+
+--[[
+	Attempts to set root's focus to this element. Returns true if this
+	element successfully obtained focus.
+--]]
+function Ui:setfocus()
+	if not self.visible then return false end
+
+	self.root:setfocus(self)
+end
+
+--[[
+	Returns true if this element, or any of its children, have focus.
+--]]
+function Ui:hasfocus()
+	return self.focused
 end
 
 function Ui:pos(x, y)
@@ -213,6 +235,7 @@ function Ui:mousedown(mx, my)
 	end
 	
 	self.root.pressedchild = self
+	self:setfocus()
 	self.pressed = true
 
 	for i=1,#self.children do
@@ -313,6 +336,26 @@ function Ui:mousemove(mx, my)
 	
 	if self.translucent then return false end
 	return true
+end
+
+function Ui:keydown(keycode)
+	if not self.visible then return false end
+
+	if self.parent and self.parent:keydown(keycode) then
+		return true
+	end
+
+	return false
+end
+
+function Ui:keyup(keycode)
+	if not self.visible then return false end
+
+	if self.parent and self.parent:keyup(keycode) then
+		return true
+	end
+
+	return false
 end
 
 function Ui:relayout()

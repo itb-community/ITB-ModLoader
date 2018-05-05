@@ -5,6 +5,7 @@ function UiRoot:new()
 	
 	self.hoveredchild = nil
 	self.pressedchild = nil
+	self.focuschild = nil
 	self.translucent = true
 	self.tooltipUi = UiTooltip():addTo(self)
 end
@@ -26,6 +27,30 @@ function UiRoot:draw(screen)
 		self.currentDropDown:draw(screen)
 		table.remove(self.children)
 	end
+end
+
+function UiRoot:setfocus(newfocus)
+	assert(
+		newfocus == nil or (newfocus.parent or newfocus.root == newfocus),
+		"Unable to set focus, because the UI element has no parent"
+	)
+
+	-- clear old focus
+	local p = self.focuschild
+	while p do
+		p.focused = false
+		p = p.parent
+	end
+
+	self.focuschild = newfocus
+	
+	p = self.focuschild
+	while p do
+		p.focused = true
+		p = p.parent
+	end
+
+	return true
 end
 
 function UiRoot:dropdownEvent(x,y)
@@ -63,6 +88,7 @@ function UiRoot:event(eventloop)
 	end
 
 	if type == sdl.events.mousebuttondown then
+		self:setfocus(nil)
 		local done = self:mousedown(mx, my)
 		if self:dropdownEvent(mx, my) then
 			done = self.currentDropDown:mousedown(mx, my) or done
@@ -90,7 +116,7 @@ function UiRoot:event(eventloop)
 			return true
 		end
 
-		if 
+		if
 			child ~= nil                  and
 			mx >= child.screenx           and
 			mx <  child.screenx + child.w and
@@ -129,6 +155,22 @@ function UiRoot:event(eventloop)
 		end
 		
 		return self:mousemove(mx, my)
+	end
+
+	if type == sdl.events.keydown then
+		if self.focuschild then
+			return self.focuschild:keydown(eventloop:keycode())
+		else
+			return false
+		end
+	end
+
+	if type == sdl.events.keyup then
+		if self.focuschild then
+			return self.focuschild:keyup(eventloop:keycode())
+		else
+			return false
+		end
 	end
 
 	return false
