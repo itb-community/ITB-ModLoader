@@ -90,3 +90,33 @@ function DecoMainMenuButton:draw(screen, widget)
 	widget.decorationx = widget.decorationx + 65
 	widget.decorationy = widget.decorationy + 1
 end
+
+
+DecoSurfaceButton = Class.inherit(UiDeco)
+function DecoSurfaceButton:new(srfBase, srfHighlight, srfDisabled)
+	assert(srfBase)
+
+	self.srfBase = srfBase
+	self.srfHighlight = srfHighlight or srfBase
+	self.srfDisabled = srfDisabled or srfBase
+end
+
+function DecoSurfaceButton:draw(screen, widget)
+	local r = widget.rect
+
+	local surface = self.srfBase
+	if widget.disabled then
+		surface = self.srfDisabled
+	elseif widget.hovered then
+		surface = self.srfHighlight
+	end
+
+	screen:blit(
+		surface,
+		nil,
+		r.x + widget.decorationx,
+		r.y + widget.decorationy + r.h / 2 - surface:h() / 2
+	)
+
+	widget.decorationx = widget.decorationx + surface:w()
+end
