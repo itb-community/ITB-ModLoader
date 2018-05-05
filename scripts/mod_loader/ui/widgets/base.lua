@@ -248,7 +248,7 @@ function Ui:mousedown(mx, my, button)
 			my >= child.screeny           and
 			my <  child.screeny + child.h
 		then
-			if child:mousedown(mx, my) then
+			if child:mousedown(mx, my, button) then
 				return true
 			end
 		end
@@ -285,7 +285,7 @@ function Ui:mouseup(mx, my, button)
 			my >= child.screeny             and
 			my <  child.screeny + child.h
 		then
-			if child:mouseup(mx, my) then
+			if child:mouseup(mx, my, button) then
 				return true
 			end
 		end
