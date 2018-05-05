@@ -42,27 +42,31 @@ local function buildBackgroundPane()
 		popDialog()
 		return true
 	end
+
 	pane.wheel = function(self, mx, my, y)
 		Ui.wheel(self, mx, my, y)
-		return self.visible
+		return true
 	end
 	pane.mousedown = function(self, mx, my)
 		Ui.mousedown(self, mx, my)
-		return self.visible
+		return true
 	end
 	pane.mouseup = function(self, mx, my)
 		Ui.mouseup(self, mx, my)
-		return self.visible
+		return true
 	end
 	pane.mousemove = function(self, mx, my)
 		Ui.mousemove(self, mx, my)
-		return self.visible
+		return true
 	end
 	pane.keydown = function(self, keycode)
-		return self.visible
+		if keycode == 27 then -- Escape
+			popDialog()
+		end
+		return true
 	end
 	pane.keyup = function(self, keycode)
-		return self.visible
+		return true
 	end
 
 	pane.hide = function(self)
