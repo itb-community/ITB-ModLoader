@@ -11,13 +11,15 @@ function mod_loader:init()
 	
 	self:enumerateMods()
 
-	-- Replace the game's cursor with a transparent image.
-	-- Helps visually, as some modded UI may want to completely intercept
-	-- mousemotion events, in which case the game's own cursor would 'hitch',
-	-- and stop moving once the mouse entered the modded UI's bounds.
-	-- We re-draw the cursor ourselves on top of modded UI to retain smooth
-	-- mouse pointer movement.
-	modApi:appendAsset("img/mouse/pointer.png","resources/mods/ui/pointer-dummy.png")
+	if MOD_API_DRAW_HOOK then
+		-- Replace the game's cursor with a transparent image.
+		-- Helps visually, as some modded UI may want to completely intercept
+		-- mousemotion events, in which case the game's own cursor would 'hitch',
+		-- and stop moving once the mouse entered the modded UI's bounds.
+		-- We re-draw the cursor ourselves on top of modded UI to retain smooth
+		-- mouse pointer movement.
+		modApi:appendAsset("img/mouse/pointer.png","resources/mods/ui/pointer-dummy.png")
+	end
 	
 	local orderedMods = self:orderMods(self:getModConfig(), self:getSavedModOrder())
 	for i, id in ipairs(orderedMods) do
