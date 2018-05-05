@@ -227,7 +227,7 @@ function Ui:wheel(mx,my,y)
 	return true
 end
 
-function Ui:mousedown(mx, my)
+function Ui:mousedown(mx, my, button)
 	if not self.visible then return false end
 	
 	if self.root.pressedchild ~= nil then
@@ -258,7 +258,7 @@ function Ui:mousedown(mx, my)
 	return true
 end
 
-function Ui:mouseup(mx, my)
+function Ui:mouseup(mx, my, button)
 	if not self.visible then return false end
 	
 	if
@@ -271,7 +271,7 @@ function Ui:mouseup(mx, my)
 		my <  self.screeny + self.h
 	then
 		self.pressed = false
-		if self:clicked() then return true end
+		if self:clicked(button) then return true end
 	end
 
 	for i=1,#self.children do
@@ -420,9 +420,9 @@ function Ui:draw(screen)
 	end
 end
 
-function Ui:clicked()
+function Ui:clicked(button)
 	if self.onclicked ~= nil then
-		local ret = self:onclicked()
+		local ret = self:onclicked(button)
 		-- Make sure we bug people to update their code to return
 		-- either `true` or `false`, depending on whether they actually
 		-- ended up handling the click.

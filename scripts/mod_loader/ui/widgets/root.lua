@@ -88,16 +88,18 @@ function UiRoot:event(eventloop)
 	end
 
 	if type == sdl.events.mousebuttondown then
+		local button = eventloop:mousebutton()
 		self:setfocus(nil)
-		local done = self:mousedown(mx, my)
+		local done = self:mousedown(mx, my, button)
 		if self:dropdownEvent(mx, my) then
-			done = self.currentDropDown:mousedown(mx, my) or done
+			done = self.currentDropDown:mousedown(mx, my, button) or done
 			table.remove(self.children)
 		end
 		return done
 	end
 	
 	if type == sdl.events.mousebuttonup then
+		local button = eventloop:mousebutton()
 		local child = self.pressedchild
 
 		local dEvent = self:dropdownEvent(mx, my)
@@ -111,7 +113,7 @@ function UiRoot:event(eventloop)
 		end
 		if dEvent then table.remove(self.children) end
 		
-		if self.pressedchild and self.pressedchild:mouseup(mx, my) then
+		if self.pressedchild and self.pressedchild:mouseup(mx, my, button) then
 			self.pressedchild = nil
 			return true
 		end
@@ -123,14 +125,14 @@ function UiRoot:event(eventloop)
 			my >= child.screeny           and
 			my <  child.screeny + child.h
 		then
-			if child:mouseup(mx, my) then
+			if child:mouseup(mx, my, button) then
 				self.pressedchild = nil
 				child.pressed = false
 				return true
 			end
 		end
 
-		local res = self:mouseup(mx, my)
+		local res = self:mouseup(mx, my, button)
 		self.pressedchild = nil
 		return res
 	end
