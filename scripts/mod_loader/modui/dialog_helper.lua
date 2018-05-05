@@ -1,10 +1,7 @@
-local bg = Ui()
-	:width(1):height(1)
-	:decorate({ DecoSolid(sdl.rgba(0, 0, 0, 128)) })
-
 local dialogStack = {}
 local function popDialog()
 	local ui = table.remove(dialogStack, #dialogStack)
+	local root = ui.root
 
 	if ui.onDialogExit then
 		ui:onDialogExit()
@@ -13,9 +10,12 @@ local function popDialog()
 	ui:detach()
 
 	if #dialogStack == 0 then
-		bg:detach()
+		root:setfocus(nil)
 	else
-		dialogStack[#dialogStack]:bringToTop()
+		ui = dialogStack[#dialogStack]
+		ui:show()
+		ui:bringToTop()
+		ui:setfocus()
 	end
 end
 
@@ -24,35 +24,56 @@ local function pushDialog(ui)
 
 	local root = sdlext.getUiRoot()
 
-	if not bg.parent then
-		bg:addTo(root)
+	if #dialogStack > 0 then
+		dialogStack[#dialogStack]:hide()
 	end
-	bg:bringToTop()
 
 	ui:addTo(root):bringToTop()
+	ui:setfocus()
 	table.insert(dialogStack, ui)
 end
 
--- Make sure the background intercepts all leftover events
-bg.onclicked = function()
-	popDialog()
-	return true
-end
-bg.wheel = function(self, mx, my, y)
-	Ui.wheel(self, mx, my, y)
-	return true
-end
-bg.mousedown = function(self, mx, my)
-	Ui.mousedown(self, mx, my)
-	return true
-end
-bg.mouseup = function(self, mx, my)
-	Ui.mouseup(self, mx, my)
-	return true
-end
-bg.mousemove = function(self, mx, my)
-	Ui.mousemove(self, mx, my)
-	return true
+local function buildBackgroundPane()
+	local pane = Ui()
+		:width(1):height(1)
+		:decorate({ DecoSolid(deco.colors.halfblack) })
+
+	pane.onclicked = function()
+		popDialog()
+		return true
+	end
+	pane.wheel = function(self, mx, my, y)
+		Ui.wheel(self, mx, my, y)
+		return self.visible
+	end
+	pane.mousedown = function(self, mx, my)
+		Ui.mousedown(self, mx, my)
+		return self.visible
+	end
+	pane.mouseup = function(self, mx, my)
+		Ui.mouseup(self, mx, my)
+		return self.visible
+	end
+	pane.mousemove = function(self, mx, my)
+		Ui.mousemove(self, mx, my)
+		return self.visible
+	end
+	pane.keydown = function(self, keycode)
+		return self.visible
+	end
+	pane.keyup = function(self, keycode)
+		return self.visible
+	end
+
+	pane.hide = function(self)
+		pane.decorations[1].color = nil
+	end
+
+	pane.show = function(self)
+		pane.decorations[1].color = deco.colors.halfblack
+	end
+
+	return pane
 end
 
 -- //////////////////////////////////////////////////////////////////////
@@ -64,8 +85,7 @@ end
 function sdlext.showDialog(init)
 	assert(type(init) == "function", "Expected function, got " .. type(init))
 
-	local ui = Ui():width(1):height(1)
-	ui.translucent = true
+	local ui = buildBackgroundPane()
 
 	ui.onDialogExit = function(self)
 	end
