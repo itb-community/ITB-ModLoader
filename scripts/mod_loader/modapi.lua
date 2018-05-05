@@ -171,7 +171,8 @@ function modApi:init()
 	self.timer = sdl.timer()
 	self.msDeltaTime = 0
 	self.msLastElapsed = 0
-	MODAPI_HOOK_draw = sdl.drawHook(function(screen)
+
+	modApi.timerDrawHook = sdl.drawHook(function(screen)
 		local t = modApi.timer:elapsed()
 		if t > modApi.msLastElapsed then
 			modApi.msDeltaTime = t - modApi.msLastElapsed
