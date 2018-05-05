@@ -4,15 +4,6 @@
 	for selection in the hangar.
 --]]
 
-local function index_of(list, value)
-	for k, v in ipairs(list) do
-		if value == v then
-			return k
-		end
-	end
-	return nil
-end
-
 function loadPilotsOrder()
 	local order = {}
 	sdlext.config("modcontent.lua", function(obj)
@@ -78,7 +69,7 @@ local function createUi()
 			
 		local draggedElement
 		local function stopDrag()
-			local index = index_of(pilotButtons, placeholder)
+			local index = list_indexof(pilotButtons, placeholder)
 			if index ~= nil and draggedElement ~= nil then
 				pilotButtons[index] = draggedElement
 			end
@@ -94,13 +85,13 @@ local function createUi()
 			placeholder.x = button.x
 			placeholder.y = button.y
 		
-			local index = index_of(pilotButtons,button)
+			local index = list_indexof(pilotButtons,button)
 			if index ~= nil then
 				pilotButtons[index] = placeholder
 			end
 		end
 		local function rearrange()
-			local index = index_of(pilotButtons, placeholder)
+			local index = list_indexof(pilotButtons, placeholder)
 			if index ~= nil and draggedElement ~= nil then
 				local col = math.floor(draggedElement.x / cellW + 0.5)
 				local row = math.floor(draggedElement.y / cellH + 0.5)

@@ -343,6 +343,15 @@ function modApi:elapsedTime()
 	return self.msLastElapsed
 end
 
+function list_indexof(list, value)
+	for k, v in ipairs(list) do
+		if value == v then
+			return k
+		end
+	end
+	return nil
+end
+
 --[[
 	Returns true if this string starts with the prefix string
 --]]
