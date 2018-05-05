@@ -14,28 +14,6 @@ local function saveModLoaderConfig()
 	end)
 end
 
-function loadModLoaderConfig()
-	local data = {
-		logLevel = 1, -- log to console by default
-		printCallerInfo = true,
-		showErrorFrame = true
-	}
-
-	sdlext.config("modcontent.lua", function(obj)
-		if not obj.modLoaderConfig then return end
-
-		data = obj.modLoaderConfig
-	end)
-
-	return data
-end
-
-function applyModLoaderConfig(config)
-	modApi.logger.logLevel = config.logLevel
-	modApi.logger.printCallerInfo = config.printCallerInfo
-	modApi.showErrorFrame = config.showErrorFrame
-end
-
 local function createUi()
 	local ddLogLevel = nil
 	local cboxCaller = nil
