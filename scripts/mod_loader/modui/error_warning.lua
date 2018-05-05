@@ -5,7 +5,7 @@
 
 function showErrorFrame(text)
 	sdlext.uiEventLoop(function(ui, quit)
-		ui.onclicked = function()
+		ui.onclicked = function(self, button)
 			quit()
 			return true
 		end

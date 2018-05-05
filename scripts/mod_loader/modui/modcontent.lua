@@ -22,53 +22,61 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 		:addTo(uiRoot)
 	buttonModContent.visible = false
 
-	buttonModContent.onclicked = function()
-		sdlext.uiEventLoop(function(ui,quit)
-			ui.onclicked = function()
-				quit()
-				return true
-			end
-
-			local frame = Ui()
-				:width(0.4):height(0.8)
-				:pos(0.3, 0.1)
-				:caption("Mod content")
-				:decorate({ DecoFrame(), DecoFrameCaption() })
-				:addTo(ui)
-
-			local scrollarea = UiScrollArea()
-				:width(1):height(1)
-				:padding(16)
-				:decorate({ DecoSolid(deco.colors.buttoncolor) })
-				:addTo(frame)
-
-			local holder = UiBoxLayout()
-				:vgap(12)
-				:width(1)
-				:addTo(scrollarea)
-			
-			local buttonHeight = 42
-			for i = 1,#modContent do
-				local obj = modContent[i]
-				local entryBtn = Ui()
-					:width(1)
-					:heightpx(buttonHeight)
-					:caption(obj.caption)
-					:settooltip(obj.tip)
-					:decorate({ DecoButton(),DecoCaption() })
-					:addTo(holder)
-
-				if obj.disabled then entryBtn.disabled = true end
-				
-				entryBtn.onclicked = function()
-					obj.func()
-
+	buttonModContent.onclicked = function(self, button)
+		if button == 1 then
+			sdlext.uiEventLoop(function(ui,quit)
+				ui.onclicked = function(self, button)
+					quit()
 					return true
 				end
-			end
-		end)
 
-		return true
+				local frame = Ui()
+					:width(0.4):height(0.8)
+					:pos(0.3, 0.1)
+					:caption("Mod content")
+					:decorate({ DecoFrame(), DecoFrameCaption() })
+					:addTo(ui)
+
+				local scrollarea = UiScrollArea()
+					:width(1):height(1)
+					:padding(16)
+					:decorate({ DecoSolid(deco.colors.buttoncolor) })
+					:addTo(frame)
+
+				local holder = UiBoxLayout()
+					:vgap(12)
+					:width(1)
+					:addTo(scrollarea)
+				
+				local buttonHeight = 42
+				for i = 1,#modContent do
+					local obj = modContent[i]
+					local entryBtn = Ui()
+						:width(1)
+						:heightpx(buttonHeight)
+						:caption(obj.caption)
+						:settooltip(obj.tip)
+						:decorate({ DecoButton(),DecoCaption() })
+						:addTo(holder)
+
+					if obj.disabled then entryBtn.disabled = true end
+					
+					entryBtn.onclicked = function(self, button)
+						if button == 1 then
+							obj.func()
+
+							return true
+						end
+
+						return false
+					end
+				end
+			end)
+
+			return true
+		end
+
+		return false
 	end
 end)
 

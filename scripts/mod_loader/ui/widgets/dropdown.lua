@@ -38,7 +38,7 @@ function UiDropDown:createDropDown()
 	
 	self.open = true
 	
-	local texts = {}
+	local items = {}
 	
 	local max_w = 32
 	for i, v in ipairs(self.values) do
@@ -48,21 +48,24 @@ function UiDropDown:createDropDown()
 			max_w = txt.surface:w()
 		end
 		
-		local object = Ui()
+		local item = Ui()
 			:width(1):heightpx(40)
 			:decorate({
 				DecoSolidHoverable(deco.colors.buttoncolor, deco.colors.buttonbordercolor),
 				txt
 			})
-		table.insert(texts, object)
+		table.insert(items, item)
 		
-		object.onclicked = function()
-			self.choice = i
-			self.value = self.values[i]
-			
-			self:destroyDropDown()
-			self.hovered = false
-			return true
+		item.onclicked = function(btn, button)
+			if button == 1 then
+				self.choice = i
+				self.value = self.values[i]
+				
+				self:destroyDropDown()
+				self.hovered = false
+				return true
+			end
+			return false
 		end
 	end
 	
@@ -85,8 +88,8 @@ function UiDropDown:createDropDown()
 		:width(1)
 		:addTo(scrollarea)
 	
-	for i, object in ipairs(texts) do
-		layout:add(object)
+	for i, item in ipairs(items) do
+		layout:add(item)
 	end
 	
 	self.root.currentDropDownOwner = self

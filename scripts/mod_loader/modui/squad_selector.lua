@@ -145,7 +145,7 @@ local function createUi()
 			
 			scrollarea:add( checkbox )
 			
-			checkbox.onclicked = function()
+			checkbox.onclicked = function(self, button)
 				updatecount()
 				return true
 			end

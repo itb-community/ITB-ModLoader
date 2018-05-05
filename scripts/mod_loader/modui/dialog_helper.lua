@@ -38,7 +38,7 @@ local function buildBackgroundPane()
 		:width(1):height(1)
 		:decorate({ DecoSolid(deco.colors.halfblack) })
 
-	pane.onclicked = function()
+	pane.onclicked = function(self, button)
 		popDialog()
 		return true
 	end

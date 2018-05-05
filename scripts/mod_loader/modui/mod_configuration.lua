@@ -95,32 +95,35 @@ local function createUi()
 		
 		local configuringMod = nil
 		
-		local function clickConfiguration(button)
-			if configuringMod then
-				local numOptions = #optionboxes[configuringMod]
-				
-				for i, optionbox in pairs(optionboxes[configuringMod]) do
-					optionbox:hide()
+		local function clickConfiguration(self, button)
+			if button == 1 then
+				if configuringMod then
+					local numOptions = #optionboxes[configuringMod]
+					
+					for i, optionbox in pairs(optionboxes[configuringMod]) do
+						optionbox:hide()
+					end
+					
+					configboxes[configuringMod].decorations[2].surface = sdl.surface("resources/mods/ui/config-unchecked.png")
 				end
 				
-				configboxes[configuringMod].decorations[2].surface = sdl.surface("resources/mods/ui/config-unchecked.png")
-			end
-			
-			if button.configi == configuringMod then
-				configuringMod = nil
-			else
-				configuringMod = button.configi
-				local numOptions = #optionboxes[configuringMod]
-				
-				configboxes[configuringMod].decorations[2].surface = sdl.surface("resources/mods/ui/config-checked.png")
-				
-				for i, optionbox in pairs(optionboxes[configuringMod]) do
-					optionbox:show()
+				if self.configi == configuringMod then
+					configuringMod = nil
+				else
+					configuringMod = self.configi
+					local numOptions = #optionboxes[configuringMod]
+					
+					configboxes[configuringMod].decorations[2].surface = sdl.surface("resources/mods/ui/config-checked.png")
+					
+					for i, optionbox in pairs(optionboxes[configuringMod]) do
+						optionbox:show()
+					end
 				end
+				
+				scrollarea:relayout()
+				return true
 			end
-			
-			scrollarea:relayout()
-			return true
+			return false
 		end
 
 		local getDisplayName = function(mod)
