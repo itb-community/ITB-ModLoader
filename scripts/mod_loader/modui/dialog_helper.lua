@@ -107,6 +107,7 @@ end
 
 -- For backwards compatibility
 function sdlext.uiEventLoop(init)
+	LOG("sdlext.uiEventLoop() has been deprecated in mod loader version 2.2.0. Use sdlext.showDialog() instead.")
 	sdlext.showDialog(init)
 end
 
