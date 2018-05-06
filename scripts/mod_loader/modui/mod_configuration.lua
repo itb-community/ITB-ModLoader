@@ -62,7 +62,10 @@ local function createUi()
 		-- are gone by this point (eg. Pawn), or the game has already
 		-- compiled cached lists which we can't modify anyway.
 		if initializedCount > 0 then
-			-- TODO display warning frame reminding to restart the game.
+			sdlext.showTextDialog(
+				"Information",
+				"You have enabled one or more mods. In order to apply them, game restart is required."
+			)
 		end
 	end
 
