@@ -109,3 +109,32 @@ end
 function sdlext.uiEventLoop(init)
 	sdlext.showDialog(init)
 end
+
+function sdlext.showTextDialog(title, text, w, h)
+	local padding = 10
+	w = w or 700
+	h = h or 400
+
+	sdlext.showDialog(function(ui, quit)
+		local wrap = UiWrappedText(text)
+			:width(w - padding * 2)
+		wrap:relayout()
+
+		h = math.min(h, wrap.h + padding * 2 + 45)
+
+		local frame = Ui()
+			:widthpx(w):heightpx(h)
+			:pospx((ui.w - w) / 2, (ui.h - h) / 2)
+			:caption(title)
+			:decorate({ DecoFrame(), DecoFrameCaption() })
+			:addTo(ui)
+
+		local scroll = UiScrollArea()
+			:width(1):height(1)
+			:padding(padding)
+			:decorate({ DecoSolid() })
+			:addTo(frame)
+
+		wrap:addTo(scroll)
+	end)
+end
