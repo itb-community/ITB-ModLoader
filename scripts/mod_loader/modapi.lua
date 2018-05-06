@@ -541,10 +541,10 @@ function modApi:loadSettings()
 end
 
 function modApi:writeProfileData(id, obj)
-	local settings = self:loadSettings()
+	Settings = self:loadSettings()
 
 	sdlext.config(
-		"profile_"..settings.last_profile.."/modcontent.lua",
+		"profile_"..Settings.last_profile.."/modcontent.lua",
 		function(readObj)
 			readObj[id] = obj
 		end
@@ -552,12 +552,12 @@ function modApi:writeProfileData(id, obj)
 end
 
 function modApi:readProfileData(id)
-	local settings = self:loadSettings()
+	Settings = self:loadSettings()
 
 	local result = nil
 
 	sdlext.config(
-		"profile_"..settings.last_profile.."/modcontent.lua",
+		"profile_"..Settings.last_profile.."/modcontent.lua",
 		function(readObj)
 			result = readObj[id]
 		end
