@@ -72,12 +72,20 @@ function sdlext.addFrameDrawnHook(fn)
 	table.insert(frameDrawnHooks, fn)
 end
 
+local windowVisibleHooks = {}
+function sdlext.addWindowVisibleHook(fn)
+	assert(type(fn) == "function")
+	table.insert(windowVisibleHooks, fn)
+end
+
 -- //////////////////////////////////////////////////////////////////////
 
 local uiRoot = nil
 function sdlext.getUiRoot()
 	return uiRoot
 end
+
+local srfBotLeft, srfTopRight
 
 MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	local wasMainMenu = isInMainMenu
@@ -90,6 +98,9 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 
 	if not uiRoot then
 		uiRoot = UiRoot():widthpx(screen:w()):heightpx(screen:h())
+
+		srfBotLeft = sdlext.surface("img/ui/tooltipshadow_0.png")
+		srfTopRight = sdlext.surface("img/ui/tooltipshadow_4.png")
 
 		for i, hook in ipairs(uiRootCreatedHooks) do
 			hook(screen, uiRoot)
@@ -129,6 +140,17 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	end
 
 	uiRoot:draw(screen)
+
+	if srfBotLeft:wasDrawn() and srfTopRight:wasDrawn() then
+		local x = srfBotLeft.x
+		local y = srfTopRight.y - 4
+		local w = srfTopRight.x - x
+		local h = srfBotLeft.y - y
+
+		for i, hook in ipairs(windowVisibleHooks) do
+			hook(screen, x, y, w, h)
+		end
+	end
 
 	for i, hook in ipairs(frameDrawnHooks) do
 		hook(screen)
