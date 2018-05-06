@@ -114,10 +114,6 @@ sdlext.addWindowVisibleHook(function(screen, x, y, w, h)
 	end
 end)
 
-sdlext.addSettingsChangedHook(function(old, new)
-	LOG("Settings changed")
-end)
-
 -- //////////////////////////////////////////////////////////////////////
 
 local uiRoot = nil
