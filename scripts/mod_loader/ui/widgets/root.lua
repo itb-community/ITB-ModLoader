@@ -149,9 +149,9 @@ function UiRoot:event(eventloop)
 		end
 		
 		if self:dropdownEvent(mx,my) then
-			self.currentDropDown:mousemove(mx, my)
+			local handled = self.currentDropDown:mousemove(mx, my)
 			table.remove(self.children)
-			return false
+			return handled
 		end
 		
 		return self:mousemove(mx, my)
