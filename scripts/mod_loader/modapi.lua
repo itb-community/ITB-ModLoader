@@ -379,6 +379,26 @@ function list_indexof(list, value)
 	return nil
 end
 
+-- Returns true if tables are equal, false otherwise
+function compare_tables(tbl1, tbl2)
+	local r = true
+	for k, v in pairs(tbl1) do
+		if type(v) == "table" then
+			if not compare_tables(tbl1[k], tbl2[k]) then
+				return false
+			end
+		elseif type(v) == "userdata" then
+			-- can't compare userdata, ignore
+		else
+			if tbl1[k] ~= tbl2[k] then
+				return false
+			end
+		end
+	end
+
+	return true
+end
+
 --[[
 	Returns true if this string starts with the prefix string
 --]]

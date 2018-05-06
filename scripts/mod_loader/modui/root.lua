@@ -78,6 +78,46 @@ function sdlext.addWindowVisibleHook(fn)
 	table.insert(windowVisibleHooks, fn)
 end
 
+local settingsChangedHooks = {}
+function sdlext.addSettingsChangedHook(fn)
+	assert(type(fn) == "function")
+	table.insert(settingsChangedHooks, fn)
+end
+
+local wasOptionsWindow = false
+local isOptionsWindow = false
+sdlext.addFrameDrawnHook(function(screen)
+	if wasOptionsWindow and not isOptionsWindow then
+		-- Settings window was visible, but isn't anymore.
+		-- This also triggers when the player hovers over
+		-- an option in the options box, but this heuristic
+		-- is good enough (at least we're not relaoding
+		-- the settings file every damn frame)
+		local oldSettings = Settings
+		Settings = modApi:loadSettings()
+
+		if not compare_tables(oldSettings, Settings) then
+			for i, hook in ipairs(settingsChangedHooks) do
+				hook(oldSettings, Settings)
+			end
+		end
+	end
+
+	wasOptionsWindow = isOptionsWindow
+	isOptionsWindow = false
+end)
+
+sdlext.addWindowVisibleHook(function(screen, x, y, w, h)
+	local optionsBox = Boxes.escape_options_box
+	if w == optionsBox.w and h == optionsBox.h then
+		isOptionsWindow = true
+	end
+end)
+
+sdlext.addSettingsChangedHook(function(old, new)
+	LOG("Settings changed")
+end)
+
 -- //////////////////////////////////////////////////////////////////////
 
 local uiRoot = nil
