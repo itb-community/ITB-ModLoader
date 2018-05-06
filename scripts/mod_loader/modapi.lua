@@ -204,6 +204,8 @@ function modApi:init()
 		modApi:updateScheduledHooks()
 		modApi:evaluateConditionalHooks()
 	end)
+
+	Settings = modApi:loadSettings()
 end
 
 --Maintain sanity
