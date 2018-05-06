@@ -194,16 +194,18 @@ function modApi:init()
 	self.msDeltaTime = 0
 	self.msLastElapsed = 0
 
-	modApi.timerDrawHook = sdl.drawHook(function(screen)
-		local t = modApi.timer:elapsed()
-		if t > modApi.msLastElapsed then
-			modApi.msDeltaTime = t - modApi.msLastElapsed
-			modApi.msLastElapsed = t
-		end
+	if MOD_API_DRAW_HOOK then
+		sdlext.addFrameDrawnHook(function(screen)
+			local t = modApi.timer:elapsed()
+			if t > modApi.msLastElapsed then
+				modApi.msDeltaTime = t - modApi.msLastElapsed
+				modApi.msLastElapsed = t
+			end
 
-		modApi:updateScheduledHooks()
-		modApi:evaluateConditionalHooks()
-	end)
+			modApi:updateScheduledHooks()
+			modApi:evaluateConditionalHooks()
+		end)
+	end
 
 	Settings = modApi:loadSettings()
 end

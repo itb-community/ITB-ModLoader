@@ -66,6 +66,12 @@ function sdlext.addGameExitedHook(fn)
 	table.insert(gameExitedHooks, fn)
 end
 
+local frameDrawnHooks = {}
+function sdlext.addFrameDrawnHook(fn)
+	assert(type(fn) == "function")
+	table.insert(frameDrawnHooks, fn)
+end
+
 -- //////////////////////////////////////////////////////////////////////
 
 local uiRoot = nil
@@ -123,6 +129,10 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	end
 
 	uiRoot:draw(screen)
+
+	for i, hook in ipairs(frameDrawnHooks) do
+		hook(screen)
+	end
 
 	if not loading:wasDrawn() then
 		screen:blit(cursor, nil, sdl.mouse.x(), sdl.mouse.y())
