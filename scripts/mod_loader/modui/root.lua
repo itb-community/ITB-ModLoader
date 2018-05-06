@@ -91,7 +91,7 @@ sdlext.addFrameDrawnHook(function(screen)
 		-- Settings window was visible, but isn't anymore.
 		-- This also triggers when the player hovers over
 		-- an option in the options box, but this heuristic
-		-- is good enough (at least we're not relaoding
+		-- is good enough (at least we're not reloading
 		-- the settings file every damn frame)
 		local oldSettings = Settings
 		Settings = modApi:loadSettings()
@@ -107,9 +107,13 @@ sdlext.addFrameDrawnHook(function(screen)
 	isOptionsWindow = false
 end)
 
+local optionsBox = Boxes.escape_options_box
+local profileBox = Boxes.profile_window
 sdlext.addWindowVisibleHook(function(screen, x, y, w, h)
-	local optionsBox = Boxes.escape_options_box
-	if w == optionsBox.w and h == optionsBox.h then
+	if
+		(w == optionsBox.w and h == optionsBox.h) or
+		(w == profileBox.w and h == profileBox.h)
+	then
 		isOptionsWindow = true
 	end
 end)
