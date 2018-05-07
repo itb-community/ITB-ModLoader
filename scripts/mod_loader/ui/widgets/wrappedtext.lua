@@ -3,6 +3,7 @@
 	Caches created sdl.text instances.
 --]]
 UiWrappedText = Class.inherit(UiBoxLayout)
+local debug = false
 
 function UiWrappedText:new(text, font, textset)
 	UiBoxLayout.new(self)
@@ -10,17 +11,8 @@ function UiWrappedText:new(text, font, textset)
 
 	self:vgap(1)
 
-	local defaultTextSet = function()
-		local res = sdl.textsettings()
-		res.antialias = false
-		res.color = sdl.rgb(255, 255, 255)
-		res.outlineColor = res.color
-		res.outlineWidth = 0
-		return res
-	end
-
-	self.font = font or sdlext.font("fonts/JustinFont12Bold.ttf", 12)
-	self.textset = textset or defaultTextSet()
+	self.font = font or deco.uifont.default.font
+	self.textset = textset or deco.uifont.default.set
 	self.textAlign = "left"
 
 	self.text = nil
@@ -76,6 +68,11 @@ function UiWrappedText:buildText(text)
 		uitext.visible = true
 	else
 		uitext = Ui():decorate({ DecoText(text, self.font, self.textset) })
+
+		if debug then
+			uitext.decorations[2] = DecoSolid(sdl.rgba(255, 0, 255, 64))
+		end
+
 		skip = true
 	end
 

@@ -16,10 +16,10 @@ deco.colors.mainMenuButtonColor =           sdl.rgba(7 , 10, 18, 187)
 deco.colors.mainMenuButtonColorDisabled =   sdl.rgba(7 , 10, 18, 84 )
 deco.colors.mainMenuButtonColorHighlight =  sdl.rgba(24, 26, 34, 255)
 
-deco.textset = function(color, outlineColor, outlineWidth)
+deco.textset = function(color, outlineColor, outlineWidth, antialias)
 	local res = sdl.textsettings()
 	
-	res.antialias = false
+	res.antialias = antialias or false
 	res.color = color
 	res.outlineColor = outlineColor or deco.colors.white
 	res.outlineWidth = outlineWidth or 0
@@ -30,6 +30,8 @@ end
 deco.fonts = {}
 deco.fonts.justin12 = sdlext.font("fonts/JustinFont12Bold.ttf", 12)
 deco.fonts.menufont = sdlext.font("fonts/JustinFont11Bold.ttf", 24)
+deco.fonts.tooltipTitle = sdlext.font("fonts/NunitoSans_Bold.ttf", 14)
+deco.fonts.tooltipText = sdlext.font("fonts/NunitoSans_Regular.ttf", 12)
 
 deco.uifont = {
 	default = {
@@ -40,6 +42,14 @@ deco.uifont = {
 		font = deco.fonts.menufont,
 		set = deco.textset(deco.colors.white, deco.colors.buttonhlcolor, 2),
 	},
+	tooltipTitle = {
+		font = deco.fonts.tooltipTitle,
+		set = deco.textset(deco.colors.white, nil, nil, true)
+	},
+	tooltipText = {
+		font = deco.fonts.tooltipText,
+		set = deco.textset(deco.colors.white, nil, nil, true)
+	}
 }
 
 deco.surfaces = {}

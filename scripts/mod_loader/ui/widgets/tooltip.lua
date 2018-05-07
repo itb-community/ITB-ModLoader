@@ -1,10 +1,10 @@
 UiTooltip = Class.inherit(UiWrappedText)
 
 function UiTooltip:new()
-	UiWrappedText.new(self)
+	UiWrappedText.new(self, nil, deco.uifont.tooltipText.font, deco.uifont.tooltipText.set)
 	
 	self:padding(10)
-		:decorate({ DecoFrame(deco.colors.buttoncolor, deco.colors.white) })
+		:decorate({ DecoFrame(deco.colors.buttoncolor, deco.colors.white, 3) })
 	
 	self.translucent = true
 	self.limit = 28
