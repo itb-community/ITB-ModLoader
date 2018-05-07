@@ -22,9 +22,15 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 		:addTo(uiRoot)
 	buttonModContent.visible = false
 
+	buttonModContent.draw = function(self, screen)
+		self:pospx(0, screen:h() - 186)
+
+		Ui.draw(self, screen)
+	end
+
 	buttonModContent.onclicked = function(self, button)
 		if button == 1 then
-			sdlext.uiEventLoop(function(ui,quit)
+			sdlext.showDialog(function(ui, quit)
 				ui.onclicked = function(self, button)
 					quit()
 					return true
