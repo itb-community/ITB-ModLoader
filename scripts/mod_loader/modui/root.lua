@@ -126,8 +126,21 @@ function sdlext.getUiRoot()
 end
 
 local srfBotLeft, srfTopRight
-sdlext.CurrentWindowRect = sdl.rect(0, 0, 0, 0)
+local function buildUiRoot(screen)
+	uiRoot = UiRoot():widthpx(screen:w()):heightpx(screen:h())
 
+	srfBotLeft = sdlext.surface("img/ui/tooltipshadow_0.png")
+	srfTopRight = sdlext.surface("img/ui/tooltipshadow_4.png")
+
+	for i, hook in ipairs(uiRootCreatedHooks) do
+		hook(screen, uiRoot)
+	end
+
+	-- clear the list of hooks since we're not gonna call it again
+	uiRootCreatedHooks = nil
+end
+
+sdlext.CurrentWindowRect = sdl.rect(0, 0, 0, 0)
 MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	local wasMainMenu = isInMainMenu
 	local wasHangar = isInHangar
@@ -138,17 +151,7 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	isInGame = Game ~= nil
 
 	if not uiRoot then
-		uiRoot = UiRoot():widthpx(screen:w()):heightpx(screen:h())
-
-		srfBotLeft = sdlext.surface("img/ui/tooltipshadow_0.png")
-		srfTopRight = sdlext.surface("img/ui/tooltipshadow_4.png")
-
-		for i, hook in ipairs(uiRootCreatedHooks) do
-			hook(screen, uiRoot)
-		end
-
-		-- clear the list of hooks since we're not gonna call it again
-		uiRootCreatedHooks = nil
+		buildUiRoot(screen)
 	end
 	uiRoot:widthpx(screen:w()):heightpx(screen:h())
 
