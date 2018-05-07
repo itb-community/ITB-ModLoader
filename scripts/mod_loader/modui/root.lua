@@ -129,6 +129,22 @@ local srfBotLeft, srfTopRight
 local function buildUiRoot(screen)
 	uiRoot = UiRoot():widthpx(screen:w()):heightpx(screen:h())
 
+	uiRoot.keydown = function(self, keycode)
+		if keycode == Settings.hotkeys[23] then -- fullscreen hotkey
+			Settings.fullscreen = 1 - Settings.fullscreen
+
+			-- Game doesn't update settings.lua with new fullscreen status...
+			-- Only writes to the file once the options menu is dismissed.
+			modApi:writeFile(
+				os.getKnownFolder(5).."/My Games/Into The Breach/settings.lua",
+				"Settings = " .. save_table(Settings)
+			)
+			isOptionsWindow = true
+		end
+
+		return Ui.keydown(self, keycode)
+	end
+
 	srfBotLeft = sdlext.surface("img/ui/tooltipshadow_0.png")
 	srfTopRight = sdlext.surface("img/ui/tooltipshadow_4.png")
 
