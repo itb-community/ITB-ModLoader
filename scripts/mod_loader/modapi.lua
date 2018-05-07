@@ -556,7 +556,12 @@ end
 function modApi:loadSettings()
 	local path = os.getKnownFolder(5).."/My Games/Into The Breach/settings.lua"
 	if self:fileExists(path) then
-		return self:loadIntoEnv(path).Settings
+		local result = self:loadIntoEnv(path).Settings
+
+		result.screenwidth = ScreenSizeX()
+		result.screenheight = ScreenSizeY()
+
+		return result
 	end
 
 	return nil
@@ -821,6 +826,16 @@ function modApi:fileExists(name)
 	else
 		return false
 	end
+end
+
+function modApi:writeFile(path, content)
+	assert(type(path) == "string")
+	assert(type(content) == "string")
+
+	local f = io.open(path, "w")
+	assert(f, "Unable to open " .. path)
+	f:write(content)
+	f:close()
 end
 
 function modApi:copyFile(src, dst)
