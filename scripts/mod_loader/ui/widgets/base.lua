@@ -56,7 +56,8 @@ function Ui:remove(child)
 	if not child then return self end
 
 	if self.root.focuschild == child then
-		self:setfocus()
+		-- pass self as arg for UiRoot override
+		self:setfocus(self)
 	end
 
 	child:setroot(nil)
@@ -235,7 +236,8 @@ function Ui:mousedown(mx, my, button)
 	end
 	
 	self.root.pressedchild = self
-	self:setfocus()
+	-- pass self as arg for UiRoot override
+	self:setfocus(self)
 	self.pressed = true
 
 	for i=1,#self.children do

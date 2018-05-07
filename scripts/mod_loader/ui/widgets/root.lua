@@ -5,7 +5,7 @@ function UiRoot:new()
 	
 	self.hoveredchild = nil
 	self.pressedchild = nil
-	self.focuschild = nil
+	self.focuschild = self
 	self.translucent = true
 	self.tooltipUi = UiTooltip():addTo(self)
 end
@@ -31,6 +31,8 @@ end
 
 function UiRoot:setfocus(newfocus)
 	assert(
+		-- we permit the focus to be set to nil, ui elements with a parent,
+		-- or to the root itself
 		newfocus == nil or (newfocus.parent or newfocus.root == newfocus),
 		"Unable to set focus, because the UI element has no parent"
 	)
