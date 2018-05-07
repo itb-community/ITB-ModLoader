@@ -126,6 +126,7 @@ function sdlext.getUiRoot()
 end
 
 local srfBotLeft, srfTopRight
+sdlext.CurrentWindowRect = sdl.rect(0, 0, 0, 0)
 
 MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	local wasMainMenu = isInMainMenu
@@ -181,14 +182,25 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 
 	uiRoot:draw(screen)
 
+	sdlext.CurrentWindowRect.x = 0
+	sdlext.CurrentWindowRect.y = 0
+	sdlext.CurrentWindowRect.w = 0
+	sdlext.CurrentWindowRect.h = 0
+
 	if srfBotLeft:wasDrawn() and srfTopRight:wasDrawn() then
-		local x = srfBotLeft.x
-		local y = srfTopRight.y - 4
-		local w = srfTopRight.x - x
-		local h = srfBotLeft.y - y
+		sdlext.CurrentWindowRect.x = srfBotLeft.x
+		sdlext.CurrentWindowRect.y = srfTopRight.y - 4
+		sdlext.CurrentWindowRect.w = srfTopRight.x - sdlext.CurrentWindowRect.x
+		sdlext.CurrentWindowRect.h = srfBotLeft.y  - sdlext.CurrentWindowRect.y
 
 		for i, hook in ipairs(windowVisibleHooks) do
-			hook(screen, x, y, w, h)
+			hook(
+				screen,
+				sdlext.CurrentWindowRect.x,
+				sdlext.CurrentWindowRect.y,
+				sdlext.CurrentWindowRect.w,
+				sdlext.CurrentWindowRect.h
+			)
 		end
 	end
 
