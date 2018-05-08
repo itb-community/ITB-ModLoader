@@ -57,11 +57,14 @@ end
 
 function UiRoot:dropdownEvent(x,y)
 	if
-		self.currentDropDown
-		and x >= self.currentDropDown.screenx
-		and x <  self.currentDropDown.screenx + self.currentDropDown.w
-		and y >= self.currentDropDown.screeny
-		and y <  self.currentDropDown.screeny + self.currentDropDown.h
+		self.currentDropDown and
+		rect_contains(
+			self.currentDropDown.screenx,
+			self.currentDropDown.screeny,
+			self.currentDropDown.w,
+			self.currentDropDown.h,
+			x, y
+		)
 	then
 		self:add(self.currentDropDown)
 		self:relayout()
@@ -121,11 +124,14 @@ function UiRoot:event(eventloop)
 		end
 
 		if
-			child ~= nil                  and
-			mx >= child.screenx           and
-			mx <  child.screenx + child.w and
-			my >= child.screeny           and
-			my <  child.screeny + child.h
+			child ~= nil       and
+			rect_contains(
+				child.screenx,
+				child.screeny,
+				child.w,
+				child.h,
+				mx, my
+			)
 		then
 			if child:mouseup(mx, my, button) then
 				self.pressedchild = nil

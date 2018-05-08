@@ -91,9 +91,63 @@ function drawborder(screen, color, rect, borderwidth, temprect)
 	screen:drawrect(color, temprect)
 end
 
-function rect_contains(rect, x, y)
-	return x > rect.x          and
-	       x < rect.x + rect.w and
-	       y > rect.y          and
-	       y < rect.y + rect.h
+local function rect_contains0(x, y, w, h, px, py)
+	return px > x     and
+	       px < x + w and
+	       py > y     and
+	       py < y + h
+end
+
+function rect_contains(...)
+	local a = {...}
+	assert(#a == 3 or #a == 6, "Invalid arguments")
+
+	if #a == 3 then
+		return rect_contains0(
+			a[1].x, a[1].y,
+			a[1].w, a[1].h,
+			a[2],   a[3]
+		)
+	else
+		return rect_contains0(...)
+	end
+end
+
+function rect_equals(...)
+	local a = {...}
+	assert(#a <= 5, "Invalid arguments")
+
+	if #a == 2 then
+		return a[1].x == a[2].x and
+		       a[1].y == a[2].y and
+		       a[1].w == a[2].w and
+		       a[1].h == a[2].h
+	else
+		a[2] = a[2] or 0
+		a[3] = a[3] or 0
+		a[4] = a[4] or 0
+		a[5] = a[5] or 0
+
+		return a[1].x == a[2] and
+		       a[1].y == a[3] and
+		       a[1].w == a[4] and
+		       a[1].h == a[5]
+	end
+end
+
+function rect_set(...)
+	local a = {...}
+	assert(#a <= 5, "Invalid arguments")
+
+	if #a == 2 then
+		a[1].x = a[2].x
+		a[1].y = a[2].y
+		a[1].w = a[2].w
+		a[1].h = a[2].h
+	else
+		a[1].x = a[2] or 0
+		a[1].y = a[3] or 0
+		a[1].w = a[4] or 0
+		a[1].h = a[5] or 0
+	end
 end

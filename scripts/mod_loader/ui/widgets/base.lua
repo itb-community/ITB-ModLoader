@@ -212,11 +212,14 @@ function Ui:wheel(mx,my,y)
 		local child = self.children[i]
 		
 		if
-			child.visible                 and
-			mx >= child.screenx           and
-			mx <  child.screenx + child.w and
-			my >= child.screeny           and
-			my <  child.screeny + child.h
+			child.visible      and
+			rect_contains(
+				child.screenx,
+				child.screeny,
+				child.w,
+				child.h,
+				mx, my
+			)
 		then
 			if child:wheel(mx,my,y) then
 				return true
@@ -244,11 +247,14 @@ function Ui:mousedown(mx, my, button)
 		local child = self.children[i]
 
 		if
-			child.visible                 and
-			mx >= child.screenx           and
-			mx <  child.screenx + child.w and
-			my >= child.screeny           and
-			my <  child.screeny + child.h
+			child.visible      and
+			rect_contains(
+				child.screenx,
+				child.screeny,
+				child.w,
+				child.h,
+				mx, my
+			)
 		then
 			if child:mousedown(mx, my, button) then
 				return true
@@ -267,10 +273,13 @@ function Ui:mouseup(mx, my, button)
 		self.root.pressedchild == self and
 		self.pressed                   and
 		not self.disabled              and
-		mx >= self.screenx             and
-		mx <  self.screenx + self.w    and
-		my >= self.screeny             and
-		my <  self.screeny + self.h
+		rect_contains(
+			self.screenx,
+			self.screeny,
+			self.w,
+			self.h,
+			mx, my
+		)
 	then
 		self.pressed = false
 		if self:clicked(button) then return true end
@@ -282,10 +291,13 @@ function Ui:mouseup(mx, my, button)
 		if
 			child ~= self.root.pressedchild and
 			child.visible                   and
-			mx >= child.screenx             and
-			mx <  child.screenx + child.w   and
-			my >= child.screeny             and
-			my <  child.screeny + child.h
+			rect_contains(
+				child.screenx,
+				child.screeny,
+				child.w,
+				child.h,
+				mx, my
+			)
 		then
 			if child:mouseup(mx, my, button) then
 				return true
@@ -316,10 +328,13 @@ function Ui:mousemove(mx, my)
 		if
 			child ~= self.root.pressedchild and
 			child.visible                   and
-			mx >= child.screenx             and
-			mx <  child.screenx + child.w   and
-			my >= child.screeny             and
-			my <  child.screeny + child.h
+			rect_contains(
+				child.screenx,
+				child.screeny,
+				child.w,
+				child.h,
+				mx, my
+			)
 		then
 			if not child.containsMouse then
 				child.containsMouse = true
