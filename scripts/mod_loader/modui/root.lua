@@ -109,6 +109,18 @@ function sdlext.addSettingsChangedHook(fn)
 	table.insert(settingsChangedHooks, fn)
 end
 
+local keyDownHooks = {}
+function sdlext.addKeyDownHook(fn)
+	assert(type(fn) == "function")
+	table.insert(keyDownHooks, fn)
+end
+
+local keyUpHooks = {}
+function sdlext.addKeyUpHook(fn)
+	assert(type(fn) == "function")
+	table.insert(keyUpHooks, fn)
+end
+
 local wasOptionsWindow = false
 local isOptionsWindow = false
 sdlext.addFrameDrawnHook(function(screen)
@@ -141,6 +153,14 @@ sdlext.addWindowVisibleHook(function(screen, x, y, w, h)
 	then
 		isOptionsWindow = true
 	end
+end)
+
+sdlext.addKeyDownHook(function(keycode)
+	if keycode == 96 then -- tilde/backtick
+		consoleOpen = not consoleOpen
+	end
+
+	return false
 end)
 
 -- //////////////////////////////////////////////////////////////////////
@@ -258,8 +278,20 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 end)
 
 MOD_API_EVENT_HOOK = sdl.eventHook(function(event)
-	if event:type() == sdl.events.keydown and event:keycode() == 96 then
-		consoleOpen = not consoleOpen
+	local type = event:type()
+
+	if type == sdl.events.keydown then
+		for i, hook in ipairs(keyDownHooks) do
+			if hook(event:keycode()) then
+				return true
+			end
+		end
+	elseif type == sdl.events.keyup then
+		for i, hook in ipairs(keyUpHooks) do
+			if hook(event:keycode()) then
+				return true
+			end
+		end
 	end
 
 	return uiRoot:event(event)
