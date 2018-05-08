@@ -92,8 +92,8 @@ function drawborder(screen, color, rect, borderwidth, temprect)
 end
 
 function rect_contains(rect, x, y)
-	return x >= rect.x          and
-	       x <  rect.x + rect.w and
-	       y >= rect.y          and
-	       y <  rect.y + rect.h
+	return x > rect.x          and
+	       x < rect.x + rect.w and
+	       y > rect.y          and
+	       y < rect.y + rect.h
 end
