@@ -109,16 +109,39 @@ function sdlext.addSettingsChangedHook(fn)
 	table.insert(settingsChangedHooks, fn)
 end
 
-local keyDownHooks = {}
-function sdlext.addKeyDownHook(fn)
+-- Key hooks are fired WHEREVER in the game you are, whenever
+-- you press a key. So your hooks will need to have a lot of
+-- additional restrictions on when they're supposed to fire.
+
+-- Pre key hooks are fired BEFORE the uiRoot handles the key events.
+-- These hooks can be used to completely hijack input and bypass the
+-- normal focus-based key event handling.
+local preKeyDownHooks = {}
+function sdlext.addPreKeyDownHook(fn)
 	assert(type(fn) == "function")
-	table.insert(keyDownHooks, fn)
+	table.insert(preKeyDownHooks, fn)
 end
 
-local keyUpHooks = {}
-function sdlext.addKeyUpHook(fn)
+local preKeyUpHooks = {}
+function sdlext.addPreKeyUpHook(fn)
 	assert(type(fn) == "function")
-	table.insert(keyUpHooks, fn)
+	table.insert(preKeyUpHooks, fn)
+end
+
+-- Post key hooks are fired AFTER the uiRoot has handled the key
+-- events. These hooks can be used to process leftover key events
+-- which haven't been handled via the normal focus-based key event
+-- handling.
+local postKeyDownHooks = {}
+function sdlext.addPostKeyDownHook(fn)
+	assert(type(fn) == "function")
+	table.insert(postKeyDownHooks, fn)
+end
+
+local postKeyUpHooks = {}
+function sdlext.addPostKeyUpHook(fn)
+	assert(type(fn) == "function")
+	table.insert(postKeyUpHooks, fn)
 end
 
 local wasOptionsWindow = false
@@ -155,9 +178,19 @@ sdlext.addWindowVisibleHook(function(screen, x, y, w, h)
 	end
 end)
 
-sdlext.addKeyDownHook(function(keycode)
+sdlext.addPreKeyDownHook(function(keycode)
 	if keycode == 96 then -- tilde/backtick
 		consoleOpen = not consoleOpen
+	elseif keycode == Settings.hotkeys[23] then -- fullscreen hotkey
+		Settings.fullscreen = 1 - Settings.fullscreen
+
+		-- Game doesn't update settings.lua with new fullscreen status...
+		-- Only writes to the file once the options menu is dismissed.
+		modApi:writeFile(
+			os.getKnownFolder(5).."/My Games/Into The Breach/settings.lua",
+			"Settings = " .. save_table(Settings)
+		)
+		isOptionsWindow = true
 	end
 
 	return false
@@ -173,22 +206,6 @@ end
 local srfBotLeft, srfTopRight
 local function buildUiRoot(screen)
 	uiRoot = UiRoot():widthpx(screen:w()):heightpx(screen:h())
-
-	uiRoot.keydown = function(self, keycode)
-		if keycode == Settings.hotkeys[23] then -- fullscreen hotkey
-			Settings.fullscreen = 1 - Settings.fullscreen
-
-			-- Game doesn't update settings.lua with new fullscreen status...
-			-- Only writes to the file once the options menu is dismissed.
-			modApi:writeFile(
-				os.getKnownFolder(5).."/My Games/Into The Breach/settings.lua",
-				"Settings = " .. save_table(Settings)
-			)
-			isOptionsWindow = true
-		end
-
-		return Ui.keydown(self, keycode)
-	end
 
 	srfBotLeft = sdlext.surface("img/ui/tooltipshadow_0.png")
 	srfTopRight = sdlext.surface("img/ui/tooltipshadow_4.png")
@@ -279,20 +296,39 @@ end)
 
 MOD_API_EVENT_HOOK = sdl.eventHook(function(event)
 	local type = event:type()
+	local keycode = event:keycode()
 
 	if type == sdl.events.keydown then
-		for i, hook in ipairs(keyDownHooks) do
-			if hook(event:keycode()) then
+		for i, hook in ipairs(preKeyDownHooks) do
+			if hook(keycode) then
 				return true
 			end
 		end
 	elseif type == sdl.events.keyup then
-		for i, hook in ipairs(keyUpHooks) do
-			if hook(event:keycode()) then
+		for i, hook in ipairs(preKeyUpHooks) do
+			if hook(keycode) then
 				return true
 			end
 		end
 	end
 
-	return uiRoot:event(event)
+	local result = uiRoot:event(event)
+
+	if not result then
+		if type == sdl.events.keydown then
+			for i, hook in ipairs(postKeyDownHooks) do
+				if hook(keycode) then
+					return true
+				end
+			end
+		elseif type == sdl.events.keyup then
+			for i, hook in ipairs(postKeyUpHooks) do
+				if hook(keycode) then
+					return true
+				end
+			end
+		end
+	end
+
+	return result
 end)

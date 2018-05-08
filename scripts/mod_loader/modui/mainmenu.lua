@@ -95,8 +95,9 @@ local function createUi(root)
 		return Ui.mousedown(self, x, y, button)
 	end
 
-	holder.keydown = function(self, keycode)
+	sdlext.addPreKeyDownHook(function(keycode)
 		if
+			holder.visible        and
 			keycode == 13         or   -- main enter
 			keycode == 1073741912 and  -- numpad enter
 			not sdlext.isConsoleOpen()
@@ -107,8 +108,8 @@ local function createUi(root)
 			end
 		end
 
-		return Ui.keydown(self, keycode)
-	end
+		return false
+	end)
 
 	holder.draw = function(self, screen)
 		local yOffset = 0
