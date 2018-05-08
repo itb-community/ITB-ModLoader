@@ -21,7 +21,7 @@ end
 
 local isInGame = false
 function sdlext.isGame()
-	return wasGame
+	return isInGame
 end
 
 local consoleOpen = false
