@@ -91,6 +91,8 @@ local function createUi(root)
 	end
 
 	sdlext.addHangarEnteredHook(function(screen)
+		Profile = modApi:loadProfile()
+
 		leaving = false
 		holder.visible = true
 		holder:setfocus()

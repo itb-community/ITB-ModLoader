@@ -196,6 +196,12 @@ sdlext.addPreKeyDownHook(function(keycode)
 	return false
 end)
 
+sdlext.addSettingsChangedHook(function(old, new)
+	if old.last_profile ~= new.last_profile then
+		Profile = modApi:loadProfile()
+	end
+end)
+
 -- //////////////////////////////////////////////////////////////////////
 
 local uiRoot = nil

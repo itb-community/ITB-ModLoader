@@ -140,6 +140,7 @@ end)
 
 sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 	leaving = false
+	Profile = modApi:loadProfile()
 end)
 
 sdlext.addUiRootCreatedHook(function(screen, root)
