@@ -1,3 +1,6 @@
+--[[
+	Root UI object provided by the modloader. 
+--]]
 
 local bgRobot = sdlext.surface("img/main_menus/bg3.png")
 local bgHangar = sdlext.surface("img/strategy/hangar_main.png")
@@ -19,6 +22,28 @@ end
 local isInGame = false
 function sdlext.isGame()
 	return wasGame
+end
+
+local consoleOpen = false
+function sdlext.isConsoleOpen()
+	return consoleOpen
+end
+
+--[[
+	Returns correct center of the screen, accounting for the weird
+	offset when the game is not running in fullscreen.
+--]]
+function GetScreenCenter()
+	local center = Point(ScreenSizeX() / 2, ScreenSizeY() / 2)
+
+	if Settings.fullscreen == 0 then
+		-- For some reason when the game is not in fullscreen,
+		-- the entire UI is shifted, correct that
+		center.x = center.x - 75
+		center.y = center.y + 50
+	end
+
+	return center
 end
 
 -- //////////////////////////////////////////////////////////////////////
@@ -233,5 +258,9 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 end)
 
 MOD_API_EVENT_HOOK = sdl.eventHook(function(event)
+	if event:type() == sdl.events.keydown and event:keycode() == 96 then
+		consoleOpen = not consoleOpen
+	end
+
 	return uiRoot:event(event)
 end)
