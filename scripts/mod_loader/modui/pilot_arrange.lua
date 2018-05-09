@@ -196,7 +196,7 @@ sdlext.addHangarEnteredHook(function(screen)
 	if not arrangePilotsButton.disabled then
 		arrangePilotsButton.disabled = true
 		arrangePilotsButton.tip = 
-			"Pilots can only be arranged before the New Game button is pressed, "
-			.."restart the game to be able to arrange pilots."
+			"Pilots can only be arranged before the New Game button is pressed.\n \n"
+			.."Restart the game to be able to arrange pilots."
 	end
 end)
