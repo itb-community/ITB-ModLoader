@@ -36,6 +36,7 @@ local oldStartNewGame = startNewGame
 local oldLoadGame = LoadGame
 local oldSaveGame = SaveGame
 local oldTriggerVoice = TriggerVoiceEvent
+local oldGetDifficulty = GetDifficulty
 
 function getStartingSquad(choice)
 	if choice == 0 then
@@ -379,3 +380,429 @@ function CreatePilot(data)
 		PilotList[#PilotList + 1] = data.Id
 	end
 end
+
+-- /////////////////////////////////////////////////////////////////////////////////////
+-- Modded difficulty levels
+
+DifficultyLevels = {
+	"DIFF_EASY",
+	"DIFF_NORMAL",
+	"DIFF_HARD"
+}
+
+local function validateDifficulty(level, unregistered)
+	assert(type(level) == "number", "Difficulty must be an integer, got " .. type(level))
+	assert(level >= 0, "Difficulty must not be negative, got " .. level)
+	if not unregistered then
+		assert(_G[DifficultyLevels[level + 1]] == level, "Unknown difficulty level: " .. level)
+	end
+end
+
+--[[
+	Returns ID of the difficulty level:
+		"DIFF_EASY", "DIFF_VERY_HARD"
+--]]
+function GetDifficultyId(level)
+	level = level or GetDifficulty()
+	validateDifficulty(level)
+
+	return DifficultyLevels[level + 1]
+end
+
+--[[
+	Returns ID of the difficulty level, but with "DIFF_" trimmed out:
+		"EASY", "VERY_HARD"
+--]]
+function GetDifficultyString(level)
+	level = level or GetDifficulty()
+	validateDifficulty(level)
+
+	return string.sub(DifficultyLevels[level + 1], 6)
+end
+
+local function toCapitalizedCase(str)
+	assert(type(str) == "string")
+	return str:sub(1, 1):upper() .. str:sub(2):lower()
+end
+
+--[[
+	Returns a suffix used to access texts related to the difficulty
+	level in the Global_Texts table:
+		"Easy", "VeryHard"
+--]]
+function GetDifficultyTipSuffix(level)
+	level = level or GetDifficulty()
+	validateDifficulty(level)
+
+	local name = string.sub(DifficultyLevels[level + 1], 6)
+
+	local result = ""
+	for str in string.gmatch(name, "([^_]+)") do
+		result = result .. toCapitalizedCase(str)
+	end
+
+	return result
+end
+
+--[[
+	Returns name of the difficulty level that will be displayed
+	to the user, obtained by replacing all underscores with spaces
+	and capitalizing each word in the difficulty string.
+		"Easy", "Very Hard"
+--]]
+function GetDifficultyFaceName(level)
+	level = level or GetDifficulty()
+	validateDifficulty(level)
+
+	local name = string.sub(DifficultyLevels[level + 1], 6)
+
+	local result = ""
+	for str in string.gmatch(name, "([^_]+)") do
+		result = result .. " " .. toCapitalizedCase(str)
+	end
+
+	return modApi:trimString(result)
+end
+
+function AddDifficultyLevel(id, level, tipTitle, tipText)
+	assert(type(id) == "string", "Difficulty level id must be a string, got: " .. type(id))
+	assert(id == string.upper(id), "Difficulty level id must use only uppercase letters.")
+	assert(modApi:stringStartsWith(id, "DIFF_"), "Difficulty level id must begin with 'DIFF_', got: " .. id)
+	validateDifficulty(level, true)
+	assert(
+		level <= #DifficultyLevels,
+		"Level being added must form a contiguous range with existing difficulties"
+	)
+	assert(type(tipTitle) == "string")
+	assert(type(tipText) == "string")
+
+	local index = level + 1
+
+	local newSectorSpawners = {}
+	for i, id in ipairs(DifficultyLevels) do
+		local lvl = _G[id]
+
+		if i < index then
+			-- No change, copy as-is
+			newSectorSpawners[lvl] = SectorSpawners[lvl]
+		else
+			newSectorSpawners[lvl + 1] = SectorSpawners[lvl]
+		end
+	end
+	SectorSpawners = newSectorSpawners
+
+	_G[id] = level
+
+	for i = index, #DifficultyLevels do
+		_G[DifficultyLevels[i]] = i
+	end
+
+	table.insert(DifficultyLevels, index, id)
+
+	local suffix = GetDifficultyTipSuffix(level)
+	Global_Texts["TipTitle_Hangar" .. suffix] = tipTitle
+	Global_Texts["TipText_Hangar" .. suffix] = tipText
+
+	-- Default to using the same spawner logic as baseline difficulty level
+	SectorSpawners[level] = SectorSpawners[GetBaselineDifficulty(level)]
+end
+
+function GetDifficulty()
+	if GAME and GAME.CustomDifficulty then
+		return GAME.CustomDifficulty
+	else
+		local customDiff = modApi:readProfileData("CustomDifficulty")
+		if customDiff then
+			return customDiff
+		end
+	end
+
+	return oldGetDifficulty()
+end
+
+--[[
+	Returns true if the specified level is a vanilla difficulty level,
+	false otherwise.
+	This function accounts for level shifting caused by addition of
+	custom difficulty levels.
+--]]
+function IsVanillaDifficultyLevel(level)
+	level = level or GetDifficulty()
+	validateDifficulty(level)
+	local name = DifficultyLevels[level + 1]
+	return name == "DIFF_EASY"   or
+	       name == "DIFF_NORMAL" or
+	       name == "DIFF_HARD"
+end
+
+--[[
+	Returns the baseline difficulty level for the specified level.
+
+	A baseline difficulty level is the vanilla difficulty level that
+	is immediately below the one specified. Eg. a custom difficulty of
+	level 2 would sit between DIFF_NORMAL and DIFF_HARD, so its
+	baseline difficulty level would be DIFF_NORMAL.
+--]]
+function GetBaselineDifficulty(level)
+	level = level or GetDifficulty()
+	validateDifficulty(level)
+
+	if level < DIFF_NORMAL then
+		return DIFF_EASY
+	elseif level < DIFF_HARD then
+		return DIFF_NORMAL
+	else
+		return DIFF_HARD
+	end
+end
+
+local tempTipTitle, tempTipText, tempToggle
+function SetDifficulty(level)
+	validateDifficulty(level)
+
+	local oldLevel = GetDifficulty()
+	if tempTipTitle and tempTipText and tempToggle then
+		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(oldLevel))
+
+		Global_Texts["TipTitle_Hangar"..baseSuffix] = tempTipTitle
+		Global_Texts["TipText_Hangar"..baseSuffix] = tempTipText
+		Global_Texts["Toggle_"..baseSuffix] = tempToggle
+
+		tempTipTitle = nil
+		tempTipText = nil
+		tempToggle = nil
+	end
+
+	if GAME then
+		GAME.CustomDifficulty = level
+	else
+		-- Hangar, before the game
+		modApi:writeProfileData("CustomDifficulty", level)
+
+		local tipSuffix = GetDifficultyTipSuffix(level)
+		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(level))
+
+		tempTipTitle = Global_Texts["TipTitle_Hangar"..baseSuffix]
+		tempTipText = Global_Texts["TipText_Hangar"..baseSuffix]
+		tempToggle = Global_Texts["Toggle_"..baseSuffix]
+
+		Global_Texts["TipTitle_Hangar"..baseSuffix] = Global_Texts["TipTitle_Hangar"..tipSuffix]
+		Global_Texts["TipText_Hangar"..baseSuffix] = Global_Texts["TipText_Hangar"..tipSuffix]
+		Global_Texts["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
+
+		if not IsVanillaDifficultyLevel(level) then
+			Global_Texts["TipText_Hangar"..baseSuffix] =
+				Global_Texts["TipText_Hangar"..baseSuffix] .. "\n\n" ..
+				"Note: this is a modded difficulty level. It won't change "..
+				"anything without mods providing content for this difficulty."
+		end
+	end
+end
+
+AddDifficultyLevel(
+	"DIFF_VERY_HARD",
+	#DifficultyLevels, -- adds as a new highest difficulty
+	"Very Hard Mode",
+	"Intended for veteran Commanders looking for a challenge."
+)
+AddDifficultyLevel(
+	"DIFF_IMPOSSIBLE",
+	#DifficultyLevels, -- adds as a new highest difficulty
+	"Impossible Mode",
+	"Humanity: Destroyed\nVek Threat: Unstoppable\nMission: Failed"
+)
+
+-- /////////////////////////////////////////////////////////////////////////////////////
+-- Tweak existing code to work with custom difficulty levels
+-- Replacing instances of GetDifficulty() with GetBaselineDifficulty()
+
+function Mission_Final:StartMission()
+	self:GetSpawner():SetSpawnIsland(5)
+	local pylons = extract_table(Board:GetZone("pylons"))
+	for i,v in ipairs(pylons) do
+		Board:BlockSpawn(v,BLOCKED_PERM)
+	end
+	
+	if GetBaselineDifficulty() == DIFF_HARD then
+		Board:SpawnPawn(random_element(self.BossList))
+	end
+end
+
+function getEnvironmentChance(sectorType, tileType)
+	--numbers are just a raw percentage chance
+	--example: TERRAIN_FOREST = 10 means 10% chance any plain tile will become Forest
+	if sectorType == "lava" or sectorType == "volcano" then
+		return 0
+	end
+	
+	if tileType == TERRAIN_ACID then
+		if sectorType == "acid" then
+			return random_element({0,0,10,20})
+		else
+			return 0
+		end
+	end
+	
+	-- "normal" mode uses the same numbers as "hard"
+	
+	local data = { 	
+		grass = { 
+			--easy 
+			{[TERRAIN_FOREST] = 10, [TERRAIN_SAND] = 0, [TERRAIN_ICE] = 0, },
+			--hard
+			{[TERRAIN_FOREST] = 16, [TERRAIN_SAND] = 0, [TERRAIN_ICE] = 0, },
+		},
+		sand = {
+			--easy
+			{ [TERRAIN_FOREST] = 0, [TERRAIN_SAND] = 10, [TERRAIN_ICE] = 0, },
+			--hard
+			{ [TERRAIN_FOREST] = 0, [TERRAIN_SAND] = 16, [TERRAIN_ICE] = 0, },
+		},
+		snow = {
+			--easy
+			{ [TERRAIN_FOREST] = 10, [TERRAIN_SAND] = 0, [TERRAIN_ICE] = 75,  },
+			--hard
+			{ [TERRAIN_FOREST] = 10, [TERRAIN_SAND] = 0, [TERRAIN_ICE] = 75,  },
+		},
+		acid = {
+			--easy
+			{ [TERRAIN_FOREST] = 0, [TERRAIN_SAND] = 0, [TERRAIN_ICE] = 0,},
+			--hard
+			{ [TERRAIN_FOREST] = 0, [TERRAIN_SAND] = 0, [TERRAIN_ICE] = 0,   },
+		}
+	}
+
+	--translate easy => 1, normal or hard => 2
+	local difficulty = (GetBaselineDifficulty() == DIFF_EASY) and 1 or 2
+	
+	--haha this is ugly
+	if data[sectorType] ~= nil and data[sectorType][difficulty] ~= nil and data[sectorType][difficulty][tileType] ~= nil then
+		return data[sectorType][difficulty][tileType]
+	else
+		LOG("Failed environment chance: terrain = "..sectorType..", tile = "..tileType)
+		return 0
+	end
+end
+
+function Mission_SpiderBoss:SpawnSpiderlings()
+	if self:IsBossDead() then
+		return
+	end
+	
+	if Board:GetPawn(self.BossID):IsFrozen() then
+		return
+	end
+	
+	if self.EggCount == -1 or GetBaselineDifficulty() == DIFF_EASY then
+		self.EggCount = 2
+	else
+		self.EggCount = self.EggCount == 2 and 3 or 2
+	end
+	
+	local proj_info = { image = "effects/shotup_spider.png", launch = "/enemy/spider_boss_1/attack_egg_launch", impact = "/enemy/spider_boss_1/attack_egg_land" }
+	return self:FlyingSpawns(Board:GetPawnSpace(self.BossID),self.EggCount,"SpiderlingEgg1",proj_info)
+end
+
+function Mission:GetKillBonus()
+	if GetBaselineDifficulty() == DIFF_EASY then
+		return 5
+	else
+		return 7
+	end
+end
+
+function Mission:GetStartingPawns()
+	local spawnCount = self.SpawnStart
+	
+	if GetBaselineDifficulty() == DIFF_EASY and self.SpawnStart_Easy ~= -1 then
+		spawnCount = self.SpawnStart_Easy
+	end
+
+	local mod = self.GlobalSpawnMod + self.SpawnStartMod
+	local count = 0
+	if type(spawnCount) == "table" then
+		local sector = math.max(1,math.min(GetSector(),#spawnCount))
+		count = spawnCount[sector]
+	else
+		count = spawnCount
+	end
+	
+	local new_count = count + mod
+			
+	return math.max(0,new_count)
+end
+
+function Mission:GetSpawnsPerTurn()
+	local spawnCount = copy_table(self.SpawnsPerTurn)
+	
+	if GetBaselineDifficulty() == DIFF_EASY and self.SpawnsPerTurn_Easy ~= -1 then
+		spawnCount = copy_table(self.SpawnsPerTurn_Easy)
+    end
+	
+	if type(spawnCount) ~= "table" then
+		spawnCount = {spawnCount, spawnCount}
+	end
+	
+	local mod = self.GlobalSpawnMod + self.SpawnMod
+	
+	while mod ~= 0 do
+		local curr = getMinIndex(spawnCount)
+		if subsign(mod) < 0 then
+			curr = getMaxIndex(spawnCount)
+		end
+		
+		spawnCount[curr] = math.max(1,spawnCount[curr] + subsign(mod))
+		
+		mod = mod - subsign(mod)
+	end
+	
+	local spawns = " {"
+	for i = 1, #spawnCount do
+		spawns = spawns..spawnCount[i]..","
+	end
+	spawns = spawns.."}"
+	--LOG("Modified spawns per turn: "..spawns)
+	
+	return spawnCount
+end
+
+function Mission:GetMaxEnemy()
+	if GetBaselineDifficulty() == DIFF_EASY and self.MaxEnemy_Easy ~= -1 then
+		return self.MaxEnemy_Easy
+	else
+		return self.MaxEnemy
+	end
+end
+
+function Mission:GetSpawnCount()
+	if not self.InfiniteSpawn then return 0 end
+	
+	if self:IsFinalTurn() then return 0 end
+	
+	--LOG("Turn counter: "..Game:GetTurnCount())
+	
+	local spawnCount = self:GetSpawnsPerTurn()
+
+--	LOG("Current index: "..(Game:GetTurnCount() % #spawnCount) + 1)
+	spawnCount = spawnCount[(Game:GetTurnCount() % #spawnCount) + 1]
+	
+	local enemies = Board:GetPawnCount(TEAM_ENEMY_MAJOR)
+	local all_enemies = Board:GetPawnCount(TEAM_ENEMY)
+	
+--	LOG("All enemy count = "..all_enemies)
+--	LOG("Enemy count = "..enemies)
+	--LOG("Enemy max = "..self:GetMaxEnemy())
+	--LOG("Spawn goal = "..spawnCount)
+	
+	if enemies <= 2 and all_enemies <= 3 and spawnCount < 3 and GetBaselineDifficulty() ~= DIFF_EASY then
+		LOG("2 or less enemies present. Increasing spawn count")
+		spawnCount = spawnCount + 1
+	end
+	
+	spawnCount = math.min(math.max(0,self:GetMaxEnemy() - enemies), spawnCount)
+	LOG("Final spawn = "..spawnCount)
+	
+	return spawnCount
+end
+
+-- /////////////////////////////////////////////////////////////////////////////////////
