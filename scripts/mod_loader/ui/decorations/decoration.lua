@@ -4,6 +4,7 @@ deco.colors = {}
 deco.colors.white =                         sdl.rgb(255, 255, 255)
 deco.colors.black =                         sdl.rgb(0, 0, 0)
 deco.colors.halfblack =                     sdl.rgba(0, 0, 0, 128)
+deco.colors.transparent =                   sdl.rgba(0, 0, 0, 0  )
 deco.colors.framebg =                       sdl.rgb(13, 15, 23)
 deco.colors.framebglight =                  sdl.rgb(30, 36, 50)
 deco.colors.buttoncolor =                   sdl.rgb(24, 28, 41)
@@ -53,3 +54,18 @@ deco.uifont = {
 }
 
 deco.surfaces = {}
+
+function InterpolateColor(color1, color2, t)
+	if t <= 0 then
+		return color1
+	elseif t >= 1 then
+		return color2
+	else
+		return sdl.rgba(
+			color1.r * (1 - t) + color2.r * t,
+			color1.g * (1 - t) + color2.g * t,
+			color1.b * (1 - t) + color2.b * t,
+			color1.a * (1 - t) + color2.a * t
+		)
+	end
+end

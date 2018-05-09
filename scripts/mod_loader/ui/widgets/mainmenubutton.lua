@@ -54,31 +54,16 @@ function MainMenuButton:new(style)
 		button.animations.unhighlight:setInitialPercent(p)
 	end
 
-	local interpolateColor = function(color1, color2, t)
-		if t <= 0 then
-			return color1
-		elseif t >= 1 then
-			return color2
-		else
-			return sdl.rgba(
-				color1.r * (1 - t) + color2.r * t,
-				color1.g * (1 - t) + color2.g * t,
-				color1.b * (1 - t) + color2.b * t,
-				color1.a * (1 - t) + color2.a * t
-			)
-		end
-	end
-
 	self.animations.highlight = UiAnim(self, 150, function(anim, widget, percent)
 		local decoBtn = widget.decorations[1]
 		decoBtn.bonusWidth = math.min(wDiff, percent * wDiff)
-		decoBtn.color = interpolateColor(decoBtn.colorBase, decoBtn.colorHighlight, percent)
+		decoBtn.color = InterpolateColor(decoBtn.colorBase, decoBtn.colorHighlight, percent)
 	end)
 
 	self.animations.unhighlight = UiAnim(self, 150, function(anim, widget, percent)
 		local decoBtn = widget.decorations[1]
 		decoBtn.bonusWidth = math.max(0, wDiff - percent * wDiff)
-		decoBtn.color = interpolateColor(decoBtn.colorHighlight, decoBtn.colorBase, percent)
+		decoBtn.color = InterpolateColor(decoBtn.colorHighlight, decoBtn.colorBase, percent)
 	end)
 
 	self.animations.slideIn = UiAnim(self, 500, function(anim, widget, percent)
