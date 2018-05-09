@@ -2,11 +2,11 @@ local scripts = {
 	"root",
 	"dialog_helper",
 
+	"mainmenu",
+	"hangar",
 	"version_string",
 	"error_warning",
 	"modcontent",
-	"mainmenu",
-	"hangar",
 	
 	"mod_configuration",
 	"pilot_arrange",
