@@ -7,6 +7,7 @@ local scripts = {
 	"version_string",
 	"error_warning",
 	"modcontent",
+	"extra_difficulty",
 	
 	"mod_configuration",
 	"pilot_arrange",
