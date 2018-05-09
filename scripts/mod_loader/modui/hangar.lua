@@ -226,7 +226,6 @@ local function isDismissClick(mx, my, button)
 		if isSecretSquadUnlocked then
 			r.x = r2.x + (r2.w - r.w) / 2
 			if rect_contains(r, mx, my) then
-				LOG("secret squad click")
 				return true
 			end
 		end
