@@ -225,6 +225,7 @@ local function buildUiRoot(screen)
 end
 
 sdlext.CurrentWindowRect = sdl.rect(0, 0, 0, 0)
+sdlext.LastWindowRect = sdl.rect(0, 0, 0, 0)
 MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	local wasMainMenu = isInMainMenu
 	local wasHangar = isInHangar
@@ -267,29 +268,26 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 		end
 	end
 
-	uiRoot:draw(screen)
-
-	sdlext.CurrentWindowRect.x = 0
-	sdlext.CurrentWindowRect.y = 0
-	sdlext.CurrentWindowRect.w = 0
-	sdlext.CurrentWindowRect.h = 0
-
+	local wx, wy, ww, wh
 	if srfBotLeft:wasDrawn() and srfTopRight:wasDrawn() then
-		sdlext.CurrentWindowRect.x = srfBotLeft.x
-		sdlext.CurrentWindowRect.y = srfTopRight.y - 4
-		sdlext.CurrentWindowRect.w = srfTopRight.x - sdlext.CurrentWindowRect.x
-		sdlext.CurrentWindowRect.h = srfBotLeft.y  - sdlext.CurrentWindowRect.y
+		wx = srfBotLeft.x
+		wy = srfTopRight.y - 4
+		ww = srfTopRight.x - wx
+		wh = srfBotLeft.y  - wy
+	end
 
+	if not rect_equals(sdlext.CurrentWindowRect, wx, wy, ww, wh) then
+		rect_set(sdlext.LastWindowRect, sdlext.CurrentWindowRect)
+	end
+
+	rect_set(sdlext.CurrentWindowRect, wx, wy, ww, wh)
+	if wx ~= nil then
 		for i, hook in ipairs(windowVisibleHooks) do
-			hook(
-				screen,
-				sdlext.CurrentWindowRect.x,
-				sdlext.CurrentWindowRect.y,
-				sdlext.CurrentWindowRect.w,
-				sdlext.CurrentWindowRect.h
-			)
+			hook(screen, wx, wy, ww, wh)
 		end
 	end
+
+	uiRoot:draw(screen)
 
 	for i, hook in ipairs(frameDrawnHooks) do
 		hook(screen)
