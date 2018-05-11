@@ -646,7 +646,7 @@ AddDifficultyLevel(
 	"DIFF_IMPOSSIBLE",
 	#DifficultyLevels, -- adds as a new highest difficulty
 	"Impossible Mode",
-	"Humanity: Destroyed\nVek Threat: Unstoppable\nMission: Failed"
+	"A punishing difficulty allowing no mistakes."
 )
 
 -- /////////////////////////////////////////////////////////////////////////////////////

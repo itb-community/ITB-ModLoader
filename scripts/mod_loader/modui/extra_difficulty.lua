@@ -46,7 +46,7 @@ local function createUi(root)
 		:addTo(pane)
 	mask.translucent = true
 
-	mask.animations.fadeIn = UiAnim(mask, 750, function(anim, widget, percent)
+	mask.animations.fadeIn = UiAnim(mask, 650, function(anim, widget, percent)
 		widget.decorations[1].color = InterpolateColor(
 			deco.colors.transparent,
 			deco.colors.black,
