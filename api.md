@@ -19,7 +19,7 @@
 		* [modApi:deltaTime](#modapideltatime)
 		* [modApi:elapsedTime](#modapielapsedtime)
 		* [modApi:scheduleHook](#modapischedulehook)
-		* [modapi:conditionalHook](#modapiconditionalhook)
+		* [modApi:conditionalHook](#modapiconditionalhook)
 		* [modApi:runLater](#modapirunlater)
 		* [modApi:splitString](#modapisplitstring)
 		* [modApi:trimString](#modapitrimstring)
