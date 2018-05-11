@@ -138,6 +138,10 @@ sdlext.addNewGameClickHook(function()
 	end)
 end)
 
+sdlext.addContinueClickHook(function()
+	fireMainMenuLeavingHooks()
+end)
+
 sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 	leaving = false
 	Profile = modApi:loadProfile()
