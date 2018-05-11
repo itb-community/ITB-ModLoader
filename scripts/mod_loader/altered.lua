@@ -556,10 +556,9 @@ end
 function IsVanillaDifficultyLevel(level)
 	level = level or GetDifficulty()
 	validateDifficulty(level)
-	local name = DifficultyLevels[level + 1]
-	return name == "DIFF_EASY"   or
-	       name == "DIFF_NORMAL" or
-	       name == "DIFF_HARD"
+	return level == DIFF_EASY   or
+	       level == DIFF_NORMAL or
+	       level == DIFF_HARD
 end
 
 --[[
