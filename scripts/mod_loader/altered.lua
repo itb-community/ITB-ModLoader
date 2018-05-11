@@ -281,6 +281,8 @@ function startNewGame()
 		GAME.squadTitles["TipTitle_"..key] = GetText("TipTitle_"..key)
 	end
 
+	SetDifficulty(GetDifficulty())
+
 	-- Schedule execution to happen in 50ms
 	-- After new game is started, the game saves game state twice,
 	-- but the first state saved is still the old one?
@@ -303,7 +305,7 @@ function LoadGame()
 	GAME.modLoadOrder = GAME.modLoadOrder or mod_loader:getSavedModOrder()
 
 	mod_loader:loadModContent(GAME.modOptions, GAME.modLoadOrder)
-	
+
 	if GAME.squadTitles then
 		for k, name in pairs(GAME.squadTitles) do
 			modApi:overwriteText(k,name)
@@ -320,6 +322,10 @@ function LoadGame()
 
 	restoreGameVariables(Settings)
 	overrideNextPhase()
+
+	if GAME.CustomDifficulty then
+		SetDifficulty(GAME.CustomDifficulty)
+	end
 
 	for i, hook in ipairs(modApi.postLoadGameHooks) do
 		hook()
@@ -561,12 +567,18 @@ function SetDifficulty(level)
 	validateDifficulty(level)
 
 	local oldLevel = GetDifficulty()
-	if tempTipTitle and tempTipText and tempToggle then
+	if tempTipTitle or tempTipText or tempToggle then
 		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(oldLevel))
 
-		Global_Texts["TipTitle_Hangar"..baseSuffix] = tempTipTitle
-		Global_Texts["TipText_Hangar"..baseSuffix] = tempTipText
-		Global_Texts["Toggle_"..baseSuffix] = tempToggle
+		if tempTipTitle then
+			Global_Texts["TipTitle_Hangar"..baseSuffix] = tempTipTitle
+		end
+		if tempTipText then
+			Global_Texts["TipText_Hangar"..baseSuffix] = tempTipText
+		end
+		if tempToggle then
+			Global_Texts["Toggle_"..baseSuffix] = tempToggle
+		end
 
 		tempTipTitle = nil
 		tempTipText = nil
@@ -575,6 +587,10 @@ function SetDifficulty(level)
 
 	if GAME then
 		GAME.CustomDifficulty = level
+
+		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(level))
+		tempToggle = Global_Texts["Toggle_"..baseSuffix]
+		Global_Texts["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
 	else
 		-- Hangar, before the game
 		modApi:writeProfileData("CustomDifficulty", level)
