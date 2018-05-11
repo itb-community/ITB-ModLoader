@@ -103,12 +103,33 @@ function Mission:MissionEnd()
 	Board:AddEffect(ret)
 end
 
+function Mission:SetupDifficulty()
+	-- Can be used to setup the difficulty of this mission
+	-- with regard to value returned by GetDifficulty()
+end
+
 function Mission:BaseStart()
 	for i, hook in ipairs(modApi.preMissionAvailableHooks) do
 		hook(self)
 	end
 	
-	oldBaseStart(self)
+	-- begin oldBaseStart
+	self.VoiceEvents = {}
+	
+	if self.AssetId ~= "" then
+		self.AssetLoc = Board:AddUniqueBuilding(_G[self.AssetId].Image)
+	end
+	
+	self.LiveEnvironment = _G[self.Environment]:new()
+	self:SetupDifficulty()
+
+	self.LiveEnvironment:Start()
+	self:StartMission()
+	
+	self:SetupDiffMod()
+	
+	self:SpawnPawns(self:GetStartingPawns())
+	-- end oldBaseStart
 	
 	for i, hook in ipairs(modApi.postMissionAvailableHooks) do
 		hook(self)
