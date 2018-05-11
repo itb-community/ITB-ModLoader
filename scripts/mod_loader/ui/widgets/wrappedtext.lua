@@ -16,6 +16,8 @@ function UiWrappedText:new(text, font, textset)
 	self.textAlign = "left"
 
 	self.text = nil
+	self.charWidth = 9.5
+	self.lineHeight = 20
 
 	if text then
 		self:setText(text)
@@ -45,7 +47,7 @@ end
 
 --[[
 	http://lua-users.org/wiki/StringRecipes , section Text Wrapping
-]]--
+--]]
 function UiWrappedText:wrap(str, limit, indent, indent1)
 	indent = indent or ""
 	indent1 = indent1 or indent
@@ -86,13 +88,14 @@ end
 function UiWrappedText:computeWidth(text)
 	-- TODO: Need a way to find out character height and width.
 	-- For now, hardcode them.
-	return 9.5 * string.len(text)
+	return self.charWidth * string.len(text)
 end
 
 function UiWrappedText:computeHeight(text)
 	-- TODO: Need a way to find out character height and width.
 	-- For now, hardcode them.
-	return 20
+	-- a decent estimate is font size * 1.2
+	return self.lineHeight
 end
 
 function UiWrappedText:rebuild(lines)
