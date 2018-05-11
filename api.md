@@ -5,51 +5,53 @@
 * [init.lua](#initlua)
 
 * [API](#api)
-	* [modApi:deltaTime](#modapideltatime)
-	* [modApi:elapsedTime](#modapielapsedtime)
-	* [modApi:scheduleHook](#modapischedulehook)
-	* [modapi:conditionalHook](#modapiconditionalhook)
-	* [modApi:runLater](#modapirunlater)
-	* [modApi:splitString](#modapisplitstring)
-	* [modApi:trimString](#modapitrimstring)
-	* [modApi:stringStartsWith](#modapistringstartswith)
-	* [modApi:stringEndsWith](#modapistringendswith)
-	* [modApi:isVersion](#modapiisversion)
-	* [modApi:addGenerationOption](#modapiaddgenerationoption)
-	* [modApi:writeAsset](#modapiwriteasset)
-	* [modApi:readAsset](#modapireadasset)
-	* [modApi:appendAsset](#modapiappendasset)
-	* [modApi:copyAsset](#modapicopyasset)
-	* [modApi:addSquad](#modapiaddsquad)
-	* [modApi:overwriteText](#modapioverwritetext)
-	* [modApi:addWeapon_Texts](#modapiaddweapon_texts)
-	* [modApi:addPopEvent](#modapiaddpopevent)
-	* [modApi:setPopEventOdds](#modapisetpopeventodds)
-	* [modApi:addOnPopEvent](#modapiaddonpopevent)
-	* [modApi:addMap](#modapiaddmap)
-	* [modApi:loadIntoEnv](#modapiloadintoenv)
-	* [modApi:loadSettings](#modapiloadsettings)
-	* [modApi:loadProfile](#modapiloadprofile)
-	* [modApi:writeProfileData](#modapiwriteprofiledata)
-	* [modApi:readProfileData](#modapireadprofiledata)
+	* [Global](#global)
+		* [GetScreenCenter](#getscreencenter)
+		* [SetDifficulty](#setdifficulty)
+		* [AddDifficulty](#adddifficulty)
+		* [GetDifficultyId](#getdifficultyid)
+		* [GetBaselineDifficulty](#getbaselinedifficulty)
+		* [InterpolateColor](#interpolatecolor)
+		* [compare_tables](#compare_tables)
+		* [list_indexof](#list_indexof)
 
-* [sdlext](#sdlext)
-	* [sdlext.isConsoleOpen](#sdlextisconsoleopen)
-	* [sdlext.isMainMenu](#sdlextismainmenu)
-	* [sdlext.isHangar](#sdlextishangar)
-	* [sdlext.isGame](#sdlextisgame)
-	* [sdlext.showDialog](#sdlextshowdialog)
-	* [sdlext.showTextDialog](#sdlextshowtextdialog)
+	* [modApi](#modapi)
+		* [modApi:deltaTime](#modapideltatime)
+		* [modApi:elapsedTime](#modapielapsedtime)
+		* [modApi:scheduleHook](#modapischedulehook)
+		* [modapi:conditionalHook](#modapiconditionalhook)
+		* [modApi:runLater](#modapirunlater)
+		* [modApi:splitString](#modapisplitstring)
+		* [modApi:trimString](#modapitrimstring)
+		* [modApi:stringStartsWith](#modapistringstartswith)
+		* [modApi:stringEndsWith](#modapistringendswith)
+		* [modApi:isVersion](#modapiisversion)
+		* [modApi:addGenerationOption](#modapiaddgenerationoption)
+		* [modApi:writeAsset](#modapiwriteasset)
+		* [modApi:readAsset](#modapireadasset)
+		* [modApi:appendAsset](#modapiappendasset)
+		* [modApi:copyAsset](#modapicopyasset)
+		* [modApi:addSquad](#modapiaddsquad)
+		* [modApi:overwriteText](#modapioverwritetext)
+		* [modApi:addWeapon_Texts](#modapiaddweapon_texts)
+		* [modApi:addPopEvent](#modapiaddpopevent)
+		* [modApi:setPopEventOdds](#modapisetpopeventodds)
+		* [modApi:addOnPopEvent](#modapiaddonpopevent)
+		* [modApi:addMap](#modapiaddmap)
+		* [modApi:loadIntoEnv](#modapiloadintoenv)
+		* [modApi:loadSettings](#modapiloadsettings)
+		* [modApi:loadProfile](#modapiloadprofile)
+		* [modApi:writeProfileData](#modapiwriteprofiledata)
+		* [modApi:readProfileData](#modapireadprofiledata)
 
-* [Global](#global)
-	* [GetScreenCenter](#getscreencenter)
-	* [SetDifficulty](#setdifficulty)
-	* [AddDifficulty](#adddifficulty)
-	* [GetDifficultyId](#getdifficultyid)
-	* [GetBaselineDifficulty](#getbaselinedifficulty)
-	* [InterpolateColor](#interpolatecolor)
-	* [compare_tables](#compare_tables)
-	* [list_indexof](#list_indexof)
+	* [sdlext](#sdlext)
+		* [sdlext.isConsoleOpen](#sdlextisconsoleopen)
+		* [sdlext.isMainMenu](#sdlextismainmenu)
+		* [sdlext.isHangar](#sdlextishangar)
+		* [sdlext.isGame](#sdlextisgame)
+		* [sdlext.getUiRoot](#sdlextgetuiroot)
+		* [sdlext.showDialog](#sdlextshowdialog)
+		* [sdlext.showTextDialog](#sdlextshowtextdialog)
 
 * [Hooks](#hooks)
 	* modApi
@@ -152,6 +154,138 @@ return {
 
 
 ## API
+
+## Global
+
+### `GetScreenCenter`
+
+Returns a `Point` center of the screen, corrected for some weird offset when the game is running in windowed mode.
+
+
+### `SetDifficulty`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `difficultyLevel` | number | The new difficulty level to set |
+
+Sets difficulty of the game to the specified level. Default valid arguments:
+
+* `DIFF_EASY`
+* `DIFF_NORMAL`
+* `DIFF_HARD`
+* `DIFF_VERY_HARD`
+* `DIFF_IMPOSSIBLE`
+
+Example:
+```lua
+SetDifficulty(DIFF_VERY_HARD)
+```
+
+
+### `AddDifficulty`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `id` | string | Id of the new difficulty that also serves as its global variable name (eg. DIFF_HARD) |
+| `level` | number | Non-negative integer level of the new difficulty. |
+| `tipTitle` | string | Title displayed in the hangar when user hovers over this difficulty |
+| `tipText` | string | Text displayed in the hangar when user hovers over this difficulty |
+
+Adds a new difficulty level to the game, taking care of minutae like updating texts and enemy spawners.
+
+If there already exists a difficulty level with the same value as the `level` argument, the old difficulty (and all difficulties above it) will be shifted one level up to make room for the difficulty being added. Eg. adding a new difficulty as `DIFF_EASY` (0) will change `DIFF_EASY` to have a value of `1` (`DIFF_NORMAL` to `2`, etc).
+
+Custom difficulty levels use the same vek spawning and score rules as the vanilla difficulty level directly below them. Eg. adding a "Very Hard" difficulty level will have additional alpha Vek and increase score by 50%. Adding a "New Normal" that is between vanilla "Normal" and "Hard" will use normal vek spawning and normal score. This is called a **baseline difficulty level**. To get it programmatically, use [GetBaselineDifficulty](#getbaselinedifficulty).
+
+Example:
+```lua
+AddDifficulty(
+	"DIFF_VERY_HARD",
+	#DifficultyLevels, -- adds as a new highest difficulty
+	"Very Hard Mode",
+	"Intended for veteran Commanders looking for a challenge."
+)
+```
+
+
+### `GetDifficultyId`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `level` | number | Difficulty level whose id is to be returned. Defaults to value returned by `GetDifficulty()` if omitted. |
+
+Returns the id of the specified difficulty level.
+
+Example:
+```lua
+LOG(GetDifficultyId(DIFF_EASY)) -- prints DIFF_EASY
+```
+
+
+### `GetBaselineDifficulty`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `level` | number | Difficulty level to get the baseline difficulty for. Defaults to value returned by `GetDifficulty()` if omitted. |
+
+Returns the baseline difficulty level for the specified level.
+
+A baseline difficulty level is the vanilla difficulty level that is immediately below the one specified. Eg. a custom difficulty of level 2 would sit between `DIFF_NORMAL` and `DIFF_HARD`, so its baseline difficulty level would be `DIFF_NORMAL`.
+
+Example:
+```lua
+LOG(GetBaselineDifficulty(DIFF_VERY_HARD)) -- prints value of DIFF_HARD
+```
+
+
+### `IsVanillaDifficultyLevel`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `level` | number | Difficulty level to check. Defaults to value returned by `GetDifficulty()` if omitted. |
+
+Returns `true` if the level specified in argument is a vanilla difficulty level (`DIFF_EASY`, `DIFF_NORMAL`, `DIFF_HARD`), accounting for shifting done by `AddDifficulty`.
+
+
+### `InterpolateColor`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `startColor` | userdata | Color (`sdl.rgb`/`sdl.rgba`) to start interpolating from |
+| `endColor` | userdata | Color (`sdl.rgb`/`sdl.rgba`) to interpolate to |
+| `t` | number | Number value in range [0, 1], specifying the intensity of `endColor` (0 means 100% `startColor`, 1 means 100% `endColor`) |
+
+Linearly interpolates between two color values.
+
+Example:
+```lua
+local c1 = sdl.rgb(255, 0, 0) -- red
+local c2 = sdl.rgb(0, 0, 255) -- blue
+local c3 = InterpolateColor(c1, c2, 0.66) -- purple (84, 0, 168)
+```
+
+
+### `compare_tables`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `tbl1` | table | First table to compare |
+| `tbl2` | table | Second table to compare |
+
+Compares two distinct tables for equality, checking member table fields recursively using the same function. Fields that cannot be compared (eg. userdata) are ignored. Does not explicitly account for metatables. Returns `true` if both tables hold the same data, `false` otherwise.
+
+
+### `list_indexof`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `list` | table | List to search |
+| `value` | object | The value to look for |
+
+Returns index of the `value` object in the specified list, or `nil` if not found.
+
+
+## modApi
 
 ### `modApi:deltaTime`
 
@@ -672,6 +806,11 @@ Returns `true` if the player is currently in the hangar. `false` otherwise.
 Returns `true` if the player is currently in a game. `false` otherwise.
 
 
+### `sdlext.getUiRoot`
+
+Returns the root UI element.
+
+
 ### `sdlext.showDialog`
 
 | Argument name | Type | Description |
@@ -743,129 +882,6 @@ sdlext.showTextDialog(
 	"This is a very important message that demands your attention."
 )
 ```
-
-
-## Global
-
-### `GetScreenCenter`
-
-Returns a `Point` center of the screen, corrected for some weird offset when the game is running in windowed mode.
-
-
-### `SetDifficulty`
-
-| Argument name | Type | Description |
-|---------------|------|-------------|
-| `difficultyLevel` | number | The new difficulty level to set |
-
-Sets difficulty of the game to the specified level. Default valid arguments:
-
-* `DIFF_EASY`
-* `DIFF_NORMAL`
-* `DIFF_HARD`
-* `DIFF_VERY_HARD`
-* `DIFF_IMPOSSIBLE`
-
-Example:
-```lua
-SetDifficulty(DIFF_VERY_HARD)
-```
-
-
-### `AddDifficulty`
-
-| Argument name | Type | Description |
-|---------------|------|-------------|
-| `id` | string | Id of the new difficulty that also serves as its global variable name (eg. DIFF_HARD) |
-| `level` | number | Non-negative integer level of the new difficulty. |
-| `tipTitle` | string | Title displayed in the hangar when user hovers over this difficulty |
-| `tipText` | string | Text displayed in the hangar when user hovers over this difficulty |
-
-Adds a new difficulty level to the game, taking care of minutae like updating texts and enemy spawners.
-
-If there already exists a difficulty level with the same value as the `level` argument, the old difficulty (and all difficulties above it) will be shifted one level up to make room for the difficulty being added. Eg. adding a new difficulty as `DIFF_EASY` (0) will change `DIFF_EASY` to have a value of `1` (`DIFF_NORMAL` to `2`, etc).
-
-Custom difficulty levels use the same vek spawning and score rules as the vanilla difficulty level directly below them. Eg. adding a "Very Hard" difficulty level will have additional alpha Vek and increase score by 50%. Adding a "New Normal" that is between vanilla "Normal" and "Hard" will use normal vek spawning and normal score. This is called a **baseline difficulty level**. To get it programmatically, use [GetBaselineDifficulty](#getbaselinedifficulty).
-
-Example:
-```lua
-AddDifficulty(
-	"DIFF_VERY_HARD",
-	#DifficultyLevels, -- adds as a new highest difficulty
-	"Very Hard Mode",
-	"Intended for veteran Commanders looking for a challenge."
-)
-```
-
-
-### `GetDifficultyId`
-
-| Argument name | Type | Description |
-|---------------|------|-------------|
-| `level` | number | Difficulty level whose id is to be returned. Defaults to value returned by `GetDifficulty()` if omitted. |
-
-Returns the id of the specified difficulty level.
-
-Example:
-```lua
-LOG(GetDifficultyId(DIFF_EASY)) -- prints DIFF_EASY
-```
-
-
-### `GetBaselineDifficulty`
-
-| Argument name | Type | Description |
-|---------------|------|-------------|
-| `level` | number | Difficulty level to get the baseline difficulty for. Defaults to value returned by `GetDifficulty()` if omitted. |
-
-Returns the baseline difficulty level for the specified level.
-
-A baseline difficulty level is the vanilla difficulty level that is immediately below the one specified. Eg. a custom difficulty of level 2 would sit between `DIFF_NORMAL` and `DIFF_HARD`, so its baseline difficulty level would be `DIFF_NORMAL`.
-
-Example:
-```lua
-LOG(GetBaselineDifficulty(DIFF_VERY_HARD)) -- prints value of DIFF_HARD
-```
-
-
-### `IsVanillaDifficultyLevel`
-
-| Argument name | Type | Description |
-|---------------|------|-------------|
-| `level` | number | Difficulty level to check. Defaults to value returned by `GetDifficulty()` if omitted. |
-
-Returns `true` if the level specified in argument is a vanilla difficulty level (`DIFF_EASY`, `DIFF_NORMAL`, `DIFF_HARD`), accounting for shifting done by `AddDifficulty`.
-
-
-### `InterpolateColor`
-
-| Argument name | Type | Description |
-|---------------|------|-------------|
-| `startColor` | userdata | Color (`sdl.rgb`/`sdl.rgba`) to start interpolating from |
-| `endColor` | userdata | Color (`sdl.rgb`/`sdl.rgba`) to interpolate to |
-| `t` | number | Number value in range [0, 1], specfiying the intensity of `endColor` (0 means 100% `startColor`, 1 means 100% `endColor`) |
-
-Linearly interpolates between two color values.
-
-
-### `compare_tables`
-
-| Argument name | Type | Description |
-|---------------|------|-------------|
-| `tbl1` | table | First table to compare |
-| `tbl2` | table | Second table to compare |
-
-Compares two distinct tables for equality, checking member table fields recursively using the same function. Fields that cannot be compared (eg. userdata) are ignored. Does not explicitly account for metatables. Returns `true` if both tables hold the same data, `false` otherwise.
-
-
-### `list_indexof`
-
-| Argument name | Type | Description |
-|---------------|------|-------------|
-| `list` | table | List to search |
-| `value` | object | The value to look for |
-
-Returns index of the `value` object in the specified list, or `nil` if not found.
 
 
 ## Hooks
@@ -1169,7 +1185,7 @@ end)
 
 ### `newGameClickHook`
 
-Fired when the New Game button in main menu is clicked (does not account for the confirmation popup when trying to start a new game while still having a game you can return to).
+Fired when the New Game button in main menu is clicked (does not account for the confirmation popup when trying to start a new game while still having a game you can return to -- for that, use [`mainMenuLeavingHook`](#mainmenuleavinghook)).
 
 Example:
 ```lua
@@ -1187,6 +1203,8 @@ end)
 | `uiRoot` | table | The root UI element |
 
 Fired when the root UI element is created. This hook can be used to create your own custom UI, if you need it created as soon as the game starts.
+
+The root UI element handles stuff like mouse and keyboard interaction with the game. All of your mod's UI should be a child of this root UI element.
 
 Example:
 ```lua
