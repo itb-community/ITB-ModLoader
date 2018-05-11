@@ -150,10 +150,10 @@ local function createUi(root)
 				ScreenSizeY() - (center.y + 255)
 			)
 
-			arrLeft:pospx (origin.x + 4          , origin.y - 1)
-			arrRight:pospx(origin.x + 28 + 90 + 4, origin.y - 1)
-			diffText:pospx(origin.x              , origin.y + 6)
-			mask:pospx    (origin.x              , origin.y    )
+			arrLeft:pospx (origin.x + 4          , origin.y + 3 )
+			arrRight:pospx(origin.x + 28 + 90 + 4, origin.y + 3 )
+			diffText:pospx(origin.x              , origin.y + 10)
+			mask:pospx    (origin.x              , origin.y + 2 )
 
 			local hideDifficultyUi = IsHangarWindowState() or
 				(leaving and not mask.animations.fadeIn:isStarted())
