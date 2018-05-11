@@ -924,6 +924,14 @@ end
 -- //////////////////////////////////////////////////////////////////////////////
 -- Resource.dat handling
 
+--[[
+	Writes a new file to the resource.dat archive with the specified content.
+
+	resource:
+		Path to the file within the archive
+	content:
+		String content to be written to the file
+--]]
 function modApi:writeAsset(resource, content)
 	assert(type(resource) == "string")
 	assert(type(content) == "string")
@@ -952,6 +960,27 @@ function modApi:writeAsset(resource, content)
 	table.insert(self.resource._files, file)
 end
 
+--[[
+	Reads the specified file from the resouce.dat archive.
+	Throws an error if the file could not be found.
+
+	resource:
+		Path of the file to read
+	returns:
+		Content of the file in string format
+--]]
+function modApi:readAsset(resource)
+	assert(type(resource) == "string")
+
+	for i, file in ipairs(self.resource._files) do
+		if file._meta._filename == resource then
+			return file._meta.body
+		end
+	end
+
+	error(string.format("Could not find file '%s' in resource.dat archive", resource))
+end
+
 function modApi:appendAsset(resource, filePath)
 	assert(type(resource) == "string")
 	local f = io.open(filePath,"rb")
@@ -960,7 +989,19 @@ function modApi:appendAsset(resource, filePath)
 	local content = f:read("*all")
 	f:close()
 
-	modApi:writeAsset(resource, content)
+	self:writeAsset(resource, content)
+end
+
+--[[
+	Copies an existing asset within the resource.dat archive to
+	another path within the resource.dat archive. Can overwrite
+	existing files.
+--]]
+function modApi:copyAsset(src, dst)
+	assert(type(src == "string"))
+	assert(type(dst == "string"))
+
+	self:writeAsset(dst, self:readAsset(src))
 end
 
 function modApi:appendDat(filePath)
