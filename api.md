@@ -8,6 +8,7 @@
 	* [modApi:deltaTime](#modapideltatime)
 	* [modApi:elapsedTime](#modapielapsedtime)
 	* [modApi:scheduleHook](#modapischedulehook)
+	* [modapi:conditionalHook](#modapiconditionalhook)
 	* [modApi:runLater](#modapirunlater)
 	* [modApi:splitString](#modapisplitstring)
 	* [modApi:trimString](#modapitrimstring)
@@ -15,7 +16,10 @@
 	* [modApi:stringEndsWith](#modapistringendswith)
 	* [modApi:isVersion](#modapiisversion)
 	* [modApi:addGenerationOption](#modapiaddgenerationoption)
+	* [modApi:writeAsset](#modapiwriteasset)
+	* [modApi:readAsset](#modapireadasset)
 	* [modApi:appendAsset](#modapiappendasset)
+	* [modApi:copyAsset](#modapicopyasset)
 	* [modApi:addSquad](#modapiaddsquad)
 	* [modApi:overwriteText](#modapioverwritetext)
 	* [modApi:addWeapon_Texts](#modapiaddweapon_texts)
@@ -23,23 +27,66 @@
 	* [modApi:setPopEventOdds](#modapisetpopeventodds)
 	* [modApi:addOnPopEvent](#modapiaddonpopevent)
 	* [modApi:addMap](#modapiaddmap)
+	* [modApi:loadIntoEnv](#modapiloadintoenv)
+	* [modApi:loadSettings](#modapiloadsettings)
+	* [modApi:loadProfile](#modapiloadprofile)
+	* [modApi:writeProfileData](#modapiwriteprofiledata)
+	* [modApi:readProfileData](#modapireadprofiledata)
+
+* [sdlext](#sdlext)
+	* [sdlext.isConsoleOpen](#sdlextisconsoleopen)
+	* [sdlext.isMainMenu](#sdlextismainmenu)
+	* [sdlext.isHangar](#sdlextishangar)
+	* [sdlext.isGame](#sdlextisgame)
+	* [sdlext.showDialog](#sdlextshowdialog)
+	* [sdlext.showTextDialog](#sdlextshowtextdialog)
+
+* [Global](#global)
+	* [GetScreenCenter](#getscreencenter)
+	* [SetDifficulty](#setdifficulty)
+	* [AddDifficulty](#adddifficulty)
+	* [GetDifficultyId](#getdifficultyid)
+	* [GetBaselineDifficulty](#getbaselinedifficulty)
+	* [InterpolateColor](#interpolatecolor)
+	* [compare_tables](#compare_tables)
+	* [list_indexof](#list_indexof)
 
 * [Hooks](#hooks)
-	* [preMissionAvailableHook](#premissionavailablehook)
-	* [postMissionAvailableHook](#postmissionavailablehook)
-	* [preEnvironmentHook](#preenvironmenthook)
-	* [postEnvironmentHook](#postenvironmenthook)
-	* [nextTurnHook](#nextturnhook)
-	* [missionUpdateHook](#missionupdatehook)
-	* [missionStartHook](#missionstarthook)
-	* [missionEndHook](#missionendhook)
-	* [missionNextPhaseCreatedHook](#missionnextphasecreatedhook)
-	* [voiceEventHook](#voiceeventhook)
-	* [preStartGameHook](#prestartgamehook)
-	* [postStartGameHook](#poststartgamehook)
-	* [preLoadGameHook](#preloadgamehook)
-	* [postLoadGameHook](#postloadgamehook)
-	* [saveGameHook](#savegamehook)
+	* modApi
+		* [preMissionAvailableHook](#premissionavailablehook)
+		* [postMissionAvailableHook](#postmissionavailablehook)
+		* [preEnvironmentHook](#preenvironmenthook)
+		* [postEnvironmentHook](#postenvironmenthook)
+		* [nextTurnHook](#nextturnhook)
+		* [missionUpdateHook](#missionupdatehook)
+		* [missionStartHook](#missionstarthook)
+		* [missionEndHook](#missionendhook)
+		* [missionNextPhaseCreatedHook](#missionnextphasecreatedhook)
+		* [voiceEventHook](#voiceeventhook)
+		* [preStartGameHook](#prestartgamehook)
+		* [postStartGameHook](#poststartgamehook)
+		* [preLoadGameHook](#preloadgamehook)
+		* [postLoadGameHook](#postloadgamehook)
+		* [saveGameHook](#savegamehook)
+	* sdlext
+		* [settingsChangedHook](#settingschangedhook)
+		* [continueClickHook](#continueclickhook)
+		* [newGameClickHook](#newgameclickhook)
+		* [uiRootCreatedHook](#uirootcreatedhook)
+		* [mainMenuEnteredHook](#mainmenuenteredhook)
+		* [mainMenuExitedHook](#mainmenuexitedhook)
+		* [mainMenuLeavingHook](#mainmenuleavinghook)
+		* [hangarEnteredHook](#hangarenteredhook)
+		* [hangarExitedHook](#hangarexitedhook)
+		* [hangarLeavingHook](#hangarleavinghook)
+		* [gameEnteredHook](#gameenteredhook)
+		* [gameExitedHook](#gameexitedhook)
+		* [frameDrawnHook](#framedrawnhook)
+		* [windowVisibleHook](#windowvisiblehook)
+		* [preKeyDownHook](#prekeydownhook)
+		* [preKeyUpHook](#prekeyuphook)
+		* [postKeyDownHook](#postkeydownhook)
+		* [postKeyUpHook](#postkeyuphook)
 
 
 ## init.lua
@@ -134,6 +181,30 @@ LOG("This message is printed right away!")
 modApi:scheduleHook(1000, function()
 	LOG("This message is printed a second later!")
 end)
+```
+
+
+### `modApi:conditionalHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `conditionFn` | function | Argumentless predicate function evaluated once every frame |
+| `fn` | function | Argumentless function which will be invoked when the amount of time specified in the first argument has elapsed. |
+| `remove` | boolean | Whether the hook should be removed once it is triggered. Defaults to `true` if omitted. |
+
+Registers a conditional hook which will be executed once the condition function associated with it returns `true`. By default, the hook is removed once it is triggered.
+
+Example:
+```lua
+-- This hook gets fired when a Combat Mech is selected
+modApi:conditionalHook(
+	function()
+		return Pawn and Pawn:GetType() == "PunchMech"
+	end,
+	function()
+		LOG("Punch mech selected")
+	end
+)
 ```
 
 
@@ -300,6 +371,30 @@ end
 ```
 
 
+### `modApi:writeAsset`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `resource` | string | Path inside resource.dat where your asset should be placed. Use forward slahes (`/`). |
+| `content` | string | String content to be written to the file |
+
+Writes a file with the specified content to the `resource.dat` archive, either creating a new file or overwriting one if it already exists. All calls to this function must be inside your mod's `init` function.
+
+
+### `modApi:readAsset`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `resource` | string | Path inside resource.dat where your asset should be placed. Use forward slahes (`/`). |
+
+Reads the specified file from the `resource.dat` archive, and returns its contents as a string. Throws an error if the file could not be found. All calls to this function must be inside your mod's `init` function.
+
+Example:
+```lua
+modApi:readAsset("img/units/player/mech_punch.png")
+```
+
+
 ### `modApi:appendAsset`
 
 | Argument name | Type | Description |
@@ -312,6 +407,22 @@ Adds an asset (image or font) to the game (by putting it into `resources/resourc
 Example:
 ```lua
 modApi:appendAsset("img/weapons/Whip.png",self.resourcePath.."/weapons/Whip.png")
+```
+
+
+### `modApi:copyAsset`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `src` | string | Path inside `resource.dat`, specifying the file to be copied. Use forward slahes (`/`). |
+| `dst` | string | Path inside `resource.dat`, specifying the destination the file will be copied to. |
+
+Copies an existing asset within the `resource.dat` archive to another path within the `resource.dat` archive. Can overwrite existing files. All calls to this function must be inside your mod's `init` function.
+
+Example:
+```lua
+-- replaces reactor core image with The Button
+modApi:copyAsset("img/weapons/support_destruct.png", "img/weapons/reactor_core.png")
 ```
 
 
@@ -468,7 +579,298 @@ end
 ```
 
 
+### `modApi:loadIntoEnv`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `path` | string | Path to the file to load. |
+| `envTable` | table | The environment the file will be loaded to. Will hold all global variables the file defines. Can be omitted, defaulting to an empty table. |
+
+Loads the specified file, loading any global variable definitions into the specified table instead of the global namespace (\_G). The file can still access variables defined in \_G, but not write to them by default (unless specifically doing \_G.foo = bar).
+
+Return value of the loaded file is ignored by this function.
+
+Example:
+```lua
+local env = modApi:loadIntoEnv("some/file.lua")
+GlobalVar = env.var1       -- this variable will be accessible globally
+local localVar = env.var2  -- this variable will not
+```
+
+
+### `modApi:loadSettings`
+
+Reloads the settings file to have access to selected settings from in-game lua scripts. Generally you shouldn't have to call this, the modloader reloads the file on its own and stores the result in global `Settings` table.
+
+If you need to be notified when settings change, see [settingsChangedHook](#settingschangedhook).
+
+Example:
+```lua
+local settings = modApi:loadSettings()
+```
+
+
+### `modApi:loadProfile`
+
+Reloads profile data of the currently selected profile. Generally you shouldn't have to call this, the modloader reloads the profile data on its own and stores the result in global `Profile` table.
+
+Example:
+```lua
+local profile = modApi:loadProfile()
+```
+
+
+### `modApi:writeProfileData`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `id` | string | Key the data will be saved as in the modded profile table |
+| `obj` | object | A lua object to store in the modded profile table |
+
+Stores the specified object under the specified key in `modcontent.lua` file in the currently selected profile's directory.
+
+Example:
+```lua
+local diff = GetDifficulty()
+modApi:writeProfileData("CustomDifficulty", level)
+```
+
+
+### `modApi:readProfileData`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `id` | string | Key of the data to be retrieved from the modded profile table |
+
+Reads the object under the specified key from `modcontent.lua` file in the currently selected profile's directory.
+
+Example:
+```lua
+local diff = modApi:readProfileData("CustomDifficulty")
+```
+
+
+## sdlext
+
+### `sdlext.isConsoleOpen`
+
+Returns `true` if console is currently open. `false` otherwise.
+
+
+### `sdlext.isMainMenu`
+
+Returns `true` if the player is currently in the main menu. `false` otherwise.
+
+
+### `sdlext.isHangar`
+
+Returns `true` if the player is currently in the hangar. `false` otherwise.
+
+
+### `sdlext.isGame`
+
+Returns `true` if the player is currently in a game. `false` otherwise.
+
+
+### `sdlext.showDialog`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `initFn` | function | An initialization function used to create the dialog's UI |
+
+
+`initFn`:
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `ui` | table | The UI object the dialog should be added to. |
+| `quit` | function | Argumentless function that be invoked to programmatically dismiss the dialog. |
+
+Puts a dark overlay on the screen which intercepts key and mouse events and prevents them from reaching the game (exception: for some reason the console receives partial input). The game continues running in the background. Clicking on the dark overlay or pressing Escape will dismiss the dialog.
+
+This function can be used to stack multiple dialogs on top of each other. Only the most recently created dialog is active. Quitting the dialog makes the previous dialog active.
+
+The `ui` object defines a `onDialogExit` callback, which can be overridden to run some custom code once the dialog is dismissed.
+
+Example:
+```lua
+sdlext.showDialog(function(ui, quit)
+	local clicked = 0
+
+	ui.onDialogExit = function(self)
+		LOG("The button has been left-clicked " .. clicked .. " times.")
+	end
+
+	local btn = Ui()
+		:widthpx(200):heightpx(30)
+		:pos(0.25, 0.3)
+		:decorate({ DecoButton(), DecoCaption() })
+		:caption("Click me!")
+		:addTo(ui)
+
+	btn.onclicked = function(self, button)
+		if button == 1 then -- left click only
+			clicked = clicked + 1
+
+			if clicked >= 10 then
+				quit()
+			end
+		end
+
+		return true
+	end
+end)
+```
+
+
+### `sdlext.showTextDialog`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `title` | string | Title of the dialog |
+| `text` | string | Text displayed in the dialog |
+| `w` | number | Optional width of the dialog. Defaults to 700 if omitted. |
+| `h` | number | Optional height of the dialog. Defaults to 400 if omitted. |
+
+Shows a simple information dialog on the screen, which prevents interaction with the game until it is dismissed, either by clicking outside of it, or pressing Escape.
+
+The dialog's height is automatically changed depending on length of the message, up to a maximum of 400px, after which the text becomes scrollable.
+
+Example:
+```lua
+sdlext.showTextDialog(
+	"Attention",
+	"This is a very important message that demands your attention."
+)
+```
+
+
+## Global
+
+### `GetScreenCenter`
+
+Returns a `Point` center of the screen, corrected for some weird offset when the game is running in windowed mode.
+
+
+### `SetDifficulty`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `difficultyLevel` | number | The new difficulty level to set |
+
+Sets difficulty of the game to the specified level. Default valid arguments:
+
+* `DIFF_EASY`
+* `DIFF_NORMAL`
+* `DIFF_HARD`
+* `DIFF_VERY_HARD`
+* `DIFF_IMPOSSIBLE`
+
+Example:
+```lua
+SetDifficulty(DIFF_VERY_HARD)
+```
+
+
+### `AddDifficulty`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `id` | string | Id of the new difficulty that also serves as its global variable name (eg. DIFF_HARD) |
+| `level` | number | Non-negative integer level of the new difficulty. |
+| `tipTitle` | string | Title displayed in the hangar when user hovers over this difficulty |
+| `tipText` | string | Text displayed in the hangar when user hovers over this difficulty |
+
+Adds a new difficulty level to the game, taking care of minutae like updating texts and enemy spawners.
+
+If there already exists a difficulty level with the same value as the `level` argument, the old difficulty (and all difficulties above it) will be shifted one level up to make room for the difficulty being added. Eg. adding a new difficulty as `DIFF_EASY` (0) will change `DIFF_EASY` to have a value of `1` (`DIFF_NORMAL` to `2`, etc).
+
+Custom difficulty levels use the same vek spawning and score rules as the vanilla difficulty level directly below them. Eg. adding a "Very Hard" difficulty level will have additional alpha Vek and increase score by 50%. Adding a "New Normal" that is between vanilla "Normal" and "Hard" will use normal vek spawning and normal score. This is called a **baseline difficulty level**. To get it programmatically, use [GetBaselineDifficulty](#getbaselinedifficulty).
+
+Example:
+```lua
+AddDifficulty(
+	"DIFF_VERY_HARD",
+	#DifficultyLevels, -- adds as a new highest difficulty
+	"Very Hard Mode",
+	"Intended for veteran Commanders looking for a challenge."
+)
+```
+
+
+### `GetDifficultyId`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `level` | number | Difficulty level whose id is to be returned. Defaults to value returned by `GetDifficulty()` if omitted. |
+
+Returns the id of the specified difficulty level.
+
+Example:
+```lua
+LOG(GetDifficultyId(DIFF_EASY)) -- prints DIFF_EASY
+```
+
+
+### `GetBaselineDifficulty`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `level` | number | Difficulty level to get the baseline difficulty for. Defaults to value returned by `GetDifficulty()` if omitted. |
+
+Returns the baseline difficulty level for the specified level.
+
+A baseline difficulty level is the vanilla difficulty level that is immediately below the one specified. Eg. a custom difficulty of level 2 would sit between `DIFF_NORMAL` and `DIFF_HARD`, so its baseline difficulty level would be `DIFF_NORMAL`.
+
+Example:
+```lua
+LOG(GetBaselineDifficulty(DIFF_VERY_HARD)) -- prints value of DIFF_HARD
+```
+
+
+### `IsVanillaDifficultyLevel`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `level` | number | Difficulty level to check. Defaults to value returned by `GetDifficulty()` if omitted. |
+
+Returns `true` if the level specified in argument is a vanilla difficulty level (`DIFF_EASY`, `DIFF_NORMAL`, `DIFF_HARD`), accounting for shifting done by `AddDifficulty`.
+
+
+### `InterpolateColor`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `startColor` | userdata | Color (`sdl.rgb`/`sdl.rgba`) to start interpolating from |
+| `endColor` | userdata | Color (`sdl.rgb`/`sdl.rgba`) to interpolate to |
+| `t` | number | Number value in range [0, 1], specfiying the intensity of `endColor` (0 means 100% `startColor`, 1 means 100% `endColor`) |
+
+Linearly interpolates between two color values.
+
+
+### `compare_tables`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `tbl1` | table | First table to compare |
+| `tbl2` | table | Second table to compare |
+
+Compares two distinct tables for equality, checking member table fields recursively using the same function. Fields that cannot be compared (eg. userdata) are ignored. Does not explicitly account for metatables. Returns `true` if both tables hold the same data, `false` otherwise.
+
+
+### `list_indexof`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `list` | table | List to search |
+| `value` | object | The value to look for |
+
+Returns index of the `value` object in the specified list, or `nil` if not found.
+
+
 ## Hooks
+
+## modApi
 
 ### `preMissionAvailableHook`
 
@@ -731,5 +1133,305 @@ local hook = function()
 end
 
 modApi:addSaveGameHook(hook)
+```
+
+
+## sdlext
+
+### `settingsChangedHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `old` | table | Old settings table |
+| `new` | table | New settings table |
+
+Fired when settings are changed.
+
+Example:
+```lua
+sdlext.addSettingsChangedHook(function(old, new)
+	LOG("Settings have changed")
+end)
+```
+
+
+### `continueClickHook`
+
+Fired when the Continue button in main menu is clicked.
+
+Example:
+```lua
+sdlext.addContinueClickHook(function()
+	LOG("Continue clicked!")
+end)
+```
+
+
+### `newGameClickHook`
+
+Fired when the New Game button in main menu is clicked (does not account for the confirmation popup when trying to start a new game while still having a game you can return to).
+
+Example:
+```lua
+sdlext.addNewGameClickHook(function()
+	LOG("New Game clicked!")
+end)
+```
+
+
+### `uiRootCreatedHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `screen` | userdata | The screen object accepting draw instructions |
+| `uiRoot` | table | The root UI element |
+
+Fired when the root UI element is created. This hook can be used to create your own custom UI, if you need it created as soon as the game starts.
+
+Example:
+```lua
+sdlext.addUiRootCreatedHook(function(screen, uiRoot)
+	LOG("UI root created!")
+end)
+```
+
+
+### `mainMenuEnteredHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `screen` | userdata | The screen object accepting draw instructions |
+| `wasHangar` | boolean | True if the player was previously in the hangar screen |
+| `wasGame` | boolean | True if the player was prviously in game |
+
+Fired when the player enters the main menu screen.
+
+Example:
+```lua
+sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
+	LOG("Main menu entered!")
+end)
+```
+
+
+### `mainMenuExitedHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `screen` | userdata | The screen object accepting draw instructions |
+
+Fired when the player exits the main menu screen.
+
+Example:
+```lua
+sdlext.addMainMenuExitedHook(function(screen)
+	LOG("Main menu exited!")
+end)
+```
+
+
+### `mainMenuLeavingHook`
+
+Fired when the player starts leaving the main menu screen.
+
+Example:
+```lua
+sdlext.addMainMenuLeavingHook(function()
+	LOG("Leaving main menu!")
+end)
+```
+
+
+### `hangarEnteredHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `screen` | userdata | The screen object accepting draw instructions |
+
+Fired when the player enters the hangar screen.
+
+Example:
+```lua
+sdlext.addHangarEnteredHook(function(screen)
+	LOG("Hangar entered!")
+end)
+```
+
+
+### `hangarExitedHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `screen` | userdata | The screen object accepting draw instructions |
+
+Fired when the player exits the hangar screen.
+
+Example:
+```lua
+sdlext.addHangarExitedHook(function(screen)
+	LOG("Hangar exited!")
+end)
+```
+
+
+### `hangarLeavingHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `startGame` | boolean | `true` if the hangar is being left to start a new game. `false` otherwise. |
+
+Fired when the player starts leaving the hangar screen.
+
+Example:
+```lua
+sdlext.addHangarLeavingHook(function(startGame)
+	LOG("Leaving hangar!")
+end)
+```
+
+
+### `gameEnteredHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `screen` | userdata | The screen object accepting draw instructions |
+
+Fired when the player enters the game screen.
+
+Example:
+```lua
+sdlext.addGameEnteredHook(function(screen)
+	LOG("Game entered!")
+end)
+```
+
+
+### `gameExitedHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `screen` | userdata | The screen object accepting draw instructions |
+
+Fired when the player exits the game screen.
+
+Example:
+```lua
+sdlext.addGameExitedHook(function(screen)
+	LOG("Game exited!")
+end)
+```
+
+
+### `frameDrawnHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `screen` | userdata | The screen object accepting draw instructions |
+
+Fired when a frame is finished being drawn.
+
+Example:
+```lua
+sdlext.addFrameDrawnHook(function(screen)
+	LOG("Frame drawn!")
+end)
+```
+
+
+### `windowVisibleHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `screen` | userdata | The screen object accepting draw instructions |
+| `wx` | number | X position of the window on screen in pixels |
+| `wy` | number | Y position of the window on screen in pixels |
+| `ww` | number | Width of the window in pixels |
+| `wh` | number | Height of the window in pixels |
+
+Fired every frame when a shadow-casting UI element is visible. This includes a variety of stuff like inert UI panes, tooltips, tip images, etc. Can be used to hack together heuristics for whether some kind of UI window is open.
+
+`sdlext.CurrentWindowRect` is a rect that is set to the `wx`, `wy`, `ww`, and `wh` values every frame, reducing the need for this hook. `sdlext.LastWindowRect` does the same, but holds values for the previous window that was visible before the current one has been opened.
+
+Example:
+```lua
+sdlext.addWindowVisibleHook(function(screen, wx, wy, ww, wh)
+	LOG("Window visible! Dimensions:", wx, wy, ww, wh)
+end)
+```
+
+
+### `preKeyDownHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `keycode` | number | SDL keycode of the key that has been pressed. See [SDL Keycode Lookup table](https://wiki.libsdl.org/SDLKeycodeLookup) |
+
+Fired whenever a key is pressed down. The hooked function can optionally return `true` to signal that it handled the key event, and that this event should not be processed further. This stops the game and other hooks from even being notified of this keypress.
+
+Key hooks are fired WHEREVER in the game you are, whenever you press a key. So your hooks will need to have a lot of additional restrictions on *when* they're supposed to fire.
+
+Pre key hooks are fired BEFORE the `uiRoot` handles the key events. These hooks can be used to completely hijack input and bypass the normal focus-based key event handling.
+
+Example:
+```lua
+sdlext.addPreKeyDownHook(function(keycode)
+	LOG("Pressed key: " .. keycode)
+end
+```
+
+
+### `preKeyUpHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `keycode` | number | SDL keycode of the key that has been pressed. See [SDL Keycode Lookup table](https://wiki.libsdl.org/SDLKeycodeLookup) |
+
+Fired whenever a key is released. The hooked function can optionally return `true` to signal that it handled the key event, and that this event should not be processed further. This stops the game and other hooks from even being notified of this keypress.
+
+Key hooks are fired WHEREVER in the game you are, whenever you press a key. So your hooks will need to have a lot of additional restrictions on *when* they're supposed to fire.
+
+Pre key hooks are fired BEFORE the `uiRoot` handles the key events. These hooks can be used to completely hijack input and bypass the normal focus-based key event handling.
+
+Example:
+```lua
+sdlext.addPreKeyUpHook(function(keycode)
+	LOG("Released key: " .. keycode)
+end
+```
+
+
+### `postKeyDownHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `keycode` | number | SDL keycode of the key that has been pressed. See [SDL Keycode Lookup table](https://wiki.libsdl.org/SDLKeycodeLookup) |
+
+Same as [preKeyDownHook](#prekeydownhook), except:
+
+Post key hooks are fired AFTER the `uiRoot` has handled the key events. These hooks can be used to process leftover key events which haven't been handled via the normal focus-based key event handling.
+
+Example:
+```lua
+sdlext.addPostKeyDownHook(function(keycode)
+	LOG("Pressed key: " .. keycode)
+end
+```
+
+
+### `postKeyUpHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `keycode` | number | SDL keycode of the key that has been pressed. See [SDL Keycode Lookup table](https://wiki.libsdl.org/SDLKeycodeLookup) |
+
+Same as [preKeyUpHook](#prekeyuphook), except:
+
+Post key hooks are fired AFTER the `uiRoot` has handled the key events. These hooks can be used to process leftover key events which haven't been handled via the normal focus-based key event handling.
+
+Example:
+```lua
+sdlext.addPostKeyUpHook(function(keycode)
+	LOG("Released key: " .. keycode)
+end
 ```
 
