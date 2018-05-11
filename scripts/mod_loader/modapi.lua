@@ -924,33 +924,43 @@ end
 -- //////////////////////////////////////////////////////////////////////////////
 -- Resource.dat handling
 
-function modApi:appendAsset(resource, filePath)
+function modApi:writeAsset(resource, content)
 	assert(type(resource) == "string")
-	local f = io.open(filePath,"rb")
-	assert(f,filePath)
-	
+	assert(type(content) == "string")
+
 	for i, file in ipairs(self.resource._files) do
 		if file._meta._filename == resource then
-			file._meta.body = f:read("*all")
+			file._meta.body = content
 			file._meta._fileSize = file._meta.body:len()
-			f:close()
 
+			-- Overwriting an existing file, return early
 			return
 		end
 	end
-	
+
+	-- Writing a new file to the archive
 	self.resource._numFiles = self.resource._numFiles + 1
-	
+
 	local file = FtlDat.File(self.resource._io,self.resource,self.resource.m_root)
 	file._meta = FtlDat.Meta(file._io, file, file.m_root)
 	
 	file._meta._filenameSize = resource:len()
 	file._meta._filename = resource
-	file._meta.body = f:read("*all")
+	file._meta.body = content
 	file._meta._fileSize = file._meta.body:len()
+
+	table.insert(self.resource._files, file)
+end
+
+function modApi:appendAsset(resource, filePath)
+	assert(type(resource) == "string")
+	local f = io.open(filePath,"rb")
+	assert(f, filePath)
+	
+	local content = f:read("*all")
 	f:close()
-    
-    table.insert(self.resource._files,file)
+
+	modApi:writeAsset(resource, content)
 end
 
 function modApi:appendDat(filePath)
