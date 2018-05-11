@@ -14,9 +14,6 @@ function UiTooltip:new()
 end
 
 function UiTooltip:draw(screen)
-	self:updateText()
-	if not self.visible then return end
-	
 	local x = sdl.mouse.x()
 	local y = sdl.mouse.y()
 	if x + 20 + self.w <= screen:w() then
@@ -30,11 +27,17 @@ function UiTooltip:draw(screen)
 	else
 		self.y = y - self.h
 	end
-	
+
 	self.screenx = self.x
 	self.screeny = self.y
-	
+
 	UiWrappedText.draw(self, screen)
+
+	-- Update *after* our first call to draw()
+	-- otherwise we get nasty flickering, since apparently
+	-- the ui element is not being updated fast enough before
+	-- it gets drawn?
+	self:updateText()
 end
 
 function UiTooltip:updateText()
@@ -45,6 +48,6 @@ function UiTooltip:updateText()
 		
 		self:relayout()
 	end
-	
+
 	self.visible = self.text and self.text ~= ""
 end
