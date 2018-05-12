@@ -20,3 +20,15 @@ function DecoCAlign:draw(screen, widget)
 	local r = widget.rect
 	widget.decorationx = r.w/2 + self.cOffset
 end
+
+DecoAlign = Class.inherit(UiDeco)
+function DecoAlign:new(lSpace, tSpace)
+	UiDeco.new(self)
+	self.lSpace = lSpace or 0
+	self.tSpace = tSpace or 0
+end
+
+function DecoAlign:draw(screen, widget)
+	widget.decorationx = widget.decorationx + self.lSpace
+	widget.decorationy = widget.decorationy + self.tSpace
+end
