@@ -4,6 +4,7 @@ deco.colors = {}
 deco.colors.white =                         sdl.rgb(255, 255, 255)
 deco.colors.black =                         sdl.rgb(0, 0, 0)
 deco.colors.halfblack =                     sdl.rgba(0, 0, 0, 128)
+deco.colors.dialogbg =                      sdl.rgba(0, 0, 0, 192)
 deco.colors.transparent =                   sdl.rgba(0, 0, 0, 0  )
 deco.colors.framebg =                       sdl.rgb(13, 15, 23)
 deco.colors.framebglight =                  sdl.rgb(30, 36, 50)

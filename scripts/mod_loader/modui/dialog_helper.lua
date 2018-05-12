@@ -36,7 +36,7 @@ end
 local function buildBackgroundPane()
 	local pane = Ui()
 		:width(1):height(1)
-		:decorate({ DecoSolid(deco.colors.halfblack) })
+		:decorate({ DecoSolid(deco.colors.dialogbg) })
 
 	pane.onclicked = function(self, button)
 		popDialog()
@@ -74,7 +74,7 @@ local function buildBackgroundPane()
 	end
 
 	pane.show = function(self)
-		pane.decorations[1].color = deco.colors.halfblack
+		pane.decorations[1].color = deco.colors.dialogbg
 	end
 
 	return pane
