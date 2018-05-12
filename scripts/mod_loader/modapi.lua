@@ -617,6 +617,28 @@ function modApi:readProfileData(id)
 	return result
 end
 
+function modApi:writeModData(id, obj)
+	sdlext.config(
+		"modcontent.lua",
+		function(readObj)
+			readObj[id] = obj
+		end
+	)
+end
+
+function modApi:readModData(id)
+	local result = nil
+
+	sdlext.config(
+		"modcontent.lua",
+		function(readObj)
+			result = readObj[id]
+		end
+	)
+
+	return result
+end
+
 -- //////////////////////////////////////////////////////////////////////////////
 -- Hooks
 
