@@ -605,6 +605,11 @@ function SetDifficulty(level)
 		tempToggle = nil
 	end
 
+	-- Cleanup the lingering difficulty from profile data
+	if modApi:readProfileData("CustomDifficulty") then
+		modApi:writeProfileData("CustomDifficulty", nil)
+	end
+
 	if Game and GAME then
 		GAME.CustomDifficulty = level
 
