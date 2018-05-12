@@ -30,7 +30,12 @@ local function pushDialog(ui)
 
 	ui:addTo(root):bringToTop()
 	ui:setfocus()
+	ui:show()
 	table.insert(dialogStack, ui)
+
+	if #dialogStack == 1 then
+		ui.animations.fadeIn:start()
+	end
 end
 
 local function buildBackgroundPane()
@@ -70,12 +75,20 @@ local function buildBackgroundPane()
 	end
 
 	pane.hide = function(self)
-		pane.decorations[1].color = nil
+		self.decorations[1].color = nil
 	end
 
 	pane.show = function(self)
-		pane.decorations[1].color = deco.colors.dialogbg
+		self.decorations[1].color = deco.colors.dialogbg
 	end
+
+	pane.animations.fadeIn = UiAnim(pane, 100, function(anim, widget, percent)
+		widget.decorations[1].color = InterpolateColor(
+			deco.colors.transparent,
+			deco.colors.dialogbg,
+			percent
+		)
+	end)
 
 	return pane
 end
