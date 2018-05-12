@@ -38,7 +38,7 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 
 				local frame = Ui()
 					:width(0.4):height(0.8)
-					:pos(0.3, 0.1)
+					:posCentered()
 					:caption("Mod content")
 					:decorate({ DecoFrameHeader(), DecoFrame() })
 					:addTo(ui)

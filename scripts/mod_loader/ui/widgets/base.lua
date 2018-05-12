@@ -149,6 +149,15 @@ function Ui:pos(x, y)
 	return self
 end
 
+function Ui:posCentered(x, y)
+	x = x or 0.5
+	y = y or 0.5
+	self.xPercent = x - self.wPercent / 2
+	self.yPercent = y - self.hPercent / 2
+
+	return self
+end
+
 function Ui:pospx(x, y)
 	self.x = x
 	self.y = y

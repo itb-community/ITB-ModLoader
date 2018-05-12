@@ -32,7 +32,7 @@ local function createUi()
 
 		local frame = Ui()
 			:width(0.5):height(0.4)
-			:pos(0.25, 0.3)
+			:posCentered()
 			:caption("Mod Loader Configuration")
 			:decorate({
 				DecoFrameHeader(),

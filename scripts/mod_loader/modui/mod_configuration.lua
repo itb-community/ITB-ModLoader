@@ -74,7 +74,7 @@ local function createUi()
 
 		local frametop = Ui()
 			:width(0.6):height(0.575)
-			:pos(0.2, 0.1)
+			:posCentered()
 			:caption("Mod Configuration")
 			:decorate({
 				DecoFrameHeader(),
