@@ -1,6 +1,6 @@
 DecoFrame = Class.inherit(UiDeco)
 function DecoFrame:new(color, bordercolor, bordersize)
-	self.color = color or deco.colors.buttoncolor
+	self.color = color or deco.colors.framebg
 	self.bordercolor = bordercolor or deco.colors.buttonbordercolor
 	self.bordersize = bordersize or 2
 	self.rect = sdl.rect(0, 0, 0, 0)
@@ -9,25 +9,17 @@ end
 function DecoFrame:draw(screen, widget)
 	local r = widget.rect
 
-	screen:drawrect(self.color, r)
-
 	self.rect.x = r.x
-	self.rect.y = r.y
-	self.rect.w = self.bordersize
-	self.rect.h = r.h
-	screen:drawrect(self.bordercolor, self.rect)
-	self.rect.x = r.x + r.w - self.bordersize
-	screen:drawrect(self.bordercolor, self.rect)
-	
-	self.rect.x = r.x
-	self.rect.y = r.y
+	self.rect.y = r.y + widget.decorationy
 	self.rect.w = r.w
-	self.rect.h = self.bordersize
-	screen:drawrect(self.bordercolor, self.rect)
-	self.rect.y = r.y + r.h - self.bordersize
-	screen:drawrect(self.bordercolor, self.rect)
+	self.rect.h = r.h - widget.decorationy
+
+	screen:drawrect(self.color, self.rect)
+
+	drawborder(screen, self.bordercolor, self.rect, self.bordersize)
 
 	widget.decorationx = widget.decorationx + self.bordersize
+	widget.decorationy = widget.decorationy + self.bordersize
 end
 
 function DecoFrame:apply(widget)
@@ -39,39 +31,64 @@ function DecoFrame:unapply(widget)
 end
 
 
-DecoFrameCaption = Class.inherit(DecoCaption)
-function DecoFrameCaption:new(color, font, textset)
-	self.color = color or deco.colors.buttonbordercolor
-	self.height = 40
+DecoFrameHeader = Class.inherit(DecoCaption)
+function DecoFrameHeader:new(bordercolor, fillcolor, bordersize, font, textset)
+	self.bordercolor = bordercolor or deco.colors.buttonbordercolor
+	self.fillcolor = fillcolor or deco.colors.buttonhlcolor
+	self.bordersize = bordersize or 2
+
+	self.height = 50
+	self.triSize = 26
+	self.triInset = 10
 	self.rect = sdl.rect(0,0,0,0)
-	
+
 	DecoCaption.new(self, deco.uifont.title.font, deco.uifont.title.set)
 end
 
-function DecoFrameCaption:draw(screen, widget)
+function DecoFrameHeader:draw(screen, widget)
 	self:setsurface(widget.captiontext)
 
 	local r = widget.rect
-	
+
 	self.rect.x = r.x
-	self.rect.y = r.y
+	self.rect.y = r.y + self.triInset
 	self.rect.w = r.w
+	self.rect.h = self.height - self.triInset
+
+	screen:drawrect(self.fillcolor, self.rect)
+	drawborder(screen, self.bordercolor, self.rect, self.bordersize)
+
+	self.rect.y = r.y
+	self.rect.w = self.surface:w()
 	self.rect.h = self.height
-	
-	screen:drawrect(self.color, self.rect)
-	local offset = self.height/2 - self.surface:h()/2
+	screen:drawrect(self.bordercolor, self.rect)
+
+	self.rect.x = r.x + self.rect.w
+	self.rect.y = r.y
+	self.rect.w = self.triSize
+	self.rect.h = self.triSize
+	drawtri_bl(screen, self.bordercolor, self.rect)
+
+	self.rect.y = r.y + self.rect.h
+	self.rect.h = self.height - self.rect.h
+	screen:drawrect(self.bordercolor, self.rect)
+
+	local offset = self.height / 2 - self.surface:h() / 2
+
 	screen:blit(
 		self.surface,
 		nil,
-		r.x + widget.decorationx + offset,
-		r.y + widget.decorationy + offset
+		r.x + widget.decorationx + offset + 1,
+		r.y + widget.decorationy + offset + 2
 	)
+
+	widget.decorationy = self.height - self.bordersize
 end
 
-function DecoFrameCaption:apply(widget)
-	widget.padt = self.height
+function DecoFrameHeader:apply(widget)
+	widget.padt = widget.padt + self.height
 end
 
-function DecoFrameCaption:unapply(widget)
-	widget.padt = 0 --oops
+function DecoFrameHeader:unapply(widget)
+	widget.padt = widget.padt - self.height
 end

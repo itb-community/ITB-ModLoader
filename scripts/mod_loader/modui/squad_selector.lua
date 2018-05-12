@@ -103,13 +103,12 @@ local function createUi()
 			:width(0.6):height(0.7)
 			:pos(0.2, 0.1)
 			:caption("Choose squads")
-			:decorate({ DecoFrame(), DecoFrameCaption() })
+			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:addTo(ui)
 
 		local scrollarea = UiScrollArea()
 			:width(1):height(1)
 			:padding(24)
-			:decorate({ DecoSolid(sdl.rgb(24,28,40)) })
 			:addTo(frametop)
 		
 		local updatecount = function()
@@ -139,11 +138,20 @@ local function createUi()
 				surface = sdl.colormapped(surface, colorTable)
 			end
 			
-			local checkbox = UiCheckbox():pos(0.5*col,0):setypx(80*row):heightpx(41):width(0.48):settooltip(modApi.squad_text[i*2]):decorate(
-				{ DecoButton(), DecoCheckbox(), DecoSurfaceOutlined(surface), DecoText(modApi.squad_text[i*2-1]) }
-			)
+			local checkbox = UiCheckbox()
+				:pos(0.5 * col, 0)
+				:setypx(80 * row)
+				:heightpx(41)
+				:width(0.48)
+				:settooltip(modApi.squad_text[i*2])
+				:decorate({
+					DecoButton(),
+					DecoCheckbox(),
+					DecoSurfaceOutlined(surface),
+					DecoText(modApi.squad_text[i*2-1])
+				})
 			
-			scrollarea:add( checkbox )
+			scrollarea:add(checkbox)
 			
 			checkbox.onclicked = function(self, button)
 				updatecount()

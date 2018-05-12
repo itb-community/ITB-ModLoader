@@ -47,13 +47,12 @@ local function createUi()
 			:width(0.8):height(0.8)
 			:pos(0.1, 0.1)
 			:caption("Rearrange pilots")
-			:decorate({ DecoFrame(), DecoFrameCaption() })
+			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:addTo(ui)
 
 		local scrollarea = UiScrollArea()
 			:width(1):height(1)
 			:padding(24)
-			:decorate({ DecoSolid(deco.colors.buttoncolor) })
 			:addTo(frametop)
 		
 		local portraitW = 134

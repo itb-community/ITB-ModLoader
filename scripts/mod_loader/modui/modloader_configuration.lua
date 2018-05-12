@@ -35,16 +35,14 @@ local function createUi()
 			:pos(0.25, 0.3)
 			:caption("Mod Loader Configuration")
 			:decorate({
-				DecoFrame(),
-				DecoSolid(deco.colors.buttonbordercolor),
-				DecoFrameCaption()
+				DecoFrameHeader(),
+				DecoFrame()
 			})
 			:addTo(ui)
 
 		local scrollarea = UiScrollArea()
 			:width(1):height(1)
 			:padding(12)
-			:decorate({ DecoSolid(deco.colors.buttoncolor) })
 			:addTo(frame)
 
 		local layout = UiBoxLayout()

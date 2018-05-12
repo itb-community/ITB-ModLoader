@@ -127,7 +127,7 @@ function sdlext.showTextDialog(title, text, w, h)
 			:widthpx(w):heightpx(h)
 			:pospx((ui.w - w) / 2, (ui.h - h) / 2)
 			:caption(title)
-			:decorate({ DecoFrame(), DecoFrameCaption() })
+			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:addTo(ui)
 
 		local scroll = UiScrollArea()
