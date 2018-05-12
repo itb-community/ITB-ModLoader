@@ -412,8 +412,8 @@ local function createUi(root)
 
 	holder.draw = function(self, screen)
 		local center = GetScreenCenter()
-		btnBack:pospx(center.x + 135, center.y - 275)
-		btnStart:pospx(center.x + 415, center.y - 275)
+		btnBack:pospx(center.x + 135, ScreenSizeY() - (center.y + 275))
+		btnStart:pospx(center.x + 415, ScreenSizeY() - (center.y + 275))
 
 		self.visible = sdlext.isHangar()
 
