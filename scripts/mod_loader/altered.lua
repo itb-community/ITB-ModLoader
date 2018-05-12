@@ -535,7 +535,7 @@ function AddDifficultyLevel(id, level, tipTitle, tipText)
 end
 
 function GetDifficulty()
-	if GAME and GAME.CustomDifficulty then
+	if Game and GAME and GAME.CustomDifficulty then
 		return GAME.CustomDifficulty
 	else
 		local customDiff = modApi:readProfileData("CustomDifficulty")
@@ -605,7 +605,7 @@ function SetDifficulty(level)
 		tempToggle = nil
 	end
 
-	if GAME then
+	if Game and GAME then
 		GAME.CustomDifficulty = level
 
 		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(level))
