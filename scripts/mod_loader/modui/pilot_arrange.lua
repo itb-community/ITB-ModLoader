@@ -43,9 +43,15 @@ local function createUi()
 	sdlext.showDialog(function(ui, quit)
 		ui.onDialogExit = onExit
 		
+		local portraitW = 122 + 8
+		local portraitH = 122 + 8
+		local gap = 10
+		local cellW = portraitW + gap
+		local cellH = portraitH + gap
+
 		local frametop = Ui()
 			:width(0.8):height(0.8)
-			:pos(0.1, 0.1)
+			:posCentered()
 			:caption("Rearrange pilots")
 			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:addTo(ui)
@@ -55,17 +61,17 @@ local function createUi()
 			:padding(24)
 			:addTo(frametop)
 		
-		local portraitW = 134
-		local portraitH = 134
-		local cellW = 140
-		local cellH = 140
-		local portraitsPerRow = math.floor(ui.w * 0.8 / cellW)
 		local placeholder = Ui()
 			:pospx(-cellW, -cellH)
 			:widthpx(portraitW):heightpx(portraitH)
 			:decorate({ })
 			:addTo(scrollarea)
-			
+
+		local portraitsPerRow = math.floor(ui.w * frametop.wPercent / cellW)
+		frametop
+			:width((portraitsPerRow * cellW + scrollarea.padl + scrollarea.padr) / ui.w)
+			:posCentered()
+
 		local draggedElement
 		local function stopDrag()
 			local index = list_indexof(pilotButtons, placeholder)
@@ -129,7 +135,11 @@ local function createUi()
 			local button = Ui()
 				:widthpx(portraitW):heightpx(portraitH)
 				:pospx(cellW * col, cellH * row)
-				:decorate({ DecoButton(), DecoSurface(surface) })
+				:decorate({
+					DecoButton(),
+					DecoAlign(-4),
+					DecoSurface(surface)
+				})
 				:addTo(scrollarea)
 			
 			button.pilotId = pilotId
