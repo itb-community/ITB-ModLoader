@@ -75,13 +75,15 @@ function UiScrollArea:mousedown(x, y)
 	self.root.pressedchild = self
 	self.pressed = true
 
-	local ratio = (y - self.screeny - self.buttonheight/2) / (self.h-self.buttonheight)
-	if ratio < 0 then ratio = 0 end
-	if ratio > 1 then ratio = 1 end
-	
-	self.dy = ratio * (self.innerHeight - self.h)
+	if self.innerHeight > self.h then
+		local ratio = (y - self.screeny - self.buttonheight/2) / (self.h-self.buttonheight)
+		if ratio < 0 then ratio = 0 end
+		if ratio > 1 then ratio = 1 end
 
-	self.scrollPressed = true
+		self.dy = ratio * (self.innerHeight - self.h)
+
+		self.scrollPressed = true
+	end
 	
 	return true
 end
