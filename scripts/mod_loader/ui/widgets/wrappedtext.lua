@@ -72,7 +72,7 @@ function UiWrappedText:buildText(text)
 		uitext = Ui():decorate({ DecoText(text, self.font, self.textset) })
 
 		if debug then
-			uitext.decorations[2] = DecoSolid(sdl.rgba(255, 0, 255, 64))
+			table.insert(uitext.decorations, DecoSolid(sdl.rgba(255, 0, 255, 64)))
 		end
 
 		skip = true
