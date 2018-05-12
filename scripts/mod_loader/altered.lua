@@ -538,7 +538,7 @@ function GetDifficulty()
 	if Game and GAME and GAME.CustomDifficulty then
 		return GAME.CustomDifficulty
 	else
-		local customDiff = modApi:readProfileData("CustomDifficulty")
+		local customDiff = modApi:readModData("CustomDifficulty")
 		if customDiff then
 			return customDiff
 		end
@@ -613,7 +613,7 @@ function SetDifficulty(level)
 		Global_Texts["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
 	else
 		-- Hangar, before the game
-		modApi:writeProfileData("CustomDifficulty", level)
+		modApi:writeModData("CustomDifficulty", level)
 
 		local tipSuffix = GetDifficultyTipSuffix(level)
 		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(level))

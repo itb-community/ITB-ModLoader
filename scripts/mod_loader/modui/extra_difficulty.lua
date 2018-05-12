@@ -6,8 +6,6 @@
 local arrLeft = nil
 local arrRight = nil
 local diffText = nil
-local mask = nil
-local leaving = false
 
 local function changeDifficulty(newDiff)
 	SetDifficulty(newDiff)
@@ -40,7 +38,7 @@ local function createUi(root)
 		return false
 	end
 
-	mask = Ui()
+	local mask = Ui()
 		:widthpx(160):heightpx(44)
 		:decorate({ DecoSolid(deco.colors.transparent) })
 		:addTo(pane)
@@ -136,6 +134,8 @@ local function createUi(root)
 		:addTo(pane)
 	diffText.translucent = true
 
+	local leaving = false
+
 	pane.draw = function(self, screen)
 		-- Only draw the difficulty UI while in the hangar
 		self.visible = sdlext.isHangar()
@@ -165,27 +165,27 @@ local function createUi(root)
 
 		Ui.draw(self, screen)
 	end
+
+	sdlext.addHangarEnteredHook(function(screen)
+		-- Apply the difficulty we're starting with
+		changeDifficulty(GetDifficulty())
+	end)
+
+	sdlext.addHangarLeavingHook(function(startGame)
+		leaving = true
+
+		if startGame then
+			mask.animations.fadeIn:start()
+		end
+	end)
+
+	sdlext.addHangarExitedHook(function(screen)
+		leaving = false
+		mask.animations.fadeIn:stop()
+		mask.decorations[1].color = deco.colors.transparent
+	end)
 end
 
 sdlext.addUiRootCreatedHook(function(screen, root)
 	createUi(root)
-end)
-
-sdlext.addHangarExitedHook(function(screen)
-	leaving = false
-	mask.animations.fadeIn:stop()
-	mask.decorations[1].color = deco.colors.transparent
-end)
-
-sdlext.addHangarEnteredHook(function(screen)
-	-- Apply the difficulty we're starting with
-	changeDifficulty(GetDifficulty())
-end)
-
-sdlext.addHangarLeavingHook(function(startGame)
-	leaving = true
-
-	if startGame then
-		mask.animations.fadeIn:start()
-	end
 end)
