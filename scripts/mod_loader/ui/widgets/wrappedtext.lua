@@ -29,11 +29,13 @@ function UiWrappedText:setText(text)
 	self.text = text
 	local allLines = {}
 
-	local lines = modApi:splitStringEmpty(text, "\n")
-	for i = 1, #lines do
-		local wrappedLines = modApi:splitStringEmpty(self:wrap(lines[i], self.limit), "\n")
-		for j = 1, #wrappedLines do
-			table.insert(allLines, wrappedLines[j])
+	if self.text and self.text ~= "" then
+		local lines = modApi:splitStringEmpty(text, "\n")
+		for i = 1, #lines do
+			local wrappedLines = modApi:splitStringEmpty(self:wrap(lines[i], self.limit), "\n")
+			for j = 1, #wrappedLines do
+				table.insert(allLines, wrappedLines[j])
+			end
 		end
 	end
 
