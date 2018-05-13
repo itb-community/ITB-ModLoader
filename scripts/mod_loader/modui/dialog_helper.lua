@@ -172,6 +172,8 @@ function sdlext.showTextDialog(title, text, w, h)
 	end)
 end
 
+local align = DecoAlign(-8, 1)
+local align2 = DecoAlign(-5, 0)
 function sdlext.showAlertDialog(title, text, w, h, ...)
 	buttons = {...}
 	assert(#buttons > 0, "AlertDialog must have at least one button!")
@@ -195,12 +197,22 @@ function sdlext.showAlertDialog(title, text, w, h, ...)
 			:addTo(frame)
 		buttonLayout:heightpx(45 + buttonLayout.padt + buttonLayout.padb)
 
-		local align = DecoAlign(-8, 1)
 		for i, text in ipairs(buttons) do
+			local decoText = DecoCAlignedText(text)
+
 			local btn = Ui()
 				:widthpx(95):height(1)
-				:decorate({ DecoButton(), align, DecoCAlignedText(text) })
 				:addTo(buttonLayout)
+
+			-- Not entirely sure why buttons with longer text need
+			-- different alignment offset (in both X and Y to boot)
+			local btnw = math.max(btn.w, decoText.surface:w() + 30)
+			if btnw > btn.w then
+				btn:decorate({ DecoButton(), align2, decoText })
+					:widthpx(btnw)
+			else
+				btn:decorate({ DecoButton(), align, decoText })
+			end
 
 			btn.onclicked = function()
 				ui.dialogButton = text
@@ -216,7 +228,11 @@ function sdlext.showAlertDialog(title, text, w, h, ...)
 		end
 
 		line:pospx(0, scroll.y + scroll.h)
-		buttonLayout:pospx((frame.w - buttonLayout.w) / 2,	line.y + line.h)
+
+		w = math.max(w, buttonLayout.w + frame.padl + frame.padr)
+		line:widthpx(w - frame.padl - frame.padr)
+		frame:widthpx(w)
+		buttonLayout:pospx((frame.w - frame.padl - frame.padr - buttonLayout.w) / 2, line.y + line.h)
 
 		h = math.min(h, scroll.innerHeight + frame.padt + frame.padb)
 		h = math.max(h, buttonLayout.y + buttonLayout.h + frame.padt + frame.padb)
