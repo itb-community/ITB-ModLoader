@@ -174,7 +174,7 @@ end
 
 function sdlext.showAlertDialog(title, text, w, h, ...)
 	buttons = {...}
-	assert(#buttons > 0)
+	assert(#buttons > 0, "AlertDialog must have at least one button!")
 	w = w or 700
 	h = h or 400
 
@@ -184,17 +184,21 @@ function sdlext.showAlertDialog(title, text, w, h, ...)
 		local frame = buildSimpleDialog(title, text, w, h)
 		local scroll = frame.children[1]
 
-		local pad = 18
-		local buttonLayout = UiBoxLayout()
-			:hgap(50)
-			:heightpx(45 + pad * 2)
-			:padding(pad)
+		local line = Ui()
+			:width(1):heightpx(frame.decorations[1].bordersize)
+			:decorate({ DecoSolid(frame.decorations[1].bordercolor) })
 			:addTo(frame)
 
-		local align = DecoAlign(-8, 0)
+		local buttonLayout = UiBoxLayout()
+			:hgap(50)
+			:padding(18)
+			:addTo(frame)
+		buttonLayout:heightpx(45 + buttonLayout.padt + buttonLayout.padb)
+
+		local align = DecoAlign(-8, 1)
 		for i, text in ipairs(buttons) do
 			local btn = Ui()
-				:widthpx(95):heightpx(45)
+				:widthpx(95):height(1)
 				:decorate({ DecoButton(), align, DecoCAlignedText(text) })
 				:addTo(buttonLayout)
 
@@ -211,7 +215,8 @@ function sdlext.showAlertDialog(title, text, w, h, ...)
 			scroll:heightpx(scroll.innerHeight)
 		end
 
-		buttonLayout:pospx((frame.w - buttonLayout.w) / 2,	scroll.y + scroll.h + 10)
+		line:pospx(0, scroll.y + scroll.h)
+		buttonLayout:pospx((frame.w - buttonLayout.w) / 2,	line.y + line.h)
 
 		h = math.min(h, scroll.innerHeight + frame.padt + frame.padb)
 		h = math.max(h, buttonLayout.y + buttonLayout.h + frame.padt + frame.padb)
