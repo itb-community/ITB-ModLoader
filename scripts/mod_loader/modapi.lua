@@ -436,6 +436,23 @@ function modApi:splitString(test,sep)
 	return t
 end
 
+--[[
+	Same as modApi:splitString, but includes empty strings
+
+	http://lua-users.org/wiki/SplitJoin
+--]]
+function modApi:splitStringEmpty(str, sep)
+	local ret = {}
+	local n = 1
+	for w in str:gmatch("([^"..sep.."]*)") do
+		ret[n] = ret[n] or w -- only set once (so the blank after a string is ignored)
+		if w == "" then
+			n = n + 1
+		end -- step forwards on a blank but not a string
+	end
+	return ret
+end
+
 function modApi:isVersion(version,comparedTo)
 	assert(type(version) == "string")
 	if not comparedTo then
