@@ -442,6 +442,10 @@ end
 	http://lua-users.org/wiki/SplitJoin
 --]]
 function modApi:splitStringEmpty(str, sep)
+	if sep == nil then
+		sep = "%s"
+	end
+
 	local ret = {}
 	local n = 1
 	for w in str:gmatch("([^"..sep.."]*)") do
