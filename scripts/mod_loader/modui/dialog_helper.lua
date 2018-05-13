@@ -42,9 +42,12 @@ local function buildBackgroundPane()
 	local pane = Ui()
 		:width(1):height(1)
 		:decorate({ DecoSolid(deco.colors.dialogbg) })
+	pane.dismissible = true
 
 	pane.onclicked = function(self, button)
-		popDialog()
+		if self.dismissible then
+			popDialog()
+		end
 		return true
 	end
 
@@ -65,7 +68,7 @@ local function buildBackgroundPane()
 		return true
 	end
 	pane.keydown = function(self, keycode)
-		if keycode == 27 then -- Escape
+		if self.dismissible and keycode == 27 then -- Escape
 			popDialog()
 		end
 		return true
@@ -124,32 +127,106 @@ function sdlext.uiEventLoop(init)
 	sdlext.showDialog(init)
 end
 
+-- //////////////////////////////////////////////////////////////////////
+
+local function buildSimpleDialog(title, text, w, h)
+	local frame = Ui()
+		:widthpx(w):heightpx(h)
+		:decorate({ DecoFrameHeader(), DecoFrame() })
+		:caption(title)
+
+	local scroll = UiScrollArea()
+		:width(1):height(1)
+		:padding(10)
+		:addTo(frame)
+
+	local font = deco.uifont.tooltipTextLarge.font
+	local textset = deco.uifont.tooltipTextLarge.set
+	local wrap = UiWrappedText(text, font, textset)
+		:width(1)
+		:addTo(scroll)
+
+	return frame
+end
+
 function sdlext.showTextDialog(title, text, w, h)
 	w = w or 700
 	h = h or 400
 
 	sdlext.showDialog(function(ui, quit)
-		local frame = Ui()
-			:widthpx(w):heightpx(h)
-			:caption(title)
-			:decorate({ DecoFrameHeader(), DecoFrame() })
-			:addTo(ui)
+		local frame = buildSimpleDialog(title, text, w, h)
+		local scroll = frame.children[1]
 
-		local scroll = UiScrollArea()
-			:width(1):height(1)
-			:padding(10)
-			:addTo(frame)
+		frame:relayout()
 
-		local wrap = UiWrappedText(text)
-			:width(1)
-			:addTo(scroll)
-		wrap:relayout()
+		if scroll.innerHeight < h - frame.padt - frame.padb then
+			scroll:heightpx(scroll.innerHeight)
+		end
 
-		h = math.min(h, wrap.h + scroll.padt + scroll.padb + frame.padt + frame.padb)
+		h = math.min(h, scroll.innerHeight + frame.padt + frame.padb)
+
 		frame
 			:heightpx(h)
 			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
-
-		wrap:addTo(scroll)
+			:addTo(ui)
 	end)
+end
+
+function sdlext.showAlertDialog(title, text, w, h, ...)
+	buttons = {...}
+	assert(#buttons > 0)
+	w = w or 700
+	h = h or 400
+
+	sdlext.showDialog(function(ui, quit)
+		ui.dismissible = false
+
+		local frame = buildSimpleDialog(title, text, w, h)
+		local scroll = frame.children[1]
+
+		local pad = 18
+		local buttonLayout = UiBoxLayout()
+			:hgap(50)
+			:heightpx(45 + pad * 2)
+			:padding(pad)
+			:addTo(frame)
+
+		local align = DecoAlign(-8, 0)
+		for i, text in ipairs(buttons) do
+			local btn = Ui()
+				:widthpx(95):heightpx(45)
+				:decorate({ DecoButton(), align, DecoCAlignedText(text) })
+				:addTo(buttonLayout)
+
+			btn.onclicked = function()
+				ui.dialogButton = text
+				quit()
+				return true
+			end
+		end
+
+		frame:relayout()
+
+		if scroll.innerHeight < h - frame.padt - frame.padb then
+			scroll:heightpx(scroll.innerHeight)
+		end
+
+		buttonLayout:pospx((frame.w - buttonLayout.w) / 2,	scroll.y + scroll.h + 10)
+
+		h = math.min(h, scroll.innerHeight + frame.padt + frame.padb)
+		h = math.max(h, buttonLayout.y + buttonLayout.h + frame.padt + frame.padb)
+
+		frame
+			:heightpx(h)
+			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
+			:addTo(ui)
+	end)
+end
+
+function sdlext.showInfoDialog(title, text, w, h)
+	sdlext.showAlertDialog(title, text, w, h, "OK")
+end
+
+function sdlext.showConfirmDialog(title, text, w, h)
+	sdlext.showAlertDialog(title, text, w, h, "YES", "NO")
 end

@@ -34,6 +34,7 @@ deco.fonts.justin12 = sdlext.font("fonts/JustinFont12Bold.ttf", 12)
 deco.fonts.menufont = sdlext.font("fonts/JustinFont11Bold.ttf", 24)
 deco.fonts.tooltipTitle = sdlext.font("fonts/NunitoSans_Bold.ttf", 14)
 deco.fonts.tooltipText = sdlext.font("fonts/NunitoSans_Regular.ttf", 12)
+deco.fonts.tooltipTextLarge = sdlext.font("fonts/NunitoSans_Regular.ttf", 14)
 
 deco.uifont = {
 	default = {
@@ -50,6 +51,10 @@ deco.uifont = {
 	},
 	tooltipText = {
 		font = deco.fonts.tooltipText,
+		set = deco.textset(deco.colors.white, nil, nil, true)
+	},
+	tooltipTextLarge = {
+		font = deco.fonts.tooltipTextLarge,
 		set = deco.textset(deco.colors.white, nil, nil, true)
 	}
 }
