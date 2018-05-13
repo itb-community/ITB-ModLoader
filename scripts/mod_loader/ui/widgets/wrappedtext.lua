@@ -3,7 +3,6 @@
 	Caches created sdl.text instances.
 --]]
 UiWrappedText = Class.inherit(UiBoxLayout)
-local debug = false
 
 function UiWrappedText:new(text, font, textset)
 	UiBoxLayout.new(self)
@@ -16,8 +15,6 @@ function UiWrappedText:new(text, font, textset)
 	self.textAlign = "left"
 
 	self.text = nil
-	self.charWidth = 9.5
-	self.lineHeight = 20
 
 	if text then
 		self:setText(text)
@@ -54,7 +51,7 @@ function UiWrappedText:wrap(str, limit, indent, indent1)
 	limit = limit or 72
 	local here = 1 - #indent1
 	return indent1..str:gsub("(%s+)()(%S+)()", function(sp, st, word, fi)
-		if fi-here > limit then
+		if fi - here > limit then
 			here = st - #indent
 			return "\n"..indent..word
 		end
@@ -70,10 +67,6 @@ function UiWrappedText:buildText(text)
 		uitext.visible = true
 	else
 		uitext = Ui():decorate({ DecoText(text, self.font, self.textset) })
-
-		if debug then
-			table.insert(uitext.decorations, DecoSolid(sdl.rgba(255, 0, 255, 64)))
-		end
 
 		skip = true
 	end

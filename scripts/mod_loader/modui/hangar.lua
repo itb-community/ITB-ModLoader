@@ -61,6 +61,11 @@ end
 function GetHangarOrigin()
 	local origin = GetScreenCenter()
 
+	-- Unreliable. Need a better way to detect whether the
+	-- game is running in fullscreen mode.
+	-- Currently, this fails if the user double-clicks the window
+	-- title bar to maximize, clicks the Maximize button, or
+	-- selects Maximize from popup menu.
 	if Settings.fullscreen == 0 then
 		origin.x = origin.x - 460
 		origin.y = origin.y - 335

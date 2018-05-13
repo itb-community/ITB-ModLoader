@@ -150,6 +150,11 @@ local function rect_contains0(x, y, w, h, px, py)
 	       py < y + h
 end
 
+--[[
+	rect_contains(rect, px, py)
+	OR
+	rect_contains(x, y, w, h, px, py)
+--]]
 function rect_contains(...)
 	local a = {...}
 	assert(#a == 3 or #a == 6, "Invalid arguments")
@@ -165,6 +170,12 @@ function rect_contains(...)
 	end
 end
 
+--[[
+	rect_equals(rect1, rect2)
+	OR
+	rect_equals(rect, x, y, w, h)
+		x, y, w, and h arguments can be nil, defaulting to 0
+--]]
 function rect_equals(...)
 	local a = {...}
 	assert(#a <= 5, "Invalid arguments")
@@ -187,6 +198,12 @@ function rect_equals(...)
 	end
 end
 
+--[[
+	rect_set(rect1, rect2)
+	OR
+	rect_set(rect, x, y, w, h)
+		x, y, w, and h arguments can be nil, defaulting to 0
+--]]
 function rect_set(...)
 	local a = {...}
 	assert(#a <= 5, "Invalid arguments")
