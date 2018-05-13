@@ -175,8 +175,12 @@ end
 local align = DecoAlign(-8, 1)
 local align2 = DecoAlign(-5, 0)
 function sdlext.showAlertDialog(title, text, w, h, ...)
-	buttons = {...}
+	local buttons = {...}
+	if type(buttons[1]) == "table" then
+		buttons = buttons[1]
+	end
 	assert(#buttons > 0, "AlertDialog must have at least one button!")
+
 	w = w or 700
 	h = h or 400
 
