@@ -141,19 +141,14 @@ local function createUi(root)
 		self.visible = sdlext.isHangar()
 
 		if self.visible then
-			-- Reposition the UI, for when the player switches between
-			-- fullscreen/windowed, or otherwise resizes the game window
-			local center = GetScreenCenter()
+			local origin = GetHangarOrigin()
+			origin.x = origin.x + 640
+			origin.y = origin.y + 30
 
-			local origin = Point(
-				center.x + 255,
-				ScreenSizeY() - (center.y + 255)
-			)
-
-			arrLeft:pospx (origin.x + 4          , origin.y + 3 )
-			arrRight:pospx(origin.x + 28 + 90 + 4, origin.y + 3 )
+			arrLeft:pospx (origin.x + 4          , origin.y + 4 )
+			arrRight:pospx(origin.x + 28 + 90 + 4, origin.y + 4 )
 			diffText:pospx(origin.x              , origin.y + 10)
-			mask:pospx    (origin.x              , origin.y + 2 )
+			mask:pospx    (origin.x              , origin.y + 3 )
 
 			local hideDifficultyUi = IsHangarWindowState() or
 				(leaving and not mask.animations.fadeIn:isStarted())
