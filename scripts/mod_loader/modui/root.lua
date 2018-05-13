@@ -29,21 +29,8 @@ function sdlext.isConsoleOpen()
 	return consoleOpen
 end
 
---[[
-	Returns correct center of the screen, accounting for the weird
-	offset when the game is not running in fullscreen.
---]]
 function GetScreenCenter()
-	local center = Point(ScreenSizeX() / 2, ScreenSizeY() / 2)
-
-	if Settings.fullscreen == 0 then
-		-- For some reason when the game is not in fullscreen,
-		-- the entire UI is shifted, correct that
-		center.x = center.x - 75
-		center.y = center.y + 50
-	end
-
-	return center
+	return Point(ScreenSizeX() / 2, ScreenSizeY() / 2)
 end
 
 -- //////////////////////////////////////////////////////////////////////

@@ -58,6 +58,20 @@ function IsHangarWindowlessState()
 	       hasbit(uiState, UI_STATE_DEFAULT_CUSTOM)
 end
 
+function GetHangarOrigin()
+	local origin = GetScreenCenter()
+
+	if Settings.fullscreen == 0 then
+		origin.x = origin.x - 460
+		origin.y = origin.y - 335
+	else
+		origin.x = origin.x - 385
+		origin.y = origin.y - 285
+	end
+
+	return origin
+end
+
 -- //////////////////////////////////////////////////////////////////////
 -- Window detection, state transitions
 
