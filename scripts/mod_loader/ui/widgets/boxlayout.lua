@@ -123,7 +123,7 @@ function UiBoxLayout:relayout()
 			child.rect.h = child.h
 		end
 	end
-	
+
 	if lastChild then
 		if self:isHBox() then
 			self.w = lastChild.x + self.padl + self.padr + lastChild.w
@@ -136,5 +136,6 @@ function UiBoxLayout:relayout()
 		self.h = self:isVBox() and 0 or self.h
 	end
 
+	self.innerWidth = self.w
 	self.innerHeight = self.h
 end

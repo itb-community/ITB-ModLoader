@@ -17,6 +17,7 @@ function Ui:new()
 	self.screeny = 0
 	self.font = uifont
 	self.textset = uitextset
+	self.innerWidth = 0
 	self.innerHeight = 0
 	self.bgcolor = nil
 	self.rect = sdl.rect(0,0,0,0)
@@ -385,6 +386,7 @@ function Ui:keyup(keycode)
 end
 
 function Ui:relayout()
+	local innerWidth = 0
 	local innerHeight = 0
 
 	for i=1,#self.children do
@@ -412,7 +414,9 @@ function Ui:relayout()
 		
 		child:relayout()
 		
+		local childright = self.padl + child.x + child.w + self.padr
 		local childbottom = self.padt + child.y + child.h + self.padb
+		if innerWidth < childright then innerWidth = childright end
 		if innerHeight < childbottom then innerHeight = childbottom end
 		
 		child.rect.x = child.screenx
@@ -421,6 +425,7 @@ function Ui:relayout()
 		child.rect.h = child.h
 	end
 	
+	self.innerWidth = innerWidth
 	self.innerHeight = innerHeight
 end
 
