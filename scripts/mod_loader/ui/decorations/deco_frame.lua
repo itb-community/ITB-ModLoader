@@ -86,9 +86,9 @@ function DecoFrameHeader:draw(screen, widget)
 end
 
 function DecoFrameHeader:apply(widget)
-	widget.padt = widget.padt + self.height
+	widget.padt = widget.padt + (self.height - self.bordersize)
 end
 
 function DecoFrameHeader:unapply(widget)
-	widget.padt = widget.padt - self.height
+	widget.padt = widget.padt - (self.height - self.bordersize)
 end
