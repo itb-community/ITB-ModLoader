@@ -215,7 +215,7 @@ function sdlext.showAlertDialog(title, text, w, h, ...)
 			end
 
 			btn.onclicked = function()
-				ui.dialogButton = text
+				ui.dialogButton = i
 				quit()
 				return true
 			end
