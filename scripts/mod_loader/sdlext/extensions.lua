@@ -1,3 +1,23 @@
+--[[
+	Try to run GC if we cross a certain threshold of created
+	SDL/sdlext objects, in an attempt to clean them up.
+--]]
+local gccounter = 0
+local function checkGC()
+	gccounter = gccounter + 1
+	if gccounter > 10000 then
+		gccounter = 0
+		collectgarbage("collect")
+		LOG("sdlext triggered GC")
+	end
+end
+
+local oldsdltext = sdl.text
+function sdl.text(font, textset, text)
+	checkGC()
+
+	return oldsdltext(font, textset, text)
+end
 
 local resourceDat = sdl.resourceDat("resources/resource.dat")
 local resourceDatMtime = os.mtime("resources/resource.dat")
@@ -13,6 +33,7 @@ sdlext = {}
 
 function sdlext.font(path,size)
 	checkResource()
+	checkGC()
 	
 	local blob = sdl.blobFromResourceDat(resourceDat,path)
 	if blob.length==0 then
@@ -24,6 +45,7 @@ end
 
 function sdlext.surface(path)
 	checkResource()
+	checkGC()
 	
 	local blob = sdl.blobFromResourceDat(resourceDat,path)
 	if blob.length==0 then
