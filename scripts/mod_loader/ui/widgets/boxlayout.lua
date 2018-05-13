@@ -132,8 +132,8 @@ function UiBoxLayout:relayout()
 			self.h = lastChild.y + self.padt + self.padb + lastChild.h
 		end
 	else
-		self.w = self.gapHorizontal and 0 or self.w
-		self.h = self.gapVertical and 0 or self.h
+		self.w = self:isHBox() and 0 or self.w
+		self.h = self:isVBox() and 0 or self.h
 	end
 
 	self.innerHeight = self.h
