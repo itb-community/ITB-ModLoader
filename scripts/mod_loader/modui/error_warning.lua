@@ -31,7 +31,7 @@ sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 				mod_loader.unmountedMods = {}
 
 				if mod_loader.firsterror then
-					sdlext.showTextDialog("Error", mod_loader.firsterror)
+					sdlext.showInfoDialog("Error", mod_loader.firsterror)
 				end
 			end)
 		end
