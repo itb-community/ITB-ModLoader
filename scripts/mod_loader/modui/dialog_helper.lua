@@ -224,9 +224,11 @@ function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
 				btn:decorate({ DecoButton(), align, decoText })
 			end
 
-			btn.onclicked = function()
-				ui.response = i
-				quit()
+			btn.onclicked = function(self, button)
+				if button == 1 then
+					ui.response = i
+					quit()
+				end
 				return true
 			end
 		end
