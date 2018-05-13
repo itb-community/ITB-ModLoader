@@ -335,7 +335,7 @@ sdlext.addUiRootCreatedHook(function()
 	-- Add a hook to check whether game resources have been loaded correctly.
 	modApi:scheduleHook(20,	function()
 		if srfTopRight:w() == 0 then
-			sdlext.showTextDialog(
+			sdlext.showInfoDialog(
 				"Resource Error",
 				"The mod loader failed to load game resources. "..
 				"This will cause some elements of modded UI to be invisible or incorrectly positioned. "..
