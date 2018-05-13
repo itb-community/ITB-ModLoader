@@ -29,13 +29,11 @@ function UiWrappedText:setText(text)
 	self.text = text
 	local allLines = {}
 
-	if self.text and self.text ~= "" then
-		local lines = modApi:splitString(text, "\n")
-		for i = 1, #lines do
-			local wrappedLines = modApi:splitString(self:wrap(lines[i], self.limit), "\n")
-			for j = 1, #wrappedLines do
-				table.insert(allLines, wrappedLines[j])
-			end
+	local lines = modApi:splitStringEmpty(text, "\n")
+	for i = 1, #lines do
+		local wrappedLines = modApi:splitStringEmpty(self:wrap(lines[i], self.limit), "\n")
+		for j = 1, #wrappedLines do
+			table.insert(allLines, wrappedLines[j])
 		end
 	end
 
@@ -59,6 +57,8 @@ function UiWrappedText:wrap(str, limit, indent, indent1)
 end
 
 function UiWrappedText:buildText(text)
+	if text == "" then text = " " end
+
 	local uitext = nil
 
 	local skip = false
