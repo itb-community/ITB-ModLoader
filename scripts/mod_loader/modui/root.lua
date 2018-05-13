@@ -330,3 +330,18 @@ MOD_API_EVENT_HOOK = sdl.eventHook(function(event)
 
 	return result
 end)
+
+sdlext.addUiRootCreatedHook(function()
+	-- Add a hook to check whether game resources have been loaded correctly.
+	modApi:scheduleHook(20,	function()
+		if srfTopRight:w() == 0 then
+			sdlext.showTextDialog(
+				"Resource Error",
+				"The mod loader failed to load game resources. "..
+				"This will cause some elements of modded UI to be invisible or incorrectly positioned. "..
+				"This happens sometimes, but so far the cause is not known.\n \n"..
+				"Restarting the game should fix this."
+			)
+		end
+	end)
+end)
