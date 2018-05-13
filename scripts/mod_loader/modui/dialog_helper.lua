@@ -174,7 +174,7 @@ end
 
 local align = DecoAlign(-8, 1)
 local align2 = DecoAlign(-5, 0)
-function sdlext.showAlertDialog(title, text, w, h, ...)
+function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
 	local buttons = {...}
 	if type(buttons[1]) == "table" then
 		buttons = buttons[1]
@@ -186,6 +186,12 @@ function sdlext.showAlertDialog(title, text, w, h, ...)
 
 	sdlext.showDialog(function(ui, quit)
 		ui.dismissible = false
+
+		ui.onDialogExit = function(self)
+			if responseFn then
+				responseFn(self.response)
+			end
+		end
 
 		local frame = buildSimpleDialog(title, text, w, h)
 		local scroll = frame.children[1]
@@ -248,10 +254,10 @@ function sdlext.showAlertDialog(title, text, w, h, ...)
 	end)
 end
 
-function sdlext.showInfoDialog(title, text, w, h)
-	sdlext.showAlertDialog(title, text, w, h, "OK")
+function sdlext.showInfoDialog(title, text, fn, w, h)
+	sdlext.showAlertDialog(title, text, fn, w, h, "OK")
 end
 
-function sdlext.showConfirmDialog(title, text, w, h)
-	sdlext.showAlertDialog(title, text, w, h, "YES", "NO")
+function sdlext.showConfirmDialog(title, text, fn, w, h)
+	sdlext.showAlertDialog(title, text, fn, w, h, "YES", "NO")
 end
