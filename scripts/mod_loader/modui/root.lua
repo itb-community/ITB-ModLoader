@@ -181,7 +181,14 @@ end)
 sdlext.addPreKeyDownHook(function(keycode)
 	if keycode == 96 then -- tilde/backtick
 		consoleOpen = not consoleOpen
-	elseif keycode == Settings.hotkeys[23] then -- fullscreen hotkey
+	end
+
+	-- don't process other keypresses while the console is open
+	if sdlext.isConsoleOpen() then
+		return
+	end
+
+	if keycode == Settings.hotkeys[23] then -- fullscreen hotkey
 		Settings.fullscreen = 1 - Settings.fullscreen
 
 		-- Game doesn't update settings.lua with new fullscreen status...
