@@ -80,8 +80,15 @@ function UiWrappedText:buildText(text)
 end
 
 function UiWrappedText:computeTextSize(text)
-	local srf = sdl.text(self.font, self.textset, text)
-	return { w = srf:w(), h = srf:h() }
+	if type(text) == "string" then
+		local srf = sdl.text(self.font, self.textset, text)
+		local t = { w = srf:w(), h = srf:h() }
+		srf = nil
+
+		return t
+	elseif type(text) == "userdata" then
+		return { w = text:w(), h = text:h() }
+	end
 end
 
 function UiWrappedText:rebuild(lines)
@@ -103,10 +110,12 @@ function UiWrappedText:relayout()
 	for i, child in pairs(self.children) do
 		local d = child.decorations[1]
 		child.alignH = self.textAlign
-		d.font = self.font
-		d.textset = self.textset
-		local size = self:computeTextSize(d.text)
-		child:widthpx(size.w):heightpx(size.h)
+		if d.font ~= self.font or d.textset ~= self.textset then
+			d.font = self.font
+			d.textset = self.textset
+			d.surface = sdl.text(d.font, d.textset, d.text)
+			child:widthpx(d.surface:w()):heightpx(d.surface:h())
+		end
 	end
 
 	UiBoxLayout.relayout(self)
