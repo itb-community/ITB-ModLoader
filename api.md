@@ -7,6 +7,7 @@
 * [API](#api)
 	* [Global](#global)
 		* [GetScreenCenter](#getscreencenter)
+		* [GetHangarOrigin](#gethangarorigin)
 		* [SetDifficulty](#setdifficulty)
 		* [AddDifficulty](#adddifficulty)
 		* [GetDifficultyId](#getdifficultyid)
@@ -22,6 +23,7 @@
 		* [modApi:conditionalHook](#modapiconditionalhook)
 		* [modApi:runLater](#modapirunlater)
 		* [modApi:splitString](#modapisplitstring)
+		* [modApi:splitStringEmpty](#modapisplitstringempty)
 		* [modApi:trimString](#modapitrimstring)
 		* [modApi:stringStartsWith](#modapistringstartswith)
 		* [modApi:stringEndsWith](#modapistringendswith)
@@ -43,6 +45,8 @@
 		* [modApi:loadProfile](#modapiloadprofile)
 		* [modApi:writeProfileData](#modapiwriteprofiledata)
 		* [modApi:readProfileData](#modapireadprofiledata)
+		* [modApi:writeModData](#modapiwritemoddata)
+		* [modApi:readModData](#modapireadmoddata)
 
 	* [sdlext](#sdlext)
 		* [sdlext.isConsoleOpen](#sdlextisconsoleopen)
@@ -52,6 +56,9 @@
 		* [sdlext.getUiRoot](#sdlextgetuiroot)
 		* [sdlext.showDialog](#sdlextshowdialog)
 		* [sdlext.showTextDialog](#sdlextshowtextdialog)
+		* [sdlext.showAlertDialog](#sdlextshowalertdialog)
+		* [sdlext.showInfoDialog](#sdlextshowinfodialog)
+		* [sdlext.showConfirmDialog](#sdlextshowconfirmdialog)
 
 * [Hooks](#hooks)
 	* modApi
@@ -159,7 +166,12 @@ return {
 
 ### `GetScreenCenter`
 
-Returns a `Point` center of the screen, corrected for some weird offset when the game is running in windowed mode.
+Returns a `Point` center of the screen.
+
+
+### `GetHangarOrigin`
+
+Returns a `Point` representing hangar origin - a reference point that can be used by modded UI to position itself in the hangar in relation to game's own UI.
 
 
 ### `SetDifficulty`
@@ -379,7 +391,17 @@ end)
 | `input` | string | The string to be split |
 | `separator` | string | The string to split by. Defaults to whitespace if omitted |
 
-Splits the input string around the provided separator string, and returns a table holding the split string.
+Splits the input string around the provided separator string, and returns a table holding the split string. Does not include empty strings.
+
+
+### `modApi:splitStringEmpty`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `input` | string | The string to be split |
+| `separator` | string | The string to split by. Defaults to whitespace if omitted |
+
+Splits the input string around the provided separator string, and returns a table holding the split string. Includes empty strings.
 
 
 ### `modApi:trimString`
@@ -784,6 +806,36 @@ local diff = modApi:readProfileData("CustomDifficulty")
 ```
 
 
+### `modApi:writeModData`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `id` | string | Key the data will be saved as in the modded settings table |
+| `obj` | object | A lua object to store in the modded settings table |
+
+Stores the specified object under the specified key in `modcontent.lua` file in game's savedata directory.
+
+Example:
+```lua
+local diff = GetDifficulty()
+modApi:writeModData("CustomDifficulty", level)
+```
+
+
+### `modApi:readModData`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `id` | string | Key the data will be saved as in the modded settings table |
+
+Reads the object under the specified key from `modcontent.lua` file in game's savedata directory.
+
+Example:
+```lua
+local diff = modApi:readModData("CustomDifficulty")
+```
+
+
 ## sdlext
 
 ### `sdlext.isConsoleOpen`
@@ -882,6 +934,72 @@ sdlext.showTextDialog(
 	"This is a very important message that demands your attention."
 )
 ```
+
+
+### `sdlext.showAlertDialog`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `title` | string | Title of the dialog |
+| `text` | string | Text displayed in the dialog |
+| `responseFn` | function | Function which receives index of the clicked button as argument. Can be nil. |
+| `w` | number | Optional width of the dialog. Defaults to 700 if omitted. |
+| `h` | number | Optional height of the dialog. Defaults to 400 if omitted. |
+| `buttons` | string(s) | Varargs. Texts for buttons that will be displayed below the dialog text. Must have at least one argument. |
+
+Shows a dialog on the screen, which prevents interaction with the game until it is dismissed. The dialog can only be dismissed by clicking one of the buttons.
+
+Button texts typically should be in all uppercase, to match the game's dialogs' style.
+
+When the dialog is dismissed, the `responseFn` function is called, with the index of the clicked button as its argument.
+
+The dialog's height is automatically changed depending on length of the message, up to a maximum of 400px, after which the text becomes scrollable.
+
+The dialog's width is automatically changed depending on number and width of buttons. Width is not capped, and putting too many buttons will simply cause the dialog to be too wide to be displayed on the screen.
+
+Example:
+```lua
+local buttons = { "OK, I GOT IT", "JEEZ, LET ME GO ALREADY" }
+local responseFn = function(buttonIndex)
+	LOG("Clicked button:", buttons[buttonIndex])
+end
+
+sdlext.showAlertDialog(
+	"Attention",
+	"This is a very important message that demands your attention, and it will not allow you to dismiss it without acknowledging its presence.",
+	responseFn, nil, nil, buttons
+)
+```
+
+
+### `sdlext.showInfoDialog`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `title` | string | Title of the dialog |
+| `text` | string | Text displayed in the dialog |
+| `responseFn` | function | Function which receives index of the clicked button as argument. Can be nil. |
+| `w` | number | Optional width of the dialog. Defaults to 700 if omitted. |
+| `h` | number | Optional height of the dialog. Defaults to 400 if omitted. |
+
+Convenience function to display an information dialog.
+
+Shows an undismissable dialog with the specified title and text, and an `OK` button.
+
+
+### `sdlext.showConfirmDialog`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `title` | string | Title of the dialog |
+| `text` | string | Text displayed in the dialog |
+| `responseFn` | function | Function which receives index of the clicked button as argument. Can be nil. |
+| `w` | number | Optional width of the dialog. Defaults to 700 if omitted. |
+| `h` | number | Optional height of the dialog. Defaults to 400 if omitted. |
+
+Convenience function to display a confirmation dialog.
+
+Shows an undismissable dialog with the specified title and text, and `YES` and `NO` buttons.
 
 
 ## Hooks
