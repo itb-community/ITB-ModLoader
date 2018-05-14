@@ -16,6 +16,18 @@ local function createUi()
 		saveModLoaderConfig()
 	end
 
+	local createCheckboxOption = function(text, tooltip)
+		return UiCheckbox()
+			:width(1):heightpx(41)
+			:settooltip(tooltip)
+			:decorate({
+				DecoButton(),
+				DecoText(text),
+				DecoRAlign(33),
+				DecoCheckbox()
+			})
+	end
+
 	sdlext.showDialog(function(ui, quit)
 		ui.onDialogExit = onExit
 
@@ -53,32 +65,18 @@ local function createUi()
 			})
 			:addTo(layout)
 
-		cboxCaller = UiCheckbox()
-			:width(1):heightpx(41)
-			:settooltip(
-				"Include timestamp and stacktrace in LOG messages."
-			)
-			:decorate({
-				DecoButton(),
-				DecoText("Print caller information"),
-				DecoRAlign(41),
-				DecoCheckbox()
-			})
+		cboxCaller = createCheckboxOption(
+			"Print caller information",
+			"Include timestamp and stacktrace in LOG messages."
+		)
 
 		cboxCaller.checked = modApi.logger.printCallerInfo
 		cboxCaller:addTo(layout)
 
-		cboxErrorFrame = UiCheckbox()
-			:width(1):heightpx(41)
-			:settooltip(
-				"Show an error popup at startup when a mod fails to mount, init, or load."
-			)
-			:decorate({
-				DecoButton(),
-				DecoText("Show error popup"),
-				DecoRAlign(41),
-				DecoCheckbox()
-			})
+		cboxErrorFrame = createCheckboxOption(
+			"Show script error popup",
+			"Show an error popup at startup if a mod fails to mount, init, or load."
+		)
 
 		cboxErrorFrame.checked = modApi.showErrorFrame
 		cboxErrorFrame:addTo(layout)
