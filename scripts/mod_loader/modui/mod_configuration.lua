@@ -172,6 +172,7 @@ local function createUi()
 								nil,
 								1
 							),
+							DecoAlign(0, 2),
 							DecoText(getDisplayName(mod))
 						})
 						:addTo(entryHeader)
@@ -209,7 +210,9 @@ local function createUi()
 								:settooltip(opt.tip)
 								:decorate({
 									DecoButton(),
+									DecoAlign(0, 2),
 									DecoText(opt.name),
+									DecoAlign(0, -2),
 									DecoRAlign(33),
 									DecoCheckbox()
 								})
@@ -222,8 +225,10 @@ local function createUi()
 								:settooltip(opt.tip)
 								:decorate({
 									DecoButton(),
+									DecoAlign(0, 2),
 									DecoText(opt.name),
 									DecoDropDownText(nil, nil, nil, 33),
+									DecoAlign(0, -2),
 									DecoDropDown()
 								})
 						end
@@ -247,6 +252,7 @@ local function createUi()
 								nil,
 								1
 							),
+							DecoAlign(0, 2),
 							DecoText(getDisplayName(mod))
 						})
 						:addTo(entryHolder)

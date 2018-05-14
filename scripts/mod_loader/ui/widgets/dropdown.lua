@@ -52,6 +52,7 @@ function UiDropDown:createDropDown()
 			:width(1):heightpx(40)
 			:decorate({
 				DecoSolidHoverable(deco.colors.buttoncolor, deco.colors.buttonbordercolor),
+				DecoAlign(0, 2),
 				txt
 			})
 		table.insert(items, item)

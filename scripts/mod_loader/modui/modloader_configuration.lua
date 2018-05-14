@@ -26,7 +26,9 @@ local function createUi()
 			:settooltip(tooltip)
 			:decorate({
 				DecoButton(),
+				DecoAlign(0, 2),
 				DecoText(text),
+				DecoAlign(0, -2),
 				DecoRAlign(33),
 				DecoCheckbox()
 			})
@@ -63,8 +65,10 @@ local function createUi()
 			:width(1):heightpx(41)
 			:decorate({
 				DecoButton(),
+				DecoAlign(0, 2),
 				DecoText("Logging Level"),
 				DecoDropDownText(nil, nil, nil, 33),
+				DecoAlign(0, -2),
 				DecoDropDown()
 			})
 			:addTo(layout)

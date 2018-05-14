@@ -32,7 +32,7 @@ function DecoText:draw(screen, widget)
 	local r = widget.rect
 
 	local x = math.floor(r.x + widget.decorationx)
-	local y = math.floor(r.y + widget.decorationy + r.h / 2 - self.surface:h() / 2 + 1)
+	local y = math.floor(r.y + widget.decorationy + r.h / 2 - self.surface:h() / 2)
 
 	screen:blit(self.surface, nil, x, y)
 	
@@ -50,7 +50,7 @@ function DecoRAlignedText:draw(screen, widget)
 	local r = widget.rect
 
 	local x = math.floor(r.x + r.w - self.rSpace - self.surface:w())
-	local y = math.floor(r.y + widget.decorationy + r.h / 2 - self.surface:h() / 2 + 1)
+	local y = math.floor(r.y + widget.decorationy + r.h / 2 - self.surface:h() / 2)
 
 	screen:blit(self.surface, nil, x, y)
 	
@@ -68,7 +68,7 @@ function DecoCAlignedText:draw(screen, widget)
 	local r = widget.rect
 
 	local x = math.floor(r.x + widget.decorationx + r.w / 2 - self.surface:w() / 2)
-	local y = math.floor(r.y + widget.decorationy + r.h / 2 - self.surface:h() / 2 + 1)
+	local y = math.floor(r.y + widget.decorationy + r.h / 2 - self.surface:h() / 2)
 
 	screen:blit(self.surface, nil, x, y)
 

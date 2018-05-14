@@ -61,7 +61,7 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 						:heightpx(buttonHeight)
 						:caption(obj.caption)
 						:settooltip(obj.tip)
-						:decorate({ DecoButton(),DecoCaption() })
+						:decorate({ DecoButton(), DecoAlign(0, 2), DecoCaption() })
 						:addTo(holder)
 
 					if obj.disabled then entryBtn.disabled = true end

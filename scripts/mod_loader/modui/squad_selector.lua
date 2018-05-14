@@ -148,6 +148,7 @@ local function createUi()
 					DecoButton(),
 					DecoCheckbox(),
 					DecoSurfaceOutlined(surface),
+					DecoAlign(0, 2),
 					DecoText(modApi.squad_text[i*2-1])
 				})
 			
