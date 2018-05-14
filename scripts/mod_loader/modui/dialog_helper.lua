@@ -215,7 +215,7 @@ function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
 
 			local btn = Ui()
 				:widthpx(math.max(95, decoText.surface:w() + 30)):height(1)
-				:decorate({ DecoButton(), DecoAlign(-6 + offset, 1), decoText })
+				:decorate({ DecoButton(), DecoAlign(-6 + offset, 2), decoText })
 				:addTo(buttonLayout)
 
 			btn.onclicked = function(self, button)
