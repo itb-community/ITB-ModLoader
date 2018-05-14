@@ -13,6 +13,7 @@ function saveModLoaderConfig()
 	data.printCallerInfo     = modApi.logger.printCallerInfo
 	data.showErrorFrame      = modApi.showErrorFrame
 	data.showResourceWarning = modApi.showResourceWarning
+	data.showRestartReminder = modApi.showRestartReminder
 
 	sdlext.config("modcontent.lua",function(obj)
 		obj.modLoaderConfig = data
@@ -25,6 +26,7 @@ function loadModLoaderConfig()
 		printCallerInfo     = true,
 		showErrorFrame      = true,
 		showResourceWarning = true,
+		showRestartReminder = true
 	}
 
 	local data = {}
@@ -46,6 +48,7 @@ function loadModLoaderConfig()
 	data.printCallerInfo     = getOrDefault("printCallerInfo")
 	data.showErrorFrame      = getOrDefault("showErrorFrame")
 	data.showResourceWarning = getOrDefault("showResourceWarning")
+	data.showRestartReminder = getOrDefault("showRestartReminder")
 
 	return data
 end
@@ -55,6 +58,7 @@ function applyModLoaderConfig(config)
 	modApi.logger.printCallerInfo = config.printCallerInfo
 	modApi.showErrorFrame         = config.showErrorFrame
 	modApi.showResourceWarning    = config.showResourceWarning
+	modApi.showRestartReminder    = config.showRestartReminder
 end
 
 function modApi:init()

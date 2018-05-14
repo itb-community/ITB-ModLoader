@@ -11,6 +11,13 @@ local function saveModConfig()
 	end)
 end
 
+local function responseFn(btnIndex)
+	if btnIndex == 2 then
+		modApi.showRestartReminder = false
+		saveModLoaderConfig()
+	end
+end
+
 local function createUi()
 	local checkboxes = {}
 	local configboxes = {}
@@ -51,7 +58,7 @@ local function createUi()
 		end
 
 		mod_loader:loadModContent(modSelection, savedOrder)
-		
+
 		saveModConfig()
 
 		-- If we have any new mods that weren't previously initialized,
@@ -61,10 +68,12 @@ local function createUi()
 		-- We can't initialize mods here, because some required vars
 		-- are gone by this point (eg. Pawn), or the game has already
 		-- compiled cached lists which we can't modify anyway.
-		if initializedCount > 0 then
-			sdlext.showInfoDialog(
+		if modApi.showRestartReminder and initializedCount > 0 then
+			sdlext.showAlertDialog(
 				"Information",
-				"You have enabled one or more mods. In order to apply them, game restart is required."
+				"You have enabled one or more mods. In order to apply them, game restart is required.",
+				responseFn, nil, nil,
+				"OK", "GOT IT, DON'T TELL ME AGAIN"
 			)
 		end
 	end
@@ -201,7 +210,7 @@ local function createUi()
 								:decorate({
 									DecoButton(),
 									DecoText(opt.name),
-									DecoRAlign(43),
+									DecoRAlign(33),
 									DecoCheckbox()
 								})
 							

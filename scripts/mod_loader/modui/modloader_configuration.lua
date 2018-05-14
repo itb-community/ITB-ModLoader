@@ -8,12 +8,14 @@ local function createUi()
 	local cboxCaller = nil
 	local cboxErrorFrame = nil
 	local cboxResourceError = nil
+	local cboxRestartReminder = nil
 
 	local onExit = function(self)
 		modApi.logger.logLevel        = ddLogLevel.value
 		modApi.logger.printCallerInfo = cboxCaller.checked
 		modApi.showErrorFrame         = cboxErrorFrame.checked
 		modApi.showResourceWarning    = cboxResourceError.checked
+		modApi.showRestartReminder    = cboxRestartReminder.checked
 
 		saveModLoaderConfig()
 	end
@@ -90,6 +92,14 @@ local function createUi()
 
 		cboxResourceError.checked = modApi.showResourceWarning
 		cboxResourceError:addTo(layout)
+
+		cboxRestartReminder = createCheckboxOption(
+			"Show restart reminder popup",
+			"Show a popup reminding to restart the game when enabling mods."
+		)
+
+		cboxRestartReminder.checked = modApi.showRestartReminder
+		cboxRestartReminder:addTo(layout)
 	end)
 end
 
