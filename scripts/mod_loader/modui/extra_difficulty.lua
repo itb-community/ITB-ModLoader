@@ -147,7 +147,7 @@ local function createUi(root)
 
 			arrLeft:pospx (origin.x + 4          , origin.y + 4 )
 			arrRight:pospx(origin.x + 28 + 90 + 4, origin.y + 4 )
-			diffText:pospx(origin.x              , origin.y + 10)
+			diffText:pospx(origin.x              , origin.y + 11)
 			mask:pospx    (origin.x              , origin.y + 3 )
 
 			local hideDifficultyUi = IsHangarWindowState() or
