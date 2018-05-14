@@ -7,11 +7,13 @@ local function createUi()
 	local ddLogLevel = nil
 	local cboxCaller = nil
 	local cboxErrorFrame = nil
+	local cboxResourceError = nil
 
 	local onExit = function(self)
 		modApi.logger.logLevel        = ddLogLevel.value
 		modApi.logger.printCallerInfo = cboxCaller.checked
 		modApi.showErrorFrame         = cboxErrorFrame.checked
+		modApi.showResourceWarning    = cboxResourceError.checked
 
 		saveModLoaderConfig()
 	end
@@ -80,6 +82,14 @@ local function createUi()
 
 		cboxErrorFrame.checked = modApi.showErrorFrame
 		cboxErrorFrame:addTo(layout)
+
+		cboxResourceError = createCheckboxOption(
+			"Show resource error popup",
+			"Show an error popup at startup if the modloader fails to load the game's resources."
+		)
+
+		cboxResourceError.checked = modApi.showResourceWarning
+		cboxResourceError:addTo(layout)
 	end)
 end
 

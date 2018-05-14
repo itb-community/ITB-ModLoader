@@ -12,6 +12,7 @@ function saveModLoaderConfig()
 	data.logLevel            = modApi.logger.logLevel
 	data.printCallerInfo     = modApi.logger.printCallerInfo
 	data.showErrorFrame      = modApi.showErrorFrame
+	data.showResourceWarning = modApi.showResourceWarning
 
 	sdlext.config("modcontent.lua",function(obj)
 		obj.modLoaderConfig = data
@@ -23,6 +24,7 @@ function loadModLoaderConfig()
 		logLevel            = 1, -- log to console by default
 		printCallerInfo     = true,
 		showErrorFrame      = true,
+		showResourceWarning = true,
 	}
 
 	local data = {}
@@ -43,6 +45,8 @@ function loadModLoaderConfig()
 	data.logLevel            = getOrDefault("logLevel")
 	data.printCallerInfo     = getOrDefault("printCallerInfo")
 	data.showErrorFrame      = getOrDefault("showErrorFrame")
+	data.showResourceWarning = getOrDefault("showResourceWarning")
+
 	return data
 end
 
@@ -50,6 +54,7 @@ function applyModLoaderConfig(config)
 	modApi.logger.logLevel        = config.logLevel
 	modApi.logger.printCallerInfo = config.printCallerInfo
 	modApi.showErrorFrame         = config.showErrorFrame
+	modApi.showResourceWarning    = config.showResourceWarning
 end
 
 function modApi:init()

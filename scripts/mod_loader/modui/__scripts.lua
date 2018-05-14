@@ -6,6 +6,7 @@ local scripts = {
 	"hangar",
 	"version_string",
 	"error_warning",
+	"resource_error",
 	"modcontent",
 	"extra_difficulty",
 	
