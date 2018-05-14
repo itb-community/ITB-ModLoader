@@ -402,8 +402,10 @@ local function createUi(root)
 	btnBack.translucent = true
 	btnBack.mousedown = function(self, x, y, button)
 		if
-			button == 1 and
-			not leaving and
+			not self.disabled         and
+			self.primed               and
+			not leaving               and
+			button == 1               and
 			IsHangarWindowlessState()
 		then
 			fireHangarLeavingHooks(false)
@@ -418,8 +420,10 @@ local function createUi(root)
 	btnStart.translucent = true
 	btnStart.mousedown = function(self, x, y, button)
 		if
-			button == 1 and
-			not leaving and
+			not self.disabled         and
+			self.primed               and
+			button == 1               and
+			not leaving               and
 			IsHangarWindowlessState() and
 			-- Start button is disabled when no valid custom squad is selected
 			(Profile.last_squad ~= 9 or isCustomSquadValid())
@@ -436,6 +440,8 @@ local function createUi(root)
 		btnStart:pospx(origin.x + 800, origin.y + 10)
 
 		self.visible = sdlext.isHangar()
+		btnBack.primed  = self.visible and btnBack.containsMouse
+		btnStart.primed = self.visible and btnStart.containsMouse
 
 		if self.visible then
 			updateUiState()
