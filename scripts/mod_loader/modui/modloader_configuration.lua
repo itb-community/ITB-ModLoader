@@ -63,14 +63,14 @@ local function createUi()
 			:width(1):heightpx(41)
 			:decorate({
 				DecoButton(),
-				DecoText("Logging level"),
-				DecoDropDownText(nil, nil, nil, 41),
+				DecoText("Logging Level"),
+				DecoDropDownText(nil, nil, nil, 33),
 				DecoDropDown()
 			})
 			:addTo(layout)
 
 		cboxCaller = createCheckboxOption(
-			"Print caller information",
+			"Print Caller Information",
 			"Include timestamp and stacktrace in LOG messages."
 		)
 
@@ -78,7 +78,7 @@ local function createUi()
 		cboxCaller:addTo(layout)
 
 		cboxErrorFrame = createCheckboxOption(
-			"Show script error popup",
+			"Show Script Error Popup",
 			"Show an error popup at startup if a mod fails to mount, init, or load."
 		)
 
@@ -86,7 +86,7 @@ local function createUi()
 		cboxErrorFrame:addTo(layout)
 
 		cboxResourceError = createCheckboxOption(
-			"Show resource error popup",
+			"Show Resource Error Popup",
 			"Show an error popup at startup if the modloader fails to load the game's resources."
 		)
 
@@ -94,7 +94,7 @@ local function createUi()
 		cboxResourceError:addTo(layout)
 
 		cboxRestartReminder = createCheckboxOption(
-			"Show restart reminder popup",
+			"Show Restart Reminder Popup",
 			"Show a popup reminding to restart the game when enabling mods."
 		)
 
