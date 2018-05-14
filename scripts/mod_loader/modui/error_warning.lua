@@ -3,6 +3,13 @@
 	if an error occurred while loading mods.
 --]]
 
+local function responseFn(btnIndex)
+	if btnIndex == 2 then
+		modApi.showErrorFrame = false
+		saveModLoaderConfig()
+	end
+end
+
 local errorFrameShown = false
 sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 	if modApi.showErrorFrame then
@@ -18,20 +25,26 @@ sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 			modApi:scheduleHook(20, function()
 				-- could show all errors one after another, but let's not...
 				for dir, err in pairs(mod_loader.unmountedMods) do
-					sdlext.showTextDialog(
+					sdlext.showAlertDialog(
 						"Error",
 						string.format(
 							"Unable to mount mod at [%s]:\n%s",
 							dir,
 							err
-						)
+						),
+						responseFn, nil, nil,
+						"OK", "GOT IT, DON'T TELL ME AGAIN"
 					)
 					break
 				end
 				mod_loader.unmountedMods = {}
 
 				if mod_loader.firsterror then
-					sdlext.showInfoDialog("Error", mod_loader.firsterror)
+					sdlext.showAlertDialog(
+						"Error", mod_loader.firsterror,
+						responseFn, nil, nil,
+						"OK", "GOT IT, DON'T TELL ME AGAIN"
+					)
 				end
 			end)
 		end
