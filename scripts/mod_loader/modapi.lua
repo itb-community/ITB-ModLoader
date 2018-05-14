@@ -7,26 +7,49 @@ modApi = {}
 
 local prev_path = package.path
 
+function saveModLoaderConfig()
+	local data = {}
+	data.logLevel            = modApi.logger.logLevel
+	data.printCallerInfo     = modApi.logger.printCallerInfo
+	data.showErrorFrame      = modApi.showErrorFrame
+
+	sdlext.config("modcontent.lua",function(obj)
+		obj.modLoaderConfig = data
+	end)
+end
+
 function loadModLoaderConfig()
-	local data = {
-		logLevel = 1, -- log to console by default
-		printCallerInfo = true,
-		showErrorFrame = true
+	local defaults = {
+		logLevel            = 1, -- log to console by default
+		printCallerInfo     = true,
+		showErrorFrame      = true,
 	}
 
+	local data = {}
 	sdlext.config("modcontent.lua", function(obj)
 		if not obj.modLoaderConfig then return end
 
 		data = obj.modLoaderConfig
 	end)
 
+	local getOrDefault = function(field)
+		if data[field] ~= nil then
+			return data[field]
+		else
+			return defaults[field]
+		end
+	end
+
+	data.logLevel            = getOrDefault("logLevel")
+	data.printCallerInfo     = getOrDefault("printCallerInfo")
+	data.showErrorFrame      = getOrDefault("showErrorFrame")
 	return data
 end
 
 function applyModLoaderConfig(config)
-	modApi.logger.logLevel = config.logLevel
+	modApi.logger.logLevel        = config.logLevel
 	modApi.logger.printCallerInfo = config.printCallerInfo
-	modApi.showErrorFrame = config.showErrorFrame
+	modApi.showErrorFrame         = config.showErrorFrame
 end
 
 function modApi:init()

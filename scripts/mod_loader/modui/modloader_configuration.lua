@@ -3,26 +3,15 @@
 	some features of the mod loader itself.
 --]]
 
-local function saveModLoaderConfig()
-	local data = {}
-	data.logLevel = modApi.logger.logLevel
-	data.printCallerInfo = modApi.logger.printCallerInfo
-	data.showErrorFrame = modApi.showErrorFrame
-
-	sdlext.config("modcontent.lua",function(obj)
-		obj.modLoaderConfig = data
-	end)
-end
-
 local function createUi()
 	local ddLogLevel = nil
 	local cboxCaller = nil
 	local cboxErrorFrame = nil
 
 	local onExit = function(self)
-		modApi.logger.logLevel = ddLogLevel.value
+		modApi.logger.logLevel        = ddLogLevel.value
 		modApi.logger.printCallerInfo = cboxCaller.checked
-		modApi.showErrorFrame = cboxErrorFrame.checked
+		modApi.showErrorFrame         = cboxErrorFrame.checked
 
 		saveModLoaderConfig()
 	end
