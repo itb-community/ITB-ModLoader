@@ -46,7 +46,7 @@ function UiTooltip:updateText()
 		self.w = 0
 		self:setText(self.root.tooltip)
 		self.w = self:maxChildSize() + self.padl + self.padr
-		
+
 		self:relayout()
 	end
 

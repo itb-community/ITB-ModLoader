@@ -160,7 +160,7 @@ local function createUi()
 						:addTo(entryBox)
 
 					local checkbox = UiCheckbox()
-						:widthpx((scrollarea.w - scrollarea.padl - scrollarea.padr) - 46)
+						:widthpx((scrollarea.w - scrollarea.padl - scrollarea.padr) - 41 - 5)
 						:heightpx(41)
 						:decorate({
 							DecoButton(),

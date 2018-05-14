@@ -15,8 +15,10 @@ function UiBoxLayout:new()
 end
 
 function UiBoxLayout:hgap(hgap)
-	self.gapVertical = nil
 	self.gapHorizontal = hgap or 0
+	self.gapVertical = nil
+	self.nofitx = true
+	self.nofity = nil
 	assert(type(self.gapHorizontal) == "number")
 
 	return self
@@ -29,6 +31,8 @@ end
 function UiBoxLayout:vgap(vgap)
 	self.gapHorizontal = nil
 	self.gapVertical = vgap or 0
+	self.nofitx = nil
+	self.nofity = true
 	assert(type(self.gapVertical) == "number")
 
 	return self
