@@ -172,8 +172,6 @@ function sdlext.showTextDialog(title, text, w, h)
 	end)
 end
 
-local align = DecoAlign(-8, 1)
-local align2 = DecoAlign(-5, 0)
 function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
 	local buttons = {...}
 	if type(buttons[1]) == "table" then
@@ -209,20 +207,16 @@ function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
 
 		for i, text in ipairs(buttons) do
 			local decoText = DecoCAlignedText(text)
+			-- JustinFont has some weird issues causing the sdl.surface to report
+			-- slightly bigger width than it should have. Correct for this.
+			-- Calculate the excess width (0.0375), and then halve it twice;
+			-- once to get the centering offset, twice to get the correction offset
+			local offset = math.floor(0.0375 * decoText.surface:w() / 4)
 
 			local btn = Ui()
-				:widthpx(95):height(1)
+				:widthpx(math.max(95, decoText.surface:w() + 30)):height(1)
+				:decorate({ DecoButton(), DecoAlign(-6 + offset, 1), decoText })
 				:addTo(buttonLayout)
-
-			-- Not entirely sure why buttons with longer text need
-			-- different alignment offset (in both X and Y to boot)
-			local btnw = math.max(btn.w, decoText.surface:w() + 30)
-			if btnw > btn.w then
-				btn:decorate({ DecoButton(), align2, decoText })
-					:widthpx(btnw)
-			else
-				btn:decorate({ DecoButton(), align, decoText })
-			end
 
 			btn.onclicked = function(self, button)
 				if button == 1 then
