@@ -5,7 +5,7 @@ function UiTooltip:new()
 	
 	self:padding(10)
 		:decorate({ DecoFrame(deco.colors.buttoncolor, deco.colors.white, 3) })
-	self.padt = self.padt - 4
+	self.padt = self.padt - 1
 
 	self.translucent = true
 	self.limit = 28
