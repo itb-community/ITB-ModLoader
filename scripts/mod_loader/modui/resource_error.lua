@@ -10,10 +10,13 @@ local function responseFn(btnIndex)
 	end
 end
 
-local srf = sdlext.surface("img/nullResource.png")
+local srf = nil
 sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
-	if modApi.showResourceWarning then
-		modApi:scheduleHook(30,	function()
+	if not srf and modApi.showResourceWarning then
+		srf = sdlext.surface("img/nullResource.png")
+		srf:wasDrawn()
+
+		modApi:scheduleHook(30, function()
 			if srf:w() == 0 then
 				sdlext.showAlertDialog(
 					"Resource Error",
