@@ -453,6 +453,7 @@ local function createUi(root)
 	sdlext.addPreKeyDownHook(function(keycode)
 		if
 			holder.visible             and
+			not btnBack.disabled       and
 			keycode == 27              and -- escape
 			not sdlext.isConsoleOpen() and
 			not leaving
@@ -483,8 +484,16 @@ local function createUi(root)
 
 		leaving = false
 		uiState = UI_STATE_DEFAULT
+
 		holder.visible = true
 		holder:setfocus()
+
+		btnBack.disabled = true
+		btnStart.disabled = true
+		modApi:scheduleHook(500, function()
+			btnBack.disabled = false
+			btnStart.disabled = false
+		end)
 	end)
 end
 
