@@ -37,6 +37,7 @@ local oldLoadGame = LoadGame
 local oldSaveGame = SaveGame
 local oldTriggerVoice = TriggerVoiceEvent
 local oldGetDifficulty = GetDifficulty
+local oldCreateIncidents = createIncidents
 
 function getStartingSquad(choice)
 	if choice == 0 then
@@ -225,6 +226,18 @@ function TriggerVoiceEvent(event, custom_odds)
 
 	if not suppress then
 		oldTriggerVoice(event, custom_odds)
+	end
+end
+
+function createIncidents(corporation, island)
+	for i, hook in ipairs(modApi.preIslandSelectionHooks) do
+		hook(corporation, island)
+	end
+
+	oldCreateIncidents(corporation, island)
+
+	for i, hook in ipairs(modApi.postIslandSelectionHooks) do
+		hook(corporation, island)
 	end
 end
 

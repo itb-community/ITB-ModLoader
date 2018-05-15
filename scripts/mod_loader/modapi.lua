@@ -311,6 +311,8 @@ function modApi:resetModContent()
 	self.currentModSquads = {}
 	self.currentModSquadText = {}
 	self.voiceEventHooks = {}
+	self.preIslandSelectionHooks = {}
+	self.postIslandSelectionHooks = {}
 	self.missionEndHooks = {
 		--Pilot Message
 		function(mission,ret)
@@ -727,6 +729,16 @@ end
 function modApi:addVoiceEventHook(fn)
 	assert(type(fn) == "function")
 	table.insert(self.voiceEventHooks,fn)
+end
+
+function modApi:addPreIslandSelectionHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.preIslandSelectionHooks,fn)
+end
+
+function modApi:addPostIslandSelectionHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.postIslandSelectionHooks,fn)
 end
 
 function modApi:addMissionUpdateHook(fn)
