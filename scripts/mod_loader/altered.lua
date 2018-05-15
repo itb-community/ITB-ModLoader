@@ -38,6 +38,8 @@ local oldSaveGame = SaveGame
 local oldTriggerVoice = TriggerVoiceEvent
 local oldGetDifficulty = GetDifficulty
 local oldCreateIncidents = createIncidents
+local oldCreateMission = CreateMission
+local oldReloadMissions = ReloadMissions
 local oldSaveTable = save_table
 
 function getStartingSquad(choice)
@@ -62,6 +64,19 @@ function getStartingSquad(choice)
 	else
 		return oldGetStartingSquad(choice)
 	end
+end
+
+function Mission:OnSerializationStart(t)
+	t.MissionEndImpl = self.MissionEndImpl
+	t.MissionEnd = self.MissionEnd
+
+	self.MissionEndImpl = nil
+	self.MissionEnd = nil
+end
+
+function Mission:OnSerializationEnd(t)
+	self.MissionEndImpl = t.MissionEndImpl
+	self.MissionEnd = t.MissionEnd
 end
 
 function Mission:BaseNextTurn()
@@ -90,18 +105,84 @@ function Mission:BaseDeployment()
 	end	
 end
 
+local function overrideMissionEnd(self)
+	local mlEnd = Mission.MissionEnd
+	local mEnd = self.MissionEnd
+
+	if mEnd and mEnd ~= mlEnd then
+		self.MissionEndImpl = mEnd
+		self.MissionEnd = mlEnd
+	end
+end
+
+function CreateMission(mission)
+	local mObject = oldCreateMission(mission)
+
+	overrideMissionEnd(mObject)
+
+	return mObject
+end
+
+function ReloadMissions(missions)
+	oldReloadMissions(missions)
+
+	if missions then
+		for i, mission in pairs(GAME.Missions) do
+			overrideMissionEnd(mission)
+		end
+	end
+end
+
+function Mission:MissionEndImpl()
+	local ret = SkillEffect()
+	local enemy_count = Board:GetEnemyCount()
+	
+	if enemy_count == 0 then
+		ret:AddVoice("MissionEnd_Dead", -1)
+	elseif self.RetreatEndingMessage then
+		ret:AddVoice("MissionEnd_Retreat", -1)
+	end
+	
+	if self:GetDamage() == 0 then
+		ret:AddScript("Board:StartPopEvent(\"Closing_Perfect\")")
+	elseif self:GetDamage() > 4 then
+		ret:AddScript("Board:StartPopEvent(\"Closing_Bad\")")
+	elseif enemy_count > 0 then
+		ret:AddScript("Board:StartPopEvent(\"Closing\")")
+	else
+		ret:AddScript("Board:StartPopEvent(\"Closing_Dead\")")
+	end
+	
+	local effect = SpaceDamage()
+	effect.bEvacuate = true
+	effect.fDelay = 0.5
+	
+	local retreated = 0
+	local board_size = Board:GetSize()
+	for i = 0, board_size.x - 1 do
+		for j = 0, board_size.y - 1  do
+			if Board:IsPawnTeam(Point(i,j),TEAM_ENEMY)  then
+				effect.loc = Point(i,j)
+				ret:AddDamage(effect)
+				retreated = retreated + 1
+			end
+		end
+	end
+	
+	ret:AddDelay(math.max(0,4 - retreated * 0.5))
+		
+	Board:AddEffect(ret)
+end
+
 function Mission:MissionEnd()
 	local ret = SkillEffect()
-	
-	CurrentMission = self
-	EndingMission = true
-	self.delayToAdd = 4
+
+	self:MissionEndImpl()
+
 	for i, hook in ipairs(modApi.missionEndHooks) do
-		hook(self,ret)
+		hook(self, ret)
 	end
-	ret:AddDelay(self:GetEndDelay())
-	EndingMission = false
-		
+
 	Board:AddEffect(ret)
 end
 
@@ -114,7 +195,7 @@ function Mission:BaseStart()
 	for i, hook in ipairs(modApi.preMissionAvailableHooks) do
 		hook(self)
 	end
-	
+
 	-- begin oldBaseStart
 	self.VoiceEvents = {}
 	
@@ -136,10 +217,6 @@ function Mission:BaseStart()
 	for i, hook in ipairs(modApi.postMissionAvailableHooks) do
 		hook(self)
 	end
-end
-
-function Mission:GetEndDelay()
-	return math.max(0,self.delayToAdd)
 end
 
 function Mission:ApplyEnvironmentEffect()

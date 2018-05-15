@@ -313,71 +313,7 @@ function modApi:resetModContent()
 	self.voiceEventHooks = {}
 	self.preIslandSelectionHooks = {}
 	self.postIslandSelectionHooks = {}
-	self.missionEndHooks = {
-		--Pilot Message
-		function(mission,ret)
-			ret:AddScript([[
-			local ret = SkillEffect()
-			local enemy_count = Board:GetEnemyCount()
-			if enemy_count == 0 then
-				ret:AddVoice("MissionEnd_Dead", -1)
-			elseif self.RetreatEndingMessage then
-				ret:AddVoice("MissionEnd_Retreat", -1)
-			end
-			Board:AddEffect(ret)]])
-		end,
-		
-		--Population Event
-		function(mission,ret)
-			ret:AddScript([[
-			local ret = SkillEffect()
-			local enemy_count = Board:GetEnemyCount()
-			
-			if CurrentMission:GetDamage() == 0 then
-				ret:AddScript("Board:StartPopEvent(\"Closing_Perfect\")")
-			elseif CurrentMission:GetDamage() > 4 then
-				ret:AddScript("Board:StartPopEvent(\"Closing_Bad\")")
-			elseif enemy_count > 0 then
-				ret:AddScript("Board:StartPopEvent(\"Closing\")")
-			else
-				ret:AddScript("Board:StartPopEvent(\"Closing_Dead\")")
-			end
-			Board:AddEffect(ret)]])
-		end,
-		
-		--Enemy retreat
-		function(mission,ret)
-			ret:AddScript([[
-			local ret = SkillEffect()
-			local effect = SpaceDamage()
-			effect.bEvacuate = true
-			effect.fDelay = 0.5
-			
-			local board_size = Board:GetSize()
-			for i = 0, board_size.x - 1 do
-				for j = 0, board_size.y - 1  do
-					if Board:IsPawnTeam(Point(i,j),TEAM_ENEMY)  then
-						effect.loc = Point(i,j)
-						ret:AddDamage(effect)
-						CurrentMission.delayToAdd = CurrentMission.delayToAdd - 0.5
-					end
-				end
-			end
-			Board:AddEffect(ret)]])
-		end,
-		
-		--End Delay
-		function(mission,ret)
-			ret:AddScript([[
-			local ret = SkillEffect()
-			--ret:AddDelay(CurrentMission:GetEndDelay())
-			Board:AddEffect(ret)]])
-		end,
-	}
-	self.iMePilotMessage = 1
-	self.iMePopEvent = 2
-	self.iMeRetreat = 3
-	self.iMeDelay = 4
+	self.missionEndHooks = {}
 	
 	local name, tbl = debug.getupvalue(oldGetPopulationTexts,1)
 	self.PopEvents = copy_table(tbl)
@@ -751,28 +687,9 @@ function modApi:addMissionStartHook(fn)
 	table.insert(self.missionStartHooks,fn)
 end
 
-function modApi:addMissionEndHook(fn, i)
+function modApi:addMissionEndHook(fn)
 	assert(type(fn) == "function")
-	if i ~= nil then
-		assert(type(i) == "number")
-		assert(i > 0)
-		assert(math.floor(i) == i)
-		table.insert(self.missionEndHooks,i,fn)
-		if i <= self.iMePilotMessage then
-			self.iMePilotMessage = self.iMePilotMessage + 1
-		end
-		if i <= self.iMePopEvent then
-			self.iMePopEvent = self.iMePopEvent + 1
-		end
-		if i <= self.iMeRetreat then
-			self.iMeRetreat = self.iMeRetreat + 1
-		end
-		if i <= self.iMeDelay then
-			self.iMeDelay = self.iMeDelay + 1
-		end
-	else
-		table.insert(self.missionEndHooks,fn)
-	end
+	table.insert(self.missionEndHooks,fn)
 end
 
 function modApi:addMissionNextPhaseCreatedHook(fn)
