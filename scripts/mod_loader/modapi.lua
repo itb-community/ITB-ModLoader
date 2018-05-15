@@ -801,13 +801,13 @@ end
 	invoked during the next update step (not the current one).
 --]]
 function modApi:runLater(fn)
-	assert(type(f) == "function")
+	assert(type(fn) == "function")
 
 	if not self.runLaterQueue then
 		self.runLaterQueue = {}
 	end
 
-	table.insert(self.runLaterQueue, f)
+	table.insert(self.runLaterQueue, fn)
 end
 
 function modApi:processRunLaterQueue(mission)
