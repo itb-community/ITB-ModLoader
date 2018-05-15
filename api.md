@@ -72,6 +72,8 @@
 		* [missionEndHook](#missionendhook)
 		* [missionNextPhaseCreatedHook](#missionnextphasecreatedhook)
 		* [voiceEventHook](#voiceeventhook)
+		* [preIslandSelectionHook](#preislandselectionhook)
+		* [postIslandSelectionHook](#postislandselectionhook)
 		* [preStartGameHook](#prestartgamehook)
 		* [postStartGameHook](#poststartgamehook)
 		* [preLoadGameHook](#preloadgamehook)
@@ -1197,6 +1199,44 @@ local hook = function(eventInfo, customOdds, suppress)
 end
 
 modApi:addVoiceEventHook(hook)
+```
+
+
+### `preIslandSelectionHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `corporation` | string | A string identifier of the island's corporation. `Corp_Grass`, etc. |
+| `island` | number | A number id of the island. `0` for Archive, `1` for R.S.T., etc. |
+
+Fired when the player selects an island, before missions are created for the island.
+
+Example:
+```lua
+local hook = function(corporation, island)
+	LOG("Selected island " .. island .. ": " .. corporation)
+end
+
+modApi:addPreIslandSelectionHook(hook)
+```
+
+
+### `postIslandSelectionHook`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `corporation` | string | A string identifier of the island's corporation. `Corp_Grass`, etc. |
+| `island` | number | A number id of the island. `0` for Archive, `1` for R.S.T., etc. |
+
+Fired when the player selects an island, after missions have been created for the island.
+
+Example:
+```lua
+local hook = function(corporation, island)
+	LOG("Selected island " .. island .. ": " .. corporation)
+end
+
+modApi:addPostIslandSelectionHook(hook)
 ```
 
 
