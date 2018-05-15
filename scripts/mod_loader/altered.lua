@@ -38,6 +38,7 @@ local oldSaveGame = SaveGame
 local oldTriggerVoice = TriggerVoiceEvent
 local oldGetDifficulty = GetDifficulty
 local oldCreateIncidents = createIncidents
+local oldSaveTable = save_table
 
 function getStartingSquad(choice)
 	if choice == 0 then
@@ -385,6 +386,30 @@ function SaveGame()
 
 	GAME.CreateNextPhase = nil
 	return oldSaveGame()
+end
+
+function save_table(target)
+	local sStart = target.OnSerializationStart
+	local sEnd = target.OnSerializationEnd
+	local temp = {}
+
+	if sStart then
+		sStart(target, temp)
+	end
+
+	target.OnSerializationStart = nil
+	target.OnSerializationEnd = nil
+
+	local result = oldSaveTable(target)
+
+	if sEnd then
+		sEnd(target, temp)
+	end
+
+	target.OnSerializationStart = sStart
+	target.OnSerializationEnd = sEnd
+
+	return result
 end
 
 -- ///////////////////////////////////////////////////////////////////
