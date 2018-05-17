@@ -9,6 +9,7 @@ local function createUi()
 	local cboxErrorFrame = nil
 	local cboxResourceError = nil
 	local cboxRestartReminder = nil
+	local cboxFloatyTooltips = nil
 
 	local onExit = function(self)
 		modApi.logger.logLevel        = ddLogLevel.value
@@ -16,6 +17,7 @@ local function createUi()
 		modApi.showErrorFrame         = cboxErrorFrame.checked
 		modApi.showResourceWarning    = cboxResourceError.checked
 		modApi.showRestartReminder    = cboxRestartReminder.checked
+		modApi.floatyTooltips         = cboxFloatyTooltips.checked
 
 		saveModLoaderConfig()
 	end
@@ -93,6 +95,21 @@ local function createUi()
 
 		cboxCaller.checked = modApi.logger.printCallerInfo
 		cboxCaller:addTo(layout)
+
+		cboxFloatyTooltips = createCheckboxOption(
+			"Attach Tooltips To Mouse Cursor",
+			"Tooltips follow the mouse cursor around.",
+			"Tooltips show to the side of the UI element that spawned them, similar to the game's own tooltips."
+		)
+
+		local oldClicked = cboxFloatyTooltips.clicked
+		cboxFloatyTooltips.clicked = function(self, button)
+			local result = oldClicked(self, button)
+			modApi.floatyTooltips = self.checked
+			return result
+		end
+		cboxFloatyTooltips.checked = modApi.floatyTooltips
+		cboxFloatyTooltips:addTo(layout)
 
 		cboxErrorFrame = createCheckboxOption(
 			"Show Script Error Popup",

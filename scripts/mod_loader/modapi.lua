@@ -14,6 +14,7 @@ function saveModLoaderConfig()
 	data.showErrorFrame      = modApi.showErrorFrame
 	data.showResourceWarning = modApi.showResourceWarning
 	data.showRestartReminder = modApi.showRestartReminder
+	data.floatyTooltips      = modApi.floatyTooltips
 
 	sdlext.config("modcontent.lua",function(obj)
 		obj.modLoaderConfig = data
@@ -26,7 +27,8 @@ function loadModLoaderConfig()
 		printCallerInfo     = true,
 		showErrorFrame      = true,
 		showResourceWarning = true,
-		showRestartReminder = true
+		showRestartReminder = true,
+		floatyTooltips      = true
 	}
 
 	local data = {}
@@ -49,6 +51,7 @@ function loadModLoaderConfig()
 	data.showErrorFrame      = getOrDefault("showErrorFrame")
 	data.showResourceWarning = getOrDefault("showResourceWarning")
 	data.showRestartReminder = getOrDefault("showRestartReminder")
+	data.floatyTooltips      = getOrDefault("floatyTooltips")
 
 	return data
 end
@@ -59,6 +62,7 @@ function applyModLoaderConfig(config)
 	modApi.showErrorFrame         = config.showErrorFrame
 	modApi.showResourceWarning    = config.showResourceWarning
 	modApi.showRestartReminder    = config.showRestartReminder
+	modApi.floatyTooltips         = config.floatyTooltips
 end
 
 function modApi:init()
