@@ -48,6 +48,12 @@ function UiScrollArea:relayout()
 	self.scrollrect.y = self.screeny
 	self.scrollrect.w = self.scrollwidth
 	self.scrollrect.h = self.h
+
+	if self.innerHeight > self.h and self.dy + self.h > self.innerHeight then
+		self.dy = self.innerHeight - self.h
+	elseif self.innerHeight < self.h and self.dy > 0 then
+		self.dy = 0
+	end
 	
 	local ratio = self.h / self.innerHeight
 	local offset = self.dy / (self.innerHeight - self.h)
