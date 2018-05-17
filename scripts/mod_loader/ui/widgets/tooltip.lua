@@ -38,6 +38,7 @@ function UiTooltip:draw(screen)
 	-- otherwise we get nasty flickering, since apparently
 	-- the ui element is not being updated fast enough before
 	-- it gets drawn?
+	self.laidOut = true
 	self:updateText()
 end
 
@@ -48,7 +49,8 @@ function UiTooltip:updateText()
 		self.w = self:maxChildSize() + self.padl + self.padr
 
 		self:relayout()
+		self.laidOut = false
 	end
 
-	self.visible = self.text and self.text ~= ""
+	self.visible = self.laidOut and self.text and self.text ~= ""
 end
