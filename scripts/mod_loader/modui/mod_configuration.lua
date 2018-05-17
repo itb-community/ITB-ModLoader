@@ -69,11 +69,12 @@ local function createUi()
 		-- are gone by this point (eg. Pawn), or the game has already
 		-- compiled cached lists which we can't modify anyway.
 		if modApi.showRestartReminder and initializedCount > 0 then
-			sdlext.showAlertDialog(
-				"Information",
+			sdlext.showButtonDialog(
+				"Restart Required",
 				"You have enabled one or more mods. In order to apply them, game restart is required.",
 				responseFn, nil, nil,
-				"OK", "GOT IT, DON'T TELL ME AGAIN"
+				{ "OK", "GOT IT, DON'T TELL ME AGAIN" },
+				{ "", "This dialog will not be shown anymore. You can re-enable it in Configure Mod Loader." }
 			)
 		end
 	end

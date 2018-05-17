@@ -102,7 +102,7 @@ local function createUi()
 		local frametop = Ui()
 			:width(0.6):height(0.7)
 			:pos(0.2, 0.1)
-			:caption("Choose squads")
+			:caption("Squad Selection")
 			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:addTo(ui)
 

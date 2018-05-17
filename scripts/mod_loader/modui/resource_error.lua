@@ -18,14 +18,15 @@ sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 
 		modApi:scheduleHook(30, function()
 			if srf:w() == 0 then
-				sdlext.showAlertDialog(
+				sdlext.showButtonDialog(
 					"Resource Error",
 					"The mod loader failed to load game resources. "..
 					"This will cause some elements of modded UI to be invisible or incorrectly positioned. "..
 					"This happens sometimes, but so far the cause is not known.\n\n"..
 					"Restarting the game should fix this.",
 					responseFn, nil, nil,
-					"OK", "GOT IT, DON'T TELL ME AGAIN"
+					{ "OK", "GOT IT, DON'T TELL ME AGAIN" },
+					{ "", "This dialog will not be shown anymore. You can re-enable it in Configure Mod Loader." }
 				)
 			end
 		end)

@@ -52,7 +52,7 @@ local function createUi()
 		local frametop = Ui()
 			:width(0.8):height(0.8)
 			:posCentered()
-			:caption("Rearrange pilots")
+			:caption("Rearrange Pilots")
 			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:addTo(ui)
 
