@@ -20,10 +20,10 @@ local function createUi()
 		saveModLoaderConfig()
 	end
 
-	local createCheckboxOption = function(text, tooltip)
-		return UiCheckbox()
+	local createCheckboxOption = function(text, tooltipOn, tooltipOff)
+		local cbox = UiCheckbox()
 			:width(1):heightpx(41)
-			:settooltip(tooltip)
+			:settooltip(tooltipOn)
 			:decorate({
 				DecoButton(),
 				DecoAlign(0, 2),
@@ -32,6 +32,19 @@ local function createUi()
 				DecoRAlign(33),
 				DecoCheckbox()
 			})
+
+		cbox.clicked = function(self, button)
+			local result = UiCheckbox.clicked(self, button)
+
+			if tooltipOff then
+				cbox:settooltip(cbox.checked and tooltipOn or tooltipOff)
+				cbox.root.tooltip = cbox.tooltip
+			end
+
+			return result
+		end
+
+		return cbox
 	end
 
 	sdlext.showDialog(function(ui, quit)
