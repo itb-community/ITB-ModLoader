@@ -172,12 +172,9 @@ function sdlext.showTextDialog(title, text, w, h)
 	end)
 end
 
-function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
-	local buttons = {...}
-	if type(buttons[1]) == "table" then
-		buttons = buttons[1]
-	end
-	assert(#buttons > 0, "AlertDialog must have at least one button!")
+function sdlext.showButtonDialog(title, text, responseFn, w, h, buttons, tooltips)
+	assert(#buttons > 0, "ButtonDialog must have at least one button!")
+	assert(not tooltips or #tooltips == #buttons, "Number of tooltips must be equal to number of buttons. Use empty string (\"\") for no tooltip.")
 
 	w = w or 700
 	h = h or 400
@@ -218,6 +215,10 @@ function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
 				:decorate({ DecoButton(), DecoAlign(-6 + offset, 2), decoText })
 				:addTo(buttonLayout)
 
+			if tooltips and tooltips[i] ~= "" then
+				btn:settooltip(tooltips[i])
+			end
+
 			btn.onclicked = function(self, button)
 				if button == 1 then
 					ui.response = i
@@ -248,6 +249,16 @@ function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
 			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
 			:addTo(ui)
 	end)
+end
+
+function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
+	local buttons = {...}
+	if type(buttons[1]) == "table" then
+		buttons = buttons[1]
+	end
+	assert(#buttons > 0, "AlertDialog must have at least one button!")
+
+	sdlext.showButtonDialog(title, text, responseFn, nil, nil, buttons, nil)
 end
 
 function sdlext.showInfoDialog(title, text, fn, w, h)
