@@ -55,12 +55,12 @@ local function buildBackgroundPane()
 		Ui.wheel(self, mx, my, y)
 		return true
 	end
-	pane.mousedown = function(self, mx, my)
-		Ui.mousedown(self, mx, my)
+	pane.mousedown = function(self, mx, my, button)
+		Ui.mousedown(self, mx, my, button)
 		return true
 	end
-	pane.mouseup = function(self, mx, my)
-		Ui.mouseup(self, mx, my)
+	pane.mouseup = function(self, mx, my, button)
+		Ui.mouseup(self, mx, my, button)
 		return true
 	end
 	pane.mousemove = function(self, mx, my)
