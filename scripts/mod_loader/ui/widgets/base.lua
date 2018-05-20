@@ -243,15 +243,6 @@ end
 
 function Ui:mousedown(mx, my, button)
 	if not self.visible then return false end
-	
-	if self.root.pressedchild ~= nil then
-		self.root.pressedchild.pressed = false
-	end
-	
-	self.root.pressedchild = self
-	-- pass self as arg for UiRoot override
-	self:setfocus(self)
-	self.pressed = true
 
 	for i=1,#self.children do
 		local child = self.children[i]
@@ -271,6 +262,15 @@ function Ui:mousedown(mx, my, button)
 			end
 		end
 	end
+
+	if self.root.pressedchild ~= nil then
+		self.root.pressedchild.pressed = false
+	end
+
+	self.root.pressedchild = self
+	-- pass self as arg for UiRoot override
+	self:setfocus(self)
+	self.pressed = true
 
 	if self.translucent then return false end
 	return true
