@@ -14,6 +14,7 @@ function UiScrollArea:new()
 	self.nofity = true
 
 	self.scrollPressed = false
+	self.scrollHovered = false
 	self.clipRect = sdl.rect(0,0,0,0)
 end
 
@@ -29,6 +30,8 @@ function UiScrollArea:draw(screen)
 		drawborder(screen, deco.colors.white, self.scrollrect, 2)
 
 		if self.scrollPressed then
+			screen:drawrect(deco.colors.focus, self.scrollbuttonrect)
+		elseif self.scrollHovered then
 			screen:drawrect(deco.colors.buttonborderhlcolor, self.scrollbuttonrect)
 		else
 			screen:drawrect(deco.colors.white, self.scrollbuttonrect)
@@ -118,6 +121,8 @@ function UiScrollArea:wheel(mx,my,y)
 end
 
 function UiScrollArea:mousemove(x, y)
+	self.scrollHovered = x >= self.scrollrect.x
+
 	if self.scrollPressed then
 		self:relayout()
 
