@@ -146,7 +146,7 @@ local function createUi()
 			
 			pilotButtons[i] = button
 			
-			button.mousedown = function(self, mx, my)
+			button.mousedown = function(self, mx, my, btn)
 				startDrag(self)
 				
 				self.dragged = true
@@ -155,7 +155,7 @@ local function createUi()
 				
 				self:bringToTop()
 				
-				Ui.mousedown(self, mx, my)
+				Ui.mousedown(self, mx, my, btn)
 				rearrange()
 				
 				return true
@@ -174,13 +174,13 @@ local function createUi()
 				return Ui.mousemove(self, mx, my)
 			end
 			
-			button.mouseup = function(self, mx, my)
+			button.mouseup = function(self, mx, my, btn)
 				self.dragged = false
 				
 				stopDrag()
 				rearrange()
 				
-				return Ui.mouseup(self, mx, my)
+				return Ui.mouseup(self, mx, my, btn)
 			end
 		end
 		
