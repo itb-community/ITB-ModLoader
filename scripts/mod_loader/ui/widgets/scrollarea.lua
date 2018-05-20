@@ -74,36 +74,37 @@ function UiScrollArea:relayout()
 	self.clipRect.h = self.h
 end
 
-function UiScrollArea:mousedown(x, y)
-	if x < self.scrollrect.x then return Ui.mousedown(self, x, y) end
+function UiScrollArea:mousedown(x, y, button)
+	if x >= self.scrollrect.x then
+		if self.root.pressedchild ~= nil then
+			self.root.pressedchild.pressed = false
+		end
 
-	if self.root.pressedchild ~= nil then
-		self.root.pressedchild.pressed = false
+		self.root.pressedchild = self
+		self.pressed = true
+
+		if self.innerHeight > self.h then
+			local ratio = (y - self.screeny - self.buttonheight/2) / (self.h - self.buttonheight)
+			if ratio < 0 then ratio = 0 end
+			if ratio > 1 then ratio = 1 end
+
+			self.dy = ratio * (self.innerHeight - self.h)
+
+			self.scrollPressed = true
+			return true
+		end
 	end
-	
-	self.root.pressedchild = self
-	self.pressed = true
 
-	if self.innerHeight > self.h then
-		local ratio = (y - self.screeny - self.buttonheight/2) / (self.h-self.buttonheight)
-		if ratio < 0 then ratio = 0 end
-		if ratio > 1 then ratio = 1 end
-
-		self.dy = ratio * (self.innerHeight - self.h)
-
-		self.scrollPressed = true
-	end
-	
-	return true
+	return Ui.mousedown(self, x, y, button)
 end
 
-function UiScrollArea:mouseup(x, y)
+function UiScrollArea:mouseup(x, y, button)
 	self.scrollPressed = false
 
-	return Ui.mouseup(self, x, y)
+	return Ui.mouseup(self, x, y, button)
 end
 
-function UiScrollArea:wheel(mx,my,y)
+function UiScrollArea:wheel(mx, my, y)
 	self:relayout()
 
 	-- Have the scrolling speed scale with the height of the inner area,
