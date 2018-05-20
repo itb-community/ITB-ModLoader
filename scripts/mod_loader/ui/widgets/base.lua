@@ -272,13 +272,25 @@ function Ui:mousedown(mx, my, button)
 	self:setfocus(self)
 	self.pressed = true
 
+	if self.draggable and not self.disabled and button == 1 then
+		self.dragged = true
+		self:startDrag(mx, my, button)
+		return true
+	end
+
 	if self.translucent then return false end
 	return true
 end
 
 function Ui:mouseup(mx, my, button)
 	if not self.visible then return false end
-	
+
+	if self.dragged and button == 1 then
+		self.dragged = false
+		self:stopDrag(mx, my, button)
+		return true
+	end
+
 	if
 		self.root.pressedchild == self and
 		self.pressed                   and
@@ -321,14 +333,19 @@ end
 
 function Ui:mousemove(mx, my)
 	if not self.visible then return false end
-	
+
 	if self.root.hoveredchild ~= nil then
 		self.root.hoveredchild.hovered = false
 	end
-	
+
 	self.root.hoveredchild = self
 	self.hovered = true
-	
+
+	if self.dragged then
+		self:dragMove(mx, my)
+		return true
+	end
+
 	if self.tooltip then
 		self.root.tooltip = self.tooltip
 	end
@@ -487,6 +504,16 @@ function Ui:mouseExited()
 	if self.onMouseExit ~= nil then
 		self:onMouseExit()
 	end
+end
+
+function Ui:stopDrag(mx, my, button)
+end
+
+function Ui:dragMove(mx, my)
+end
+
+function Ui:startDrag(mx, my, button)
+	self:stopDrag(mx, my, button)
 end
 
 function Ui:bringToTop()
