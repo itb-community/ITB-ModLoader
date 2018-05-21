@@ -138,3 +138,7 @@ function UiScrollArea:mousemove(x, y)
 
 	return Ui.mousemove(self, x, y)
 end
+
+function UiScrollArea:onMouseExit()
+	self.scrollHovered = false
+end
