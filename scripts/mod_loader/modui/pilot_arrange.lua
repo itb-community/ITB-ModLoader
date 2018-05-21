@@ -120,7 +120,7 @@ local function createUi()
 				})
 				:addTo(scrollarea)
 			
-			button:addDragMove()
+			button:registerDragMove()
 			button.pilotId = pilotId
 			
 			pilotButtons[i] = button

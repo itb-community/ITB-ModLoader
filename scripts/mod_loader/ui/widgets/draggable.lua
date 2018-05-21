@@ -4,8 +4,8 @@ function UiDraggable:new()
 	Ui.new(self)
 
 	self.draggable = true
-	self.__movable = true
-	self.__resizable = true
+	self.dragMovable = true
+	self.dragResizable = true
 	self.__resizeHandle = 7
 	self.__minSize = 50
 end
@@ -64,15 +64,15 @@ function UiDraggable:startDrag(mx, my, button)
 	self.dragX = mx
 	self.dragY = my
 
-	if self.__movable then
-		self.__moving = true
+	if self.dragMovable then
+		self.dragMoving = true
 	end
-	if self.__resizable then
+	if self.dragResizable then
 		self.startX = self.screenx
 		self.startY = self.screeny
 		self.dragW = self.w
 		self.dragH = self.h
-		self.__resizing = UiDraggable.isEdge(self, mx, my, self.__resizeHandle)
+		self.dragResizing = UiDraggable.isEdge(self, mx, my, self.__resizeHandle)
 		self.__resizeDir = getResizeDirection(self, mx, my, self.__resizeHandle)
 	end
 
@@ -88,12 +88,12 @@ function UiDraggable:stopDrag(mx, my, button)
 		return
 	end
 
-	self.__moving   = false
-	self.__resizing = false
+	self.dragMoving   = false
+	self.dragResizing = false
 end
 
 function UiDraggable:dragMove(mx, my)
-	if self.__resizable and self.__resizing then
+	if self.dragResizable and self.dragResizing then
 		local minsize = self.__minSize or 50
 		if
 			self.__resizeDir == RESIZE_DIR_TOPLEFT or
@@ -129,7 +129,7 @@ function UiDraggable:dragMove(mx, my)
 		then
 			self.h = math.max(self.dragH + my - self.dragY, minsize)
 		end
-	elseif self.__movable and self.__moving then
+	elseif self.dragMovable and self.dragMoving then
 		self.x = self.x + mx - self.dragX
 		self.y = self.y + my - self.dragY
 		self.dragX = mx
@@ -147,16 +147,16 @@ local function registerDragFunctions(self)
 	self.dragMove  = UiDraggable.dragMove
 end
 
-function Ui:addDragMove()
+function Ui:registerDragMove()
 	registerDragFunctions(self)
-	self.draggable = true
-	self.__movable = true
+	self.draggable   = true
+	self.dragMovable = true
 end
 
-function Ui:addDragResize(resizeHandleSize, minSize)
+function Ui:registerDragResize(resizeHandleSize, minSize)
 	registerDragFunctions(self)
-	self.draggable = true
-	self.__resizable = true
+	self.draggable     = true
+	self.dragResizable = true
 	self.__resizeHandle = resizeHandleSize or self.__resizeHandle
 	self.__minSize = minSize or self.__minSize
 end
