@@ -14,6 +14,7 @@ local scripts = {
 	"decorations/deco_dropdown",
 
 	"widgets/base",
+	"widgets/draggable",
 	"widgets/boxlayout",
 	"widgets/wrappedtext",
 	"widgets/tooltip",
