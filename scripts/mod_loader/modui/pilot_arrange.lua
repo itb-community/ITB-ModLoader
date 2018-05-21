@@ -73,28 +73,6 @@ local function createUi()
 			:posCentered()
 
 		local draggedElement
-		local function stopDrag()
-			local index = list_indexof(pilotButtons, placeholder)
-			if index ~= nil and draggedElement ~= nil then
-				pilotButtons[index] = draggedElement
-			end
-			
-			placeholder:pospx(-2 * cellW, -2 * cellH)
-			
-			draggedElement = nil
-		end
-		local function startDrag(button)
-			stopDrag()
-			draggedElement = button
-			
-			placeholder.x = button.x
-			placeholder.y = button.y
-		
-			local index = list_indexof(pilotButtons,button)
-			if index ~= nil then
-				pilotButtons[index] = placeholder
-			end
-		end
 		local function rearrange()
 			local index = list_indexof(pilotButtons, placeholder)
 			if index ~= nil and draggedElement ~= nil then
@@ -143,44 +121,51 @@ local function createUi()
 				:addTo(scrollarea)
 			
 			button.pilotId = pilotId
+			button.draggable = true
 			
 			pilotButtons[i] = button
-			
-			button.mousedown = function(self, mx, my, btn)
-				startDrag(self)
-				
-				self.dragged = true
+
+			button.startDrag = function(self, mx, my, btn)
+				Ui.startDrag(self, mx, my, btn)
+
+				draggedElement = self
+				placeholder.x = self.x
+				placeholder.y = self.y
+
+				local index = list_indexof(pilotButtons, self)
+				if index ~= nil then
+					pilotButtons[index] = placeholder
+				end
+
 				self.dragX = mx
 				self.dragY = my
-				
+
 				self:bringToTop()
-				
-				Ui.mousedown(self, mx, my, btn)
 				rearrange()
-				
-				return true
 			end
-			
-			button.mousemove = function(self, mx, my)
-				if self.dragged then
-					self.x = self.x + mx - self.dragX
-					self.y = self.y + my - self.dragY
-					self.dragX = mx
-					self.dragY = my
+
+			button.stopDrag = function(self, mx, my, btn)
+				Ui.stopDrag(self, mx, my, btn)
+
+				local index = list_indexof(pilotButtons, placeholder)
+				if index ~= nil and draggedElement ~= nil then
+					pilotButtons[index] = draggedElement
 				end
-				
+
+				placeholder:pospx(-2 * cellW, -2 * cellH)
+
+				draggedElement = nil
+
 				rearrange()
-				
-				return Ui.mousemove(self, mx, my)
 			end
-			
-			button.mouseup = function(self, mx, my, btn)
-				self.dragged = false
-				
-				stopDrag()
+
+			button.dragMove = function(self, mx, my)
+				self.x = self.x + mx - self.dragX
+				self.y = self.y + my - self.dragY
+				self.dragX = mx
+				self.dragY = my
+
 				rearrange()
-				
-				return Ui.mouseup(self, mx, my, btn)
 			end
 		end
 		
