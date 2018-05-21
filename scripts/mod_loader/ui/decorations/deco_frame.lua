@@ -16,7 +16,14 @@ function DecoFrame:draw(screen, widget)
 
 	screen:drawrect(self.color, self.rect)
 
-	drawborder(screen, self.bordercolor, self.rect, self.bordersize)
+	local c = self.bordercolor
+	if widget.dragResizing then
+		c = deco.colors.focus
+	elseif widget.canDragResize then
+		c = deco.colors.buttonborderhlcolor
+	end
+
+	drawborder(screen, c, self.rect, self.bordersize)
 
 	widget.decorationx = widget.decorationx + self.bordersize
 	widget.decorationy = widget.decorationy + self.bordersize

@@ -139,12 +139,27 @@ function UiDraggable:dragMove(mx, my)
 	end
 end
 
+function UiDraggable:mousemove(mx, my)
+	self.__index.mousemove(self, mx, my)
+
+	self.canDragResize = self.dragResizable and
+		UiDraggable.isEdge(self, mx, my, self.__resizeHandle)
+end
+
+function UiDraggable:mouseExited()
+	self.__index.mouseExited(self)
+
+	self.canDragResize = false
+end
+
 -- //////////////////////////////////////////////////////////////////////////////////
 
 local function registerDragFunctions(self)
-	self.startDrag = UiDraggable.startDrag
-	self.stopDrag  = UiDraggable.stopDrag
-	self.dragMove  = UiDraggable.dragMove
+	self.startDrag   = UiDraggable.startDrag
+	self.stopDrag    = UiDraggable.stopDrag
+	self.dragMove    = UiDraggable.dragMove
+	self.mousemove   = UiDraggable.mousemove
+	self.mouseExited = UiDraggable.mouseExited
 end
 
 function Ui:registerDragMove()
