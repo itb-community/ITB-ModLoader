@@ -120,13 +120,13 @@ local function createUi()
 				})
 				:addTo(scrollarea)
 			
+			button:addDragMove()
 			button.pilotId = pilotId
-			button.draggable = true
 			
 			pilotButtons[i] = button
 
 			button.startDrag = function(self, mx, my, btn)
-				Ui.startDrag(self, mx, my, btn)
+				UiDraggable.startDrag(self, mx, my, btn)
 
 				draggedElement = self
 				placeholder.x = self.x
@@ -137,15 +137,12 @@ local function createUi()
 					pilotButtons[index] = placeholder
 				end
 
-				self.dragX = mx
-				self.dragY = my
-
 				self:bringToTop()
 				rearrange()
 			end
 
 			button.stopDrag = function(self, mx, my, btn)
-				Ui.stopDrag(self, mx, my, btn)
+				UiDraggable.stopDrag(self, mx, my, btn)
 
 				local index = list_indexof(pilotButtons, placeholder)
 				if index ~= nil and draggedElement ~= nil then
@@ -160,10 +157,7 @@ local function createUi()
 			end
 
 			button.dragMove = function(self, mx, my)
-				self.x = self.x + mx - self.dragX
-				self.y = self.y + my - self.dragY
-				self.dragX = mx
-				self.dragY = my
+				UiDraggable.dragMove(self, mx, my)
 
 				rearrange()
 			end
