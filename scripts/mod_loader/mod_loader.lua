@@ -124,7 +124,7 @@ function mod_loader:initMod(id)
 		end,
 		function(e)
 			return string.format(
-				"Initializing mod [%s] with id [%s] failed: %s\n%s",
+				"Initializing mod [%s] with id [%s] failed: %s\n\n%s",
 				mod.name,
 				id,
 				e,
@@ -298,7 +298,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 				end,
 				function(e)
 					return string.format(
-						"Loading mod [%s] with id [%s] failed: %s\n%s",
+						"Loading mod [%s] with id [%s] failed: %s\n\n%s",
 						mod.name,
 						id,
 						e,
