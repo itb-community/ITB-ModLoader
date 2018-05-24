@@ -35,14 +35,16 @@ local function createUi()
 				DecoCheckbox()
 			})
 
+		cbox.updateTooltip = function(self)
+			if tooltipOff then
+				self:settooltip(self.checked and tooltipOn or tooltipOff)
+				self.root.tooltip = self.tooltip
+			end
+		end
+
 		cbox.clicked = function(self, button)
 			local result = UiCheckbox.clicked(self, button)
-
-			if tooltipOff then
-				cbox:settooltip(cbox.checked and tooltipOn or tooltipOff)
-				cbox.root.tooltip = cbox.tooltip
-			end
-
+			self:updateTooltip()
 			return result
 		end
 
@@ -109,6 +111,7 @@ local function createUi()
 			return result
 		end
 		cboxFloatyTooltips.checked = modApi.floatyTooltips
+		cboxFloatyTooltips:updateTooltip()
 		cboxFloatyTooltips:addTo(layout)
 
 		cboxErrorFrame = createCheckboxOption(
