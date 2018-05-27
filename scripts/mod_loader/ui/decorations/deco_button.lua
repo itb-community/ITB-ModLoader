@@ -1,11 +1,11 @@
 DecoButton = Class.inherit(UiDeco)
 function DecoButton:new(color, bordercolor, hlcolor, borderhlcolor)
-	self.color = color or deco.colors.buttoncolor
-	self.bordercolor = bordercolor or deco.colors.buttonbordercolor
-	self.hlcolor = hlcolor or deco.colors.buttonhlcolor
-	self.borderhlcolor = borderhlcolor or deco.colors.buttonborderhlcolor
-	self.disabledcolor = deco.colors.buttondisabledcolor
-	self.disabledbordercolor = deco.colors.buttondisabledbordercolor
+	self.color = color or deco.colors.button
+	self.bordercolor = bordercolor or deco.colors.buttonborder
+	self.hlcolor = hlcolor or deco.colors.buttonhl
+	self.borderhlcolor = borderhlcolor or deco.colors.buttonborderhl
+	self.disabledcolor = deco.colors.buttondisabled
+	self.disabledbordercolor = deco.colors.buttondisabledborder
 	
 	self.rect = sdl.rect(0, 0, 0, 0)
 end
@@ -64,9 +64,9 @@ end
 
 DecoMainMenuButton = Class.inherit(UiDeco)
 function DecoMainMenuButton:new(colorBase, colorHighlight)
-	self.colorBase = colorBase or deco.colors.mainMenuButtonColor
-	self.colorHighlight = colorHighlight or deco.colors.mainMenuButtonColorHighlight
-	self.colorDisabled = deco.colors.mainMenuButtonColorDisabled
+	self.colorBase = colorBase or deco.colors.mainMenuButton
+	self.colorHighlight = colorHighlight or deco.colors.mainMenuButtonHighlight
+	self.colorDisabled = deco.colors.mainMenuButtonDisabled
 	
 	self.bonusX = 0
 	self.bonusWidth = 0

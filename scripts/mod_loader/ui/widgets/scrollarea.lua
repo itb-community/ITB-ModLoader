@@ -32,7 +32,7 @@ function UiScrollArea:draw(screen)
 		if self.scrollPressed then
 			screen:drawrect(deco.colors.focus, self.scrollbuttonrect)
 		elseif self.scrollHovered then
-			screen:drawrect(deco.colors.buttonborderhlcolor, self.scrollbuttonrect)
+			screen:drawrect(deco.colors.buttonborderhl, self.scrollbuttonrect)
 		else
 			screen:drawrect(deco.colors.white, self.scrollbuttonrect)
 		end

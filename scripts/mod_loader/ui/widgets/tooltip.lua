@@ -4,7 +4,7 @@ function UiTooltip:new()
 	UiWrappedText.new(self, nil, deco.uifont.tooltipText.font, deco.uifont.tooltipText.set)
 	
 	self:padding(10)
-		:decorate({ DecoFrame(deco.colors.buttoncolor, deco.colors.white, 3) })
+		:decorate({ DecoFrame(deco.colors.button, deco.colors.white, 3) })
 	self.padt = self.padt - 1
 
 	self.translucent = true

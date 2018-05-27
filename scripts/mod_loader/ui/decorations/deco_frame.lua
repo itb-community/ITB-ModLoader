@@ -1,7 +1,7 @@
 DecoFrame = Class.inherit(UiDeco)
 function DecoFrame:new(color, bordercolor, bordersize)
 	self.color = color or deco.colors.framebg
-	self.bordercolor = bordercolor or deco.colors.buttonbordercolor
+	self.bordercolor = bordercolor or deco.colors.buttonborder
 	self.bordersize = bordersize or 2
 	self.rect = sdl.rect(0, 0, 0, 0)
 end
@@ -20,7 +20,7 @@ function DecoFrame:draw(screen, widget)
 	if widget.dragResizing then
 		c = deco.colors.focus
 	elseif widget.canDragResize then
-		c = deco.colors.buttonborderhlcolor
+		c = deco.colors.buttonborderhl
 	end
 
 	drawborder(screen, c, self.rect, self.bordersize)
@@ -40,8 +40,8 @@ end
 
 DecoFrameHeader = Class.inherit(DecoCaption)
 function DecoFrameHeader:new(bordercolor, fillcolor, bordersize, font, textset)
-	self.bordercolor = bordercolor or deco.colors.buttonbordercolor
-	self.fillcolor = fillcolor or deco.colors.buttonhlcolor
+	self.bordercolor = bordercolor or deco.colors.buttonborder
+	self.fillcolor = fillcolor or deco.colors.buttonhl
 	self.bordersize = bordersize or 2
 
 	self.height = 50

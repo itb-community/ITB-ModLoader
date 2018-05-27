@@ -51,7 +51,7 @@ function UiDropDown:createDropDown()
 		local item = Ui()
 			:width(1):heightpx(40)
 			:decorate({
-				DecoSolidHoverable(deco.colors.buttoncolor, deco.colors.buttonbordercolor),
+				DecoSolidHoverable(deco.colors.button, deco.colors.buttonborder),
 				DecoAlign(0, 2),
 				txt
 			})
