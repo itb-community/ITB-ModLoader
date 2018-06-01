@@ -158,20 +158,32 @@ local function isDismissClick(mx, my, button)
 
 		-- Check the last pilot button
 		r.w = 2 * portraitBtn.w + gap
-		if rect_contains(r, mx, my) then
+		if Profile.pilot and rect_contains(r, mx, my) then
 			return true
 		end
 
 		-- Check pilot portrait buttons
 		r.w = portraitBtn.w
-		local columns = isSecretPilotsUnlocked and 5 or 4
+		local columns = isSecretPilotsUnlocked and 6 or 5
 		for y = 0, 2 do
 			r.x = startX
 
-			for x = 0, columns do
+			for x = 0, columns - 1 do
 				if y > 0 or x > 1 then
 					if rect_contains(r, mx, my) then
-						return true
+						-- Check if the pilot is actually unlocked
+						-- Secret pilots are not included in PilotList, so skip them
+						if x < 5 then
+							-- Compute index in the pilot list
+							-- First two slots are taken by last pilot button
+							local idx = 1 + (y * 5 + x) - 2
+
+							return list_contains(Profile.pilots, PilotList[idx])
+						else
+							return isSecretPilotsUnlocked
+						end
+
+						return false
 					end
 				end
 
