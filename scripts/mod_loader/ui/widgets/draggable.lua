@@ -140,10 +140,12 @@ function UiDraggable:dragMove(mx, my)
 end
 
 function UiDraggable:mousemove(mx, my)
-	self.__index.mousemove(self, mx, my)
+	local result = self.__index.mousemove(self, mx, my)
 
 	self.canDragResize = self.dragResizable and
 		UiDraggable.isEdge(self, mx, my, self.__resizeHandle)
+
+	return result
 end
 
 function UiDraggable:mouseExited()
