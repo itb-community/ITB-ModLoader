@@ -385,8 +385,8 @@ end
 function Ui:keydown(keycode)
 	if not self.visible then return false end
 
-	if self.parent and self.parent:keydown(keycode) then
-		return true
+	if self.parent then
+		return self.parent:keydown(keycode)
 	end
 
 	return false
@@ -395,8 +395,8 @@ end
 function Ui:keyup(keycode)
 	if not self.visible then return false end
 
-	if self.parent and self.parent:keyup(keycode) then
-		return true
+	if self.parent then
+		return self.parent:keyup(keycode)
 	end
 
 	return false

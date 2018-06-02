@@ -106,7 +106,9 @@ function UiDropDown:draw(screen)
 		local oldClip = self.root.clippingrect
 		self.root.clippingrect = nil
 		--We don't want our dropdown to be clipped
-		screen:unclip()
+		if oldClip then
+			screen:unclip()
+		end
 		
 		Ui.draw(self, screen)
 		
@@ -128,4 +130,41 @@ function UiDropDown:clicked(button)
 	end
 	
 	return Ui.clicked(self, button)
+end
+
+function UiDropDown:keydown(keycode)
+	if self.focused then
+		if self.open then
+			if keycode == 27 then
+				self:destroyDropDown()
+			end
+
+			return true
+		else
+			if
+				-- enter or keypad enter
+				keycode == 0x0D       or
+				keycode == 0x40000058
+			then
+				self:createDropDown()
+				return true
+			end
+		end
+	end
+
+	return Ui.keydown(self, keycode)
+end
+
+function UiDropDown:keyup(keycode)
+	if
+		self.open and self.focused and (
+			keycode == 27         or
+			keycode == 0x0D       or
+			keycode == 0x40000058
+		)
+	then
+		return true
+	end
+
+	return Ui.keyup(self, keycode)
 end
