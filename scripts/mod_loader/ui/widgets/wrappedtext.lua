@@ -13,6 +13,7 @@ function UiWrappedText:new(text, font, textset)
 	self.font = font or deco.uifont.default.font
 	self.textset = textset or deco.uifont.default.set
 	self.textAlign = "left"
+	self.pixelWrap = false
 
 	self.text = nil
 
@@ -52,6 +53,7 @@ local function buildText(self, text)
 	uitext:widthpx(size.w):heightpx(size.h)
 	if not skip then uitext.decorations[1]:setsurface(text) end
 	uitext.alignH = self.textAlign
+	uitext.translucent = self.translucent
 
 	return uitext
 end
@@ -71,10 +73,21 @@ local function rebuild(self, lines)
 	end
 end
 
+local function wrapPixel(self, str, maxWidth)
+	local here = 1
+	return str:gsub("(%s+)()(%S+)()", function(sp, st, word, fi)
+		local sub = str:sub(here, fi)
+		if self:computeTextSize(sub).w > maxWidth then
+			here = st
+			return "\n"..word
+		end
+	end)
+end
+
 --[[
 	http://lua-users.org/wiki/StringRecipes , section Text Wrapping
 --]]
-local function wrap(self, str, limit, indent, indent1)
+local function wrapChar(self, str, limit, indent, indent1)
 	indent = indent or ""
 	indent1 = indent1 or indent
 	limit = limit or 72
@@ -85,6 +98,14 @@ local function wrap(self, str, limit, indent, indent1)
 			return "\n"..indent..word
 		end
 	end)
+end
+
+local function wrap(self, str)
+	if self.pixelWrap then
+		return wrapPixel(self, str, self.w)
+	else
+		return wrapChar(self, str, self.limit)
+	end
 end
 
 function UiWrappedText:setText(text)
@@ -98,7 +119,7 @@ function UiWrappedText:setText(text)
 	if self.text and self.text ~= "" then
 		local lines = modApi:splitStringEmpty(text, "\n")
 		for i = 1, #lines do
-			local wrappedLines = modApi:splitStringEmpty(wrap(self, lines[i], self.limit), "\n")
+			local wrappedLines = modApi:splitStringEmpty(wrap(self, lines[i]), "\n")
 			for j = 1, #wrappedLines do
 				table.insert(allLines, wrappedLines[j])
 			end
@@ -106,6 +127,12 @@ function UiWrappedText:setText(text)
 	end
 
 	rebuild(self, allLines)
+end
+
+function UiWrappedText:rebuild()
+	local t = self.text
+	self:setText("")
+	self:setText(t)
 end
 
 function UiWrappedText:relayout()
