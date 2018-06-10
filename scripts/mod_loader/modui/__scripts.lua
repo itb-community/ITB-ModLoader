@@ -9,6 +9,7 @@ local scripts = {
 	"resource_error",
 	"modcontent",
 	"extra_difficulty",
+	"repair_icon_replace",
 	
 	"mod_configuration",
 	"pilot_arrange",
