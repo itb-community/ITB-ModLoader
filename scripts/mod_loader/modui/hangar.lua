@@ -62,10 +62,10 @@ function GetHangarOrigin()
 	local origin = GetScreenCenter()
 
 	-- Hangar UI is drawn at a different offset when
-	-- window size is less than 1032px.
+	-- window height is less than 1032px.
 	-- This probably scales at certain thresholds when
 	-- the UI can be scaled cleanly, but I can't test
-	-- resolutions higher than 1920x1080, and it's
+	-- resolutions greater than 1920x1080, and it's
 	-- difficult to extrapolate from one data point.
 	if ScreenSizeY() < 1032 then
 		origin.x = origin.x - 460
@@ -95,7 +95,7 @@ local function isWindowless()
 	-- other than the squad frame which is always drawn in the hangar.
 	return  sdlext.CurrentWindowRect.w == 420 and
 	       (sdlext.CurrentWindowRect.h == 480 or
-	        -- higher when Custom Squad is selected
+	        -- taller when Custom Squad is selected
 	        sdlext.CurrentWindowRect.h == 493)
 end
 
@@ -108,7 +108,7 @@ local function isSquadWindow(w, h)
 	w = w or sdlext.CurrentWindowRect.w
 	h = h or sdlext.CurrentWindowRect.h
 	return (w == squadBox.w and h == squadBox.h) or
-	        -- higher when Secret Squad is unlocked
+	        -- taller when Secret Squad is unlocked
 	       (isSecretSquadUnlocked and
 	        w == squadBox.w and h == 563)
 end
@@ -169,13 +169,15 @@ local function isDismissClick(mx, my, button)
 			r.x = startX
 
 			for x = 0, columns - 1 do
-				if y > 0 or x > 1 then
+				-- Skip the first two columns on the first row,
+				-- since they're occupied by the Last Pilot button
+				if y >= 1 or x >= 2 then
 					if rect_contains(r, mx, my) then
 						-- Check if the pilot is actually unlocked
 						-- Secret pilots are not included in PilotList, so skip them
 						if x < 5 then
 							-- Compute index in the pilot list
-							-- First two slots are taken by last pilot button
+							-- Decrement by 2 to account for Last Pilot button
 							local idx = 1 + (y * 5 + x) - 2
 
 							return list_contains(Profile.pilots, PilotList[idx])
@@ -213,15 +215,14 @@ local function isDismissClick(mx, my, button)
 		local gapH = 25
 		local gapV = isSecretSquadUnlocked and 53 or 60
 
-		local r = isSquadWindow()
+		local r2 = isSquadWindow()
 			and sdlext.CurrentWindowRect
 			or  sdlext.LastWindowRect
-		local r2 = r -- store for later
 
-		local startX = r.x + inset
-		local startY = r.y + inset
+		local startX = r2.x + inset
+		local startY = r2.y + inset
 
-		r = sdl.rect(startX, startY, selectBtn.w, selectBtn.h)
+		local r = sdl.rect(startX, startY, selectBtn.w, selectBtn.h)
 
 		for y = 0, 4 do
 			r.x = startX
