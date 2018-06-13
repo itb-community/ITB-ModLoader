@@ -638,15 +638,17 @@ function AddDifficultyLevel(id, level, tipTitle, tipText)
 
 	local index = level + 1
 
+	-- Rebuild SectorSpawners array, to account for shifting
+	-- caused by the new difficulty level.
 	local newSectorSpawners = {}
 	for i, id in ipairs(DifficultyLevels) do
 		local lvl = _G[id]
 
 		if i < index then
 			-- No change, copy as-is
-			newSectorSpawners[lvl] = SectorSpawners[lvl]
+			newSectorSpawners[lvl] = copy_table(SectorSpawners[lvl])
 		else
-			newSectorSpawners[lvl + 1] = SectorSpawners[lvl]
+			newSectorSpawners[lvl + 1] = copy_table(SectorSpawners[lvl])
 		end
 	end
 	SectorSpawners = newSectorSpawners
