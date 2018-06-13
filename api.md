@@ -15,6 +15,9 @@
 		* [InterpolateColor](#interpolatecolor)
 		* [compare_tables](#compare_tables)
 		* [list_indexof](#list_indexof)
+		* [table:OnSerializationStart](#tableonserializationstart)
+		* [table:OnSerializationEnd](#tableonserializationend)
+		* [RegisterRepairIconReplacement](#registerrepairiconreplacement)
 
 	* [modApi](#modapi)
 		* [modApi:deltaTime](#modapideltatime)
@@ -297,6 +300,79 @@ Compares two distinct tables for equality, checking member table fields recursiv
 | `value` | object | The value to look for |
 
 Returns index of the `value` object in the specified list, or `nil` if not found.
+
+
+### `table:OnSerializationStart`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `t` | table | A helper table used to store temporarily removed fields |
+
+Every table that is saved to `GAME`, and defines this function, will have this function called whenever the game is being saved. This effectively allows to temporarily prune unserializable fields (such as raw pawn references), or transient data that should not be saved to the savefile (for example when creating custom Missions).
+
+The `t` argument can be used to save the field before it is removed. The same table is then passed on to `OnSerializationEnd` callback, allowing to restore the field.
+
+Example:
+```lua
+mytable = {}
+mytable.transientField = "qwe"
+mytable.OnSerializationStart = function(self, t)
+	t.transientField = self.transientField
+	self.transientField = nil
+end
+
+-- OR
+
+MyMission.transientField = "qwe"
+funtion MyMission:OnSerializationStart(t)
+	t.transientField = self.transientField
+	self.transientField = nil
+end
+```
+
+
+### `table:OnSerializationEnd`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `t` | table | A helper table used to store temporarily removed fields |
+
+Every table that is saved to `GAME`, and defines this function, will have this function called whenever the game is being saved. This effectively allows to temporarily prune unserializable fields (such as raw pawn references), or transient data that should not be saved to the savefile (for example when creating custom Missions).
+
+The `t` argument can be used to retrieve fields that were removed in `OnSerializationStart` callback.
+
+Example:
+```lua
+mytable = {}
+mytable.OnSerializationEnd = function(self, t)
+	self.transientField = t.transientField
+end
+
+-- OR
+
+function MyMission:OnSerializationEnd(t)
+	self.transientField = t.transientField
+end
+```
+
+
+### `RegisterRepairIconReplacement`
+
+| Argument name | Type | Description |
+|---------------|------|-------------|
+| `personalityId` | string | Id of the pilot personality whose repair icon is to be replaced (sans the `Pilot_` prefix, eg. `Original`) |
+| `iconPath` | string | Path to the image that will replace the repair icon. Either in the game archives, or in the mod directory. |
+
+This function allows to define repair skill replacement icons that will be drawn on top of the vanilla repair icon.
+
+Caveats:
+- Hotkey is obscured by the custom icon
+- Replacement icon shows up when the pilot of the last selected mech had a replacement registered, is deselected, and then another mech is hovered over without being selected.
+
+Example:
+```lua
+RegisterRepairIconReplacement("Original", "img/weapons/repair_mantis.png")
+```
 
 
 ## modApi
