@@ -624,6 +624,16 @@ function GetDifficultyFaceName(level)
 	return modApi:trimString(result)
 end
 
+local function copySpawner(src)
+	local t = {}
+
+	for sectorId, data in ipairs(src) do
+		t[sectorId] = Spawner:new(data)
+	end
+
+	return t
+end
+
 function AddDifficultyLevel(id, level, tipTitle, tipText)
 	assert(type(id) == "string", "Difficulty level id must be a string, got: " .. type(id))
 	assert(id == string.upper(id), "Difficulty level id must use only uppercase letters.")
@@ -641,14 +651,15 @@ function AddDifficultyLevel(id, level, tipTitle, tipText)
 	-- Rebuild SectorSpawners array, to account for shifting
 	-- caused by the new difficulty level.
 	local newSectorSpawners = {}
-	for i, id in ipairs(DifficultyLevels) do
-		local lvl = _G[id]
+	for i, diffId in ipairs(DifficultyLevels) do
+		local lvl = _G[diffId]
 
+		-- We skip one index here, we'll fill it at the end
 		if i < index then
 			-- No change, copy as-is
-			newSectorSpawners[lvl] = copy_table(SectorSpawners[lvl])
+			newSectorSpawners[lvl] = SectorSpawners[lvl]
 		else
-			newSectorSpawners[lvl + 1] = copy_table(SectorSpawners[lvl])
+			newSectorSpawners[lvl + 1] = SectorSpawners[lvl]
 		end
 	end
 	SectorSpawners = newSectorSpawners
@@ -666,7 +677,7 @@ function AddDifficultyLevel(id, level, tipTitle, tipText)
 	Global_Texts["TipText_Hangar" .. suffix] = tipText
 
 	-- Default to using the same spawner logic as baseline difficulty level
-	SectorSpawners[level] = SectorSpawners[GetBaselineDifficulty(level)]
+	SectorSpawners[level] = copySpawner(SectorSpawners[GetBaselineDifficulty(level)])
 end
 
 function GetDifficulty()
