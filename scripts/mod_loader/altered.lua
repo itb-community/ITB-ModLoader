@@ -79,9 +79,25 @@ function Mission:OnSerializationEnd(t)
 	self.MissionEnd = t.MissionEnd
 end
 
+local function updateQueuedSpawns(self)
+	for i, el in ipairs(self.QueuedSpawns) do
+		if not Board:IsSpawning(el.location) then
+			remove_element(el, self.QueuedSpawns)
+		end
+	end
+end
+
 function Mission:BaseNextTurn()
 	oldBaseNextTurn(self)
-	
+
+	if Game:GetTeamTurn() == TEAM_PLAYER then
+		updateQueuedSpawns(self)
+
+		for i, el in ipairs(self.QueuedSpawns) do
+			el.turns = el.turns + 1
+		end
+	end
+
 	for i, hook in ipairs(modApi.nextTurnHooks) do
 		hook(self)
 	end
@@ -91,7 +107,12 @@ function Mission:BaseUpdate()
 	modApi:processRunLaterQueue(self)
 
 	oldBaseUpdate(self)
-	
+
+	if Board:GetBusyState() == 6 then
+		-- BusyState 6 happens when Vek are burrowing out of the ground
+		updateQueuedSpawns(self)
+	end
+
 	for i, hook in ipairs(modApi.missionUpdateHooks) do
 		hook(self)
 	end
@@ -196,6 +217,8 @@ function Mission:BaseStart()
 		hook(self)
 	end
 
+	self.QueuedSpawns = {}
+
 	-- begin oldBaseStart
 	self.VoiceEvents = {}
 	
@@ -213,7 +236,10 @@ function Mission:BaseStart()
 	
 	self:SpawnPawns(self:GetStartingPawns())
 	-- end oldBaseStart
-	
+
+	-- Clear QueuedSpawns, since the Vek burrow out immediately when entering the mission
+	self.QueuedSpawns = {}
+
 	for i, hook in ipairs(modApi.postMissionAvailableHooks) do
 		hook(self)
 	end
@@ -993,3 +1019,84 @@ function Mission:GetSpawnCount()
 end
 
 -- /////////////////////////////////////////////////////////////////////////////////////
+
+--[[
+	Scan the game board and return a list of points that have a vek spawning on them.
+--]]
+local function enumerateSpawns()
+	local result = {}
+	local size = Board:GetSize()
+	for y = 0, size.y - 1 do
+		for x = 0, size.x - 1 do
+			local p = Point(x, y)
+			if Board:IsSpawning(p) then
+				table.insert(result, p)
+			end
+		end
+	end
+
+	return result
+end
+
+--[[
+	Compute the difference (complement) of two sets of elements
+--]]
+local function setDifference(setA, setB)
+	assert(setA)
+	assert(setB)
+	assert(type(setA) == "table")
+	assert(type(setB) == "table")
+
+	local result = {}
+
+	for i, el in ipairs(setA) do
+		if not list_contains(setB, el) then
+			table.insert(result, el)
+		end
+	end
+
+	return result
+end
+
+local function addSpawnData(self, location, type, id, age)
+	local el = {}
+	-- where the spawn is located
+	el.location = location
+	-- type of the enemy that will be spawned
+	el.type = type
+	-- id of the pawn that will be spawned
+	el.id = id
+	-- how long the spawn has been on the board (in case it's blocked repeatedly)
+	el.turns = age or 0
+
+	--[[
+		Vek surface in the order defined in this table, but spawn points
+		appear on the board in reverse order.
+	--]]
+	table.insert(self.QueuedSpawns, el)
+end
+
+function Mission:SpawnPawn(location)
+	local pawn = self:NextPawn()
+	Board:SpawnPawn(pawn, location)
+	addSpawnData(self, location, pawn:GetType(), pawn:GetId())
+end
+
+function Mission:SpawnPawns(count)
+	local spawns1 = enumerateSpawns()
+
+	for i = 1, count do
+		local pawn = self:NextPawn()
+
+		Board:SpawnPawn(pawn)
+		-- We have access to the pawn instance here, but its GetSpace()
+		-- function returns (-1, -1), so we can't use it to identify its
+		-- spawn location...
+		local spawns2 = enumerateSpawns()
+
+		local diff = setDifference(spawns2, spawns1)
+		spawns1 = spawns2
+
+		addSpawnData(self, diff[1], pawn:GetType(), pawn:GetId())
+	end
+end
