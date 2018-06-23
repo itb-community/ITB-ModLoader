@@ -1130,3 +1130,63 @@ function GetCurrentMission()
 	return nil
 end
 
+--[[
+	Returns spawn data of the specified point, or nil if there's no Vek spawning
+	at that location.
+--]]
+function GetSpawnPointData(point, m)
+	local m = m or GetCurrentMission()
+
+	local spawn = nil
+	for i, e in ipairs(m.QueuedSpawns) do
+		if e.location == point then
+			spawn = e
+			break
+		end
+	end
+
+	return spawn
+end
+
+--[[
+	Removes the vek spawn at the specified location. The vek that was
+	supposed to be spawned will not appear.
+--]]
+function RemoveSpawnPoint(point, m)
+	local m = m or GetCurrentMission()
+
+	if GetSpawnPointData(point, m) then
+		local terrain = Board:GetTerrain(point)
+		local smoke = Board:IsSmoke(point)
+		local acid = Board:IsAcid(point)
+		local fire = Board:IsFire(point)
+
+		Board:ClearSpace(point)
+
+		Board:SetTerrain(point, terrain)
+		Board:SetSmoke(point, smoke, false)
+		Board:SetAcid(point, acid)
+		if fire then
+			local d = SpaceDamage(point)
+			d.iFIRE = EFFECT_CREATE
+			Board:DamageSpace(d)
+		end
+
+		updateQueuedSpawns(m)
+	end
+end
+
+--[[
+	Moves the specified spawn point to the specified location.
+--]]
+function MoveSpawnPoint(point, to, m)
+	local m = m or GetCurrentMission()
+	local spawn = GetSpawnPointData(point, m)
+
+	if spawn then
+		RemoveSpawnPoint(point, m)
+
+		local id = Board:SpawnPawn(spawn.type, to)
+		addSpawnData(m, to, spawn.type, id, spawn.turns)
+	end
+end
