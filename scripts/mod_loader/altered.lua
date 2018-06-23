@@ -1100,3 +1100,33 @@ function Mission:SpawnPawns(count)
 		addSpawnData(self, diff[1], pawn:GetType(), pawn:GetId())
 	end
 end
+
+--[[
+	Returns a savedata table holding information about the region the player
+	is currently in. Returns nil when not in a mission.
+--]]
+function GetCurrentRegion()
+	if RegionData and RegionData.iBattleRegion then
+		if RegionData.iBattleRegion == 20 then
+			return RegionData["final_region"]
+		else
+			return RegionData["region"..RegionData.iBattleRegion]
+		end
+	end
+
+	return nil
+end
+
+--[[
+	Returns the table instance of the current mission. Returns nil when not in a mission.
+--]]
+function GetCurrentMission()
+	local region = GetCurrentRegion()
+
+	if region then
+		return GAME:GetMission(region.mission)
+	end
+
+	return nil
+end
+
