@@ -12,7 +12,7 @@ At the moment, modded UI is implemented by replacing original `lua5.1.dll` and `
 This solution works decently at the moment, but once Into the Breach is released on other platforms, all mods which make use of modded UI will be effectively FUBAR'd, and will most likely stop working. Seeing as I have no C++ experience whatsoever, I will not be able to update the DLLs to work on other platforms. Without an experienced C++ programmer to do this, or direct support from the game's side, the days of modded UI are effectively numbered.
 
 Things that the game's lua API should provide in order to make the mod loader independent of modified DLLs (this list is incomplete, and probably uses different terminology than the game's engine):
-- A function allowing to walk a directory tree (needed to find and load mods in /mods directory)
+- A function allowing to walk a directory tree (needed to find and load mods in `/mods` directory)
 	- Technically doable in lua, but requires a lot of fussing and would likely be pretty slow
 - A way to draw arbitrary pixels on the screen
 	- Rendering a rect of solid color (RGB/RGBA)
@@ -23,12 +23,13 @@ Things that the game's lua API should provide in order to make the mod loader in
 - A texture object used to draw images/text on the screen
 	- Read access to width and height
 - A font object
+	- Read access to font size, glyph widths (or generally computing screen dimensions of the text before it is rendered)
 - A timer: read access to `SDL_GetTicks()` would be sufficient to implement this
 - Read access to mouse position
 
 Code for the DLLs is hosted on GitHub. Hopefully these files will be useful:
-Functions exported to lua: https://github.com/AUTOMATIC1111/IntoTheBreachLua/blob/master/lua-functions.cc#L133
-SDL abstractions (?): https://github.com/AUTOMATIC1111/IntoTheBreachLua/blob/master/sdl-utils.cpp
+- Functions exported to lua: https://github.com/AUTOMATIC1111/IntoTheBreachLua/blob/master/lua-functions.cc#L133
+- SDL abstractions (?): https://github.com/AUTOMATIC1111/IntoTheBreachLua/blob/master/sdl-utils.cpp
 
 
 ## Game settings modification
@@ -100,7 +101,11 @@ Recently, Celeste has released its whole FMOD project. Perhaps this could be use
 ```
 Satellite - Last Tuesday at 14:38
 
-https://www.fmod.com/download#demos Celeste, also using FMOD Studio for sound, released its whole FMOD project and lets you activate FMOD live update in the game settings (Steam version) which makes it possible to mod on the fly while the game is running. If Subset did something similar, even if they release just the project and not the assets, that would make audio mods very easy to make (main problem would then be conflicting audio mods)
+https://www.fmod.com/download#demos Celeste, also using FMOD Studio for sound, released its whole
+FMOD project and lets you activate FMOD live update in the game settings (Steam version) which makes
+it possible to mod on the fly while the game is running. If Subset did something similar, even if
+they release just the project and not the assets, that would make audio mods very easy to make (main
+	problem would then be conflicting audio mods)
 ```
 
 
