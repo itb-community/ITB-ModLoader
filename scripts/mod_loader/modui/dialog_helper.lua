@@ -219,8 +219,18 @@ function sdlext.showButtonDialog(title, text, responseFn, w, h, buttons, tooltip
 				btn:settooltip(tooltips[i])
 			end
 
+			btn.onMouseEnter = function(self)
+				if Game then
+					Game:TriggerSound("/ui/general/highlight_button")
+				end
+			end
+
 			btn.onclicked = function(self, button)
 				if button == 1 then
+					if Game then
+						Game:TriggerSound("/ui/general/button_confirm")
+					end
+
 					ui.response = i
 					quit()
 				end
