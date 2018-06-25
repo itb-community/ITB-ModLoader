@@ -557,6 +557,23 @@ function Move:GetSkillEffect(p1, p2)
     return originalGetSkillEffect(self, p1, p2)
 end
 
+local PilotPersonality = nil
+function CreatePilotPersonality(label, name)
+	-- PilotPersonality is local to personality.lua
+	-- We can't access it directly, so we have to grab it via
+	-- the metatable of one of the existing PilotPersonality instances.
+	-- 'Artificial' happens to be the most generic one.
+	PilotPersonality = PilotPersonality or getmetatable(Personality["Artificial"])
+	local t = PilotPersonality:new()
+
+	-- Name of the pilot, leave nil for random name
+	t.Name = name
+	-- Pilot label, used in debug messages
+	t.Label = label or "NULL"
+
+	return t
+end
+
 function CreatePilot(data)
 	_G[data.Id] = Pilot:new(data)
 
