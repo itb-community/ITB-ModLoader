@@ -318,6 +318,8 @@ function modApi:resetModContent()
 	self.preIslandSelectionHooks = {}
 	self.postIslandSelectionHooks = {}
 	self.missionEndHooks = {}
+	self.vekSpawnAddedHooks = {}
+	self.vekSpawnRemovedHooks = {}
 	
 	local name, tbl = debug.getupvalue(oldGetPopulationTexts,1)
 	self.PopEvents = copy_table(tbl)
@@ -724,6 +726,16 @@ end
 function modApi:addSaveGameHook(fn)
 	assert(type(fn) == "function")
 	table.insert(self.saveGameHooks,fn)
+end
+
+function modApi:addVekSpawnAddedHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.vekSpawnAddedHooks,fn)
+end
+
+function modApi:addVekSpawnRemovedHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.vekSpawnRemovedHooks,fn)
 end
 
 --[[

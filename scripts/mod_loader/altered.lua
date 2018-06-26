@@ -80,9 +80,18 @@ function Mission:OnSerializationEnd(t)
 end
 
 local function updateQueuedSpawns(self)
+	local removed = {}
+
 	for i, el in ipairs(self.QueuedSpawns) do
 		if not Board:IsSpawning(el.location) then
 			remove_element(el, self.QueuedSpawns)
+			table.insert(removed, el)
+		end
+	end
+
+	for i, el in ipairs(removed) do
+		for i, hook in ipairs(modApi.vekSpawnRemovedHooks) do
+			hook(self, el)
 		end
 	end
 end
@@ -138,6 +147,7 @@ end
 
 function CreateMission(mission)
 	local mObject = oldCreateMission(mission)
+	mObject.Initialized = false
 
 	overrideMissionEnd(mObject)
 
@@ -243,6 +253,8 @@ function Mission:BaseStart()
 	for i, hook in ipairs(modApi.postMissionAvailableHooks) do
 		hook(self)
 	end
+
+	self.Initialized = true
 end
 
 function Mission:ApplyEnvironmentEffect()
@@ -1091,10 +1103,24 @@ local function addSpawnData(self, location, type, id, age)
 		appear on the board in reverse order.
 	--]]
 	table.insert(self.QueuedSpawns, el)
+
+	if self.Initialized then
+		-- Don't trigger the hooks when missions become available
+		for i, hook in ipairs(modApi.vekSpawnAddedHooks) do
+			hook(self, el)
+		end
+	end
 end
 
-function Mission:SpawnPawn(location)
-	local pawn = self:NextPawn()
+function Mission:SpawnPawn(location, type)
+	local pawn = nil
+
+	if type then
+		pawn = PAWN_FACTORY:CreatePawn(type)
+	else
+		pawn = self:NextPawn()
+	end
+
 	Board:SpawnPawn(pawn, location)
 	addSpawnData(self, location, pawn:GetType(), pawn:GetId())
 end
