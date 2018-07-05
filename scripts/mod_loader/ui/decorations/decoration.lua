@@ -85,3 +85,10 @@ function InterpolateColor(color1, color2, t)
 		)
 	end
 end
+
+function IsColorEqual(c1, c2)
+	return c1.r == c2.r and
+	       c1.g == c2.g and
+	       c1.b == c2.b and
+	       c1.a == c2.a
+end
