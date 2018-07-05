@@ -15,7 +15,7 @@ function DecoText:setsurface(text)
 end
 
 function DecoText:setcolor(color)
-	if color ~= self.textset.color then
+	if not IsColorEqual(color, self.textset.color) then
 		self.textset = deco.textset(color, self.textset.outlineColor, self.textset.outlineWidth)
 		self.surface = sdl.text(self.font, self.textset, self.text)
 	end
@@ -83,6 +83,6 @@ end
 
 function DecoCaption:draw(screen,widget)
 	self:setsurface(widget.captiontext)
-	
+
 	DecoText.draw(self, screen, widget)
 end
