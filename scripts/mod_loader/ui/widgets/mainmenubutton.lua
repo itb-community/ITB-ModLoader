@@ -37,6 +37,8 @@ function MainMenuButton:new(style)
 	self:decorate({ DecoMainMenuButton(), DecoCaption(font) })
 
 	self.onMouseEnter = function(button)
+		if button.disabled then return end
+
 		button.animations.unhighlight:stop()
 		button.animations.highlight:start()
 
@@ -46,6 +48,8 @@ function MainMenuButton:new(style)
 	end
 
 	self.onMouseExit = function(button)
+		if button.disabled then return end
+
 		button.animations.highlight:stop()
 		button.animations.unhighlight:start()
 
