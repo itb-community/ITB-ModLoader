@@ -18,6 +18,7 @@ deco.colors.buttonborderdisabled =          sdl.rgb(43, 53, 72)
 deco.colors.mainMenuButton =                sdl.rgba(7 , 10, 18, 187)
 deco.colors.mainMenuButtonHighlight =       sdl.rgba(24, 26, 34, 255)
 deco.colors.mainMenuButtonDisabled =        sdl.rgba(7 , 10, 18, 84 )
+deco.colors.mainMenuButtonCaptionDisabled = sdl.rgba(190, 190, 190, 255)
 
 -- Retain old names for compatibility
 deco.colors.buttoncolor =                   deco.colors.button

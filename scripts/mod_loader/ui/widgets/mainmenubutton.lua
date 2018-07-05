@@ -34,7 +34,10 @@ function MainMenuButton:new(style)
 		error("Unknown MainMenuButton style: " .. style)
 	end
 
-	self:decorate({ DecoMainMenuButton(), DecoCaption(font) })
+	self:decorate({
+		DecoMainMenuButton(),
+		DecoCaption(font, nil, nil, deco.colors.mainMenuButtonCaptionDisabled)
+	})
 
 	self.onMouseEnter = function(button)
 		if button.disabled then return end
@@ -79,8 +82,12 @@ function MainMenuButton:new(style)
 		-- sharply slows down.
 		local blend = percent * (2 - percent)
 		decoBtn.bonusX = math.min(0, widget.w * (blend - 1))
-		
-		decoTxt:setcolor(sdl.rgba(255, 255, 255, 255 * percent))
+
+		local tc = widget.disabled
+			and decoTxt.colorDisabled
+			or  decoTxt.colorNormal
+
+		decoTxt:setcolor(sdl.rgba(tc.r, tc.g, tc.b, tc.a * percent))
 	end)
 
 	self.animations.slideOut = UiAnim(self, 500, function(anim, widget, percent)
@@ -90,7 +97,7 @@ function MainMenuButton:new(style)
 		local blend = percent * (2 - percent)
 		decoBtn.bonusX = math.max(-widget.w, -widget.w * blend)
 
-		decoTxt:setcolor(sdl.rgba(255, 255, 255, 255 * (1 - percent)))
+		decoTxt:setcolor(sdl.rgba(tc.r, tc.g, tc.b, tc.a * (1 - percent)))
 	end)
 end
 

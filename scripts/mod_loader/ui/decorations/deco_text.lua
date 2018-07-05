@@ -77,12 +77,34 @@ end
 
 
 DecoCaption = Class.inherit(DecoText)
-function DecoCaption:new(font, textset)
+function DecoCaption:new(font, textset, colorNormal, colorDisabled)
 	DecoText.new(self, self.text, font, textset)
+
+	self.colorNormal = colorNormal or deco.colors.white
+	self.colorDisabled = colorDisabled or self.colorNormal
+end
+
+function DecoCaption:setsurface(text, color)
+	local textset = nil
+	if color and not IsColorEqual(color, self.textset.color) then
+		textset = deco.textset(color, self.textset.outlineColor, self.textset.outlineWidth)
+	end
+
+	if text ~= self.text or textset then
+		self.text = text or self.text
+		self.surface = sdl.text(self.font, textset or self.textset, self.text)
+	end
 end
 
 function DecoCaption:draw(screen,widget)
-	self:setsurface(widget.captiontext)
+	local color = nil
+	if widget.disabled then
+		color = self.colorDisabled
+	else
+		color = self.colorNormal
+	end
+
+	self:setsurface(widget.captiontext, color)
 
 	DecoText.draw(self, screen, widget)
 end
