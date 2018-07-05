@@ -1204,7 +1204,16 @@ function RemoveSpawnPoint(point, m)
 		local acid = Board:IsAcid(point)
 		local fire = Board:IsFire(point)
 
+		local pawn = Board:GetPawn(point)
+		if pawn then
+			pawn:SetSpace(Point(-1, -1))
+		end
+
 		Board:ClearSpace(point)
+
+		if pawn then
+			pawn:SetSpace(point)
+		end
 
 		Board:SetTerrain(point, terrain)
 		Board:SetSmoke(point, smoke, false)
