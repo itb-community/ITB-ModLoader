@@ -12,6 +12,7 @@ local scripts = {
 	"decorations/deco_button",
 	"decorations/deco_checkbox",
 	"decorations/deco_dropdown",
+	"decorations/deco_animsheet",
 
 	"widgets/base",
 	"widgets/draggable",
