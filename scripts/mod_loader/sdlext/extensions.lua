@@ -192,6 +192,13 @@ function rect_contains(...)
 	end
 end
 
+function rect_intersects(r1, r2)
+	return not (r2.x > r1.x + r1.w or
+	            r2.x + r2.w < r1.x or
+	            r2.y > r1.y + r1.h or
+	            r2.y + r2.h < r1.y)
+end
+
 --[[
 	rect_equals(rect1, rect2)
 	OR
