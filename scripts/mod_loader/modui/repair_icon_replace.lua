@@ -3,6 +3,9 @@
 	personalities.
 --]]
 
+-- Technically this doesn't work for vanilla pilots who have custom repair abilities
+-- (Mantis and Repairman), but we assume that no one will want to override those.
+-- (Since you can do just by just replacing the image file)
 local repairIcon = sdlext.surface("img/weapons/repair.png")
 
 local iconHolder = nil
@@ -28,7 +31,7 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 
  	iconHolder.draw = function(self, screen)
  		self.visible = false
- 		if Pawn and repairIcon:wasDrawn() then
+ 		if Pawn and Pawn:IsSelected() and repairIcon:wasDrawn() then
 			local srf = repairReplacementIcons[Pawn:GetPersonality()]
 			if srf then
 	 			self.x = repairIcon.x
@@ -37,6 +40,15 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 	 			self.clipRect1.y = self.y
 	 			self.clipRect2.x = self.x
 	 			self.clipRect2.y = self.y + self.clipRect1.h
+
+	 			if rect_intersects(self.clipRect1, sdlext.CurrentWindowRect) then
+	 				self.clipRect1.w = math.max(0, math.min(32, sdlext.CurrentWindowRect.x - self.x))
+	 				self.clipRect2.w = math.max(0, math.min(18, sdlext.CurrentWindowRect.x - self.x))
+	 			else
+	 				self.clipRect1.w = 32
+	 				self.clipRect2.w = 18
+	 			end
+
 	 			self.visible = true
 	 			self.decorations[1].surface = srf
 			end
