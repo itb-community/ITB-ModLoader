@@ -76,15 +76,15 @@ function modApi:init()
 	LOG("MOD-API VERSION "..self.version)
 	self.currentModSquads = {}
 	self.currentModSquadText = {}
-	
+
 	if not self:fileExists("resources/resource.dat.bak") then
 		LOG("Backing up resource.dat")
-	
+
 		local from = io.open("resources/resource.dat","rb")
 		local to = io.open("resources/resource.dat.bak","w+b")
-		
+
 		to:write(from:read("*all"))
-		
+
 		from:close()
 		to:close()
 	else
@@ -92,7 +92,7 @@ function modApi:init()
 		local inp = file:read("*all")
 		file:close()
 		local instance = FtlDat.FtlDat:from_string(inp)
-		
+
 		if not instance.signature then
 			LOG("resource.dat has been updated since last launch, re-acquiring backup")
 			
@@ -101,12 +101,12 @@ function modApi:init()
 			to:close()
 		else
 			LOG("Restoring resource.dat")
-		
+
 			local from = io.open("resources/resource.dat.bak","rb")
 			local to = io.open("resources/resource.dat","wb")
-			
+
 			to:write(from:read("*all"))
-			
+
 			from:close()
 			to:close()
 		end
@@ -246,8 +246,8 @@ function modApi:init()
 	Settings = modApi:loadSettings()
 end
 
---Maintain sanity
---Update as new API functions are added
+-- Maintain sanity
+-- Update as new API functions are added
 function modApi:resetModContent()
 	self.textOverrides = {}
 	self.mod_squads = {
@@ -320,7 +320,7 @@ function modApi:resetModContent()
 	self.missionEndHooks = {}
 	self.vekSpawnAddedHooks = {}
 	self.vekSpawnRemovedHooks = {}
-	
+
 	local name, tbl = debug.getupvalue(oldGetPopulationTexts,1)
 	self.PopEvents = copy_table(tbl)
 	self.onGetPopEvent = {}
