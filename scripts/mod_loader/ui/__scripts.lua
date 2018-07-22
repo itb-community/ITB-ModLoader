@@ -26,7 +26,7 @@ local scripts = {
 	"widgets/mainmenubutton",
 }
 
-local rootpath = "scripts/mod_loader/ui/"
+local rootpath = GetParentPath(...)
 for i, filepath in ipairs(scripts) do
 	require(rootpath..filepath)
 end

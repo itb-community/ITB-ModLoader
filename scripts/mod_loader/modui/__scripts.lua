@@ -19,7 +19,7 @@ local scripts = {
 	"modcontent_entries",
 }
 
-local rootpath = "scripts/mod_loader/modui/"
+local rootpath = GetParentPath(...)
 for i, filepath in ipairs(scripts) do
 	require(rootpath..filepath)
 end
