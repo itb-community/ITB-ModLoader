@@ -11,12 +11,17 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 	versionText.decorations[1].rSpace = 8
 	versionText.visible = false
 
-	-- override the versionText element's draw() function to also
-	-- update its position
 	versionText.draw = function(self, screen)
-		self:pospx(screen:w() - 200, screen:h() - 50)
 		self.visible = sdlext.isMainMenu()
-		
 		Ui.draw(self, screen)
 	end
+
+	local relayout = function(screen, ...)
+		versionText:pospx(screen:w() - 200, screen:h() - 50)
+		versionText:widthpx(200):heightpx(20)
+		versionText.decorations[1].rSpace = 16
+		versionText.decorations[1].rSpace = 8
+	end
+
+	sdlext.addGameWindowResizedHook(relayout)
 end)

@@ -22,11 +22,10 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 		:addTo(uiRoot)
 	buttonModContent.visible = false
 
-	buttonModContent.draw = function(self, screen)
-		self:pospx(0, screen:h() - 186)
+	sdlext.addGameWindowResizedHook(function(screen, oldSize)
+		buttonModContent:pospx(0, screen:h() - 186)
+	end)
 
-		Ui.draw(self, screen)
-	end
 
 	buttonModContent.onclicked = function(self, button)
 		if button == 1 then

@@ -96,6 +96,13 @@ local function buildBackgroundPane()
 	return pane
 end
 
+sdlext.addGameWindowResizedHook(function(screen)
+	for i, pane in ipairs(dialogStack) do
+		pane:widthpx(screen:w()):heightpx(screen:h())
+		pane:relayout()
+	end
+end)
+
 -- //////////////////////////////////////////////////////////////////////
 
 function sdlext.dialogVisible()

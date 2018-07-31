@@ -12,6 +12,8 @@ function UiTooltip:new()
 
 	self.text = nil
 	self.visible = false
+
+	self.tooltipOffset = 10
 end
 
 --[[
@@ -66,21 +68,21 @@ function UiTooltip:draw(screen)
 		local x = 0
 		local y = 0
 
-		if c.screenx + 10 + c.w + self.w <= screen:w() then
-			x = c.screenx + 10 + c.w
+		if c.screenx + self.tooltipOffset + c.w + self.w <= screen:w() then
+			x = c.screenx + self.tooltipOffset + c.w
 			y = computeAlignedPos(self, c, screen, false)
-		elseif c.screenx - 10 - self.w >= 0 then
-			x = c.screenx - 10 - self.w
+		elseif c.screenx - self.tooltipOffset - self.w >= 0 then
+			x = c.screenx - self.tooltipOffset - self.w
 			y = computeAlignedPos(self, c, screen, false)
 		else
 			-- Can't fit the tooltip on either horizontal side
 			-- of the widget, try vertical alignment
 			x = computeAlignedPos(self, c, screen, true)
 
-			if c.screeny + 10 + c.h + self.h <= screen:h() then
-				y = c.screeny + 10 + c.h
-			elseif c.screeny - 10 - self.h >= 0 then
-				y = c.screeny - 10 - self.h
+			if c.screeny + self.tooltipOffset + c.h + self.h <= screen:h() then
+				y = c.screeny + self.tooltipOffset + c.h
+			elseif c.screeny - self.tooltipOffset - self.h >= 0 then
+				y = c.screeny - self.tooltipOffset - self.h
 			else
 				-- Can't fit the tooltip anywhere outside of the widget.
 				-- Give up, we'll just cover a part of it.
