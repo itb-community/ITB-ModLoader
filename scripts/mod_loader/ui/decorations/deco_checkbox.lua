@@ -5,22 +5,27 @@ deco.surfaces.checkboxHoveredUnchecked = sdl.surface("resources/mods/ui/checkbox
 
 
 DecoCheckbox = Class.inherit(DecoSurface)
-function DecoCheckbox:new()
-	DecoSurface.new(self, deco.surfaces.checkboxUnchecked)
+function DecoCheckbox:new(checked, unchecked, hovChecked, hovUnchecked)
+	self.srfChecked = checked or deco.surfaces.checkboxChecked
+	self.srfUnchecked = unchecked or deco.surfaces.checkboxUnchecked
+	self.srfHoveredChecked = hovChecked or deco.surfaces.checkboxHoveredChecked
+	self.srfHoveredUnchecked = hovUnchecked or deco.surfaces.checkboxHoveredUnchecked
+
+	DecoSurface.new(self, self.srfUnchecked)
 end
 
 function DecoCheckbox:draw(screen, widget)
 	if widget.checked ~= nil and widget.checked then
 		if widget.hovered then
-			self.surface = deco.surfaces.checkboxHoveredChecked
+			self.surface = self.srfHoveredChecked
 		else
-			self.surface = deco.surfaces.checkboxChecked
+			self.surface = self.srfChecked
 		end
 	else
 		if widget.hovered then
-			self.surface = deco.surfaces.checkboxHoveredUnchecked
+			self.surface = self.srfHoveredUnchecked
 		else
-			self.surface = deco.surfaces.checkboxUnchecked
+			self.surface = self.srfUnchecked
 		end
 	end
 	
