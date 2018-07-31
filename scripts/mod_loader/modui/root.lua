@@ -122,6 +122,12 @@ function sdlext.addSettingsChangedHook(fn)
 	table.insert(settingsChangedHooks, fn)
 end
 
+local settingsStretchChangedHooks = {}
+function sdlext.addSettingsStretchChangedHook(fn)
+	assert(type(fn) == "function")
+	table.insert(settingsStretchChangedHooks, fn)
+end
+
 -- Key hooks are fired WHEREVER in the game you are, whenever
 -- you press a key. So your hooks will need to have a lot of
 -- additional restrictions on when they're supposed to fire.
@@ -157,15 +163,51 @@ function sdlext.addPostKeyUpHook(fn)
 	table.insert(postKeyUpHooks, fn)
 end
 
+local function round(a)
+	return math.floor(a + 0.5)
+end
+
+local optionsBox = Boxes.escape_options_box
+local profileBox = Boxes.profile_window
+local function isOptionsBox(rect)
+	return (rect.w == round(optionsBox.w * uiScale) and rect.h == round(optionsBox.h * uiScale)) or
+	       (rect.w == round(profileBox.w * uiScale) and rect.h == round(profileBox.h * uiScale))
+end
+
+local escapeBox = Boxes.escape_box
+local function isBackgroundBox(rect)
+	return (rect.w == 0 and rect.h == 0) or
+	       (rect.w == round(escapeBox.w * uiScale) and rect.h == round(escapeBox.h * uiScale))
+end
+
 local wasOptionsWindow = false
 local isOptionsWindow = false
 sdlext.addFrameDrawnHook(function(screen)
+	if
+		-- was not stretched, but is now
+		(Settings.stretched == 0 and
+			screen:w() ~= ScreenSizeX() and
+			screen:h() ~= ScreenSizeY())
+		or
+		-- was stretched, now isn't
+		(Settings.stretched == 1 and
+			screen:w() == ScreenSizeX() and
+			screen:h() == ScreenSizeY())
+	then
+		Settings.stretched = 1 - Settings.stretched
+		uiScale = ComputeUiScale(screen)
+
+		for i, hook in ipairs(settingsStretchChangedHooks) do
+			hook(screen, Settings.stretched, uiScale)
+		end
+	end
+
+	if not wasOptionsWindow and isOptionsWindow then
+		-- TODO
+	end
+
 	if wasOptionsWindow and not isOptionsWindow then
 		-- Settings window was visible, but isn't anymore.
-		-- This also triggers when the player hovers over
-		-- an option in the options box, but this heuristic
-		-- is good enough (at least we're not reloading
-		-- the settings file every damn frame)
 		local oldSettings = Settings
 		Settings = modApi:loadSettings()
 
@@ -180,15 +222,11 @@ sdlext.addFrameDrawnHook(function(screen)
 	isOptionsWindow = false
 end)
 
-local optionsBox = Boxes.escape_options_box
-local profileBox = Boxes.profile_window
 sdlext.addWindowVisibleHook(function(screen, x, y, w, h)
-	if
-		(w == optionsBox.w and h == optionsBox.h) or
-		(w == profileBox.w and h == profileBox.h)
-	then
-		isOptionsWindow = true
-	end
+	isOptionsWindow = isOptionsBox(sdlext.CurrentWindowRect) or (
+		isOptionsBox(sdlext.LastWindowRect) and
+		not isBackgroundBox(sdlext.CurrentWindowRect)
+	)
 end)
 
 sdlext.addPreKeyDownHook(function(keycode)
@@ -210,7 +248,11 @@ sdlext.addPreKeyDownHook(function(keycode)
 			os.getKnownFolder(5).."/My Games/Into The Breach/settings.lua",
 			"Settings = " .. save_table(Settings)
 		)
-		isOptionsWindow = true
+		-- Defer setting the flag, so that we trigger settingsChanged hooks
+		-- after the settings file has been updated.
+		modApi:scheduleHook(50, function()
+			isOptionsWindow = true
+		end)
 	end
 
 	return false
