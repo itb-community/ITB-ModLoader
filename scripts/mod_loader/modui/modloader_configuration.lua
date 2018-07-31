@@ -88,6 +88,7 @@ local function createUi()
 				DecoAlign(0, -2),
 				DecoDropDown()
 			})
+			:settooltip("Controls where the game's logging messages are printed.")
 			:addTo(layout)
 
 		cboxCaller = createCheckboxOption(
