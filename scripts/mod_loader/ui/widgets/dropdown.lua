@@ -3,6 +3,7 @@ UiDropDown = Class.inherit(Ui)
 function UiDropDown:new(values,strings,value)
 	Ui.new(self)
 
+	self.dropdownFont = deco.uifont.default.font
 	self.tooltip = ""
 	self.nofitx = true
 	self.nofity = true
@@ -36,20 +37,22 @@ function UiDropDown:createDropDown()
 		self.root.currentDropDownOwner:destroyDropDown()
 	end
 	
+	local uiScale = GetUiScale()
+
 	self.open = true
 	
 	local items = {}
 	
 	local max_w = 32
 	for i, v in ipairs(self.values) do
-		local txt = DecoRAlignedText(self.strings[i] or tostring(v))
+		local txt = DecoRAlignedText(self.strings[i] or tostring(v), self.dropdownFont)
 		
 		if txt.surface:w() > max_w then
 			max_w = txt.surface:w()
 		end
 		
 		local item = Ui()
-			:width(1):heightpx(40)
+			:width(1):heightpx(40 * uiScale)
 			:decorate({
 				DecoSolidHoverable(deco.colors.button, deco.colors.buttonborder),
 				DecoAlign(0, 2),
@@ -70,15 +73,15 @@ function UiDropDown:createDropDown()
 		end
 	end
 	
-	local ddw = math.max(max_w + 8, 210)
+	local ddw = uiScale * math.max(max_w + 8, 210)
 	local dropDown = Ui()
 		:pospx(
 			self.rect.x + self.w - ddw,
 			self.rect.y + self.h + 2
 		)
 		:widthpx(ddw)
-		:heightpx(math.min(2 + #self.values * 40, 210))
-		:decorate({ DecoFrame(nil, nil, 1) })
+		:heightpx(uiScale * math.min(2 + #self.values * 40, 210))
+		:decorate({ DecoFrame(nil, nil, 1 * uiScale) })
 
 	local scrollarea = UiScrollArea()
 		:width(1):height(1)

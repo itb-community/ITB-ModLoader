@@ -42,10 +42,12 @@ local function createUi()
 
 	sdlext.showDialog(function(ui, quit)
 		ui.onDialogExit = onExit
+
+		local uiScale = GetUiScale()
 		
-		local portraitW = 122 + 8
-		local portraitH = 122 + 8
-		local gap = 10
+		local portraitW = (122 + 8) * uiScale
+		local portraitH = (122 + 8) * uiScale
+		local gap = 10 * uiScale
 		local cellW = portraitW + gap
 		local cellH = portraitH + gap
 
@@ -58,7 +60,7 @@ local function createUi()
 
 		local scrollarea = UiScrollArea()
 			:width(1):height(1)
-			:padding(24)
+			:padding(24 * uiScale)
 			:addTo(frametop)
 		
 		local placeholder = Ui()
@@ -109,13 +111,13 @@ local function createUi()
 			local col = (i - 1) % portraitsPerRow
 			local row = math.floor((i - 1) / portraitsPerRow)
 			
-			local surface = sdl.scaled(2, sdlext.surface("img/portraits/pilots/"..pilotId..".png"))
+			local surface = sdl.scaled(2 * uiScale, sdlext.surface("img/portraits/pilots/"..pilotId..".png"))
 			local button = Ui()
 				:widthpx(portraitW):heightpx(portraitH)
 				:pospx(cellW * col, cellH * row)
 				:decorate({
 					DecoButton(),
-					DecoAlign(-4),
+					DecoAlign(-4 * uiScale),
 					DecoSurface(surface)
 				})
 				:addTo(scrollarea)

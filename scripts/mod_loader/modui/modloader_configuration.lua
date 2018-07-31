@@ -4,6 +4,9 @@
 --]]
 
 local function createUi()
+	local uiScale = GetUiScale()
+	local font = sdlext.font("fonts/NunitoSans_Regular.ttf", 12 * uiScale)
+
 	local ddLogLevel = nil
 	local cboxCaller = nil
 	local cboxErrorFrame = nil
@@ -22,17 +25,25 @@ local function createUi()
 		saveModLoaderConfig()
 	end
 
+	local srfChecked = sdl.scaled(uiScale, deco.surfaces.checkboxChecked)
+	local srfUnchecked = sdl.scaled(uiScale, deco.surfaces.checkboxUnchecked)
+	local srfHovChecked = sdl.scaled(uiScale, deco.surfaces.checkboxHoveredChecked)
+	local srfHovUnchecked = sdl.scaled(uiScale, deco.surfaces.checkboxHoveredUnchecked)
+
+	local srfOpen = sdl.scaled(uiScale, deco.surfaces.dropdownOpen)
+	local srfClosed = sdl.scaled(uiScale, deco.surfaces.dropdownClosed)
+	local srfHovOpen = sdl.scaled(uiScale, deco.surfaces.dropdownOpenHovered)
+	local srfHovClosed = sdl.scaled(uiScale, deco.surfaces.dropdownClosedHovered)
+
 	local createCheckboxOption = function(text, tooltipOn, tooltipOff)
 		local cbox = UiCheckbox()
-			:width(1):heightpx(41)
+			:width(1):heightpx(41 * uiScale)
 			:settooltip(tooltipOn)
 			:decorate({
 				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText(text),
-				DecoAlign(0, -2),
-				DecoRAlign(33),
-				DecoCheckbox()
+				DecoText(text, font),
+				DecoRAlign(8 + srfChecked:w()),
+				DecoCheckbox(srfChecked, srfUnchecked, srfHovChecked, srfHovUnchecked)
 			})
 
 		cbox.updateTooltip = function(self)
@@ -66,11 +77,11 @@ local function createUi()
 
 		local scrollarea = UiScrollArea()
 			:width(1):height(1)
-			:padding(12)
+			:padding(12 * uiScale)
 			:addTo(frame)
 
 		local layout = UiBoxLayout()
-			:vgap(5)
+			:vgap(5 * uiScale)
 			:width(1)
 			:addTo(scrollarea)
 
@@ -79,17 +90,17 @@ local function createUi()
 				{ "None", "Only console", "File and console" },
 				modApi.logger.logLevel
 			)
-			:width(1):heightpx(41)
+			:width(1):heightpx(41 * uiScale)
 			:decorate({
 				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText("Logging Level"),
-				DecoDropDownText(nil, nil, nil, 33),
-				DecoAlign(0, -2),
-				DecoDropDown()
+				DecoText("Logging Level", font),
+				DecoDropDownText(nil, font, nil, 16 * uiScale + srfOpen:w()),
+				DecoAlign(10 * uiScale),
+				DecoDropDown(srfOpen, srfClosed, srfHovOpen, srfHovClosed)
 			})
 			:settooltip("Controls where the game's logging messages are printed.")
 			:addTo(layout)
+		ddLogLevel.dropdownFont = font
 
 		cboxCaller = createCheckboxOption(
 			"Print Caller Information",

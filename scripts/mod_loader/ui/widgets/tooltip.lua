@@ -1,10 +1,13 @@
 UiTooltip = Class.inherit(UiWrappedText)
 
 function UiTooltip:new()
-	UiWrappedText.new(self, nil, deco.uifont.tooltipText.font, deco.uifont.tooltipText.set)
-	
-	self:padding(10)
-		:decorate({ DecoFrame(deco.colors.button, deco.colors.white, 3) })
+	local uiScale = GetUiScale()
+	local font = sdlext.font("fonts/NunitoSans_Regular.ttf", 12 * uiScale)
+
+	UiWrappedText.new(self, nil, font, deco.uifont.tooltipText.set)
+
+	self:padding(10 * uiScale)
+		:decorate({ DecoFrame(deco.colors.button, deco.colors.white, 3 * uiScale) })
 	self.padt = self.padt - 1
 
 	self.translucent = true
@@ -13,7 +16,19 @@ function UiTooltip:new()
 	self.text = nil
 	self.visible = false
 
-	self.tooltipOffset = 10
+	self.tooltipOffset = 10 * uiScale
+
+	sdlext.addGameWindowResizedHook(function(screen) self:updateUiScale(screen) end)
+	sdlext.addSettingsStretchChangedHook(function(screen) self:updateUiScale(screen) end)
+end
+
+function UiTooltip:updateUiScale(screen)
+	local oldScale = self.decorations[1].bordersize / 3
+	local uiScale = GetUiScale()
+	self.font = sdlext.font("fonts/NunitoSans_Regular.ttf", 12 * uiScale)
+	self:padding(-10 * oldScale):padding(10 * uiScale)
+	self.decorations[1].bordersize = 3 * uiScale
+	self.tooltipOffset = 10 * uiScale
 end
 
 --[[

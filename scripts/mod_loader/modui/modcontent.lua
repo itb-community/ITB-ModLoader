@@ -17,15 +17,18 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 	if buttonModContent then return end
 	
 	buttonModContent = MainMenuButton("short")
-		:pospx(0, screen:h() - 186)
+		:pospx(0, screen:h() - 186 * GetUiScale())
 		:caption("Mod Content")
 		:addTo(uiRoot)
 	buttonModContent.visible = false
 
 	sdlext.addGameWindowResizedHook(function(screen, oldSize)
-		buttonModContent:pospx(0, screen:h() - 186)
+		buttonModContent:pospx(0, screen:h() - 186 * GetUiScale())
 	end)
 
+	sdlext.addSettingsStretchChangedHook(function(screen, settingsStretched, uiScale)
+		buttonModContent:pospx(0, screen:h() - 186 * GetUiScale())
+	end)
 
 	buttonModContent.onclicked = function(self, button)
 		if button == 1 then
@@ -34,6 +37,8 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 					quit()
 					return true
 				end
+
+				local uiScale = GetUiScale()
 
 				local frame = Ui()
 					:width(0.4):height(0.8)
@@ -44,15 +49,16 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 
 				local scrollarea = UiScrollArea()
 					:width(1):height(1)
-					:padding(16)
+					:padding(16 * uiScale)
 					:addTo(frame)
 
 				local holder = UiBoxLayout()
-					:vgap(12)
+					:vgap(12 * uiScale)
 					:width(1)
 					:addTo(scrollarea)
 				
-				local buttonHeight = 42
+				local font = sdlext.font("fonts/NunitoSans_Regular.ttf", 12 * uiScale)
+				local buttonHeight = 42 * uiScale
 				for i = 1,#modContent do
 					local obj = modContent[i]
 					local entryBtn = Ui()
@@ -60,7 +66,7 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 						:heightpx(buttonHeight)
 						:caption(obj.caption)
 						:settooltip(obj.tip)
-						:decorate({ DecoButton(), DecoAlign(0, 2), DecoCaption() })
+						:decorate({ DecoButton(), DecoAlign(0, -1 * uiScale), DecoCaption(font) })
 						:addTo(holder)
 
 					if obj.disabled then entryBtn.disabled = true end
