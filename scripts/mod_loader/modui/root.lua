@@ -309,10 +309,13 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 
 	local wx, wy, ww, wh
 	if srfBotLeft:wasDrawn() and srfTopRight:wasDrawn() then
-		wx = srfBotLeft.x
-		wy = srfTopRight.y - 4
-		ww = srfTopRight.x - wx
-		wh = srfBotLeft.y  - wy
+		wx = srfBotLeft.x         * uiScale
+		wy = (srfTopRight.y - 4)  * uiScale
+		ww = round((srfTopRight.x * uiScale) - wx)
+		wh = round((srfBotLeft.y  * uiScale) - wy)
+
+		wx = round(wx)
+		wy = round(wy)
 	end
 
 	if not rect_equals(sdlext.CurrentWindowRect, wx, wy, ww, wh) then
