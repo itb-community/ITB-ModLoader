@@ -31,6 +31,26 @@ end
 
 function GetScreenCenter()
 	return Point(ScreenSizeX() / 2, ScreenSizeY() / 2)
+
+local uiScale = 1
+function GetUiScale()
+	return uiScale
+end
+
+function ComputeUiScale(screen, stretched)
+	stretched = stretched or Settings.stretched
+	assert(type(stretched) == "number")
+
+	if stretched == 1 then
+		-- When stretch-scaling is on, game's
+		-- resolution is forcibly set to 1280x720.
+		return math.min(
+			screen:w() / 1280,
+			screen:h() / 720
+		)
+	end
+
+	return 1
 end
 
 -- //////////////////////////////////////////////////////////////////////
@@ -203,6 +223,8 @@ sdlext.addSettingsChangedHook(function(old, new)
 end)
 
 sdlext.addGameWindowResizedHook(function(screen, oldSize)
+	uiScale = ComputeUiScale(screen)
+
 	sdlext.getUiRoot():widthpx(screen:w()):heightpx(screen:h())
 end)
 
