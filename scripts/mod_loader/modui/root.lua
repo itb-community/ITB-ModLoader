@@ -30,7 +30,13 @@ function sdlext.isConsoleOpen()
 end
 
 function GetScreenCenter()
-	return Point(ScreenSizeX() / 2, ScreenSizeY() / 2)
+	if Settings.stretched == 1 then
+		local screen = sdl.screen()
+		return Point(screen:w() / 2, screen:h() / 2)
+	else
+		return Point(ScreenSizeX() / 2, ScreenSizeY() / 2)
+	end
+end
 
 local uiScale = 1
 function GetUiScale()
