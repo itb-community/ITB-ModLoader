@@ -17,13 +17,14 @@ function DecoSurface:draw(screen, widget)
 	widget.decorationx = widget.decorationx + self.surface:w()
 end
 
+
 DecoSurfaceOutlined = Class.inherit(DecoSurface)
-function DecoSurfaceOutlined:new(surface, levels, bordercolor, hlcolor, scale)
+function DecoSurfaceOutlined:new(surface, outlineWidth, bordercolor, hlcolor, scale)
 	self.surfacenormal = sdl.scaled(
 		scale or 2,
 		sdl.outlined(
 			surface,
-			levels or 1,
+			outlineWidth or 1,
 			bordercolor or deco.colors.buttonborder
 		)
 	)
@@ -31,7 +32,7 @@ function DecoSurfaceOutlined:new(surface, levels, bordercolor, hlcolor, scale)
 		scale or 2,
 		sdl.outlined(
 			surface,
-			levels or 1,
+			outlineWidth or 1,
 			hlcolor or deco.colors.buttonborderhl
 		)
 	)
