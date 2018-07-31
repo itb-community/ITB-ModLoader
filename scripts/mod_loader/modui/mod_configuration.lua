@@ -163,6 +163,7 @@ local function createUi()
 					local checkbox = UiCheckbox()
 						:widthpx((scrollarea.w - scrollarea.padl - scrollarea.padr) - 41 - 5)
 						:heightpx(41)
+						:settooltip(mod.description)
 						:decorate({
 							DecoButton(),
 							DecoCheckbox(),
@@ -243,6 +244,7 @@ local function createUi()
 				else
 					local checkbox = UiCheckbox()
 						:width(1):heightpx(41)
+						:settooltip(mod.description)
 						:decorate({
 							DecoButton(),
 							DecoCheckbox(),
