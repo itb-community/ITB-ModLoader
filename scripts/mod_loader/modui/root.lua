@@ -42,6 +42,12 @@ function sdlext.addUiRootCreatedHook(fn)
 	table.insert(uiRootCreatedHooks, fn)
 end
 
+local gameWindowResizedHooks = {}
+function sdlext.addGameWindowResizedHook(fn)
+	assert(type(fn) == "function")
+	table.insert(gameWindowResizedHooks, fn)
+end
+
 local mainMenuEnteredHooks = {}
 function sdlext.addMainMenuEnteredHook(fn)
 	assert(type(fn) == "function")
@@ -172,7 +178,7 @@ sdlext.addPreKeyDownHook(function(keycode)
 
 	-- don't process other keypresses while the console is open
 	if sdlext.isConsoleOpen() then
-		return
+		return false
 	end
 
 	if keycode == Settings.hotkeys[23] then -- fullscreen hotkey
@@ -194,6 +200,10 @@ sdlext.addSettingsChangedHook(function(old, new)
 	if old.last_profile ~= new.last_profile then
 		Profile = modApi:loadProfile()
 	end
+end)
+
+sdlext.addGameWindowResizedHook(function(screen, oldSize)
+	sdlext.getUiRoot():widthpx(screen:w()):heightpx(screen:h())
 end)
 
 -- //////////////////////////////////////////////////////////////////////
@@ -218,6 +228,7 @@ local function buildUiRoot(screen)
 	uiRootCreatedHooks = nil
 end
 
+local lastScreenSize = { x = ScreenSizeX(), y = ScreenSizeY() }
 sdlext.CurrentWindowRect = sdl.rect(0, 0, 0, 0)
 sdlext.LastWindowRect = sdl.rect(0, 0, 0, 0)
 MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
@@ -232,7 +243,19 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	if not uiRoot then
 		buildUiRoot(screen)
 	end
-	uiRoot:widthpx(screen:w()):heightpx(screen:h())
+
+	if
+		lastScreenSize.x ~= screen:w() or
+		lastScreenSize.y ~= screen:h()
+	then
+		local oldSize = copy_table(lastScreenSize)
+		for i, hook in ipairs(gameWindowResizedHooks) do
+			hook(screen, oldSize)
+		end
+
+		lastScreenSize.x = screen:w()
+		lastScreenSize.y = screen:h()
+	end
 
 	if wasMainMenu and not isInMainMenu then
 		for i, hook in ipairs(mainMenuExitedHooks) do
