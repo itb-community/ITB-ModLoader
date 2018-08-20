@@ -82,16 +82,20 @@ end
 local function updateQueuedSpawns(self)
 	local removed = {}
 
-	for i, el in ipairs(self.QueuedSpawns) do
-		if not Board:IsSpawning(el.location) then
-			remove_element(el, self.QueuedSpawns)
-			table.insert(removed, el)
+	for i = #self.QueuedSpawns, 1, -1 do
+		local spawn = self.QueuedSpawns[i]
+
+		if not Board:IsSpawning(spawn.location) then
+			table.remove(self.QueuedSpawns, i)
+			table.insert(removed, spawn)
 		end
 	end
 
-	for i, el in ipairs(removed) do
-		for i, hook in ipairs(modApi.vekSpawnRemovedHooks) do
-			hook(self, el)
+	for i = #removed, 1, -1 do
+		local spawn = removed[i]
+
+		for _, hook in ipairs(modApi.vekSpawnRemovedHooks) do
+			hook(self, spawn)
 		end
 	end
 end
