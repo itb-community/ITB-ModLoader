@@ -5,6 +5,7 @@ local scripts = {
 	"mainmenu",
 	"hangar",
 	"version_string",
+	"version_warning",
 	"error_warning",
 	"resource_error",
 	"modcontent",

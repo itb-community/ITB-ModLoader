@@ -7,6 +7,7 @@ local function createUi()
 	local ddLogLevel = nil
 	local cboxCaller = nil
 	local cboxErrorFrame = nil
+	local cboxVersionFrame = nil
 	local cboxResourceError = nil
 	local cboxRestartReminder = nil
 	local cboxFloatyTooltips = nil
@@ -15,6 +16,7 @@ local function createUi()
 		modApi.logger.logLevel        = ddLogLevel.value
 		modApi.logger.printCallerInfo = cboxCaller.checked
 		modApi.showErrorFrame         = cboxErrorFrame.checked
+		modApi.showVersionFrame       = cboxVersionFrame.checked
 		modApi.showResourceWarning    = cboxResourceError.checked
 		modApi.showRestartReminder    = cboxRestartReminder.checked
 		modApi.floatyTooltips         = cboxFloatyTooltips.checked
@@ -122,6 +124,14 @@ local function createUi()
 
 		cboxErrorFrame.checked = modApi.showErrorFrame
 		cboxErrorFrame:addTo(layout)
+
+		cboxVersionFrame = createCheckboxOption(
+			"Show Mod Loader Outdated Popup",
+			"Show a popup if the mod loader is out-of-date for installed mods."
+		)
+
+		cboxVersionFrame.checked = modApi.showVersionFrame
+		cboxVersionFrame:addTo(layout)
 
 		cboxResourceError = createCheckboxOption(
 			"Show Resource Error Popup",

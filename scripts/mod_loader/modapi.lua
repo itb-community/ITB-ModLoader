@@ -12,6 +12,7 @@ function saveModLoaderConfig()
 	data.logLevel            = modApi.logger.logLevel
 	data.printCallerInfo     = modApi.logger.printCallerInfo
 	data.showErrorFrame      = modApi.showErrorFrame
+	data.showVersionFrame    = modApi.showVersionFrame
 	data.showResourceWarning = modApi.showResourceWarning
 	data.showRestartReminder = modApi.showRestartReminder
 	data.floatyTooltips      = modApi.floatyTooltips
@@ -26,6 +27,7 @@ function loadModLoaderConfig()
 		logLevel            = 1, -- log to console by default
 		printCallerInfo     = true,
 		showErrorFrame      = true,
+		showVersionFrame    = true,
 		showResourceWarning = true,
 		showRestartReminder = true,
 		floatyTooltips      = true
@@ -49,6 +51,7 @@ function loadModLoaderConfig()
 	data.logLevel            = getOrDefault("logLevel")
 	data.printCallerInfo     = getOrDefault("printCallerInfo")
 	data.showErrorFrame      = getOrDefault("showErrorFrame")
+	data.showVersionFrame    = getOrDefault("showVersionFrame")
 	data.showResourceWarning = getOrDefault("showResourceWarning")
 	data.showRestartReminder = getOrDefault("showRestartReminder")
 	data.floatyTooltips      = getOrDefault("floatyTooltips")
@@ -60,6 +63,7 @@ function applyModLoaderConfig(config)
 	modApi.logger.logLevel        = config.logLevel
 	modApi.logger.printCallerInfo = config.printCallerInfo
 	modApi.showErrorFrame         = config.showErrorFrame
+	modApi.showVersionFrame       = config.showVersionFrame
 	modApi.showResourceWarning    = config.showResourceWarning
 	modApi.showRestartReminder    = config.showRestartReminder
 	modApi.floatyTooltips         = config.floatyTooltips
