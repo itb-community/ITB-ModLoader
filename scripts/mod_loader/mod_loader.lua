@@ -118,6 +118,18 @@ end
 function mod_loader:initMod(id)
 	local mod = self.mods[id]
 
+	if mod.modApiVersion and not modApi:isVersion(mod.modApiVersion) then
+		mod.initialized = false
+		mod.installed = false
+		mod.outOfDate = true
+
+		LOG(string.format(
+			"Could not initialize mod [%s] with id [%s], because it requires mod loader version %s or higher (installed: %s).",
+			mod.name, id, mod.modApiVersion, modApi.version
+		))
+		return
+	end
+
 	local ok, err = xpcall(
 		function()
 			mod.init(mod)
@@ -320,7 +332,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 				if not self.firsterror then self.firsterror = err end
 				LOG(err)
 			end
-		else
+		elseif not mod.outOfDate then
 			mod.installed = false
 			LOG(string.format(
 				"Failed to load mod [%s] with id [%s], because it was not initialized.",
