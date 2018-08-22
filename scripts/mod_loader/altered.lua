@@ -1102,6 +1102,12 @@ local function addSpawnData(self, location, type, id, age)
 	-- how long the spawn has been on the board (in case it's blocked repeatedly)
 	el.turns = age or 0
 
+	if not self.QueuedSpawns then
+		-- For some reason, QueuedSpawns might be nil here somehow.
+		-- Not entirely clear why that happens.
+		self.QueuedSpawns = {}
+	end
+
 	--[[
 		Vek surface in the order defined in this table, but spawn points
 		appear on the board in reverse order.
