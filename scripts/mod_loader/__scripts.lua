@@ -5,9 +5,9 @@ local scripts = {
 	"ui/__scripts",
 	"modui/__scripts",
 
-	"modapi",
+	"modapi/__scripts",
 	"ftldat/__scripts",
-	"altered",
+	"altered/__scripts",
 	"mod_loader",
 }
 

@@ -21,7 +21,7 @@ local function createUi()
 		modApi.showRestartReminder    = cboxRestartReminder.checked
 		modApi.floatyTooltips         = cboxFloatyTooltips.checked
 
-		saveModLoaderConfig()
+		SaveModLoaderConfig()
 	end
 
 	local createCheckboxOption = function(text, tooltipOn, tooltipOff)
@@ -151,8 +151,8 @@ local function createUi()
 	end)
 end
 
-function configureModLoader()
-	applyModLoaderConfig(loadModLoaderConfig())
+function ConfigureModLoader()
+	ApplyModLoaderConfig(LoadModLoaderConfig())
 
 	createUi()
 end

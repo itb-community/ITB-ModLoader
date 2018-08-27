@@ -173,8 +173,7 @@ local function createUi()
 	end)
 end
 
-
-function selectSquads()
+function SelectSquads()
 	loadSquadSelection()
 	
 	createUi()

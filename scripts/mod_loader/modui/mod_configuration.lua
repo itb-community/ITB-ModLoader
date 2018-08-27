@@ -14,7 +14,7 @@ end
 local function responseFn(btnIndex)
 	if btnIndex == 2 then
 		modApi.showRestartReminder = false
-		saveModLoaderConfig()
+		SaveModLoaderConfig()
 	end
 end
 
@@ -269,7 +269,7 @@ local function createUi()
 	end)
 end
 
-function configureMods()
+function ConfigureMods()
 	loadSquadSelection()
 	
 	createUi()

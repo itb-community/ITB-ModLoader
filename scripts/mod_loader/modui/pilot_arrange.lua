@@ -174,7 +174,7 @@ local function createUi()
 	end)
 end
 
-function showArrangePilotsUi()
+function ArrangePilots()
 	loadPilotsOrder()
 
 	createUi()
