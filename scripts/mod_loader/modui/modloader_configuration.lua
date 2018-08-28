@@ -64,7 +64,7 @@ local function createUi()
 		ui.onDialogExit = onExit
 
 		local frame = Ui()
-			:width(0.5):height(0.4)
+			:width(0.6):height(0.575)
 			:posCentered()
 			:caption("Mod Loader Configuration")
 			:decorate({
@@ -152,7 +152,7 @@ local function createUi()
 
 		cboxResourceError = createCheckboxOption(
 			"Show Resource Error Popup",
-			"Show an error popup at startup if the modloader fails to load the game's resources."
+			"Show an error popup at startup if the mod loader fails to load the game's resources."
 		)
 
 		cboxResourceError.checked = modApi.showResourceWarning
