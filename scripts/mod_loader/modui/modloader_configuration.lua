@@ -126,7 +126,7 @@ local function createUi()
 
 		cboxProfileConfig = createCheckboxOption(
 			"Profile-Specific Configuration",
-			"Configuration for the mod loader and individual mods will be remembered per-profile, instead of globally."
+			"Configuration for the mod loader and individual mods will be remembered per profile, instead of globally.\n\nNote: with this option enabled, switching profiles will require you to restart the game to apply the different configurations."
 		)
 
 		cboxProfileConfig.checked = modApi.profileConfig
