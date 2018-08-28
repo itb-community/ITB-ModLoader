@@ -5,10 +5,19 @@
 --]]
 
 local function saveModConfig()
-	sdlext.config("modcontent.lua", function(obj)
+	local saveConfig = function(obj)
 		obj.modOptions = mod_loader:getCurrentModContent()
 		obj.modOrder = mod_loader:getCurrentModOrder()
-	end)
+	end
+
+	local modcontent = nil
+	if modApi.profileConfig then
+		modcontent = modApi:getCurrentProfilePath().."modcontent.lua"
+	else
+		modcontent = "modcontent.lua"
+	end
+
+	sdlext.config(modcontent, saveConfig)
 end
 
 local function responseFn(btnIndex)

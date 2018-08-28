@@ -188,11 +188,11 @@ end
 
 function mod_loader:getModConfig()
 	local options = self:getModContentDefaults()
-	
-	sdlext.config("modcontent.lua",function(obj)
+
+	local readConfig = function(obj)
 		if not obj.modOptions then return end
 		
-		for id,mod in pairs(obj.modOptions) do
+		for id, mod in pairs(obj.modOptions) do
 			if options[id] then
 				options[id].enabled = mod.enabled
 				for i, option in pairs(mod.options) do
@@ -202,7 +202,16 @@ function mod_loader:getModConfig()
 				end
 			end
 		end
-	end)
+	end
+
+	local modcontent = nil
+	if modApi.profileConfig then
+		modcontent = modApi:getCurrentProfilePath().."modcontent.lua"
+	else
+		modcontent = "modcontent.lua"
+	end
+
+	sdlext.config(modcontent, readConfig)
 	
 	return options
 end

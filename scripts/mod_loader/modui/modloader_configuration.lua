@@ -11,6 +11,7 @@ local function createUi()
 	local cboxResourceError = nil
 	local cboxRestartReminder = nil
 	local cboxFloatyTooltips = nil
+	local cboxProfileConfig = nil
 
 	local onExit = function(self)
 		modApi.logger.logLevel        = ddLogLevel.value
@@ -20,6 +21,7 @@ local function createUi()
 		modApi.showResourceWarning    = cboxResourceError.checked
 		modApi.showRestartReminder    = cboxRestartReminder.checked
 		modApi.floatyTooltips         = cboxFloatyTooltips.checked
+		modApi.profileConfig          = cboxProfileConfig.checked
 
 		SaveModLoaderConfig()
 	end
@@ -51,6 +53,11 @@ local function createUi()
 		end
 
 		return cbox
+	end
+
+	local createSeparator = function(h)
+		return Ui()
+			:width(1):heightpx(h)
 	end
 
 	sdlext.showDialog(function(ui, quit)
@@ -116,6 +123,16 @@ local function createUi()
 		cboxFloatyTooltips.checked = modApi.floatyTooltips
 		cboxFloatyTooltips:updateTooltip()
 		cboxFloatyTooltips:addTo(layout)
+
+		cboxProfileConfig = createCheckboxOption(
+			"Profile-Specific Configuration",
+			"Configuration for the mod loader and individual mods will be remembered per-profile, instead of globally."
+		)
+
+		cboxProfileConfig.checked = modApi.profileConfig
+		cboxProfileConfig:addTo(layout)
+
+		createSeparator(10):addTo(layout)
 
 		cboxErrorFrame = createCheckboxOption(
 			"Show Script Error Popup",

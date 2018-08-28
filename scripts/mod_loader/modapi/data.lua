@@ -41,11 +41,14 @@ function modApi:loadProfile()
 	return nil
 end
 
-function modApi:writeProfileData(id, obj)
+function modApi:getCurrentProfilePath()
 	Settings = self:loadSettings()
+	return "profile_"..Settings.last_profile.."/"
+end
 
+function modApi:writeProfileData(id, obj)
 	sdlext.config(
-		"profile_"..Settings.last_profile.."/modcontent.lua",
+		self:getCurrentProfilePath().."modcontent.lua",
 		function(readObj)
 			readObj[id] = obj
 		end
@@ -53,12 +56,10 @@ function modApi:writeProfileData(id, obj)
 end
 
 function modApi:readProfileData(id)
-	Settings = self:loadSettings()
-
 	local result = nil
 
 	sdlext.config(
-		"profile_"..Settings.last_profile.."/modcontent.lua",
+		self:getCurrentProfilePath().."modcontent.lua",
 		function(readObj)
 			result = readObj[id]
 		end
