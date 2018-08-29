@@ -25,6 +25,7 @@ function mod_loader:init()
 	-- orderMods only returns a list with enabled mods, so we iterate over the
 	-- list of all mods here.
 	for id, _ in pairs(self.mods) do
+		modApi:setCurrentMod(id)
 		self:initMetadata(id)
 	end
 
