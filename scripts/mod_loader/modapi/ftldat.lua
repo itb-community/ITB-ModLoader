@@ -63,7 +63,7 @@ end
 function modApi:appendAsset(resource, filePath)
 	assert(type(resource) == "string")
 	local f = io.open(filePath,"rb")
-	assert(f, filePath)
+	assert(f, "File doesn't exist: ".. filePath)
 	
 	local content = f:read("*all")
 	f:close()
