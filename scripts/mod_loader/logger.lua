@@ -3,9 +3,9 @@ local Logger = {
 	LOG_LEVEL_CONSOLE = 1,
 	LOG_LEVEL_FILE = 2,
 
-	logLevel = 0,
+	logLevel = 1,
 	logFile = nil,
-	printCallerInfo = true,
+	printCallerInfo = false,
 }
 
 function Logger.logNothing()
