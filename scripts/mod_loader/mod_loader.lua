@@ -98,6 +98,11 @@ function mod_loader:enumerateMods()
 		end]]
 
 		-- Optional fields, just verify the type if they're defined
+		if ok and data.icon and type(data.icon) ~= "string" then
+			ok = false
+			err = "'icon' is not a string"
+		end
+
 		if ok and data.metadata and type(data.metadata) ~= "function" then
 			ok = false
 			err = "'metadata' is not a function"
@@ -175,6 +180,10 @@ end
 
 function mod_loader:initMetadata(id)
 	local mod = self.mods[id]
+
+	if mod.icon then
+		mod.icon = mod.resourcePath .. mod.icon
+	end
 
 	if mod.metadata then
 		local ok, err = xpcall(
