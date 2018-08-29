@@ -7,10 +7,6 @@ function modApi:init()
 
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
-	if self.logger.logLevel == self.logger.LOG_LEVEL_FILE then
-		self.logger.logToFile("log.txt")
-	end
-
 	self.version = "2.3.0"
 	LOG("MOD-API VERSION "..self.version)
 	self.currentModSquads = {}

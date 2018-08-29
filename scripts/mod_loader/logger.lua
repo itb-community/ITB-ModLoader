@@ -32,6 +32,21 @@ function Logger.logToFile(filename)
 	print(message)
 end
 
+function Logger.setLogLevel(newLevel)
+	if Logger.logLevel == Logger.LOG_LEVEL_FILE and Logger.logFile then
+		io.close(Logger.logFile)
+		Logger.logFile = nil
+	end
+
+	if newLevel == Logger.LOG_LEVEL_NONE then
+		Logger.logNothing()
+	elseif newLevel == Logger.LOG_LEVEL_CONSOLE then
+		Logger.logToConsole()
+	elseif newLevel == Logger.LOG_LEVEL_FILE then
+		Logger.logToFile("log.txt")
+	end
+end
+
 function Logger.log(...)
 	if Logger.logLevel == Logger.LOG_LEVEL_NONE then
 		return

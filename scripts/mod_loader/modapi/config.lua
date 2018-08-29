@@ -81,7 +81,8 @@ function LoadModLoaderConfig()
 end
 
 function ApplyModLoaderConfig(config)
-	modApi.logger.logLevel        = config.logLevel
+	modApi.logger.setLogLevel(config.logLevel)
+
 	modApi.logger.printCallerInfo = config.printCallerInfo
 	modApi.showErrorFrame         = config.showErrorFrame
 	modApi.showVersionFrame       = config.showVersionFrame

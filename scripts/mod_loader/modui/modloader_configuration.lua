@@ -14,14 +14,15 @@ local function createUi()
 	local cboxProfileConfig = nil
 
 	local onExit = function(self)
-		modApi.logger.logLevel        = ddLogLevel.value
-		modApi.logger.printCallerInfo = cboxCaller.checked
-		modApi.showErrorFrame         = cboxErrorFrame.checked
-		modApi.showVersionFrame       = cboxVersionFrame.checked
-		modApi.showResourceWarning    = cboxResourceError.checked
-		modApi.showRestartReminder    = cboxRestartReminder.checked
-		modApi.floatyTooltips         = cboxFloatyTooltips.checked
-		modApi.profileConfig          = cboxProfileConfig.checked
+		ApplyModLoaderConfig({
+			logLevel            = ddLogLevel.value,
+			printCallerInfo     = cboxCaller.checked,
+			profileConfig       = cboxProfileConfig.checked,
+			showErrorFrame      = cboxErrorFrame.checked,
+			showVersionFrame    = cboxVersionFrame.checked,
+			showResourceWarning = cboxResourceError.checked,
+			showRestartReminder = cboxRestartReminder.checked
+		})
 
 		SaveModLoaderConfig()
 	end
@@ -169,7 +170,5 @@ local function createUi()
 end
 
 function ConfigureModLoader()
-	ApplyModLoaderConfig(LoadModLoaderConfig())
-
 	createUi()
 end
