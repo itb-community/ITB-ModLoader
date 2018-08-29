@@ -21,6 +21,13 @@ function mod_loader:init()
 		modApi:appendAsset("img/mouse/pointer.png","resources/mods/ui/pointer-dummy.png")
 	end
 	
+	-- Process all mods for metadata first.
+	-- orderMods only returns a list with enabled mods, so we iterate over the
+	-- list of all mods here.
+	for id, _ in pairs(self.mods) do
+		self:initMetadata(id)
+	end
+
 	local orderedMods = self:orderMods(self:getModConfig(), self:getSavedModOrder())
 	for i, id in ipairs(orderedMods) do
 		modApi:setCurrentMod(id)
@@ -89,7 +96,13 @@ function mod_loader:enumerateMods()
 			ok = false
 			err = "Invalid version format"
 		end]]
-		
+
+		-- Optional fields, just verify the type if they're defined
+		if ok and data.metadata and type(data.metadata) ~= "function" then
+			ok = false
+			err = "'metadata' is not a function"
+		end
+
 		if ok then
 			data.dir = dir
 			data.path = path
@@ -118,6 +131,8 @@ end
 function mod_loader:initMod(id)
 	local mod = self.mods[id]
 
+	-- Process version in init, so that mods that are not enabled don't
+	-- trigger the warning dialog.
 	if mod.modApiVersion and not modApi:isVersion(mod.modApiVersion) then
 		mod.initialized = false
 		mod.installed = false
@@ -137,10 +152,7 @@ function mod_loader:initMod(id)
 		function(e)
 			return string.format(
 				"Initializing mod [%s] with id [%s] failed: %s\n\n%s",
-				mod.name,
-				id,
-				e,
-				debug.traceback()
+				mod.name, id, e, debug.traceback()
 			)
 		end
 	)
@@ -158,6 +170,33 @@ function mod_loader:initMod(id)
 		mod.error = err
 		if not self.firsterror then self.firsterror = err end
 		LOG(err)
+	end
+end
+
+function mod_loader:initMetadata(id)
+	local mod = self.mods[id]
+
+	if mod.metadata then
+		local ok, err = xpcall(
+			function()
+				mod.metadata(mod)
+			end,
+			function(e)
+				return string.format(
+					"Preparing metadata for mod [%s] with id [%s] failed: %s\n\n%s",
+					mod.name, id, e, debug.traceback()
+				)
+			end
+		)
+
+		if ok then
+			LOG(string.format(
+				"Metadata for mod [%s] with id [%s] prepared successfully!",
+				mod.name, id
+			))
+		else
+			LOG(err)
+		end
 	end
 end
 
@@ -320,10 +359,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 				function(e)
 					return string.format(
 						"Loading mod [%s] with id [%s] failed: %s\n\n%s",
-						mod.name,
-						id,
-						e,
-						debug.traceback()
+						mod.name, id, e, debug.traceback()
 					)
 				end
 			)
