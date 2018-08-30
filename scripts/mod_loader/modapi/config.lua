@@ -94,3 +94,9 @@ function ApplyModLoaderConfig(config)
 	modApi.showResourceWarning    = config.showResourceWarning
 	modApi.showRestartReminder    = config.showRestartReminder
 end
+
+sdlext.addSettingsChangedHook(function(old, neu)
+	if modApi.profileConfig and old.last_profile ~= neu.last_profile then
+		ApplyModLoaderConfig(LoadModLoaderConfig())
+	end
+end)
