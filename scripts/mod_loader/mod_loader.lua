@@ -238,29 +238,33 @@ end
 function mod_loader:getModConfig()
 	local options = self:getModContentDefaults()
 
-	local readConfig = function(obj)
-		if not obj.modOptions then return end
-		
-		for id, mod in pairs(obj.modOptions) do
-			if options[id] then
-				options[id].enabled = mod.enabled
+	local copyOptionsFn = function(from, to)
+		for id, mod in pairs(from) do
+			if to[id] then
+				to[id].enabled = mod.enabled
 				for i, option in pairs(mod.options) do
-					if options[id].options[i] then
-						options[id].options[i] = mod.options[i]
+					if to[id].options[i] then
+						to[id].options[i] = mod.options[i]
 					end
 				end
 			end
 		end
 	end
 
-	local modcontent = nil
-	if modApi.profileConfig then
-		modcontent = modApi:getCurrentProfilePath().."modcontent.lua"
-	else
-		modcontent = "modcontent.lua"
+	local readConfigFn = function(obj)
+		if not obj.modOptions then return end
+		copyOptionsFn(obj.modOptions, options)
 	end
 
-	sdlext.config(modcontent, readConfig)
+	-- Read from shared config first
+	sdlext.config("modcontent.lua", readConfigFn)
+
+	-- Read from profile-specific config, if enabled
+	-- For newly created profiles, this will not change the options in any way,
+	-- effectively "copying" current settings.
+	if modApi.profileConfig then
+		sdlext.config(modApi:getCurrentProfilePath().."modcontent.lua", readConfigFn)
+	end
 	
 	return options
 end
