@@ -5,6 +5,7 @@ modApi = {}
 function modApi:init()
 	self.logger = require("scripts/mod_loader/logger")
 
+	Settings = self:loadSettings()
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
 	self.version = "2.3.0"
@@ -177,8 +178,6 @@ function modApi:init()
 			modApi:evaluateConditionalHooks()
 		end)
 	end
-
-	Settings = modApi:loadSettings()
 end
 
 -- Maintain sanity
