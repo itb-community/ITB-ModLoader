@@ -23,7 +23,7 @@ end
 local function responseFn(btnIndex)
 	if btnIndex == 2 then
 		modApi.showRestartReminder = false
-		SaveModLoaderConfig()
+		SaveModLoaderConfig(CurrentModLoaderConfig())
 	end
 end
 

@@ -6,25 +6,52 @@
 local function createUi()
 	local ddLogLevel = nil
 	local cboxCaller = nil
+	local cboxFloatyTooltips = nil
+	local cboxProfileConfig = nil
 	local cboxErrorFrame = nil
 	local cboxVersionFrame = nil
 	local cboxResourceError = nil
 	local cboxRestartReminder = nil
-	local cboxFloatyTooltips = nil
-	local cboxProfileConfig = nil
 
 	local onExit = function(self)
-		ApplyModLoaderConfig({
+		local data = {
 			logLevel            = ddLogLevel.value,
 			printCallerInfo     = cboxCaller.checked,
+			floatyTooltips      = cboxFloatyTooltips.checked,
 			profileConfig       = cboxProfileConfig.checked,
+
 			showErrorFrame      = cboxErrorFrame.checked,
 			showVersionFrame    = cboxVersionFrame.checked,
 			showResourceWarning = cboxResourceError.checked,
 			showRestartReminder = cboxRestartReminder.checked
-		})
+		}
 
-		SaveModLoaderConfig()
+		ApplyModLoaderConfig(data)
+		SaveModLoaderConfig(data)
+	end
+
+	local uiSetSettings = function(config)
+		ddLogLevel.value            = config.logLevel
+		ddLogLevel.choice           = ddLogLevel.value + 1
+		cboxCaller.checked          = config.printCallerInfo
+		cboxFloatyTooltips.checked  = config.floatyTooltips
+		cboxProfileConfig.checked   = config.profileConfig
+
+		cboxErrorFrame.checked      = config.showErrorFrame
+		cboxVersionFrame.checked    = config.showVersionFrame
+		cboxResourceError.checked   = config.showResourceWarning
+		cboxRestartReminder.checked = config.showRestartReminder
+
+		local t = cboxFloatyTooltips.root.tooltip
+		modApi.floatyTooltips = config.floatyTooltips
+		cboxFloatyTooltips:updateTooltip()
+		cboxFloatyTooltips.root.tooltip = t
+	end
+
+	local checkboxClickFn = function(self, button)
+		local result = UiCheckbox.clicked(self, button)
+		if self.updateTooltip then self:updateTooltip() end
+		return result
 	end
 
 	local createCheckboxOption = function(text, tooltipOn, tooltipOff)
@@ -47,11 +74,7 @@ local function createUi()
 			end
 		end
 
-		cbox.clicked = function(self, button)
-			local result = UiCheckbox.clicked(self, button)
-			self:updateTooltip()
-			return result
-		end
+		cbox.clicked = checkboxClickFn
 
 		return cbox
 	end
@@ -84,6 +107,8 @@ local function createUi()
 			:width(1)
 			:addTo(scrollarea)
 
+		-- ////////////////////////////////////////////////////////////////////////
+		-- Logging level
 		ddLogLevel = UiDropDown(
 				{ 0, 1, 2 },
 				{ "None", "Only console", "File and console" },
@@ -101,71 +126,71 @@ local function createUi()
 			:settooltip("Controls where the game's logging messages are printed.")
 			:addTo(layout)
 
+		-- ////////////////////////////////////////////////////////////////////////
+		-- Caller information
 		cboxCaller = createCheckboxOption(
 			"Print Caller Information",
 			"Include timestamp and stacktrace in LOG messages."
-		)
+		):addTo(layout)
 
-		cboxCaller.checked = modApi.logger.printCallerInfo
-		cboxCaller:addTo(layout)
-
+		-- ////////////////////////////////////////////////////////////////////////
+		-- Floaty tooltips
 		cboxFloatyTooltips = createCheckboxOption(
 			"Attach Tooltips To Mouse Cursor",
 			"Tooltips follow the mouse cursor around.",
 			"Tooltips show to the side of the UI element that spawned them, similar to the game's own tooltips."
-		)
+		):addTo(layout)
 
-		local oldClicked = cboxFloatyTooltips.clicked
 		cboxFloatyTooltips.clicked = function(self, button)
-			local result = oldClicked(self, button)
+			local result = checkboxClickFn(self, button)
+
 			modApi.floatyTooltips = self.checked
+
 			return result
 		end
-		cboxFloatyTooltips.checked = modApi.floatyTooltips
-		cboxFloatyTooltips:updateTooltip()
-		cboxFloatyTooltips:addTo(layout)
 
+		-- ////////////////////////////////////////////////////////////////////////
+		-- Profile-specific config
 		cboxProfileConfig = createCheckboxOption(
 			"Profile-Specific Configuration",
 			"Configuration for the mod loader and individual mods will be remembered per profile, instead of globally.\n\nNote: with this option enabled, switching profiles will require you to restart the game to apply the different configurations."
-		)
+		):addTo(layout)
 
-		cboxProfileConfig.checked = modApi.profileConfig
-		cboxProfileConfig:addTo(layout)
+		cboxProfileConfig.clicked = function(self, button)
+			local result = checkboxClickFn(self, button)
 
+			local checked = self.checked
+			uiSetSettings(LoadModLoaderConfig(checked))
+			self.checked = checked
+
+			return result
+		end
+
+		-- ////////////////////////////////////////////////////////////////////////
+		-- Warning dialogs
 		createSeparator(10):addTo(layout)
 
 		cboxErrorFrame = createCheckboxOption(
 			"Show Script Error Popup",
 			"Show an error popup at startup if a mod fails to mount, init, or load."
-		)
-
-		cboxErrorFrame.checked = modApi.showErrorFrame
-		cboxErrorFrame:addTo(layout)
+		):addTo(layout)
 
 		cboxVersionFrame = createCheckboxOption(
 			"Show Mod Loader Outdated Popup",
 			"Show a popup if the mod loader is out-of-date for installed mods."
-		)
-
-		cboxVersionFrame.checked = modApi.showVersionFrame
-		cboxVersionFrame:addTo(layout)
+		):addTo(layout)
 
 		cboxResourceError = createCheckboxOption(
 			"Show Resource Error Popup",
 			"Show an error popup at startup if the mod loader fails to load the game's resources."
-		)
-
-		cboxResourceError.checked = modApi.showResourceWarning
-		cboxResourceError:addTo(layout)
+		):addTo(layout)
 
 		cboxRestartReminder = createCheckboxOption(
 			"Show Restart Reminder Popup",
 			"Show a popup reminding to restart the game when enabling mods."
-		)
+		):addTo(layout)
 
-		cboxRestartReminder.checked = modApi.showRestartReminder
-		cboxRestartReminder:addTo(layout)
+		uiSetSettings(LoadModLoaderConfig())
 	end)
 end
 

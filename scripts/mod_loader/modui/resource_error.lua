@@ -6,7 +6,7 @@
 local function responseFn(btnIndex)
 	if btnIndex == 2 then
 		modApi.showResourceWarning = false
-		SaveModLoaderConfig()
+		SaveModLoaderConfig(CurrentModLoaderConfig())
 	end
 end
 
