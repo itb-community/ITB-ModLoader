@@ -101,6 +101,11 @@ function modApi:addVekSpawnRemovedHook(fn)
 	table.insert(self.vekSpawnRemovedHooks,fn)
 end
 
+function modApi:addModsLoadedHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.modsLoadedHooks,fn)
+end
+
 -- //////////////////////////////////////////////////////////////////////////////
 
 --[[

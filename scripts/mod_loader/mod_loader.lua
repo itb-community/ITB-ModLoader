@@ -400,6 +400,14 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 			))
 		end
 	end
+
+	for i, hook in ipairs(modApi.modsLoadedHooks) do
+		local ok, err = pcall(function() hook() end)
+
+		if not ok then
+			LOG("A modsLoadedHook failed: ", err)
+		end
+	end
 end
 
 modApi:init()
