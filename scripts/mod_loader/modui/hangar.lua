@@ -235,7 +235,7 @@ local function isDismissClick(mx, my, button)
 						return true
 					else
 						-- Squad is not unlocked yet, so this is not a dismiss click.
-						modApi:scheduleHook(20, function()
+						modApi:scheduleHook(50, function()
 							Profile = modApi:loadProfile()
 						end)
 
@@ -385,7 +385,7 @@ local function createUi(root)
 						isUiState(UI_STATE_WINDOW_SQUAD) or
 						isUiState(UI_STATE_WINDOW_SQUAD_EDIT)
 					then
-						modApi:scheduleHook(20, function()
+						modApi:scheduleHook(50, function()
 							Profile = modApi:loadProfile()
 						end)
 					end
@@ -478,7 +478,7 @@ local function createUi(root)
 				isUiState(UI_STATE_WINDOW_SQUAD_EDIT)
 			then
 				uiState = UI_STATE_DEFAULT
-				modApi:scheduleHook(20, function()
+				modApi:scheduleHook(50, function()
 					Profile = modApi:loadProfile()
 				end)
 			end
