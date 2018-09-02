@@ -5,7 +5,7 @@
 
 -- Technically this doesn't work for vanilla pilots who have custom repair abilities
 -- (Mantis and Repairman), but we assume that no one will want to override those.
--- (Since you can do just by just replacing the image file)
+-- (Since you can do that by just replacing the image file)
 local repairIcon = sdlext.surface("img/weapons/repair.png")
 
 local iconHolder = nil
@@ -33,9 +33,14 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
  		self.visible = false
  		if Pawn and Pawn:IsSelected() and repairIcon:wasDrawn() then
 			local srf = repairReplacementIcons[Pawn:GetPersonality()]
+
 			if srf then
+				-- Move the ui object to the place where the real repair icon is drawn
 	 			self.x = repairIcon.x
 	 			self.y = repairIcon.y
+
+	 			-- Adjust clip rects to limit where the overlaid repair icon is drawn,
+	 			-- so that we don't obscure the repair hotkey, or the pilot tooltip
 	 			self.clipRect1.x = self.x
 	 			self.clipRect1.y = self.y
 	 			self.clipRect2.x = self.x
@@ -49,6 +54,8 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 	 				self.clipRect2.w = 18
 	 			end
 
+	 			-- Set the ui object as visible, and update its decoration to the
+	 			-- selected surface (repair icon)
 	 			self.visible = true
 	 			self.decorations[1].surface = srf
 			end
