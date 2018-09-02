@@ -44,6 +44,22 @@ local function isUiState(state)
 	return hasbit(uiState, state)
 end
 
+function GetHangarUIState()
+	return uiState
+end
+
+function GetReadableHangarUIState()
+	return uiState == UI_STATE_DEFAULT_NORMAL    and "UI_STATE_DEFAULT_NORMAL"    or
+	       uiState == UI_STATE_DEFAULT_CUSTOM    and "UI_STATE_DEFAULT_CUSTOM"    or
+	       uiState == UI_STATE_DEFAULT           and "UI_STATE_DEFAULT"           or
+	       uiState == UI_STATE_WINDOW_PILOT      and "UI_STATE_WINDOW_PILOT"      or
+	       uiState == UI_STATE_WINDOW_SQUAD      and "UI_STATE_WINDOW_SQUAD"      or
+	       uiState == UI_STATE_WINDOW_SQUAD_EDIT and "UI_STATE_WINDOW_SQUAD_EDIT" or
+	       uiState == UI_STATE_WINDOW_ACH        and "UI_STATE_WINDOW_ACH"        or
+	       uiState == UI_STATE_WINDOW            and "UI_STATE_WINDOW"            or
+	       "<unknown state>"
+end
+
 function IsHangarWindowState()
 	return uiState == UI_STATE_WINDOW             or
 	       hasbit(uiState, UI_STATE_WINDOW_ACH)   or
