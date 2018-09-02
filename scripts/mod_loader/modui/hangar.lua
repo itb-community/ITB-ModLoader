@@ -94,6 +94,70 @@ function GetHangarOrigin()
 	return origin
 end
 
+
+-- //////////////////////////////////////////////////////////////////////
+
+local fetchedMechs = {}
+local oldGetNames = {}
+local pawns = {}
+
+local function clearFetchedMechs()
+	for i, _ in ipairs(fetchedMechs) do
+		fetchedMechs[i] = nil
+	end
+end
+
+local function defaultGetName(self)
+	return self.Name
+end
+
+local function overrideGetNames()
+	pawns = {}
+
+	for k, v in pairs(_G) do
+		if type(v) == "table" and v.Health and v.Image then
+			table.insert(pawns, k)
+
+			if v.GetName then
+				oldGetNames[k] = v.GetName
+			end
+
+			v.GetName = function(self)
+				if
+					IsHangarWindowlessState() and
+					#fetchedMechs < 3
+				then
+					table.insert(fetchedMechs, k)
+				end
+
+				local fn = oldGetNames[k]
+				return fn
+					and fn(self)
+					or  defaultGetName(self)
+			end
+		end
+	end
+end
+
+local function restoreGetNames()
+	for _, id in ipairs(pawns) do
+		_G[id].GetName = oldGetNames[id]
+	end
+end
+
+sdlext.addHangarEnteredHook(function()
+	overrideGetNames()
+end)
+
+sdlext.addHangarLeavingHook(function()
+	restoreGetNames()
+end)
+
+function HangarGetSelectedMechs()
+	return copy_table(fetchedMechs)
+end
+
+
 -- //////////////////////////////////////////////////////////////////////
 -- Window detection, state transitions
 
@@ -438,6 +502,8 @@ local function createUi(root)
 						isUiState(UI_STATE_WINDOW_SQUAD) or
 						isUiState(UI_STATE_WINDOW_SQUAD_EDIT)
 					then
+						clearFetchedMechs()
+
 						modApi:scheduleHook(50, function()
 							Profile = modApi:loadProfile()
 						end)
@@ -455,6 +521,11 @@ local function createUi(root)
 					uiState = UI_STATE_WINDOW_SQUAD
 				elseif isEditSquadButtonClick(x, y) then
 					uiState = UI_STATE_WINDOW_SQUAD_EDIT
+				elseif
+					isChaosRollClick(x, y) or
+					isBalancedRollClick(x, y)
+				then
+					clearFetchedMechs()
 				end
 			end
 		end
