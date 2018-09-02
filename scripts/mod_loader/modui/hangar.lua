@@ -334,9 +334,13 @@ local function isCustomSquadValid()
 	return Profile.last_custom and #Profile.last_custom > 0
 end
 
+local function isRandomSquad()
+	return Profile.last_squad == 8
+end
+
 local recustomBtn = Buttons.hangar_recustom.hitstats
 local function isEditSquadButtonClick(mx, my)
-	if isUiState(UI_STATE_DEFAULT_CUSTOM) then
+	if IsHangarWindowlessState() then
 		if isCustomSquadValid() then
 			-- Got valid custom squad selected, button is at the bottom
 			local r = sdl.rect(
@@ -354,6 +358,35 @@ local function isEditSquadButtonClick(mx, my)
 			)
 			return rect_contains(r, mx, my)
 		end
+	end
+
+	return false
+end
+
+local randomBtn = Buttons.hangar_reroll_chaos.hitstats
+local function isChaosRollClick(mx, my)
+	if IsHangarWindowlessState() and isRandomSquad() then
+		local r = sdl.rect(
+			sdlext.CurrentWindowRect.x + sdlext.CurrentWindowRect.w + 10,
+			sdlext.CurrentWindowRect.y,
+			randomBtn.w, randomBtn.h
+		)
+
+		return rect_contains(r, mx, my)
+	end
+
+	return false
+end
+
+local function isBalancedRollClick(mx, my)
+	if IsHangarWindowlessState() and isRandomSquad() then
+		local r = sdl.rect(
+			sdlext.CurrentWindowRect.x + sdlext.CurrentWindowRect.w + 10 + randomBtn.w + 2,
+			sdlext.CurrentWindowRect.y,
+			randomBtn.w, randomBtn.h
+		)
+
+		return rect_contains(r, mx, my)
 	end
 
 	return false
