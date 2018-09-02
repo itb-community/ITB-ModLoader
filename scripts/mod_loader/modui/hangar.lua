@@ -395,7 +395,16 @@ local function isPilotsButtonClick(mx, my)
 end
 
 local function isCustomSquadValid()
-	return Profile.last_custom and #Profile.last_custom > 0
+	if Profile.last_custom then
+		-- When selecting custom squad for the first time, the first
+		-- selection is not saved in the profile file, even though
+		-- the fact that the player is using a custom squad IS saved.
+		-- In that case, we need to figure out whether the squad is valid
+		-- by checking the list of selected mechs.
+		return #Profile.last_custom > 0 or #HangarGetSelectedMechs() > 0
+	end
+
+	return false
 end
 
 local function isRandomSquad()
