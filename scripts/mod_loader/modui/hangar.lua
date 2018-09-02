@@ -90,18 +90,22 @@ local selectBtn =   Buttons.hangar_select.hitstats
 local isSecretSquadUnlocked = false
 local isSecretPilotsUnlocked = false
 
-local function isWindowless()
+local function isWindowless(w, h)
+	w = w or sdlext.CurrentWindowRect.w
+	h = h or sdlext.CurrentWindowRect.h
 	-- Check that there are no frames with shadow currently visible,
 	-- other than the squad frame which is always drawn in the hangar.
-	return  sdlext.CurrentWindowRect.w == 420 and
-	       (sdlext.CurrentWindowRect.h == 480 or
+	return  w == 420 and
+	       (h == 480 or
 	        -- taller when Custom Squad is selected
-	        sdlext.CurrentWindowRect.h == 493)
+	        h == 493)
 end
 
-local function isCustomSquadUi()
-	return sdlext.CurrentWindowRect.w == 420 and
-	       sdlext.CurrentWindowRect.h == 493
+local function isCustomSquadUi(w, h)
+	w = w or sdlext.CurrentWindowRect.w
+	h = h or sdlext.CurrentWindowRect.h
+
+	return w == 420 and h == 493
 end
 
 local function isSquadWindow(w, h)
