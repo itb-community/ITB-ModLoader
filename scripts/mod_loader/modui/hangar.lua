@@ -636,7 +636,7 @@ local function createUi(root)
 
 		btnBack.disabled = true
 		btnStart.disabled = true
-		modApi:scheduleHook(500, function()
+		modApi:scheduleHook(400, function()
 			btnBack.disabled = false
 			btnStart.disabled = false
 		end)
