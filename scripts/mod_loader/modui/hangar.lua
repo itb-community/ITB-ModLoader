@@ -687,3 +687,14 @@ end
 sdlext.addUiRootCreatedHook(function(screen, root)
 	createUi(root)
 end)
+
+sdlext.addGameWindowResizedHook(function(screen, oldSize)
+	portraitBtn = Buttons.hangar_pilot.hitstats
+	selectBtn =   Buttons.hangar_select.hitstats
+	squadBtn =    Buttons.hangar_squad.hitstats
+	pilotsBtn =   Buttons.hangar_pilots.hitstats
+	recustomBtn = Buttons.hangar_recustom.hitstats
+	randomBtn =   Buttons.hangar_reroll_chaos.hitstats
+
+	pilotBox =    Rect2D(0, 0, squadBox.w - 150, squadBox.h)
+end)
