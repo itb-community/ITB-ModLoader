@@ -495,6 +495,30 @@ local function createUi(root)
 		:width(1):height(1)
 		:addTo(root)
 	holder.translucent = true
+
+	-- In custom squad edit dialog, mouse wheel up events are treated as left clicks,
+	-- probably to allow people to quickly select 3 of the same mech by scrolling up.
+	-- Unfortunately, this means that it can also be used to dismiss the dialog,
+	-- so we have to account for that.
+	holder.wheel = function(self, x, y, value)
+		local result = Ui.wheel(self, x, y, value)
+
+		if
+			not leaving and
+			value > 0   and
+			isUiState(UI_STATE_WINDOW_SQUAD_EDIT) and
+			isDismissClick(x, y, 1)
+		then
+			clearFetchedMechs()
+
+			modApi:scheduleHook(50, function()
+				Profile = modApi:loadProfile()
+			end)
+
+			uiState = UI_STATE_DEFAULT
+		end
+	end
+
 	holder.mousedown = function(self, x, y, button)
 		-- Process events first so that children (btnBack and btnStart)
 		-- process events BEFORE we change states.
