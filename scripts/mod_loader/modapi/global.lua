@@ -26,6 +26,20 @@ function CreatePilot(data)
 	end
 end
 
+function IsTestMechScenario()
+	if not Game then return false end
+
+	local p0 = Game:GetPawn(0)
+	local p1 = Game:GetPawn(1)
+	local p2 = Game:GetPawn(2)
+
+	-- In test mech scenario, only one of the three
+	-- player mechs will not be nil.
+	return (    p0 and not p1 and not p2) or
+	       (not p0 and     p1 and not p2) or
+	       (not p0 and not p1 and     p2)
+end
+
 --[[
 	Returns a savedata table holding information about the region the player
 	is currently in. Returns nil when not in a mission.
