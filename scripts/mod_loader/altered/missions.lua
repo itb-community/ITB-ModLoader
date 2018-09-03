@@ -227,3 +227,24 @@ end
 function Mission:IsEnvironmentEffect()
 	return true
 end
+
+-- ////////////////////////////////////////////////////////////////////
+
+function Mission_Test:BaseStart()
+	Mission.BaseStart(self, true)
+
+	for i, hook in ipairs(modApi.testMechEnteredHooks) do
+		hook(self)
+	end
+end
+
+-- MissionEnd is not actually called when exiting test mech scenario;
+-- we call it manually when we detect the player leaving the test mech scenario.
+function Mission_Test:MissionEnd()
+	-- DON'T call the default MissionEnd
+	-- Mission.MissionEnd(self)
+
+	for i, hook in ipairs(modApi.testMechExitedHooks) do
+		hook(self)
+	end
+end

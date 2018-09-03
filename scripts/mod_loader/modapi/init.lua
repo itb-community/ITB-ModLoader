@@ -255,6 +255,8 @@ function modApi:resetModContent()
 	self.vekSpawnAddedHooks = {}
 	self.vekSpawnRemovedHooks = {}
 	self.modsLoadedHooks = {}
+	self.testMechEnteredHooks = {}
+	self.testMechExitedHooks = {}
 
 	local name, tbl = debug.getupvalue(oldGetPopulationTexts,1)
 	self.PopEvents = copy_table(tbl)

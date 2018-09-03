@@ -238,6 +238,7 @@ local function buildUiRoot(screen)
 	uiRootCreatedHooks = nil
 end
 
+local isTestMech = false
 local lastScreenSize = { x = ScreenSizeX(), y = ScreenSizeY() }
 sdlext.CurrentWindowRect = sdl.rect(0, 0, 0, 0)
 sdlext.LastWindowRect = sdl.rect(0, 0, 0, 0)
@@ -245,10 +246,15 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	local wasMainMenu = isInMainMenu
 	local wasHangar = isInHangar
 	local wasGame = isInGame
+	local wasTestMech = isTestMech
 
 	isInMainMenu = bgRobot:wasDrawn() and bgRobot.x < screen:w() and not bgHangar:wasDrawn()
 	isInHangar = bgHangar:wasDrawn()
 	isInGame = Game ~= nil
+	isTestMech = IsTestMechScenario()
+
+	-- ////////////////////////////////////////////////////////
+	-- Hooks
 
 	if not uiRoot then
 		buildUiRoot(screen)
@@ -294,6 +300,12 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 			hook(screen)
 		end
 	end
+
+	if wasTestMech and not isTestMech then
+		Mission_Test:MissionEnd()
+	end
+
+	-- ////////////////////////////////////////////////////////
 
 	local wx, wy, ww, wh
 	if srfBotLeft:wasDrawn() and srfTopRight:wasDrawn() then
