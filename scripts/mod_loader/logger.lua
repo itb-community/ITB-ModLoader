@@ -52,8 +52,8 @@ function Logger.log(...)
 		return
 	end
 
-	for i, v in ipairs(arg) do
-		arg[i] = tostring(v)
+	for i = 1, #arg do
+		arg[i] = tostring(arg[i])
 	end
 
 	local message = table.concat(arg, " ")
