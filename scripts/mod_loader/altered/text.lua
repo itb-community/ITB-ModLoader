@@ -1,28 +1,4 @@
 
---[[
-	Rewrites text.lua so that Global_Texts table inside
-	of it becomes globally accessible.
---]]
-local function GlobalizeGlobalTexts()
-	if not Global_Texts then
-		local path = "scripts/text.lua"
-		local file = io.open(path, "rb")
-
-		local content = file:read("*all")
-		file:close()
-		file = nil
-
-		content = string.sub(content, 8)
-		file = io.open(path, "w+b")
-		file:write(content)
-		file:close()
-
-		dofile(path)
-		LOG("Globalized Global_Texts")
-	end
-end
-GlobalizeGlobalTexts()
-
 oldGetPopulationTexts = GetPopulationTexts
 function GetPopulationTexts(event, count)
 	local nullReturn = count == 1 and "" or {}

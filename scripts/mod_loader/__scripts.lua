@@ -1,4 +1,6 @@
 local scripts = {
+	"hard-alter",
+
 	"sdlext/serialize",
 	"sdlext/extensions",
 
