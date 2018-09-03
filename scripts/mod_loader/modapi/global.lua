@@ -66,6 +66,10 @@ function GetCurrentMission()
 		return GAME:GetMission(region.mission)
 	end
 
+	if IsTestMechScenario() then
+		return Mission_Test
+	end
+
 	return nil
 end
 
