@@ -44,10 +44,16 @@ local function isUiState(state)
 	return hasbit(uiState, state)
 end
 
+--[[
+	Returns current UI state value.
+--]]
 function GetHangarUIState()
 	return uiState
 end
 
+--[[
+	Returns current UI state name. Suitable for debugging.
+--]]
 function GetReadableHangarUIState()
 	return uiState == UI_STATE_DEFAULT_NORMAL    and "UI_STATE_DEFAULT_NORMAL"    or
 	       uiState == UI_STATE_DEFAULT_CUSTOM    and "UI_STATE_DEFAULT_CUSTOM"    or
@@ -60,6 +66,11 @@ function GetReadableHangarUIState()
 	       "<unknown state>"
 end
 
+--[[
+	If this returns true, it means that there is some sort of window
+	open (pilots, squads, acievements, custom squad edit), and normal
+	hangar UI is not accessible.
+--]]
 function IsHangarWindowState()
 	return uiState == UI_STATE_WINDOW             or
 	       hasbit(uiState, UI_STATE_WINDOW_ACH)   or
@@ -68,6 +79,11 @@ function IsHangarWindowState()
 	       hasbit(uiState, UI_STATE_WINDOW_SQUAD_EDIT)
 end
 
+--[[
+	If this returns true, it means that there are no windows open,
+	and the player can interact with normal hangar UI
+	(back/start game buttons, color picker, mech skill icons, etc.)
+--]]
 function IsHangarWindowlessState()
 	return uiState == UI_STATE_DEFAULT              or
 	       hasbit(uiState, UI_STATE_DEFAULT_NORMAL) or
@@ -96,6 +112,7 @@ end
 
 
 -- //////////////////////////////////////////////////////////////////////
+-- Current mech detection
 
 local fetchedMechs = {}
 local oldGetNames = {}
