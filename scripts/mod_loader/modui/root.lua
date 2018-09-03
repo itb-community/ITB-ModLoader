@@ -84,6 +84,12 @@ function sdlext.addGameExitedHook(fn)
 	table.insert(gameExitedHooks, fn)
 end
 
+local consoleToggledHooks = {}
+function sdlext.addFrameToggledHook(fn)
+	assert(type(fn) == "function")
+	table.insert(consoleToggledHooks, fn)
+end
+
 local frameDrawnHooks = {}
 function sdlext.addFrameDrawnHook(fn)
 	assert(type(fn) == "function")
@@ -174,6 +180,10 @@ end)
 sdlext.addPreKeyDownHook(function(keycode)
 	if keycode == 96 then -- tilde/backtick
 		consoleOpen = not consoleOpen
+
+		for _, hook in ipairs(consoleToggledHooks) do
+			hook(consoleOpen)
+		end
 	end
 
 	-- don't process other keypresses while the console is open
