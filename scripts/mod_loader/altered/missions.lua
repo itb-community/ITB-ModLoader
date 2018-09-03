@@ -165,9 +165,13 @@ function Mission:SetupDifficulty()
 end
 
 local oldBaseStart = Mission.BaseStart
-function Mission:BaseStart()
-	for i, hook in ipairs(modApi.preMissionAvailableHooks) do
-		hook(self)
+function Mission:BaseStart(suppressHooks)
+	suppressHooks = suppressHooks or false
+
+	if not suppressHooks then
+		for i, hook in ipairs(modApi.preMissionAvailableHooks) do
+			hook(self)
+		end
 	end
 
 	self.QueuedSpawns = {}
@@ -193,8 +197,10 @@ function Mission:BaseStart()
 	-- Clear QueuedSpawns, since the Vek burrow out immediately when entering the mission
 	self.QueuedSpawns = {}
 
-	for i, hook in ipairs(modApi.postMissionAvailableHooks) do
-		hook(self)
+	if not suppressHooks then
+		for i, hook in ipairs(modApi.postMissionAvailableHooks) do
+			hook(self)
+		end
 	end
 
 	self.Initialized = true
