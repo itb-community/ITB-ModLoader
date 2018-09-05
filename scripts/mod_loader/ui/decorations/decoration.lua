@@ -6,7 +6,7 @@ deco.colors.black =                         sdl.rgb(0, 0, 0)
 deco.colors.halfblack =                     sdl.rgba(0, 0, 0, 128)
 deco.colors.focus =                         sdl.rgb(255, 255, 50)
 deco.colors.dialogbg =                      sdl.rgba(0, 0, 0, 192)
-deco.colors.transparent =                   sdl.rgba(0, 0, 0, 0  )
+deco.colors.transparent =                   sdl.rgba(0, 0, 0, 0)
 deco.colors.framebg =                       sdl.rgb(13, 15, 23)
 deco.colors.framebglight =                  sdl.rgb(30, 36, 50)
 deco.colors.button =                        sdl.rgb(24, 28, 41)
@@ -15,9 +15,10 @@ deco.colors.buttondisabled =                deco.colors.framebg
 deco.colors.buttonborder =                  sdl.rgb(73, 92, 121)
 deco.colors.buttonborderhl =                sdl.rgb(217, 235, 200)
 deco.colors.buttonborderdisabled =          sdl.rgb(43, 53, 72)
-deco.colors.mainMenuButton =                sdl.rgba(7 , 10, 18, 187)
-deco.colors.mainMenuButtonHighlight =       sdl.rgba(24, 26, 34, 255)
-deco.colors.mainMenuButtonDisabled =        sdl.rgba(7 , 10, 18, 84 )
+
+deco.colors.mainMenuButton =                sdl.rgba(7  ,  10,  18, 187)
+deco.colors.mainMenuButtonHighlight =       sdl.rgba(24 ,  26,  34, 255)
+deco.colors.mainMenuButtonDisabled =        sdl.rgba(7  ,  10,  18, 84 )
 deco.colors.mainMenuButtonCaptionDisabled = sdl.rgba(190, 190, 190, 255)
 
 -- Retain old names for compatibility
