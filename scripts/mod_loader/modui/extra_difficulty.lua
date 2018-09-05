@@ -39,15 +39,16 @@ local function createUi(root)
 	end
 
 	local mask = Ui()
-		:widthpx(160):heightpx(44)
+		:widthpx(156):heightpx(30)
 		:decorate({ DecoSolid(deco.colors.transparent) })
 		:addTo(pane)
 	mask.translucent = true
 
-	mask.animations.fadeIn = UiAnim(mask, 650, function(anim, widget, percent)
+	local hangarBg = sdl.rgb(9, 7, 8)
+	mask.animations.fadeIn = UiAnim(mask, 750, function(anim, widget, percent)
 		widget.decorations[1].color = InterpolateColor(
 			deco.colors.transparent,
-			deco.colors.black,
+			hangarBg,
 			percent
 		)
 	end)
@@ -148,7 +149,7 @@ local function createUi(root)
 			arrLeft:pospx (origin.x + 4          , origin.y + 4 )
 			arrRight:pospx(origin.x + 28 + 90 + 4, origin.y + 4 )
 			diffText:pospx(origin.x              , origin.y + 11)
-			mask:pospx    (origin.x              , origin.y + 3 )
+			mask:pospx    (origin.x              , origin.y + 11 )
 
 			local hideDifficultyUi = IsHangarWindowState() or
 				(leaving and not mask.animations.fadeIn:isStarted())
