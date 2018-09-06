@@ -115,7 +115,7 @@ end
 -- Current mech detection
 
 local fetchedMechs = {}
-local oldGetNames = {}
+local oldGetImages = {}
 local pawns = {}
 
 local function clearFetchedMechs()
@@ -124,22 +124,22 @@ local function clearFetchedMechs()
 	end
 end
 
-local function defaultGetName(self)
-	return self.Name
+local function defaultGetImage(self)
+	return self.Image
 end
 
-local function overrideGetNames()
+local function overrideGetImages()
 	pawns = {}
 
 	for k, v in pairs(_G) do
 		if type(v) == "table" and v.Health and v.Image then
 			table.insert(pawns, k)
 
-			if v.GetName then
-				oldGetNames[k] = v.GetName
+			if v.GetImage then
+				oldGetImages[k] = v.GetImage
 			end
 
-			v.GetName = function(self)
+			v.GetImage = function(self)
 				if
 					IsHangarWindowlessState() and
 					#fetchedMechs < 3
@@ -147,27 +147,27 @@ local function overrideGetNames()
 					table.insert(fetchedMechs, k)
 				end
 
-				local fn = oldGetNames[k]
+				local fn = oldGetImages[k]
 				return fn
 					and fn(self)
-					or  defaultGetName(self)
+					or  defaultGetImage(self)
 			end
 		end
 	end
 end
 
-local function restoreGetNames()
+local function restoreGetImages()
 	for _, id in ipairs(pawns) do
-		_G[id].GetName = oldGetNames[id]
+		_G[id].GetImage = oldGetImages[id]
 	end
 end
 
 sdlext.addHangarEnteredHook(function()
-	overrideGetNames()
+	overrideGetImages()
 end)
 
 sdlext.addHangarLeavingHook(function()
-	restoreGetNames()
+	restoreGetImages()
 end)
 
 function HangarGetSelectedMechs()
