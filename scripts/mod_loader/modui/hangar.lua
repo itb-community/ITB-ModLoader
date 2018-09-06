@@ -411,6 +411,10 @@ local function isPilotsButtonClick(mx, my)
 	return false
 end
 
+local function isCustomSquad()
+	return Profile.last_squad == 9
+end
+
 local function isCustomSquadValid()
 	if Profile.last_custom then
 		-- When selecting custom squad for the first time, the first
@@ -430,7 +434,7 @@ end
 
 local recustomBtn = Buttons.hangar_recustom.hitstats
 local function isEditSquadButtonClick(mx, my)
-	if IsHangarWindowlessState() then
+	if IsHangarWindowlessState() and isCustomSquad() then
 		if isCustomSquadValid() then
 			-- Got valid custom squad selected, button is at the bottom
 			local r = sdl.rect(
