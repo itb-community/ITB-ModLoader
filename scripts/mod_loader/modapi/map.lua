@@ -3,8 +3,7 @@
 -- Map handling
 
 function modApi:fileExists(name)
-	assert(name ~= nil, "Filename is nil")
-	assert(type(name) == "string", "Filename is not a string")
+	assert(type(name) == "string", "Expected a string, got: "..type(name))
 
 	local f = io.open(name, "rb")
 

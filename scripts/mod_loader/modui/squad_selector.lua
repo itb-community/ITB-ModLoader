@@ -95,14 +95,14 @@ local function createUi()
 		Ui()
 			:width(0.3):height(0.05)
 			:pos(0.7,0.925)
-			:caption("Total selected")
+			:caption(modApi:getText("SquadSelect_Total"))
 			:decorate({ DecoCaption() })
 			:addTo(ui)
 
 		local frametop = Ui()
 			:width(0.6):height(0.7)
 			:pos(0.2, 0.1)
-			:caption("Squad Selection")
+			:caption(modApi:getText("FrameTitle_SquadSelect"))
 			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:addTo(ui)
 
@@ -110,7 +110,7 @@ local function createUi()
 			:width(1):height(1)
 			:padding(24)
 			:addTo(frametop)
-		
+
 		local updatecount = function()
 			local count = 0
 			

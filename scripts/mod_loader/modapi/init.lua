@@ -10,6 +10,7 @@ function modApi:init()
 
 	self.version = "2.3.0"
 	LOG("MOD-API VERSION "..self.version)
+	self.texts = {}
 	self.currentModSquads = {}
 	self.currentModSquadText = {}
 
@@ -48,8 +49,8 @@ function modApi:init()
 		end
 	end
 	
-	modApi.resource = FtlDat.FtlDat:from_file("resources/resource.dat")
-	
+	self.resource = FtlDat.FtlDat:from_file("resources/resource.dat")
+
 	self.squadKeys = {
 		"Archive_A",
 		"Rust_A",
@@ -60,6 +61,9 @@ function modApi:init()
 		"Pinnacle_B",
 		"Detritus_B",
 	}
+
+	self:setupVanillaTexts()
+	self:setupModLoaderTexts()
 
 	self.defaultMaps = {
 		"acid0", "acid1", "acid2", "acid3", "acid4",
@@ -178,6 +182,133 @@ function modApi:init()
 			modApi:evaluateConditionalHooks()
 		end)
 	end
+
+	-- Execute deferred statements
+
+	AddDifficultyLevel(
+		"DIFF_VERY_HARD",
+		#DifficultyLevels -- adds as a new highest difficulty
+	)
+	AddDifficultyLevel(
+		"DIFF_IMPOSSIBLE",
+		#DifficultyLevels -- adds as a new highest difficulty
+	)
+
+	sdlext.executeAddModContent()
+end
+
+function modApi:getText(id)
+	assert(type(id) == "string", "Expected string, got: "..type(id))
+	local result = self.texts[id]
+
+	if not result then
+		LOG("Attempt to reference non-existing text id '"..id.."', "..debug.traceback())
+	end
+	
+	return result
+end
+
+function modApi:setupVanillaTexts()
+	for i, v in ipairs(self.squadKeys) do
+		self.texts[v.."_Name"] = Global_Texts["TipTitle_"..v]
+		self.texts[v.."_Description"] = Global_Texts["TipText_"..v]
+	end
+
+	self.texts["Difficulty_Easy_Name"]          = Global_Texts.Toggle_Easy
+	self.texts["Difficulty_Easy_Title"]         = Global_Texts.TipTitle_HangarEasy
+	self.texts["Difficulty_Easy_Description"]   = Global_Texts.TipText_HangarEasy
+	self.texts["Difficulty_Normal_Name"]        = Global_Texts.Toggle_Normal
+	self.texts["Difficulty_Normal_Title"]       = Global_Texts.TipTitle_HangarNormal
+	self.texts["Difficulty_Normal_Description"] = Global_Texts.TipText_HangarNormal
+	self.texts["Difficulty_Hard_Name"]          = Global_Texts.Toggle_Hard
+	self.texts["Difficulty_Hard_Title"]         = Global_Texts.TipTitle_HangarHard
+	self.texts["Difficulty_Hard_Description"]   = Global_Texts.TipText_HangarHard
+end
+
+function modApi:setupModLoaderTexts()
+	self.texts["Button_ModContent"] = "Mod Content"
+	self.texts["FrameTitle_ModContent"] = "Mod Content"
+
+	self.texts["Button_ModConfig"] = "Configure Mods"
+	self.texts["ButtonTooltip_ModConfig"] = "Turn on and off individual mods, and configure any settings they might have."
+	self.texts["FrameTitle_ModConfig"] = "Mod Configuration"
+
+	self.texts["Button_SquadSelect"] = "Edit Squads"
+	self.texts["ButtonTooltip_SquadSelect"] = "Select which squads will be available to pick."
+	self.texts["FrameTitle_SquadSelect"] = "Squad Selection"
+	self.texts["SquadSelect_Total"] = "Total selected"
+
+	self.texts["Button_PilotArrange"] = "Arrange Pilots"
+	self.texts["ButtonTooltip_PilotArrange"] = "Select which pilots will be available to pick."
+	self.texts["ButtonTooltipOff_PilotArrange"] = "Pilots can only be arranged before the New Game button is pressed.\n\nRestart the game to be able to arrange pilots."
+	self.texts["FrameTitle_PilotArrange"] = "Arrange Pilots"
+
+	self.texts["Button_ModLoaderConfig"] = "Configure Mod Loader"
+	self.texts["ButtonTooltip_ModLoaderConfig"] = "Configure some features of the mod loader."
+	self.texts["FrameTitle_ModLoaderConfig"] = "Mod Loader Configuration"
+
+	self.texts["ModLoaderConfig_LogLevel_Text"] = "Logging level"
+	self.texts["ModLoaderConfig_LogLevel_Tooltip"] = "Controls where the game's logging messages are printed."
+	self.texts["ModLoaderConfig_LogLevel_DD0"] = "None"
+	self.texts["ModLoaderConfig_LogLevel_DD1"] = "Only console"
+	self.texts["ModLoaderConfig_LogLevel_DD2"] = "File and console"
+
+	self.texts["ModLoaderConfig_Caller_Text"] = "Print Caller Information"
+	self.texts["ModLoaderConfig_Caller_Tooltip"] = "Include timestamp and stacktrace in LOG messages."
+
+	self.texts["ModLoaderConfig_FloatyTooltips_Text"] = "Attach Tooltips To Mouse Cursor"
+	self.texts["ModLoaderConfig_FloatyTooltips_Tooltip_On"] = "Tooltips follow the mouse cursor around."
+	self.texts["ModLoaderConfig_FloatyTooltips_Tooltip_Off"] = "Tooltips show to the side of the UI element that spawned them, similar to the game's own tooltips."
+
+	self.texts["ModLoaderConfig_ProfileConfig_Text"] = "Profile-Specific Configuration"
+	self.texts["ModLoaderConfig_ProfileConfig_Tooltip"] = "Configuration for the mod loader and individual mods will be remembered per profile, instead of globally.\n\nNote: with this option enabled, switching profiles will require you to restart the game to apply the different mod configurations."
+
+	self.texts["ModLoaderConfig_ScriptError_Text"] = "Show Script Error Popup"
+	self.texts["ModLoaderConfig_ScriptError_Tooltip"] = "Show an error popup at startup if a mod fails to mount, init, or load."
+
+	self.texts["ModLoaderConfig_OldVersion_Text"] = "Show Mod Loader Outdated Popup"
+	self.texts["ModLoaderConfig_OldVersion_Tooltip"] = "Show a popup if the mod loader is out-of-date for installed mods."
+
+	self.texts["ModLoaderConfig_ResourceError_Text"] = "Show Resource Error Popup"
+	self.texts["ModLoaderConfig_ResourceError_Tooltip"] = "Show an error popup at startup if the mod loader fails to load the game's resources."
+
+	self.texts["ModLoaderConfig_RestartReminder_Text"] = "Show Restart Reminder Popup"
+	self.texts["ModLoaderConfig_RestartReminder_Tooltip"] = "Show a popup reminding to restart the game when enabling mods."
+
+	self.texts["Button_Ok"] = "OK"
+	self.texts["Button_Yes"] = "YES"
+	self.texts["Button_No"] = "NO"
+	self.texts["Button_DisablePopup"] = "GOT IT, DON'T TELL ME AGAIN"
+	self.texts["ButtonTooltip_DisablePopup"] = "This dialog will not be shown anymore. You can re-enable it in Configure Mod Loader."
+
+	self.texts["FrameTitle_ScriptError"] = "Script Error"
+	self.texts["FrameText_ScriptError_Mount"] = "Unable to mount mod at [%s]:\n%s"
+
+	self.texts["FrameTitle_RestartRequired"] = "Restart Required"
+	self.texts["FrameText_RestartRequired"] = "You have enabled one or more mods. In order to apply them, game restart is required."
+
+	self.texts["FrameTitle_OldVersion"] = "Mod Loader Outdated"
+	self.texts["FrameText_OldVersion"] = "The following mods could not be loaded, because they require a newer version of the mod loader:\n\n%s\nYour installed version: %s"
+	self.texts["OldVersion_ListEntry"] = "- [%s] requires at least version %s."
+
+	self.texts["FrameTitle_ResourceError"] = "Resource Error"
+	self.texts["FrameText_ResourceError"] = 
+					"The mod loader failed to load game resources. "..
+					"This will cause some elements of modded UI to be invisible or incorrectly positioned. "..
+					"This happens sometimes, but so far the cause is not known.\n\n"..
+					"Restarting the game should fix this."
+
+	self.texts["VersionString"] = "Mod loader version: "
+
+	self.texts["Custom_Difficulty_Note"] = "Note: this is a modded difficulty level. It won't change anything without mods providing content for this difficulty."
+
+	self.texts["Difficulty_VeryHard_Name"] = "Very Hard"
+	self.texts["Difficulty_VeryHard_Title"] = "Very Hard Mode"
+	self.texts["Difficulty_VeryHard_Description"] = "Intended for veteran Commanders looking for a challenge."
+
+	self.texts["Difficulty_Impossible_Name"] = "Impossible"
+	self.texts["Difficulty_Impossible_Title"] = "Impossible Mode"
+	self.texts["Difficulty_Impossible_Description"] = "A punishing difficulty allowing no mistakes."
 end
 
 -- Maintain sanity
@@ -185,39 +316,39 @@ end
 function modApi:resetModContent()
 	self.textOverrides = {}
 	self.mod_squads = {
-		{ "Rift Walkers", "PunchMech", "TankMech", "ArtiMech" },
-		{ "Rusting Hulks", "JetMech", "RocketMech",  "PulseMech" },
-		{ "Zenith Guard", "LaserMech", "ChargeMech", "ScienceMech" },
-		{ "Blitzkrieg", "ElectricMech", "WallMech", "RockartMech" },
-		{ "Steel Judoka", "JudoMech", "DStrikeMech", "GravMech" },
-		{ "Flame Behemoths", "FlameMech", "IgniteMech", "TeleMech" },
-		{ "Frozen Titans", "GuardMech", "MirrorMech", "IceMech" },
-		{ "Hazardous Mechs", "LeapMech", "UnstableTank", "NanoMech" },
+		{ self:getText("Archive_A_Name"), "PunchMech", "TankMech", "ArtiMech" },
+		{ self:getText("Rust_A_Name"), "JetMech", "RocketMech",  "PulseMech" },
+		{ self:getText("Pinnacle_A_Name"), "LaserMech", "ChargeMech", "ScienceMech" },
+		{ self:getText("Detritus_A_Name"), "ElectricMech", "WallMech", "RockartMech" },
+		{ self:getText("Archive_B_Name"), "JudoMech", "DStrikeMech", "GravMech" },
+		{ self:getText("Rust_B_Name"), "FlameMech", "IgniteMech", "TeleMech" },
+		{ self:getText("Pinnacle_B_Name"), "GuardMech", "MirrorMech", "IceMech" },
+		{ self:getText("Detritus_B_Name"), "LeapMech", "UnstableTank", "NanoMech" },
 	}
 	self.squad_text = {
-		"Rift Walkers",
-		"These were the very first Mechs to fight against the Vek. They are efficient and reliable.",
+		self:getText("Archive_A_Name"),
+		self:getText("Archive_A_Description"),
 		
-		"Rusting Hulks",
-		"R.S.T. weather manipulators allow these Mechs to take advantage of smoke storms everywhere.",
+		self:getText("Rust_A_Name"),
+		self:getText("Rust_A_Description"),
 		
-		"Zenith Guard",
-		"Detritus' Beam technology and Pinnacle's Shield technology create a powerful combination.",
+		self:getText("Pinnacle_A_Name"),
+		self:getText("Pinnacle_A_Description"),
 		
-		"Blitzkrieg",
-		"R.S.T. engineers designed this Squad around the mass destruction capabilities of harnessed lightning.",
+		self:getText("Detritus_A_Name"),
+		self:getText("Detritus_A_Description"),
 		
-		"Steel Judoka",
-		"These Mechs specialize in positional manipulation to turn the Vek against each other.",
+		self:getText("Archive_B_Name"),
+		self:getText("Archive_B_Description"),
 		
-		"Flame Behemoths",
-		"Invincible to flames, these Mechs aim to burn any threat to ashes.",
+		self:getText("Rust_B_Name"),
+		self:getText("Rust_B_Description"),
 		
-		"Frozen Titans",
-		"These Titans rely on the Cryo Launcher, a powerful weapon that takes an experienced Pilot to master.",
+		self:getText("Pinnacle_B_Name"),
+		self:getText("Pinnacle_B_Description"),
 		
-		"Hazardous Mechs",
-		"These Mechs have spectacular damage output but rely on nanobots feeding off dead Vek to stay alive.",
+		self:getText("Detritus_B_Name"),
+		self:getText("Detritus_B_Description"),
 	}
 	self.squad_icon = {
 		"img/units/player/mech_punch_ns.png",

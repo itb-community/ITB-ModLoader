@@ -12,10 +12,10 @@ end
 
 local function showErrorDialog(text)
 	sdlext.showButtonDialog(
-		"Script Error", text,
+		modApi:getText("FrameTitle_ScriptError"), text,
 		responseFn, nil, nil,
-		{ "OK", "GOT IT, DON'T TELL ME AGAIN" },
-		{ "", "This dialog will not be shown anymore. You can re-enable it in Configure Mod Loader." }
+		{ modApi:getText("Button_Ok"), modApi:getText("Button_DisablePopup") },
+		{ "", modApi:getText("ButtonTooltip_DisablePopup") }
 	)
 end
 
@@ -34,7 +34,7 @@ sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 			modApi:scheduleHook(20, function()
 				-- could show all errors one after another, but let's not...
 				for dir, err in pairs(mod_loader.unmountedMods) do
-					showErrorDialog(string.format("Unable to mount mod at [%s]:\n%s", dir, err))
+					showErrorDialog(string.format(modApi:getText("FrameText_ScriptError_Mount"), dir, err))
 					break
 				end
 				mod_loader.unmountedMods = {}

@@ -12,10 +12,10 @@ end
 
 local function showVersionDialog(text)
 	sdlext.showButtonDialog(
-		"Mod Loader Outdated", text,
+		modApi:getText("FrameTitle_OldVersion"), text,
 		responseFn, nil, nil,
-		{ "OK", "GOT IT, DON'T TELL ME AGAIN" },
-		{ "", "This dialog will not be shown anymore. You can re-enable it in Configure Mod Loader." }
+		{ modApi:getText("Button_Ok"), modApi:getText("Button_DisablePopup") },
+		{ "", modApi:getText("ButtonTooltip_DisablePopup") }
 	)
 end
 
@@ -39,16 +39,17 @@ sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 					if mod.outOfDate then
 						isOutOfDate = true
 						text = text .. string.format(
-							"- [%s] requires at least version %s.",
+							modApi:getText("OldVersion_ListEntry"),
 							mod.name, mod.modApiVersion
 						) .. "\n"
 					end
 				end
 
 				if isOutOfDate then
-					text = "The following mods could not be loaded, because they require a newer version of the mod loader:\n\n"..
-						text..
-						"\nYour installed version: ".. modApi.version
+					text = string.format(
+						modApi:getText("FrameText_OldVersion"),
+						text, modApi.version
+					)
 
 					showVersionDialog(text)
 				end

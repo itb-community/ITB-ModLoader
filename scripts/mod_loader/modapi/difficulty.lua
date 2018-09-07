@@ -63,23 +63,15 @@ function GetDifficultyTipSuffix(level)
 end
 
 --[[
-	Returns name of the difficulty level that will be displayed
-	to the user, obtained by replacing all underscores with spaces
-	and capitalizing each word in the difficulty string.
-		"Easy", "Very Hard"
+	Returns name of the difficulty level
 --]]
 function GetDifficultyFaceName(level)
 	level = level or GetDifficulty()
 	validateDifficulty(level)
 
-	local name = string.sub(DifficultyLevels[level + 1], 6)
+	local suffix = GetDifficultyTipSuffix(level)
 
-	local result = ""
-	for str in string.gmatch(name, "([^_]+)") do
-		result = result .. " " .. toCapitalizedCase(str)
-	end
-
-	return modApi:trimString(result)
+	return modApi:getText("Difficulty_"..suffix.."_Name")
 end
 
 local function copySpawner(src)
@@ -92,7 +84,7 @@ local function copySpawner(src)
 	return t
 end
 
-function AddDifficultyLevel(id, level, tipTitle, tipText)
+function AddDifficultyLevel(id, level)
 	assert(type(id) == "string", "Difficulty level id must be a string, got: " .. type(id))
 	assert(id == string.upper(id), "Difficulty level id must use only uppercase letters.")
 	assert(modApi:stringStartsWith(id, "DIFF_"), "Difficulty level id must begin with 'DIFF_', got: " .. id)
@@ -101,8 +93,6 @@ function AddDifficultyLevel(id, level, tipTitle, tipText)
 		level <= #DifficultyLevels,
 		"Level being added must form a contiguous range with existing difficulties"
 	)
-	assert(type(tipTitle) == "string")
-	assert(type(tipText) == "string")
 
 	local index = level + 1
 
@@ -129,10 +119,6 @@ function AddDifficultyLevel(id, level, tipTitle, tipText)
 	end
 
 	table.insert(DifficultyLevels, index, id)
-
-	local suffix = GetDifficultyTipSuffix(level)
-	Global_Texts["TipTitle_Hangar" .. suffix] = tipTitle
-	Global_Texts["TipText_Hangar" .. suffix] = tipText
 
 	-- Default to using the same spawner logic as baseline difficulty level
 	SectorSpawners[level] = copySpawner(SectorSpawners[GetBaselineDifficulty(level)])
@@ -218,28 +204,13 @@ function SetDifficulty(level)
 		tempTipText = Global_Texts["TipText_Hangar"..baseSuffix]
 		tempToggle = Global_Texts["Toggle_"..baseSuffix]
 
-		Global_Texts["TipTitle_Hangar"..baseSuffix] = Global_Texts["TipTitle_Hangar"..tipSuffix]
-		Global_Texts["TipText_Hangar"..baseSuffix] = Global_Texts["TipText_Hangar"..tipSuffix]
+		Global_Texts["TipTitle_Hangar"..baseSuffix] = modApi:getText("Difficulty_"..tipSuffix.."_Title")
+		Global_Texts["TipText_Hangar"..baseSuffix] = modApi:getText("Difficulty_"..tipSuffix.."_Description")
 		Global_Texts["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
 
 		if not IsVanillaDifficultyLevel(level) then
 			Global_Texts["TipText_Hangar"..baseSuffix] =
-				Global_Texts["TipText_Hangar"..baseSuffix] .. "\n\n" ..
-				"Note: this is a modded difficulty level. It won't change "..
-				"anything without mods providing content for this difficulty."
+				Global_Texts["TipText_Hangar"..baseSuffix] .. "\n\n" .. modApi:getText("Custom_Difficulty_Note")
 		end
 	end
 end
-
-AddDifficultyLevel(
-	"DIFF_VERY_HARD",
-	#DifficultyLevels, -- adds as a new highest difficulty
-	"Very Hard Mode",
-	"Intended for veteran Commanders looking for a challenge."
-)
-AddDifficultyLevel(
-	"DIFF_IMPOSSIBLE",
-	#DifficultyLevels, -- adds as a new highest difficulty
-	"Impossible Mode",
-	"A punishing difficulty allowing no mistakes."
-)

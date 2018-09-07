@@ -52,7 +52,7 @@ local function createUi()
 		local frametop = Ui()
 			:width(0.8):height(0.8)
 			:posCentered()
-			:caption("Rearrange Pilots")
+			:caption(modApi:getText("FrameTitle_PilotArrange"))
 			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:addTo(ui)
 
@@ -183,8 +183,6 @@ end
 sdlext.addHangarEnteredHook(function(screen)
 	if not arrangePilotsButton.disabled then
 		arrangePilotsButton.disabled = true
-		arrangePilotsButton.tip = 
-			"Pilots can only be arranged before the New Game button is pressed.\n\n"
-			.."Restart the game to be able to arrange pilots."
+		arrangePilotsButton.tip = modApi:getText("ButtonTooltipOff_PilotArrange")
 	end
 end)

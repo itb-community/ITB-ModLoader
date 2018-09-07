@@ -18,14 +18,13 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 	
 	buttonModContent = MainMenuButton("short")
 		:pospx(0, screen:h() - 186)
-		:caption("Mod Content")
+		:caption(modApi:getText("Button_ModContent"))
 		:addTo(uiRoot)
 	buttonModContent.visible = false
 
 	sdlext.addGameWindowResizedHook(function(screen, oldSize)
 		buttonModContent:pospx(0, screen:h() - 186)
 	end)
-
 
 	buttonModContent.onclicked = function(self, button)
 		if button == 1 then
@@ -38,7 +37,7 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 				local frame = Ui()
 					:width(0.4):height(0.8)
 					:posCentered()
-					:caption("Mod Content")
+					:caption(modApi:getText("FrameTitle_ModContent"))
 					:decorate({ DecoFrameHeader(), DecoFrame() })
 					:addTo(ui)
 

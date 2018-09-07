@@ -90,7 +90,7 @@ local function createUi()
 		local frame = Ui()
 			:width(0.6):height(0.575)
 			:posCentered()
-			:caption("Mod Loader Configuration")
+			:caption(modApi:getText("FrameTitle_ModLoaderConfig"))
 			:decorate({
 				DecoFrameHeader(),
 				DecoFrame()
@@ -111,34 +111,38 @@ local function createUi()
 		-- Logging level
 		ddLogLevel = UiDropDown(
 				{ 0, 1, 2 },
-				{ "None", "Only console", "File and console" },
+				{
+					modApi:getText("ModLoaderConfig_LogLevel_DD0"),
+					modApi:getText("ModLoaderConfig_LogLevel_DD1"),
+					modApi:getText("ModLoaderConfig_LogLevel_DD2")
+				},
 				modApi.logger.logLevel
 			)
 			:width(1):heightpx(41)
 			:decorate({
 				DecoButton(),
 				DecoAlign(0, 2),
-				DecoText("Logging Level"),
+				DecoText(modApi:getText("ModLoaderConfig_LogLevel_Text")),
 				DecoDropDownText(nil, nil, nil, 33),
 				DecoAlign(0, -2),
 				DecoDropDown()
 			})
-			:settooltip("Controls where the game's logging messages are printed.")
+			:settooltip(modApi:getText("ModLoaderConfig_LogLevel_Tooltip"))
 			:addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Caller information
 		cboxCaller = createCheckboxOption(
-			"Print Caller Information",
-			"Include timestamp and stacktrace in LOG messages."
+			modApi:getText("ModLoaderConfig_Caller_Text"),
+			modApi:getText("ModLoaderConfig_Caller_Tooltip")
 		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Floaty tooltips
 		cboxFloatyTooltips = createCheckboxOption(
-			"Attach Tooltips To Mouse Cursor",
-			"Tooltips follow the mouse cursor around.",
-			"Tooltips show to the side of the UI element that spawned them, similar to the game's own tooltips."
+			modApi:getText("ModLoaderConfig_FloatyTooltips_Text"),
+			modApi:getText("ModLoaderConfig_FloatyTooltips_Tooltip_On"),
+			modApi:getText("ModLoaderConfig_FloatyTooltips_Tooltip_Off")
 		):addTo(layout)
 
 		cboxFloatyTooltips.clicked = function(self, button)
@@ -152,8 +156,8 @@ local function createUi()
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Profile-specific config
 		cboxProfileConfig = createCheckboxOption(
-			"Profile-Specific Configuration",
-			"Configuration for the mod loader and individual mods will be remembered per profile, instead of globally.\n\nNote: with this option enabled, switching profiles will require you to restart the game to apply the different mod configurations."
+			modApi:getText("ModLoaderConfig_ProfileConfig_Text"),
+			modApi:getText("ModLoaderConfig_ProfileConfig_Tooltip")
 		):addTo(layout)
 
 		cboxProfileConfig.clicked = function(self, button)
@@ -171,23 +175,23 @@ local function createUi()
 		createSeparator(10):addTo(layout)
 
 		cboxErrorFrame = createCheckboxOption(
-			"Show Script Error Popup",
-			"Show an error popup at startup if a mod fails to mount, init, or load."
+			modApi:getText("ModLoaderConfig_ScriptError_Text"),
+			modApi:getText("ModLoaderConfig_ScriptError_Tooltip")
 		):addTo(layout)
 
 		cboxVersionFrame = createCheckboxOption(
-			"Show Mod Loader Outdated Popup",
-			"Show a popup if the mod loader is out-of-date for installed mods."
+			modApi:getText("ModLoaderConfig_OldVersion_Text"),
+			modApi:getText("ModLoaderConfig_OldVersion_Tooltip")
 		):addTo(layout)
 
 		cboxResourceError = createCheckboxOption(
-			"Show Resource Error Popup",
-			"Show an error popup at startup if the mod loader fails to load the game's resources."
+			modApi:getText("ModLoaderConfig_ResourceError_Text"),
+			modApi:getText("ModLoaderConfig_ResourceError_Tooltip")
 		):addTo(layout)
 
 		cboxRestartReminder = createCheckboxOption(
-			"Show Restart Reminder Popup",
-			"Show a popup reminding to restart the game when enabling mods."
+			modApi:getText("ModLoaderConfig_RestartReminder_Text"),
+			modApi:getText("ModLoaderConfig_RestartReminder_Tooltip")
 		):addTo(layout)
 
 		uiSetSettings(LoadModLoaderConfig())

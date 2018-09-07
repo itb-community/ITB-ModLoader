@@ -79,11 +79,11 @@ local function createUi()
 		-- compiled cached lists which we can't modify anyway.
 		if modApi.showRestartReminder and initializedCount > 0 then
 			sdlext.showButtonDialog(
-				"Restart Required",
-				"You have enabled one or more mods. In order to apply them, game restart is required.",
+				modApi:getText("FrameTitle_RestartRequired"),
+				modApi:getText("FrameText_RestartRequired"),
 				responseFn, nil, nil,
-				{ "OK", "GOT IT, DON'T TELL ME AGAIN" },
-				{ "", "This dialog will not be shown anymore. You can re-enable it in Configure Mod Loader." }
+				{ modApi:getText("Button_Ok"), modApi:getText("Button_DisablePopup") },
+				{ "", modApi:getText("ButtonTooltip_DisablePopup") }
 			)
 		end
 	end
@@ -94,7 +94,7 @@ local function createUi()
 		local frametop = Ui()
 			:width(0.6):height(0.575)
 			:posCentered()
-			:caption("Mod Configuration")
+			:caption(modApi:getText("FrameTitle_ModConfig"))
 			:decorate({
 				DecoFrameHeader(),
 				DecoFrame()

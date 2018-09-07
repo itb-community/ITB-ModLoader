@@ -1,23 +1,25 @@
-sdlext.addModContent(
-	"Configure Mods",
-	ConfigureMods,
-	"Turn on and off individual mods and configure any settings they might have."
-)
+function sdlext.executeAddModContent()
+	sdlext.addModContent(
+		modApi:getText("Button_ModConfig"),
+		ConfigureMods,
+		modApi:getText("ButtonTooltip_ModConfig")
+	)
 
-sdlext.addModContent(
-	"Edit Squads",
-	SelectSquads,
-	"Select which squads will be available to pick."
-)
+	sdlext.addModContent(
+		modApi:getText("Button_SquadSelect"),
+		SelectSquads,
+		modApi:getText("ButtonTooltip_SquadSelect")
+	)
 
-arrangePilotsButton = sdlext.addModContent(
-	"Arrange Pilots",
-	ArrangePilots,
-	"Select which pilots will be available to pick."
-)
+	arrangePilotsButton = sdlext.addModContent(
+		modApi:getText("Button_PilotArrange"),
+		ArrangePilots,
+		modApi:getText("ButtonTooltip_PilotArrange")
+	)
 
-sdlext.addModContent(
-	"Configure Mod Loader",
-	ConfigureModLoader,
-	"Configure some features of the mod loader."
-)
+	sdlext.addModContent(
+		modApi:getText("Button_ModLoaderConfig"),
+		ConfigureModLoader,
+		modApi:getText("ButtonTooltip_ModLoaderConfig")
+	)
+end
