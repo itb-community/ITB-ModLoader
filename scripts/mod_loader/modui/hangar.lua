@@ -617,7 +617,7 @@ local function createUi(root)
 			not leaving               and
 			IsHangarWindowlessState() and
 			-- Start button is disabled when no valid custom squad is selected
-			(Profile.last_squad ~= 9 or isCustomSquadValid())
+			(not isCustomSquad() or isCustomSquadValid())
 		then
 			fireHangarLeavingHooks(true)
 		end
@@ -631,6 +631,8 @@ local function createUi(root)
 		btnStart:pospx(origin.x + 800, origin.y + 10)
 
 		self.visible = sdlext.isHangar()
+		-- The game doesn't register clicks if the button isn't "primed", ie.
+		-- if it wasn't highlighted prior to being clicked.
 		btnBack.primed  = self.visible and btnBack.containsMouse
 		btnStart.primed = self.visible and btnStart.containsMouse
 
