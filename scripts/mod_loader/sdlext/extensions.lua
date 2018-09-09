@@ -58,8 +58,12 @@ end
 function sdlext.squadPalettes()
 	local GetColorMapOld = GetColorMap
 	local GL_ColorOld = GL_Color
-	function GL_Color(r,g,b)
-		return sdl.rgb(r,g,b)
+	function GL_Color(r,g,b,a)
+		if a == nil then
+			return sdl.rgb(r,g,b)
+		else
+			return sdl.rgba(r,g,b,a)
+		end
 	end
 	
 	require("scripts/color_map")
