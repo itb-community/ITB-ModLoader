@@ -28,6 +28,7 @@ function Ui:new()
 	self.disabled = false
 	self.focused = false
 	self.containsMouse = false
+	self.ignoreMouse = false
 	self.visible = true
 	self.root = self
 	self.parent = nil
@@ -217,6 +218,7 @@ end
 
 function Ui:wheel(mx,my,y)
 	if not self.visible then return false end
+	if self.ignoreMouse then return false end
 	
 	for i=1,#self.children do
 		local child = self.children[i]
@@ -243,6 +245,7 @@ end
 
 function Ui:mousedown(mx, my, button)
 	if not self.visible then return false end
+	if self.ignoreMouse then return false end
 
 	for i=1,#self.children do
 		local child = self.children[i]
@@ -284,6 +287,7 @@ end
 
 function Ui:mouseup(mx, my, button)
 	if not self.visible then return false end
+	if self.ignoreMouse then return false end
 
 	local contains = rect_contains(
 		self.screenx,
@@ -344,6 +348,7 @@ end
 
 function Ui:mousemove(mx, my)
 	if not self.visible then return false end
+	if self.ignoreMouse then return false end
 
 	if self.root.hoveredchild ~= nil then
 		self.root.hoveredchild.hovered = false
