@@ -113,12 +113,18 @@ function UiScrollArea:wheel(mx, my, y)
 	d = math.min(d, self.h * 0.8)
 	d = d * y
 
+	local startdy = self.dy
+
 	self.dy = self.dy - d
 	if self.dy < 0 then self.dy = 0 end
 	if self.dy + self.h > self.innerHeight then self.dy = self.innerHeight - self.h end
 	if self.h > self.innerHeight then self.dy = 0 end
 
-	return true
+	-- Call back to mousemove to update hover and tooltip statuses of the area's
+	-- child elements.
+	Ui.mousemove(self, mx, my + (self.dy - startdy))
+
+	return Ui.wheel(self, mx, my, y)
 end
 
 function UiScrollArea:mousemove(x, y)
