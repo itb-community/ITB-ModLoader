@@ -83,12 +83,13 @@ function UiRoot:event(eventloop)
 	
 	if type == sdl.events.mousewheel then
 		if self:dropdownEvent(mx, my) then
-			local done = self.currentDropDown:wheel(mx, my,eventloop:wheel())
+			local done = self.currentDropDown:wheel(mx, my, eventloop:wheel())
 			table.remove(self.children)
 			if done then
 				return done
 			end
 		end
+
 		return self:wheel(mx, my, eventloop:wheel())
 	end
 

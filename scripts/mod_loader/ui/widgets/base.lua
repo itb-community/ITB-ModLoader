@@ -219,7 +219,7 @@ end
 function Ui:wheel(mx,my,y)
 	if not self.visible then return false end
 	if self.ignoreMouse then return false end
-	
+
 	for i=1,#self.children do
 		local child = self.children[i]
 		
