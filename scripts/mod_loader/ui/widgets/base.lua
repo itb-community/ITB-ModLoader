@@ -285,6 +285,23 @@ end
 function Ui:mouseup(mx, my, button)
 	if not self.visible then return false end
 
+	local contains = rect_contains(
+		self.screenx,
+		self.screeny,
+		self.w,
+		self.h,
+		mx, my
+	)
+
+	if not contains then
+		self.root.hoveredchild = nil
+		self.hovered = false
+		-- Cleanup the tooltip to prevent flickering when mouse is
+		-- first moved after the release
+		self.root.tooltip = ""
+		self.root.tooltipUi:updateText()
+	end
+
 	if self.dragged and button == 1 then
 		self.dragged = false
 		self:stopDrag(mx, my, button)
@@ -295,13 +312,7 @@ function Ui:mouseup(mx, my, button)
 		self.root.pressedchild == self and
 		self.pressed                   and
 		not self.disabled              and
-		rect_contains(
-			self.screenx,
-			self.screeny,
-			self.w,
-			self.h,
-			mx, my
-		)
+		contains
 	then
 		self.pressed = false
 		if self:clicked(button) then return true end
