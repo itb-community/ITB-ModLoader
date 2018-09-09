@@ -39,3 +39,4 @@ local function globalizeLocalVariable(filePath, variableName)
 end
 
 globalizeLocalVariable("scripts/text.lua", "Global_Texts")
+globalizeLocalVariable("scripts/spawner_backend.lua", "WeakPawns")
