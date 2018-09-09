@@ -118,26 +118,11 @@ function UiRoot:event(eventloop)
 		end
 		if dEvent then table.remove(self.children) end
 		
+		-- Notify pressed children of the event, even if the mouse is released
+		-- outside of them.
 		if self.pressedchild and self.pressedchild:mouseup(mx, my, button) then
 			self.pressedchild = nil
 			return true
-		end
-
-		if
-			child ~= nil       and
-			rect_contains(
-				child.screenx,
-				child.screeny,
-				child.w,
-				child.h,
-				mx, my
-			)
-		then
-			if child:mouseup(mx, my, button) then
-				self.pressedchild = nil
-				child.pressed = false
-				return true
-			end
 		end
 
 		local res = self:mouseup(mx, my, button)
