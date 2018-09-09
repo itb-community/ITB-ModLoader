@@ -1,13 +1,13 @@
 
 local oldMoveGetTargetArea = Move.GetTargetArea
 function Move:GetTargetArea(point)
-    local moveSkill = _G[Pawn:GetType()].MoveSkill
+	local moveSkill = _G[Pawn:GetType()].MoveSkill
 	
 	if moveSkill ~= nil and moveSkill.GetTargetArea ~= nil then
 		return moveSkill:GetTargetArea(point)
-    end
+	end
 
-    return oldMoveGetTargetArea(self, point)
+	return oldMoveGetTargetArea(self, point)
 end
 
 -- Override default Move:GetSkillEffect to fix leap movement
@@ -30,11 +30,11 @@ end
 
 local oldMoveGetSkillEffect = Move.GetSkillEffect
 function Move:GetSkillEffect(p1, p2)
-    local moveSkill = _G[Pawn:GetType()].MoveSkill
+	local moveSkill = _G[Pawn:GetType()].MoveSkill
 
-    if moveSkill ~= nil and moveSkill.GetSkillEffect ~= nil then
+	if moveSkill ~= nil and moveSkill.GetSkillEffect ~= nil then
 		return moveSkill:GetSkillEffect(p1, p2)
-    end
-    
-    return oldMoveGetSkillEffect(self, p1, p2)
+	end
+
+	return oldMoveGetSkillEffect(self, p1, p2)
 end
