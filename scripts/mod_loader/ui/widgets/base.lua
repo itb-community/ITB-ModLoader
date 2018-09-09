@@ -367,8 +367,7 @@ function Ui:mousemove(mx, my)
 				child.containsMouse = true
 				child:mouseEntered()
 			end
-			
-			self.root.hoveredchild = child
+
 			if child:mousemove(mx, my) then
 				return true
 			end
