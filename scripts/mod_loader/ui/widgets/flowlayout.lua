@@ -83,4 +83,10 @@ function UiFlowLayout:relayout()
 			child.rect.h = child.h
 		end
 	end
+
+	if self.horizontal then
+		self.innerHeight = self.innerHeight + currentMaxSize
+	else
+		self.innerWidth = self.innerWidth + currentMaxSize
+	end
 end
