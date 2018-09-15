@@ -394,10 +394,23 @@ local function isSquadsButtonClick(mx, my)
 	return false
 end
 
+-- last_squad values 0..7 are for regular unlockable squads
+local function isRandomSquad()
+	return Profile.last_squad == 8
+end
+
+local function isCustomSquad()
+	return Profile.last_squad == 9
+end
+
+local function isSecretSquad()
+	return Profile.last_squad == 10
+end
+
 local pilotsBtn = Buttons.hangar_pilots.hitstats
 local function isPilotsButtonClick(mx, my)
 	-- Pilot selection UI is not available for the secret squad
-	if IsHangarWindowlessState() and Profile.last_squad ~= 10 then
+	if IsHangarWindowlessState() and not isSecretSquad() then
 		local r = sdl.rect(
 			sdlext.CurrentWindowRect.x - 510 + 4,
 			-- the pilot button is 1px lower than squad button
@@ -411,10 +424,6 @@ local function isPilotsButtonClick(mx, my)
 	return false
 end
 
-local function isCustomSquad()
-	return Profile.last_squad == 9
-end
-
 local function isCustomSquadValid()
 	if Profile.last_custom then
 		-- When selecting custom squad for the first time, the first
@@ -426,10 +435,6 @@ local function isCustomSquadValid()
 	end
 
 	return false
-end
-
-local function isRandomSquad()
-	return Profile.last_squad == 8
 end
 
 local recustomBtn = Buttons.hangar_recustom.hitstats
