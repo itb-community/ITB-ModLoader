@@ -113,6 +113,7 @@ local function createUi()
 			local button = Ui()
 				:widthpx(portraitW):heightpx(portraitH)
 				:pospx(cellW * col, cellH * row)
+				:settooltip(pilot.Name)
 				:decorate({
 					DecoButton(),
 					DecoAlign(-4),
