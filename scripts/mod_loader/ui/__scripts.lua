@@ -1,5 +1,4 @@
 local scripts = {
-	"classes",
 	"ui_anim",
 
 	"decorations/decoration",
