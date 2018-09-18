@@ -24,16 +24,12 @@ local function createUi(root)
 	-- Hack. Having buttons return false in their mousemove causes
 	-- UI's highlighting system to break, and fail to unhighlight
 	-- the UI elements.
-	-- Fix this by having their parent clean their mess.
+	-- Fix this by having their parent mark them as hovered.
 	pane.mousemove = function(self, x, y)
 		Ui.mousemove(self, x, y)
 
-		if arrLeft.hovered and not arrLeft.containsMouse then
-			arrLeft.hovered = false
-		end
-		if arrRight.hovered and not arrRight.containsMouse then
-			arrRight.hovered = false
-		end
+		arrLeft.hovered = arrLeft.containsMouse
+		arrRight.hovered = arrRight.containsMouse
 
 		return false
 	end
