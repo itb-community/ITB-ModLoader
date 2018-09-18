@@ -208,6 +208,7 @@ end)
 
 sdlext.addSettingsChangedHook(function(old, new)
 	if old.last_profile ~= new.last_profile then
+		Hangar_lastProfileHadSecretPilots = IsSecretPilotsUnlocked()
 		Profile = modApi:loadProfile()
 	end
 end)

@@ -184,8 +184,34 @@ local pilotBox =    Rect2D(0, 0, squadBox.w - 150, squadBox.h)
 local portraitBtn = Buttons.hangar_pilot.hitstats
 local selectBtn =   Buttons.hangar_select.hitstats
 
+Hangar_lastProfileHadSecretPilots = false
 local isSecretSquadUnlocked = false
 local isSecretPilotsUnlocked = false
+local secretPilots = {
+	"Pilot_Mantis",
+	"Pilot_Rock",
+	"Pilot_Zoltan"
+}
+
+function HangarIsSecretSquadUnlocked()
+	return isSecretSquadUnlocked
+end
+
+function HangarIsSecretPilotsUnlocked()
+	return isSecretPilotsUnlocked
+end
+
+function IsSecretPilotsUnlocked(profile)
+	profile = profile or Profile
+
+	for i, v in ipairs(secretPilots) do
+		if list_contains(Profile.pilots, v) then
+			return true
+		end
+	end
+
+	return false
+end
 
 local function isWindowless(w, h)
 	w = w or sdlext.CurrentWindowRect.w
@@ -675,10 +701,8 @@ local function createUi(root)
 	sdlext.addHangarEnteredHook(function(screen)
 		Profile = modApi:loadProfile()
 		isSecretSquadUnlocked = Profile.squads[11]
-		isSecretPilotsUnlocked =
-			list_contains(Profile.pilots, "Pilot_Mantis") or
-			list_contains(Profile.pilots, "Pilot_Rock")   or
-			list_contains(Profile.pilots, "Pilot_Zoltan")
+		isSecretPilotsUnlocked = Hangar_lastProfileHadSecretPilots or
+		                         IsSecretPilotsUnlocked()
 
 		leaving = false
 		uiState = UI_STATE_DEFAULT
