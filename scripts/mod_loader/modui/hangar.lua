@@ -300,8 +300,9 @@ local function isDismissClick(mx, my, button)
 				-- since they're occupied by the Last Pilot button
 				if y >= 1 or x >= 2 then
 					if rect_contains(r, mx, my) then
-						-- Check if the pilot is actually unlocked
-						-- Secret pilots are not included in PilotList, so skip them
+						-- Check if the pilot is actually unlocked.
+						-- Secret pilots are not included in PilotList, so
+						-- process them separately
 						if x < 5 then
 							-- Compute index in the pilot list
 							-- Decrement by 2 to account for Last Pilot button
@@ -309,7 +310,7 @@ local function isDismissClick(mx, my, button)
 
 							return list_contains(Profile.pilots, PilotList[idx])
 						else
-							return isSecretPilotsUnlocked
+							return list_contains(Profile.pilots, secretPilots[1 + y])
 						end
 
 						return false
