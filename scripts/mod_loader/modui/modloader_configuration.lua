@@ -12,6 +12,7 @@ local function createUi()
 	local cboxVersionFrame = nil
 	local cboxResourceError = nil
 	local cboxRestartReminder = nil
+	local cboxProfileFrame = nil
 
 	local onExit = function(self)
 		local data = {
@@ -23,7 +24,8 @@ local function createUi()
 			showErrorFrame      = cboxErrorFrame.checked,
 			showVersionFrame    = cboxVersionFrame.checked,
 			showResourceWarning = cboxResourceError.checked,
-			showRestartReminder = cboxRestartReminder.checked
+			showRestartReminder = cboxRestartReminder.checked,
+			showProfileSettingsFrame = cboxProfileFrame.checked
 		}
 
 		ApplyModLoaderConfig(data)
@@ -41,6 +43,7 @@ local function createUi()
 		cboxVersionFrame.checked    = config.showVersionFrame
 		cboxResourceError.checked   = config.showResourceWarning
 		cboxRestartReminder.checked = config.showRestartReminder
+		cboxProfileFrame.checked    = config.showProfileSettingsFrame
 
 		local t = cboxFloatyTooltips.root.tooltip
 		modApi.floatyTooltips = config.floatyTooltips
@@ -192,6 +195,11 @@ local function createUi()
 		cboxRestartReminder = createCheckboxOption(
 			modApi:getText("ModLoaderConfig_RestartReminder_Text"),
 			modApi:getText("ModLoaderConfig_RestartReminder_Tooltip")
+		):addTo(layout)
+
+		cboxProfileFrame = createCheckboxOption(
+			modApi:getText("ModLoaderConfig_ProfileFrame_Text"),
+			modApi:getText("ModLoaderConfig_ProfileFrame_Tooltip")
 		):addTo(layout)
 
 		uiSetSettings(LoadModLoaderConfig())

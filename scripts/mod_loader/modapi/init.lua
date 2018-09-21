@@ -275,6 +275,9 @@ function modApi:setupModLoaderTexts()
 	self.texts["ModLoaderConfig_RestartReminder_Text"] = "Show Restart Reminder Popup"
 	self.texts["ModLoaderConfig_RestartReminder_Tooltip"] = "Show a popup reminding to restart the game when enabling mods."
 
+	self.texts["ModLoaderConfig_ProfileFrame_Text"] = "Show Profile Settings Change Popup"
+	self.texts["ModLoaderConfig_ProfileFrame_Tooltip"] = "Show a popup reminding to restart the game when switching profiles with Profile-Specific Configuration enabled."
+
 	self.texts["Button_Ok"] = "OK"
 	self.texts["Button_Yes"] = "YES"
 	self.texts["Button_No"] = "NO"
@@ -297,6 +300,9 @@ function modApi:setupModLoaderTexts()
 					"This will cause some elements of modded UI to be invisible or incorrectly positioned. "..
 					"This happens sometimes, but so far the cause is not known.\n\n"..
 					"Restarting the game should fix this."
+
+	self.texts["FrameTitle_ProfileSettings"] = "Profile Settings Changed"
+	self.texts["FrameText_ProfileSettings"] = "Active profile has been changed, and profile-specific configuration is enabled.\n\nYou need to restart the game in order to apply the changes made by the profile's configuration."
 
 	self.texts["VersionString"] = "Mod loader version: "
 

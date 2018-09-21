@@ -5,11 +5,13 @@ function CurrentModLoaderConfig()
 	data.profileConfig       = modApi.profileConfig
 	data.logLevel            = modApi.logger.logLevel
 	data.printCallerInfo     = modApi.logger.printCallerInfo
+	data.floatyTooltips      = modApi.floatyTooltips
+
 	data.showErrorFrame      = modApi.showErrorFrame
 	data.showVersionFrame    = modApi.showVersionFrame
 	data.showResourceWarning = modApi.showResourceWarning
 	data.showRestartReminder = modApi.showRestartReminder
-	data.floatyTooltips      = modApi.floatyTooltips
+	data.showProfileSettingsFrame = modApi.showProfileSettingsFrame
 
 	return data
 end
@@ -50,7 +52,8 @@ function DefaultModLoaderConfig()
 		showErrorFrame      = true,
 		showVersionFrame    = true,
 		showResourceWarning = true,
-		showRestartReminder = true
+		showRestartReminder = true,
+		showProfileSettingsFrame = true
 	}
 end
 
@@ -93,6 +96,7 @@ function ApplyModLoaderConfig(config)
 	modApi.showVersionFrame       = config.showVersionFrame
 	modApi.showResourceWarning    = config.showResourceWarning
 	modApi.showRestartReminder    = config.showRestartReminder
+	modApi.showProfileSettingsFrame = config.showProfileSettingsFrame
 end
 
 sdlext.addSettingsChangedHook(function(old, neu)

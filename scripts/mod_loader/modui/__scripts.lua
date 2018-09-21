@@ -8,6 +8,7 @@ local scripts = {
 	"version_warning",
 	"error_warning",
 	"resource_error",
+	"profile_warning",
 	"modcontent",
 	"extra_difficulty",
 	"repair_icon_replace",
