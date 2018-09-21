@@ -59,7 +59,7 @@ end
 local function restoreGameVariables(settings)
 	-- Grab the last profile from settings. It's updated as soon
 	-- as the player switches the profile, so it should be okay.
-	local path = os.getKnownFolder(5).."/My Games/Into The Breach/"
+	local path = GetSavedataLocation()
 	local saveFile = path.."profile_"..settings.last_profile.."/saveData.lua"
 	
 	if modApi:fileExists(saveFile) then

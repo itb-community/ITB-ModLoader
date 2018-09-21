@@ -4,7 +4,7 @@
 	from in-game lua scripts.
 --]]
 function modApi:loadSettings()
-	local path = os.getKnownFolder(5).."/My Games/Into The Breach/settings.lua"
+	local path = GetSavedataLocation() .. "settings.lua"
 	if self:fileExists(path) then
 		local result = self:loadIntoEnv(path).Settings
 
@@ -23,8 +23,7 @@ end
 function modApi:loadProfile()
 	Settings = self:loadSettings()
 
-	local path = os.getKnownFolder(5) ..
-	             "/My Games/Into the Breach/profile_" ..
+	local path = GetSavedataLocation() .. "profile_" ..
 	             Settings.last_profile ..
 	             "/profile.lua"
 

@@ -79,16 +79,16 @@ function sdlext.squadPalettes()
 	return res
 end
 
-function sdlext.config(filename,func)
-	local path = os.getKnownFolder(5).."/My Games/Into The Breach"
+function sdlext.config(filename, func)
+	local path = GetSavedataLocation()
 	os.mkdir(path)
 
-	local obj = persistence.load(path.."/"..filename)
+	local obj = persistence.load(path..filename)
 	obj = obj or {}
 	
 	func(obj)
 	
-	persistence.store(path.."/"..filename, obj)
+	persistence.store(path..filename, obj)
 end
 
 function drawborder(screen, color, rect, borderwidth, temprect)
