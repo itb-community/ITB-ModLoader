@@ -8,7 +8,10 @@ function GetSavedataLocation()
 	if not cachedSavedata then
 		local candidates = {
 			os.getKnownFolder(5).."/My Games/Into The Breach/",
-			"./user/" -- installation dir fallback
+			-- Linux via Steam's Proton wrapper
+			"../../steamapps/compatdata/590380/pfx/",
+			-- installation dir fallback
+			"./user/"
 		}
 
 		for _, candidate in ipairs(candidates) do
