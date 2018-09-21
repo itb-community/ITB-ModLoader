@@ -31,7 +31,7 @@ sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 			-- due to the game not registering return key release event,
 			-- when using 'reload' command to reload scripts, and getting
 			-- a script error.
-			modApi:scheduleHook(20, function()
+			modApi:scheduleHook(50, function()
 				-- could show all errors one after another, but let's not...
 				for dir, err in pairs(mod_loader.unmountedMods) do
 					showErrorDialog(string.format(modApi:getText("FrameText_ScriptError_Mount"), dir, err))

@@ -5,10 +5,12 @@ local scripts = {
 	"mainmenu",
 	"hangar",
 	"version_string",
-	"version_warning",
-	"error_warning",
-	"resource_error",
-	"profile_warning",
+
+	"popup_version",
+	"popup_script-error",
+	"popup_resource-error",
+	"popup_profile-config",
+
 	"modcontent",
 	"extra_difficulty",
 	"repair_icon_replace",

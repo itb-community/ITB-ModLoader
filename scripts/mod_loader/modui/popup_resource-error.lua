@@ -16,7 +16,7 @@ sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 		srf = sdlext.surface("img/nullResource.png")
 		srf:wasDrawn()
 
-		modApi:scheduleHook(30, function()
+		modApi:scheduleHook(50, function()
 			if srf:w() == 0 then
 				sdlext.showButtonDialog(
 					modApi:getText("FrameTitle_ResourceError"),
