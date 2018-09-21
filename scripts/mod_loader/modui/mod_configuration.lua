@@ -79,8 +79,8 @@ local function createUi()
 		-- compiled cached lists which we can't modify anyway.
 		if modApi.showRestartReminder and initializedCount > 0 then
 			sdlext.showButtonDialog(
-				modApi:getText("FrameTitle_RestartRequired"),
-				modApi:getText("FrameText_RestartRequired"),
+				modApi:getText("RestartRequired_FrameTitle"),
+				modApi:getText("RestartRequired_FrameText"),
 				responseFn, nil, nil,
 				{ modApi:getText("Button_Ok"), modApi:getText("Button_DisablePopup") },
 				{ "", modApi:getText("ButtonTooltip_DisablePopup") }
@@ -94,7 +94,7 @@ local function createUi()
 		local frametop = Ui()
 			:width(0.6):height(0.575)
 			:posCentered()
-			:caption(modApi:getText("FrameTitle_ModConfig"))
+			:caption(modApi:getText("ModConfig_FrameTitle"))
 			:decorate({
 				DecoFrameHeader(),
 				DecoFrame()

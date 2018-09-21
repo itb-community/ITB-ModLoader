@@ -210,73 +210,31 @@ end
 
 function modApi:setupVanillaTexts()
 	for i, v in ipairs(self.squadKeys) do
-		self.texts[v.."_Name"] = Global_Texts["TipTitle_"..v]
-		self.texts[v.."_Description"] = Global_Texts["TipText_"..v]
+		self.texts["Squad_Name_"..v] = Global_Texts["TipTitle_"..v]
+		self.texts["Squad_Description_"..v] = Global_Texts["TipText_"..v]
 	end
 
-	self.texts["Difficulty_Easy_Name"]          = Global_Texts.Toggle_Easy
-	self.texts["Difficulty_Easy_Title"]         = Global_Texts.TipTitle_HangarEasy
-	self.texts["Difficulty_Easy_Description"]   = Global_Texts.TipText_HangarEasy
-	self.texts["Difficulty_Normal_Name"]        = Global_Texts.Toggle_Normal
-	self.texts["Difficulty_Normal_Title"]       = Global_Texts.TipTitle_HangarNormal
-	self.texts["Difficulty_Normal_Description"] = Global_Texts.TipText_HangarNormal
-	self.texts["Difficulty_Hard_Name"]          = Global_Texts.Toggle_Hard
-	self.texts["Difficulty_Hard_Title"]         = Global_Texts.TipTitle_HangarHard
-	self.texts["Difficulty_Hard_Description"]   = Global_Texts.TipText_HangarHard
+	self.texts["Difficulty_Name_Easy"]          = Global_Texts.Toggle_Easy
+	self.texts["Difficulty_Title_Easy"]         = Global_Texts.TipTitle_HangarEasy
+	self.texts["Difficulty_Description_Easy"]   = Global_Texts.TipText_HangarEasy
+	self.texts["Difficulty_Name_Normal"]        = Global_Texts.Toggle_Normal
+	self.texts["Difficulty_Title_Normal"]       = Global_Texts.TipTitle_HangarNormal
+	self.texts["Difficulty_Description_Normal"] = Global_Texts.TipText_HangarNormal
+	self.texts["Difficulty_Name_Hard"]          = Global_Texts.Toggle_Hard
+	self.texts["Difficulty_Title_Hard"]         = Global_Texts.TipTitle_HangarHard
+	self.texts["Difficulty_Description_Hard"]   = Global_Texts.TipText_HangarHard
 end
 
 function modApi:setupModLoaderTexts()
-	self.texts["Button_ModContent"] = "Mod Content"
-	self.texts["FrameTitle_ModContent"] = "Mod Content"
-
-	self.texts["Button_ModConfig"] = "Configure Mods"
-	self.texts["ButtonTooltip_ModConfig"] = "Turn on and off individual mods, and configure any settings they might have."
-	self.texts["FrameTitle_ModConfig"] = "Mod Configuration"
-
-	self.texts["Button_SquadSelect"] = "Edit Squads"
-	self.texts["ButtonTooltip_SquadSelect"] = "Select which squads will be available to pick."
-	self.texts["FrameTitle_SquadSelect"] = "Squad Selection"
-	self.texts["SquadSelect_Total"] = "Total selected"
-
-	self.texts["Button_PilotArrange"] = "Arrange Pilots"
-	self.texts["ButtonTooltip_PilotArrange"] = "Select which pilots will be available to pick."
-	self.texts["ButtonTooltipOff_PilotArrange"] = "Pilots can only be arranged before the New Game button is pressed.\n\nRestart the game to be able to arrange pilots."
-	self.texts["FrameTitle_PilotArrange"] = "Arrange Pilots"
-
-	self.texts["Button_ModLoaderConfig"] = "Configure Mod Loader"
-	self.texts["ButtonTooltip_ModLoaderConfig"] = "Configure some features of the mod loader."
-	self.texts["FrameTitle_ModLoaderConfig"] = "Mod Loader Configuration"
-
-	self.texts["ModLoaderConfig_LogLevel_Text"] = "Logging level"
-	self.texts["ModLoaderConfig_LogLevel_Tooltip"] = "Controls where the game's logging messages are printed."
-	self.texts["ModLoaderConfig_LogLevel_DD0"] = "None"
-	self.texts["ModLoaderConfig_LogLevel_DD1"] = "Only console"
-	self.texts["ModLoaderConfig_LogLevel_DD2"] = "File and console"
-
-	self.texts["ModLoaderConfig_Caller_Text"] = "Print Caller Information"
-	self.texts["ModLoaderConfig_Caller_Tooltip"] = "Include timestamp and stacktrace in LOG messages."
-
-	self.texts["ModLoaderConfig_FloatyTooltips_Text"] = "Attach Tooltips To Mouse Cursor"
-	self.texts["ModLoaderConfig_FloatyTooltips_Tooltip_On"] = "Tooltips follow the mouse cursor around."
-	self.texts["ModLoaderConfig_FloatyTooltips_Tooltip_Off"] = "Tooltips show to the side of the UI element that spawned them, similar to the game's own tooltips."
-
-	self.texts["ModLoaderConfig_ProfileConfig_Text"] = "Profile-Specific Configuration"
-	self.texts["ModLoaderConfig_ProfileConfig_Tooltip"] = "Configuration for the mod loader and individual mods will be remembered per profile, instead of globally.\n\nNote: with this option enabled, switching profiles will require you to restart the game to apply the different mod configurations."
-
-	self.texts["ModLoaderConfig_ScriptError_Text"] = "Show Script Error Popup"
-	self.texts["ModLoaderConfig_ScriptError_Tooltip"] = "Show an error popup at startup if a mod fails to mount, init, or load."
-
-	self.texts["ModLoaderConfig_OldVersion_Text"] = "Show Mod Loader Outdated Popup"
-	self.texts["ModLoaderConfig_OldVersion_Tooltip"] = "Show a popup if the mod loader is out-of-date for installed mods."
-
-	self.texts["ModLoaderConfig_ResourceError_Text"] = "Show Resource Error Popup"
-	self.texts["ModLoaderConfig_ResourceError_Tooltip"] = "Show an error popup at startup if the mod loader fails to load the game's resources."
-
-	self.texts["ModLoaderConfig_RestartReminder_Text"] = "Show Restart Reminder Popup"
-	self.texts["ModLoaderConfig_RestartReminder_Tooltip"] = "Show a popup reminding to restart the game when enabling mods."
-
-	self.texts["ModLoaderConfig_ProfileFrame_Text"] = "Show Profile Settings Change Popup"
-	self.texts["ModLoaderConfig_ProfileFrame_Tooltip"] = "Show a popup reminding to restart the game when switching profiles with Profile-Specific Configuration enabled."
+	DefaultColorMapNames[1] = "Rift Walkers' Olive"
+	DefaultColorMapNames[2] = "Rusting Hulks' Orange"
+	DefaultColorMapNames[3] = "Zenith Guard's Blue"
+	DefaultColorMapNames[4] = "Blitzkrieg's Yellow"
+	DefaultColorMapNames[5] = "Steel Judoka's Charcoal"
+	DefaultColorMapNames[6] = "Flame Behemoths' Red"
+	DefaultColorMapNames[7] = "Frozen Titans' Celeste"
+	DefaultColorMapNames[8] = "Hazardous Mechs' Tan"
+	DefaultColorMapNames[9] = "Secret Squad's Purple"
 
 	self.texts["Button_Ok"] = "OK"
 	self.texts["Button_Yes"] = "YES"
@@ -284,37 +242,89 @@ function modApi:setupModLoaderTexts()
 	self.texts["Button_DisablePopup"] = "GOT IT, DON'T TELL ME AGAIN"
 	self.texts["ButtonTooltip_DisablePopup"] = "This dialog will not be shown anymore. You can re-enable it in Configure Mod Loader."
 
-	self.texts["FrameTitle_ScriptError"] = "Script Error"
-	self.texts["FrameText_ScriptError_Mount"] = "Unable to mount mod at [%s]:\n%s"
+	self.texts["MainMenu_Button_ModContent"] = "Mod Content"
+	self.texts["ModContent_FrameTitle"] = "Mod Content"
 
-	self.texts["FrameTitle_RestartRequired"] = "Restart Required"
-	self.texts["FrameText_RestartRequired"] = "You have enabled one or more mods. In order to apply them, game restart is required."
+	self.texts["ModContent_Button_ModConfig"] = "Configure Mods"
+	self.texts["ModContent_ButtonTooltip_ModConfig"] = "Turn on and off individual mods, and configure any settings they might have."
+	self.texts["ModConfig_FrameTitle"] = "Mod Configuration"
 
-	self.texts["FrameTitle_OldVersion"] = "Mod Loader Outdated"
-	self.texts["FrameText_OldVersion"] = "The following mods could not be loaded, because they require a newer version of the mod loader:\n\n%s\nYour installed version: %s"
+	self.texts["ModContent_Button_SquadSelect"] = "Edit Squads"
+	self.texts["ModContent_ButtonTooltip_SquadSelect"] = "Select which squads will be available to pick."
+	self.texts["SquadSelect_FrameTitle"] = "Squad Selection"
+	self.texts["SquadSelect_Total"] = "Total selected"
+
+	self.texts["ModContent_Button_PilotArrange"] = "Arrange Pilots"
+	self.texts["ModContent_ButtonTooltip_PilotArrange"] = "Select which pilots will be available to pick."
+	self.texts["PilotArrange_ButtonTooltip_Off"] = "Pilots can only be arranged before the New Game button is pressed.\n\nRestart the game to be able to arrange pilots."
+	self.texts["PilotArrange_FrameTitle"] = "Arrange Pilots"
+
+	self.texts["ModContent_Button_ModLoaderConfig"] = "Configure Mod Loader"
+	self.texts["ModContent_ButtonTooltip_ModLoaderConfig"] = "Configure some features of the mod loader."
+	self.texts["ModLoaderConfig_FrameTitle"] = "Mod Loader Configuration"
+
+	self.texts["ModLoaderConfig_Text_LogLevel"] = "Logging level"
+	self.texts["ModLoaderConfig_Tooltip_LogLevel"] = "Controls where the game's logging messages are printed."
+	self.texts["ModLoaderConfig_DD_LogLevel_0"] = "None"
+	self.texts["ModLoaderConfig_DD_LogLevel_1"] = "Only console"
+	self.texts["ModLoaderConfig_DD_LogLevel_2"] = "File and console"
+
+	self.texts["ModLoaderConfig_Text_Caller"] = "Print Caller Information"
+	self.texts["ModLoaderConfig_Tooltip_Caller"] = "Include timestamp and stacktrace in LOG messages."
+
+	self.texts["ModLoaderConfig_Text_FloatyTooltips"] = "Attach Tooltips To Mouse Cursor"
+	self.texts["ModLoaderConfig_Tooltip_FloatyTooltips_On"] = "Tooltips follow the mouse cursor around."
+	self.texts["ModLoaderConfig_Tooltip_FloatyTooltips_Off"] = "Tooltips show to the side of the UI element that spawned them, similar to the game's own tooltips."
+
+	self.texts["ModLoaderConfig_Text_ProfileConfig"] = "Profile-Specific Configuration"
+	self.texts["ModLoaderConfig_Tooltip_ProfileConfig"] = "Configuration for the mod loader and individual mods will be remembered per profile, instead of globally.\n\nNote: with this option enabled, switching profiles will require you to restart the game to apply the different mod configurations."
+
+	self.texts["ModLoaderConfig_Text_ScriptError"] = "Show Script Error Popup"
+	self.texts["ModLoaderConfig_Tooltip_ScriptError"] = "Show an error popup at startup if a mod fails to mount, init, or load."
+
+	self.texts["ModLoaderConfig_Text_OldVersion"] = "Show Mod Loader Outdated Popup"
+	self.texts["ModLoaderConfig_Tooltip_OldVersion"] = "Show a popup if the mod loader is out-of-date for installed mods."
+
+	self.texts["ModLoaderConfig_Text_ResourceError"] = "Show Resource Error Popup"
+	self.texts["ModLoaderConfig_Tooltip_ResourceError"] = "Show an error popup at startup if the mod loader fails to load the game's resources."
+
+	self.texts["ModLoaderConfig_Text_RestartReminder"] = "Show Restart Reminder Popup"
+	self.texts["ModLoaderConfig_Tooltip_RestartReminder"] = "Show a popup reminding to restart the game when enabling mods."
+
+	self.texts["ModLoaderConfig_Text_ProfileFrame"] = "Show Profile Settings Change Popup"
+	self.texts["ModLoaderConfig_Tooltip_ProfileFrame"] = "Show a popup reminding to restart the game when switching profiles with Profile-Specific Configuration enabled."
+
+	self.texts["ScriptError_FrameTitle"] = "Script Error"
+	self.texts["ScriptError_FrameText_Mount"] = "Unable to mount mod at [%s]:\n%s"
+
+	self.texts["RestartRequired_FrameTitle"] = "Restart Required"
+	self.texts["RestartRequired_FrameText"] = "You have enabled one or more mods. In order to apply them, game restart is required."
+
+	self.texts["OldVersion_FrameTitle"] = "Mod Loader Outdated"
+	self.texts["OldVersion_FrameText"] = "The following mods could not be loaded, because they require a newer version of the mod loader:\n\n%s\nYour installed version: %s"
 	self.texts["OldVersion_ListEntry"] = "- [%s] requires at least version %s."
 
-	self.texts["FrameTitle_ResourceError"] = "Resource Error"
-	self.texts["FrameText_ResourceError"] = 
+	self.texts["ResourceError_FrameTitle"] = "Resource Error"
+	self.texts["ResourceError_FrameText"] = 
 					"The mod loader failed to load game resources. "..
 					"This will cause some elements of modded UI to be invisible or incorrectly positioned. "..
 					"This happens sometimes, but so far the cause is not known.\n\n"..
 					"Restarting the game should fix this."
 
-	self.texts["FrameTitle_ProfileSettings"] = "Profile Settings Changed"
-	self.texts["FrameText_ProfileSettings"] = "Active profile has been changed, and profile-specific configuration is enabled.\n\nYou need to restart the game in order to apply the changes made by the profile's configuration."
+	self.texts["ProfileSettings_FrameTitle"] = "Profile Settings Changed"
+	self.texts["ProfileSettings_FrameText"] = "Active profile has been changed, and profile-specific configuration is enabled.\n\nYou need to restart the game in order to apply the changes made by the profile's configuration."
 
 	self.texts["VersionString"] = "Mod loader version: "
 
-	self.texts["Custom_Difficulty_Note"] = "Note: this is a modded difficulty level. It won't change anything without mods providing content for this difficulty."
+	self.texts["Difficulty_Custom_Note"] = "Note: this is a modded difficulty level. It won't change anything without mods providing content for this difficulty."
 
-	self.texts["Difficulty_VeryHard_Name"] = "Very Hard"
-	self.texts["Difficulty_VeryHard_Title"] = "Very Hard Mode"
-	self.texts["Difficulty_VeryHard_Description"] = "Intended for veteran Commanders looking for a challenge."
+	self.texts["Difficulty_Name_VeryHard"] = "Very Hard"
+	self.texts["Difficulty_Title_VeryHard"] = "Very Hard Mode"
+	self.texts["Difficulty_Description_VeryHard"] = "Intended for veteran Commanders looking for a challenge."
 
-	self.texts["Difficulty_Impossible_Name"] = "Impossible"
-	self.texts["Difficulty_Impossible_Title"] = "Impossible Mode"
-	self.texts["Difficulty_Impossible_Description"] = "A punishing difficulty allowing no mistakes."
+	self.texts["Difficulty_Name_Impossible"] = "Impossible"
+	self.texts["Difficulty_Title_Impossible"] = "Impossible Mode"
+	self.texts["Difficulty_Description_Impossible"] = "A punishing difficulty allowing no mistakes."
 end
 
 -- Maintain sanity
@@ -322,39 +332,39 @@ end
 function modApi:resetModContent()
 	self.textOverrides = {}
 	self.mod_squads = {
-		{ self:getText("Archive_A_Name"), "PunchMech", "TankMech", "ArtiMech" },
-		{ self:getText("Rust_A_Name"), "JetMech", "RocketMech",  "PulseMech" },
-		{ self:getText("Pinnacle_A_Name"), "LaserMech", "ChargeMech", "ScienceMech" },
-		{ self:getText("Detritus_A_Name"), "ElectricMech", "WallMech", "RockartMech" },
-		{ self:getText("Archive_B_Name"), "JudoMech", "DStrikeMech", "GravMech" },
-		{ self:getText("Rust_B_Name"), "FlameMech", "IgniteMech", "TeleMech" },
-		{ self:getText("Pinnacle_B_Name"), "GuardMech", "MirrorMech", "IceMech" },
-		{ self:getText("Detritus_B_Name"), "LeapMech", "UnstableTank", "NanoMech" },
+		{ self:getText("Squad_Name_Archive_A"), "PunchMech", "TankMech", "ArtiMech" },
+		{ self:getText("Squad_Name_Rust_A"), "JetMech", "RocketMech",  "PulseMech" },
+		{ self:getText("Squad_Name_Pinnacle_A"), "LaserMech", "ChargeMech", "ScienceMech" },
+		{ self:getText("Squad_Name_Detritus_A"), "ElectricMech", "WallMech", "RockartMech" },
+		{ self:getText("Squad_Name_Archive_B"), "JudoMech", "DStrikeMech", "GravMech" },
+		{ self:getText("Squad_Name_Rust_B"), "FlameMech", "IgniteMech", "TeleMech" },
+		{ self:getText("Squad_Name_Pinnacle_B"), "GuardMech", "MirrorMech", "IceMech" },
+		{ self:getText("Squad_Name_Detritus_B"), "LeapMech", "UnstableTank", "NanoMech" },
 	}
 	self.squad_text = {
-		self:getText("Archive_A_Name"),
-		self:getText("Archive_A_Description"),
-		
-		self:getText("Rust_A_Name"),
-		self:getText("Rust_A_Description"),
-		
-		self:getText("Pinnacle_A_Name"),
-		self:getText("Pinnacle_A_Description"),
-		
-		self:getText("Detritus_A_Name"),
-		self:getText("Detritus_A_Description"),
-		
-		self:getText("Archive_B_Name"),
-		self:getText("Archive_B_Description"),
-		
-		self:getText("Rust_B_Name"),
-		self:getText("Rust_B_Description"),
-		
-		self:getText("Pinnacle_B_Name"),
-		self:getText("Pinnacle_B_Description"),
-		
-		self:getText("Detritus_B_Name"),
-		self:getText("Detritus_B_Description"),
+		self:getText("Squad_Name_Archive_A"),
+		self:getText("Squad_Description_Archive_A"),
+
+		self:getText("Squad_Name_Rust_A"),
+		self:getText("Squad_Description_Rust_A"),
+
+		self:getText("Squad_Name_Pinnacle_A"),
+		self:getText("Squad_Description_Pinnacle_A"),
+
+		self:getText("Squad_Name_Detritus_A"),
+		self:getText("Squad_Description_Detritus_A"),
+
+		self:getText("Squad_Name_Archive_B"),
+		self:getText("Squad_Description_Archive_B"),
+
+		self:getText("Squad_Name_Rust_B"),
+		self:getText("Squad_Description_Rust_B"),
+
+		self:getText("Squad_Name_Pinnacle_B"),
+		self:getText("Squad_Description_Pinnacle_B"),
+
+		self:getText("Squad_Name_Detritus_B"),
+		self:getText("Squad_Description_Detritus_B"),
 	}
 	self.squad_icon = {
 		"img/units/player/mech_punch_ns.png",

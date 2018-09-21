@@ -93,7 +93,7 @@ local function createUi()
 		local frame = Ui()
 			:width(0.6):height(0.575)
 			:posCentered()
-			:caption(modApi:getText("FrameTitle_ModLoaderConfig"))
+			:caption(modApi:getText("ModLoaderConfig_FrameTitle"))
 			:decorate({
 				DecoFrameHeader(),
 				DecoFrame()
@@ -115,9 +115,9 @@ local function createUi()
 		ddLogLevel = UiDropDown(
 				{ 0, 1, 2 },
 				{
-					modApi:getText("ModLoaderConfig_LogLevel_DD0"),
-					modApi:getText("ModLoaderConfig_LogLevel_DD1"),
-					modApi:getText("ModLoaderConfig_LogLevel_DD2")
+					modApi:getText("ModLoaderConfig_DD_LogLevel_0"),
+					modApi:getText("ModLoaderConfig_DD_LogLevel_1"),
+					modApi:getText("ModLoaderConfig_DD_LogLevel_2")
 				},
 				modApi.logger.logLevel
 			)
@@ -125,27 +125,27 @@ local function createUi()
 			:decorate({
 				DecoButton(),
 				DecoAlign(0, 2),
-				DecoText(modApi:getText("ModLoaderConfig_LogLevel_Text")),
+				DecoText(modApi:getText("ModLoaderConfig_Text_LogLevel")),
 				DecoDropDownText(nil, nil, nil, 33),
 				DecoAlign(0, -2),
 				DecoDropDown()
 			})
-			:settooltip(modApi:getText("ModLoaderConfig_LogLevel_Tooltip"))
+			:settooltip(modApi:getText("ModLoaderConfig_Tooltip_LogLevel"))
 			:addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Caller information
 		cboxCaller = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_Caller_Text"),
-			modApi:getText("ModLoaderConfig_Caller_Tooltip")
+			modApi:getText("ModLoaderConfig_Text_Caller"),
+			modApi:getText("ModLoaderConfig_Tooltip_Caller")
 		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Floaty tooltips
 		cboxFloatyTooltips = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_FloatyTooltips_Text"),
-			modApi:getText("ModLoaderConfig_FloatyTooltips_Tooltip_On"),
-			modApi:getText("ModLoaderConfig_FloatyTooltips_Tooltip_Off")
+			modApi:getText("ModLoaderConfig_Text_FloatyTooltips"),
+			modApi:getText("ModLoaderConfig_Tooltip_FloatyTooltips_On"),
+			modApi:getText("ModLoaderConfig_Tooltip_FloatyTooltips_Off")
 		):addTo(layout)
 
 		cboxFloatyTooltips.clicked = function(self, button)
@@ -159,8 +159,8 @@ local function createUi()
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Profile-specific config
 		cboxProfileConfig = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_ProfileConfig_Text"),
-			modApi:getText("ModLoaderConfig_ProfileConfig_Tooltip")
+			modApi:getText("ModLoaderConfig_Text_ProfileConfig"),
+			modApi:getText("ModLoaderConfig_Tooltip_ProfileConfig")
 		):addTo(layout)
 
 		cboxProfileConfig.clicked = function(self, button)
@@ -178,28 +178,28 @@ local function createUi()
 		createSeparator(10):addTo(layout)
 
 		cboxErrorFrame = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_ScriptError_Text"),
-			modApi:getText("ModLoaderConfig_ScriptError_Tooltip")
+			modApi:getText("ModLoaderConfig_Text_ScriptError"),
+			modApi:getText("ModLoaderConfig_Tooltip_ScriptError")
 		):addTo(layout)
 
 		cboxVersionFrame = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_OldVersion_Text"),
-			modApi:getText("ModLoaderConfig_OldVersion_Tooltip")
+			modApi:getText("ModLoaderConfig_Text_OldVersion"),
+			modApi:getText("ModLoaderConfig_Tooltip_OldVersion")
 		):addTo(layout)
 
 		cboxResourceError = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_ResourceError_Text"),
-			modApi:getText("ModLoaderConfig_ResourceError_Tooltip")
+			modApi:getText("ModLoaderConfig_Text_ResourceError"),
+			modApi:getText("ModLoaderConfig_Tooltip_ResourceError")
 		):addTo(layout)
 
 		cboxRestartReminder = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_RestartReminder_Text"),
-			modApi:getText("ModLoaderConfig_RestartReminder_Tooltip")
+			modApi:getText("ModLoaderConfig_Text_RestartReminder"),
+			modApi:getText("ModLoaderConfig_Tooltip_RestartReminder")
 		):addTo(layout)
 
 		cboxProfileFrame = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_ProfileFrame_Text"),
-			modApi:getText("ModLoaderConfig_ProfileFrame_Tooltip")
+			modApi:getText("ModLoaderConfig_Text_ProfileFrame"),
+			modApi:getText("ModLoaderConfig_Tooltip_ProfileFrame")
 		):addTo(layout)
 
 		uiSetSettings(LoadModLoaderConfig())

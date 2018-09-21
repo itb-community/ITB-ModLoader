@@ -1,25 +1,25 @@
 function sdlext.executeAddModContent()
 	sdlext.addModContent(
-		modApi:getText("Button_ModConfig"),
+		modApi:getText("ModContent_Button_ModConfig"),
 		ConfigureMods,
-		modApi:getText("ButtonTooltip_ModConfig")
+		modApi:getText("ModContent_ButtonTooltip_ModConfig")
 	)
 
 	sdlext.addModContent(
-		modApi:getText("Button_SquadSelect"),
+		modApi:getText("ModContent_Button_SquadSelect"),
 		SelectSquads,
-		modApi:getText("ButtonTooltip_SquadSelect")
+		modApi:getText("ModContent_ButtonTooltip_SquadSelect")
 	)
 
 	arrangePilotsButton = sdlext.addModContent(
-		modApi:getText("Button_PilotArrange"),
+		modApi:getText("ModContent_Button_PilotArrange"),
 		ArrangePilots,
-		modApi:getText("ButtonTooltip_PilotArrange")
+		modApi:getText("ModContent_ButtonTooltip_PilotArrange")
 	)
 
 	sdlext.addModContent(
-		modApi:getText("Button_ModLoaderConfig"),
+		modApi:getText("ModContent_Button_ModLoaderConfig"),
 		ConfigureModLoader,
-		modApi:getText("ButtonTooltip_ModLoaderConfig")
+		modApi:getText("ModContent_ButtonTooltip_ModLoaderConfig")
 	)
 end

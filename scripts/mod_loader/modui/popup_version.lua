@@ -12,7 +12,7 @@ end
 
 local function showVersionDialog(text)
 	sdlext.showButtonDialog(
-		modApi:getText("FrameTitle_OldVersion"), text,
+		modApi:getText("OldVersion_FrameTitle"), text,
 		responseFn, nil, nil,
 		{ modApi:getText("Button_Ok"), modApi:getText("Button_DisablePopup") },
 		{ "", modApi:getText("ButtonTooltip_DisablePopup") }
@@ -47,7 +47,7 @@ sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 
 				if isOutOfDate then
 					text = string.format(
-						modApi:getText("FrameText_OldVersion"),
+						modApi:getText("OldVersion_FrameText"),
 						text, modApi.version
 					)
 

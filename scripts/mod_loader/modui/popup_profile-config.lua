@@ -16,8 +16,8 @@ sdlext.addSettingsChangedHook(function(old, new)
 	then
 		modApi:scheduleHook(50, function()
 			sdlext.showButtonDialog(
-				modApi:getText("FrameTitle_ProfileSettings"),
-				modApi:getText("FrameText_ProfileSettings"),
+				modApi:getText("ProfileSettings_FrameTitle"),
+				modApi:getText("ProfileSettings_FrameText"),
 				responseFn, nil, nil,
 				{ modApi:getText("Button_Ok"), modApi:getText("Button_DisablePopup") },
 				{ "", modApi:getText("ButtonTooltip_DisablePopup") }

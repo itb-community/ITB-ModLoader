@@ -71,7 +71,7 @@ function GetDifficultyFaceName(level)
 
 	local suffix = GetDifficultyTipSuffix(level)
 
-	return modApi:getText("Difficulty_"..suffix.."_Name")
+	return modApi:getText("Difficulty_Name_"..suffix)
 end
 
 local function copySpawner(src)
@@ -204,13 +204,13 @@ function SetDifficulty(level)
 		tempTipText = Global_Texts["TipText_Hangar"..baseSuffix]
 		tempToggle = Global_Texts["Toggle_"..baseSuffix]
 
-		Global_Texts["TipTitle_Hangar"..baseSuffix] = modApi:getText("Difficulty_"..tipSuffix.."_Title")
-		Global_Texts["TipText_Hangar"..baseSuffix] = modApi:getText("Difficulty_"..tipSuffix.."_Description")
+		Global_Texts["TipTitle_Hangar"..baseSuffix] = modApi:getText("Difficulty_Title_"..tipSuffix)
+		Global_Texts["TipText_Hangar"..baseSuffix] = modApi:getText("Difficulty_Description_"..tipSuffix)
 		Global_Texts["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
 
 		if not IsVanillaDifficultyLevel(level) then
 			Global_Texts["TipText_Hangar"..baseSuffix] =
-				Global_Texts["TipText_Hangar"..baseSuffix] .. "\n\n" .. modApi:getText("Custom_Difficulty_Note")
+				Global_Texts["TipText_Hangar"..baseSuffix] .. "\n\n" .. modApi:getText("Difficulty_Custom_Note")
 		end
 	end
 end
