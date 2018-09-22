@@ -136,11 +136,7 @@ function RemoveSpawnPoint(point, m)
 			pawn:SetSpace(Point(-1, -1))
 		end
 
-		Board:ClearSpace(point)
-
-		if pawn then
-			pawn:SetSpace(point)
-		end
+		Board:SetTerrain(point, TERRAIN_HOLE)
 
 		Board:SetTerrain(point, terrain)
 		Board:SetSmoke(point, smoke, false)
@@ -149,6 +145,10 @@ function RemoveSpawnPoint(point, m)
 			local d = SpaceDamage(point)
 			d.iFIRE = EFFECT_CREATE
 			Board:DamageSpace(d)
+		end
+
+		if pawn then
+			pawn:SetSpace(point)
 		end
 
 		m:UpdateQueuedSpawns()
