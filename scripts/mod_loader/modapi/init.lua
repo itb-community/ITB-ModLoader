@@ -226,16 +226,6 @@ function modApi:setupVanillaTexts()
 end
 
 function modApi:setupModLoaderTexts()
-	DefaultColorMapNames[1] = "Rift Walkers' Olive"
-	DefaultColorMapNames[2] = "Rusting Hulks' Orange"
-	DefaultColorMapNames[3] = "Zenith Guard's Blue"
-	DefaultColorMapNames[4] = "Blitzkrieg's Yellow"
-	DefaultColorMapNames[5] = "Steel Judoka's Charcoal"
-	DefaultColorMapNames[6] = "Flame Behemoths' Red"
-	DefaultColorMapNames[7] = "Frozen Titans' Celeste"
-	DefaultColorMapNames[8] = "Hazardous Mechs' Tan"
-	DefaultColorMapNames[9] = "Secret Squad's Purple"
-
 	self.texts["Button_Ok"] = "OK"
 	self.texts["Button_Yes"] = "YES"
 	self.texts["Button_No"] = "NO"
