@@ -30,8 +30,9 @@ To uninstall the mod loader, follow these steps:
 1. Go to the base game directory (the one containing the .exe)
 2. Delete `lua5.1.dll`, `SDL2.dll`, and `opengl32.dll`.
 3. Rename `lua5.1-original.dll` to `lua5.1.dll`, and `SDL2-original.dll` to `SDL2.dll`.
-4. Go to `scripts` folder, find the file named `scripts.lua`, open it with any text editor, and remove this line (near the end of the file): `"scripts/mod_loader/__scripts.lua"`. Save the file.
-5. Go to `resources` folder, and delete `resource.dat`.
-6. Rename `resource.dat.bak` to `resource.dat`.
+4. Go to `scripts` folder, and delete `scripts.lua`.
+5. Rename `scripts-original.lua` to `scripts.lua`.
+6. Go to `resources` folder, and delete `resource.dat`.
+7. Rename `resource.dat.bak` to `resource.dat`.
 
 After that, the game should be back to unmodded state. If you get any errors despite following these steps, try validating integrity of game cache (if on Steam), or reinstalling the game.
