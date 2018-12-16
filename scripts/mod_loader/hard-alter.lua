@@ -4,34 +4,32 @@
 --]]
 
 --[[
+	Rewrites the specified game file by looking for the specified regex pattern,
+	and replacing it with the specified replacement text. The text can reference
+	regex capture groups.
+--]]
+local function replaceFileContent(filePath, regex, replacementText)
+	local file = assert(io.open(filePath, "r"), "Failed to open file: "..filePath)
+	local content = file:read("*all")
+	file:close()
+	file = nil
+
+	content, _ = string.gsub(content, regex, replacementText)
+
+	file = assert(io.open(filePath, "w"), "Failed to open file: "..filePath)
+	file:write(content)
+	file:close()
+	file = nil
+end
+
+--[[
 	Rewrites the specified game file so that the local variable inside
 	of it becomes globally accessible.
 --]]
 local function globalizeLocalVariable(filePath, variableName)
 	if not _G[variableName] then
-		local file = assert(io.open(filePath, "r"), "Failed to open file: "..filePath)
-		local content = file:read("*all")
-		file:close()
-		file = nil
-
 		local prefix = "local "
-		local index = string.find(content, prefix..variableName)
-
-		if not index or index == -1 then
-			error(string.format(
-				"Could not find local variable '%s' in file '%s'.",
-				variableName,
-				filePath
-			))
-		end
-
-		content, index = string.gsub(content, prefix..variableName, variableName)
-
-		file = assert(io.open(filePath, "w"), "Failed to open file: "..filePath)
-		file:write(content)
-		file:close()
-		file = nil
-
+		replaceFileContent(filePath, prefix..variableName, variableName)
 		dofile(filePath)
 
 		LOG("Globalized", variableName)
