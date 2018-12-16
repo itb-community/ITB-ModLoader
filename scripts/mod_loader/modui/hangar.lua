@@ -137,6 +137,8 @@ local function overrideGetImages()
 
 			if v.GetImage then
 				oldGetImages[k] = v.GetImage
+			else
+				oldGetImages[k] = defaultGetImage
 			end
 
 			v.GetImage = function(self)
@@ -147,10 +149,7 @@ local function overrideGetImages()
 					table.insert(fetchedMechs, k)
 				end
 
-				local fn = oldGetImages[k]
-				return fn
-					and fn(self)
-					or  defaultGetImage(self)
+				return oldGetImages[k](self)
 			end
 		end
 	end
