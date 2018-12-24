@@ -166,7 +166,7 @@ end
 function modApi:conditionalHook(conditionFn, fn, remove)
 	assert(type(conditionFn) == "function")
 	assert(type(fn) == "function")
-	remove = remove or true
+	remove = remove == nil and true or remove
 	assert(type(remove) == "boolean")
 
 	table.insert(self.conditionalHooks, {
