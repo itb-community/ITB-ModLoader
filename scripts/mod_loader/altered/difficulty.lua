@@ -138,7 +138,7 @@ function Mission:GetSpawnsPerTurn()
 	
 	if GetBaselineDifficulty() == DIFF_EASY and self.SpawnsPerTurn_Easy ~= -1 then
 		spawnCount = copy_table(self.SpawnsPerTurn_Easy)
-    end
+	end
 	
 	if type(spawnCount) ~= "table" then
 		spawnCount = {spawnCount, spawnCount}

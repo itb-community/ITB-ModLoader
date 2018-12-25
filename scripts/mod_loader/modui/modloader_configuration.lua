@@ -113,13 +113,17 @@ local function createUi()
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Logging level
 		ddLogLevel = UiDropDown(
-				{ 0, 1, 2 },
+				{
+					Logger.LOG_LEVEL_NONE,
+					Logger.LOG_LEVEL_CONSOLE,
+					Logger.LOG_LEVEL_FILE
+				},
 				{
 					modApi:getText("ModLoaderConfig_DD_LogLevel_0"),
 					modApi:getText("ModLoaderConfig_DD_LogLevel_1"),
 					modApi:getText("ModLoaderConfig_DD_LogLevel_2")
 				},
-				modApi.logger.logLevel
+				mod_loader.logger:getLoggingLevel()
 			)
 			:width(1):heightpx(41)
 			:decorate({

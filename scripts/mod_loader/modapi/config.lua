@@ -36,9 +36,10 @@ end
 function CurrentModLoaderConfig()
 	local data = {}
 
+	data.logLevel            = mod_loader.logger:getLoggingLevel()
+	data.printCallerInfo     = mod_loader.logger:getPrintCallerInfo()
+
 	data.profileConfig       = modApi.profileConfig
-	data.logLevel            = modApi.logger.logLevel
-	data.printCallerInfo     = modApi.logger.printCallerInfo
 	data.floatyTooltips      = modApi.floatyTooltips
 
 	data.showErrorFrame      = modApi.showErrorFrame
@@ -120,9 +121,9 @@ function LoadModLoaderConfig(overrideLoadProfileConfig)
 end
 
 function ApplyModLoaderConfig(config)
-	modApi.logger.setLogLevel(config.logLevel)
+	mod_loader.logger:setLoggingLevel(config.logLevel)
+	mod_loader.logger:setPrintCallerInfo(config.printCallerInfo)
 
-	modApi.logger.printCallerInfo = config.printCallerInfo
 	modApi.floatyTooltips         = config.floatyTooltips
 	modApi.profileConfig          = config.profileConfig
 

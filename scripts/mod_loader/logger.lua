@@ -1,54 +1,120 @@
-local Logger = {
-	LOG_LEVEL_NONE = 0,
-	LOG_LEVEL_CONSOLE = 1,
-	LOG_LEVEL_FILE = 2,
+-- Forward declaration
+local LoggerImpl
+local Logger
 
-	logLevel = 1,
-	logFile = nil,
-	printCallerInfo = false,
-}
+-- ///////////////////////////////////////////////////////////////////////
+-- Logger interface
 
-function Logger.logNothing()
-	Logger.logLevel = Logger.LOG_LEVEL_NONE
-end
+Logger = Class.new()
 
-function Logger.logToConsole()
-	Logger.logLevel = Logger.LOG_LEVEL_CONSOLE
-end
+Logger.LOG_LEVEL_NONE = 0
+Logger.LOG_LEVEL_CONSOLE = 1
+Logger.LOG_LEVEL_FILE = 2
 
-function Logger.logToFile(filename)
-	Logger.logLevel = Logger.LOG_LEVEL_FILE
-	Logger.logFile = io.open(filename, "a+")
+function Logger:new()
+	local loggerImpl = LoggerImpl()
 
-	local message =
-		string.format("\n===== Logging started at: %s =====\n", os.date("%Y-%m-%d %H:%M:%S"))
-
-	Logger.logFile:write(message)
-	Logger.logFile:flush()
-
-	message = string.format("Logging to file: %s", filename)
-
-	ConsolePrint(message)
-	print(message)
-end
-
-function Logger.setLogLevel(newLevel)
-	if Logger.logLevel == Logger.LOG_LEVEL_FILE and Logger.logFile then
-		io.close(Logger.logFile)
-		Logger.logFile = nil
+	self.getLoggingLevel = function(self)
+		return loggerImpl:getLoggingLevel()
 	end
 
-	if newLevel == Logger.LOG_LEVEL_NONE then
-		Logger.logNothing()
-	elseif newLevel == Logger.LOG_LEVEL_CONSOLE then
-		Logger.logToConsole()
-	elseif newLevel == Logger.LOG_LEVEL_FILE then
-		Logger.logToFile("log.txt")
+	self.setLoggingLevel = function(self, level)
+		loggerImpl:setLoggingLevel(level)
+	end
+
+	self.getLogFileName = function(self)
+		return loggerImpl:getLogFileName()
+	end
+
+	self.setLogFileName = function(self, fileName)
+		loggerImpl:setLogFileName(fileName)
+	end
+
+	self.getPrintCallerInfo = function(self)
+		return loggerImpl:getPrintCallerInfo()
+	end
+
+	self.setPrintCallerInfo = function(self, printCallerInfo)
+		loggerImpl:setPrintCallerInfo(printCallerInfo)
+	end
+
+	self.log = function(self, ...)
+		loggerImpl:log(...)
 	end
 end
 
-function Logger.log(...)
-	if Logger.logLevel == Logger.LOG_LEVEL_NONE then
+-- ///////////////////////////////////////////////////////////////////////
+-- Logger implementation
+
+LoggerImpl = Class.new()
+
+function LoggerImpl:new()
+	self.logLevel = Logger.LOG_LEVEL_CONSOLE
+	self.logFileName = "modloader.log"
+	self.logFileHandle = nil
+	self.printCallerInfo = false
+end
+
+function LoggerImpl:getLoggingLevel()
+	return self.logLevel
+end
+
+function LoggerImpl:setLoggingLevel(level)
+	assert(type(level) == "number")
+	assert(
+		level == Logger.LOG_LEVEL_NONE or
+		level == Logger.LOG_LEVEL_CONSOLE or
+		level == Logger.LOG_LEVEL_FILE
+	)
+
+	self.logLevel = level
+end
+
+function LoggerImpl:getLogFileName()
+	return self.logFileName
+end
+
+function LoggerImpl:setLogFileName(fileName)
+	assert(type(fileName) == "string")
+
+	if (self.logFileHandle) then
+		self.logFileHandle:close()
+		self.logFileHandle = nil
+	end
+
+	self.logFileName = fileName
+end
+
+function LoggerImpl:getPrintCallerInfo()
+	return self.printCallerInfo
+end
+
+function LoggerImpl:setPrintCallerInfo(printCallerInfo)
+	assert(type(printCallerInfo) == "boolean")
+
+	self.printCallerInfo = printCallerInfo
+end
+
+local function getCurrentDate()
+	return os.date("%Y-%m-%d %H:%M:%S")
+end
+
+local function openLogFile(fileName)
+	local fileHandle = io.open(fileName, "a+")
+
+	local t = string.format("\n===== Logging started at: %s =====\n", getCurrentDate())
+
+	fileHandle:write(t)
+	fileHandle:flush()
+
+	ConsolePrint(t)
+	print(t)
+
+	return fileHandle
+end
+
+function LoggerImpl:log(...)
+	if (self.logLevel == Logger.LOG_LEVEL_NONE) then
 		return
 	end
 
@@ -57,23 +123,27 @@ function Logger.log(...)
 	end
 
 	local message = table.concat(arg, " ")
-	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+	local timestamp = getCurrentDate()
 	local info = debug.getinfo(2, "Sl")
-	local caller = string.format("%s %s:%d", timestamp, info.short_src , info.currentline)
+	local caller = string.format("%s %s:%d", timestamp, info.short_src, info.currentline)
 
-	if Logger.logLevel == Logger.LOG_LEVEL_FILE and Logger.logFile ~= nil then
+	if (self.logLevel == Logger.LOG_LEVEL_FILE) then
+		if (not self.logFileHandle) then
+			self.logFileHandle = openLogFile(self.logFileName)
+		end
+
 		local t = ""
-		if Logger.printCallerInfo then
+		if (self.printCallerInfo) then
 			t = caller .. "\n"
 		end
 
 		t = t .. message .. "\n"
 
-		Logger.logFile:write(t)
-		Logger.logFile:flush()
+		self.logFileHandle:write(t)
+		self.logFileHandle:flush()
 	end
 
-	if Logger.printCallerInfo then
+	if (self.printCallerInfo) then
 		ConsolePrint(caller)
 		print(caller)
 	end
@@ -86,8 +156,5 @@ function Logger.log(...)
 		ConsolePrint("")
 	end
 end
-
--- Override the original LOG(...) function.
-LOG = Logger.log
 
 return Logger

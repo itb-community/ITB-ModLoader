@@ -3,8 +3,6 @@ local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 
 modApi = {}
 function modApi:init()
-	self.logger = require("scripts/mod_loader/logger")
-
 	Settings = self:loadSettings()
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 

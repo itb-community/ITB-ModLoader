@@ -1,6 +1,18 @@
 --lfs = require("lfs")
 mod_loader = {}
 
+Logger = require("scripts/mod_loader/logger")
+mod_loader.logger = Logger()
+
+local oldLog = LOG
+function LOG(...)
+	if mod_loader.logger then
+		mod_loader.logger:log(...)
+	else
+		oldLog(...)
+	end
+end
+
 function mod_loader:init()
 	self.mod_dirs = {}
 	self.mods = {}

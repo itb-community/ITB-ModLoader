@@ -8,8 +8,8 @@ function GetPopulationTexts(event, count)
 	end
 	
 	if Game == nil then
-        return nullReturn
-    end
+		return nullReturn
+	end
 	
 	local list = copy_table(modApi.PopEvents[event])
 	local ret = {}
