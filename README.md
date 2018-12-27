@@ -3,8 +3,10 @@
 A mod loader for the game [Into the Breach](https://www.subsetgames.com/itb.html), written in Lua, and with extension DLLs for some additional features. Originally created by Cyberboy2000, who has unfortunately been absent and unreachable for extended periods of time.
 
 - The mod loader's thread on Subset forums: [link](https://www.subsetgames.com/forum/viewtopic.php?f=26&t=33119)
-- Original lua mod loader created by *Cyberboy2000*: [link](https://www.subsetgames.com/forum/viewtopic.php?f=26&t=32833)
+- Original Lua mod loader created by *Cyberboy2000*: [link](https://www.subsetgames.com/forum/viewtopic.php?f=26&t=32833)
 - Original Lua proxy DLLs created by *AUTOMATIC*: [link](https://github.com/AUTOMATIC1111/IntoTheBreachLua)
+
+The mod loader **only works with Windows version of the game**. Gamepad input is not supported either.
 
 
 ## Download
@@ -25,14 +27,8 @@ If you're upgrading from a previous version of the modloader and encounter issue
 
 ## Uninstallation
 
-To uninstall the mod loader, follow these steps:
+To uninstall the mod loader, run `uninstall.bat`. This script will restore your Into the Breach installation to unmodded state. Profiles, savegames, and mods present in `mods` direcory will be left untouched.
 
-1. Go to the base game directory (the one containing the .exe)
-2. Delete `lua5.1.dll`, `SDL2.dll`, and `opengl32.dll`.
-3. Rename `lua5.1-original.dll` to `lua5.1.dll`, and `SDL2-original.dll` to `SDL2.dll`.
-4. Go to `scripts` folder, and delete `scripts.lua`.
-5. Rename `scripts-original.lua` to `scripts.lua`.
-6. Go to `resources` folder, and delete `resource.dat`.
-7. Rename `resource.dat.bak` to `resource.dat`.
+Keep in mind that savegames that used mods will be broken to a varying degree depending on which mods were enabled. Profiles used to play mods will most likely work for new games, but entering the statistics screen in main menu might cause the game to crash.
 
-After that, the game should be back to unmodded state. If you get any errors despite following these steps, try validating integrity of game cache (if on Steam), or reinstalling the game.
+If problems persist, try validating integrity of game cache (if on Steam), or reinstalling the game.
