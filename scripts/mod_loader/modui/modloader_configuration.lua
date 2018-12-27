@@ -11,6 +11,7 @@ local function createUi()
 	local cboxErrorFrame = nil
 	local cboxVersionFrame = nil
 	local cboxResourceError = nil
+	local cboxGamepadWarning = nil
 	local cboxRestartReminder = nil
 	local cboxProfileFrame = nil
 
@@ -24,6 +25,7 @@ local function createUi()
 			showErrorFrame      = cboxErrorFrame.checked,
 			showVersionFrame    = cboxVersionFrame.checked,
 			showResourceWarning = cboxResourceError.checked,
+			showGamepadWarning  = cboxGamepadWarning.checked,
 			showRestartReminder = cboxRestartReminder.checked,
 			showProfileSettingsFrame = cboxProfileFrame.checked
 		}
@@ -42,6 +44,7 @@ local function createUi()
 		cboxErrorFrame.checked      = config.showErrorFrame
 		cboxVersionFrame.checked    = config.showVersionFrame
 		cboxResourceError.checked   = config.showResourceWarning
+		cboxGamepadWarning.checked  = config.showGamepadWarning
 		cboxRestartReminder.checked = config.showRestartReminder
 		cboxProfileFrame.checked    = config.showProfileSettingsFrame
 
@@ -194,6 +197,11 @@ local function createUi()
 		cboxResourceError = createCheckboxOption(
 			modApi:getText("ModLoaderConfig_Text_ResourceError"),
 			modApi:getText("ModLoaderConfig_Tooltip_ResourceError")
+		):addTo(layout)
+
+		cboxGamepadWarning = createCheckboxOption(
+			modApi:getText("ModLoaderConfig_Text_GamepadWarning"),
+			modApi:getText("ModLoaderConfig_Tooltip_GamepadWarning")
 		):addTo(layout)
 
 		cboxRestartReminder = createCheckboxOption(

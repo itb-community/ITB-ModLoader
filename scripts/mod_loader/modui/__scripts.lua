@@ -10,6 +10,7 @@ local scripts = {
 	"popup_script-error",
 	"popup_resource-error",
 	"popup_profile-config",
+	"popup_gamepad-warning",
 
 	"modcontent",
 	"extra_difficulty",

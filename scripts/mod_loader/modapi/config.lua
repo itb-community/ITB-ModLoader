@@ -45,6 +45,7 @@ function CurrentModLoaderConfig()
 	data.showErrorFrame      = modApi.showErrorFrame
 	data.showVersionFrame    = modApi.showVersionFrame
 	data.showResourceWarning = modApi.showResourceWarning
+	data.showGamepadWarning  = modApi.showGamepadWarning
 	data.showRestartReminder = modApi.showRestartReminder
 	data.showProfileSettingsFrame = modApi.showProfileSettingsFrame
 
@@ -87,6 +88,7 @@ function DefaultModLoaderConfig()
 		showErrorFrame      = true,
 		showVersionFrame    = true,
 		showResourceWarning = true,
+		showGamepadWarning  = true,
 		showRestartReminder = true,
 		showProfileSettingsFrame = true
 	}
@@ -130,6 +132,7 @@ function ApplyModLoaderConfig(config)
 	modApi.showErrorFrame         = config.showErrorFrame
 	modApi.showVersionFrame       = config.showVersionFrame
 	modApi.showResourceWarning    = config.showResourceWarning
+	modApi.showGamepadWarning     = config.showGamepadWarning
 	modApi.showRestartReminder    = config.showRestartReminder
 	modApi.showProfileSettingsFrame = config.showProfileSettingsFrame
 end

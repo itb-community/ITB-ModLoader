@@ -276,6 +276,9 @@ function modApi:setupModLoaderTexts()
 	self.texts["ModLoaderConfig_Text_ResourceError"] = "Show Resource Error Popup"
 	self.texts["ModLoaderConfig_Tooltip_ResourceError"] = "Show an error popup at startup if the mod loader fails to load the game's resources."
 
+	self.texts["ModLoaderConfig_Text_GamepadWarning"] = "Show Gamepad Warning Popup"
+	self.texts["ModLoaderConfig_Tooltip_GamepadWarning"] = "Show a warning popup when Gamepad Mode is enabled."
+
 	self.texts["ModLoaderConfig_Text_RestartReminder"] = "Show Restart Reminder Popup"
 	self.texts["ModLoaderConfig_Tooltip_RestartReminder"] = "Show a popup reminding to restart the game when enabling mods."
 
@@ -298,6 +301,12 @@ function modApi:setupModLoaderTexts()
 					"This will cause some elements of modded UI to be invisible or incorrectly positioned. "..
 					"This happens sometimes, but so far the cause is not known.\n\n"..
 					"Restarting the game should fix this."
+
+	self.texts["GamepadWarning_FrameTitle"] = "Gamepad Warning"
+	self.texts["GamepadWarning_FrameText"] =
+					"Gamepad Mode has been enabled.\n\n" ..
+					"The mod loader does not support input via a gamepad. Since many of the mod loader's features rely on detecting " ..
+					"mouse and keyboard inputs, it is recommended to uninstall the mod loader if you plan to play with a gamepad."
 
 	self.texts["ProfileSettings_FrameTitle"] = "Profile Settings Changed"
 	self.texts["ProfileSettings_FrameText"] = "Active profile has been changed, and profile-specific configuration is enabled.\n\nYou need to restart the game in order to apply the changes made by the profile's configuration."
