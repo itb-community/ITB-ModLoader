@@ -6,7 +6,7 @@ function modApi:init()
 	Settings = self:loadSettings()
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
-	self.version = "2.3.0"
+	self.version = "2.3.1"
 	LOG("MOD-API VERSION "..self.version)
 	self.texts = {}
 	self.currentModSquads = {}
