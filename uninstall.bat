@@ -13,8 +13,8 @@ RMDIR /q /s scripts\mod_loader
 ECHO Done.
 
 ECHO Restoring original game files...
-REN lua5.1.dll.bak lua5.1.dll
-REN SDL2.dll.bak SDL2.dll
+REN lua5.1-original.dll lua5.1.dll
+REN SDL2-original.dll SDL2.dll
 IF EXIST resources\resource.dat.bak REN resources\resource.dat.bak resource.dat
 REN scripts\scripts.lua.bak scripts.lua
 ECHO Done.
