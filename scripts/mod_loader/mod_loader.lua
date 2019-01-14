@@ -70,7 +70,7 @@ function mod_loader:enumerateMods()
 		
 		if ok and type(data) ~= "table" then
 			ok = false
-			err = "Missing data"
+			err = "init.lua does not return a mod data table"
 		end
 		
 		if ok and type(data.id) ~= "string" then
