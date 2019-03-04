@@ -9,7 +9,8 @@ local scripts = {
 	"text",
 	"squad",
 	"difficulty",
-	"map"
+	"map",
+	"skills"
 }
 
 local rootpath = GetParentPath(...)
