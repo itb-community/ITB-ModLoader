@@ -137,21 +137,25 @@ function RemoveSpawnPoint(point, m)
 		end
 
 		Board:SetTerrain(point, TERRAIN_HOLE)
+		
+		-- Need to delay terrain restoration so that a single update tick happens,
+		-- and the game removes the spawn point
+		modApi:scheduleHook(20, function()
+			Board:SetTerrain(point, terrain)
+			Board:SetSmoke(point, smoke, false)
+			Board:SetAcid(point, acid)
+			if fire then
+				local d = SpaceDamage(point)
+				d.iFIRE = EFFECT_CREATE
+				Board:DamageSpace(d)
+			end
 
-		Board:SetTerrain(point, terrain)
-		Board:SetSmoke(point, smoke, false)
-		Board:SetAcid(point, acid)
-		if fire then
-			local d = SpaceDamage(point)
-			d.iFIRE = EFFECT_CREATE
-			Board:DamageSpace(d)
-		end
+			if pawn then
+				pawn:SetSpace(point)
+			end
 
-		if pawn then
-			pawn:SetSpace(point)
-		end
-
-		m:UpdateQueuedSpawns()
+			m:UpdateQueuedSpawns()
+		end)
 	end
 end
 
