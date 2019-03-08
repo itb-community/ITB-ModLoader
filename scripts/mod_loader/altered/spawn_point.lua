@@ -93,13 +93,6 @@ function Mission:SpawnPawn(location, pawnType)
 		location = newLocation
 	end
 
-	self:SpawnPawnInternal(location, pawn)
-end
-
-function Mission:SpawnSpawnAutoInternal()
-	local pawn = self:NextPawn()
-	local location = self:PreprocessSpawningPawn(pawn)
-
 	if location then
 		self:SpawnPawnInternal(location, pawn)
 	else
@@ -123,7 +116,7 @@ end
 function Mission:SpawnPawns(count)
 	for i = 1, count do
 		-- Spawns appear roughly one second apart
-		modApi:scheduleHook((i - 1) * 1000, doSpawn)
+		modApi:scheduleHook((i - 1) * 1000, function() self:SpawnPawn() end)
 	end
 end
 
