@@ -74,6 +74,9 @@ function Mission:SpawnPawnInternal(location, pawn)
 	addSpawnData(self, location, pawn:GetType(), pawn:GetId())
 end
 
+function Mission:PreprocessSpawningPawn(pawn)
+end
+
 function Mission:SpawnPawn(location, pawnType)
 	local pawn = nil
 	if type(pawnType) == "string" then
@@ -82,6 +85,12 @@ function Mission:SpawnPawn(location, pawnType)
 		pawn = pawnType
 	elseif not pawnType then
 		pawn = self:NextPawn()
+	end
+
+	local newLocation = self:PreprocessSpawningPawn(pawn)
+
+	if newLocation then
+		location = newLocation
 	end
 
 	self:SpawnPawnInternal(location, pawn)
@@ -93,17 +102,24 @@ function Mission:SpawnPawns(count)
 	for i = 1, count do
 		local pawn = self:NextPawn()
 
-		Board:SpawnPawn(pawn)
+		local location = self:PreprocessSpawningPawn(pawn)
 
-		-- We have access to the pawn instance here, but its GetSpace()
-		-- function returns (-1, -1), so we can't use it to identify its
-		-- spawn location...
-		local spawnsEnd = enumerateSpawns()
+		if location then
+			self:SpawnPawnInternal(location, pawn)
+		else
+			-- Defer to the game's spawning point-selection logic
+			Board:SpawnPawn(pawn)
 
-		local diff = setDifference(spawnsEnd, spawnsStart)
-		spawnsStart = spawnsEnd
+			-- We have access to the pawn instance here, but its GetSpace()
+			-- function returns (-1, -1), so we can't use it to identify its
+			-- spawn location...
+			local spawnsEnd = enumerateSpawns()
 
-		addSpawnData(self, diff[1], pawn:GetType(), pawn:GetId())
+			local diff = setDifference(spawnsEnd, spawnsStart)
+			spawnsStart = spawnsEnd
+
+			addSpawnData(self, diff[1], pawn:GetType(), pawn:GetId())
+		end
 	end
 end
 
