@@ -131,11 +131,9 @@ end
 	Returns spawn data of the specified point, or nil if there's no Vek spawning
 	at that location.
 --]]
-function GetSpawnPointData(point, m)
-	local m = m or GetCurrentMission()
-
+function Mission:GetSpawnPointData(point)
 	local spawn = nil
-	for i, e in ipairs(m.QueuedSpawns) do
+	for i, e in ipairs(self.QueuedSpawns) do
 		if e.location == point then
 			spawn = e
 			break
@@ -173,7 +171,7 @@ function Mission:RemoveSpawnPoint(point)
 			if fire then
 				local d = SpaceDamage(point)
 				d.iFIRE = EFFECT_CREATE
-				m.Board:DamageSpace(d)
+				self.Board:DamageSpace(d)
 			end
 
 			if pawn then
