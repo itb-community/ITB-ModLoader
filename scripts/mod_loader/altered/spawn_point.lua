@@ -187,7 +187,7 @@ end
 	Moves the specified spawn point to the specified location.
 	Has no effect if the specified location is not an existing spawn point.
 --]]
-function MoveSpawnPoint(point, newLocation)
+function Mission:MoveSpawnPoint(point, newLocation)
 	self:ModifySpawnPoint(point, { location = newLocation })
 end
 
@@ -195,11 +195,11 @@ end
 	Changes the type of pawn that will be spawned at the specfiied location.
 	Has no effect if the specified location is not an existing spawn point.
 --]]
-function ChangeSpawnPointPawnType(point, newPawnType)
+function Mission:ChangeSpawnPointPawnType(point, newPawnType)
 	self:ModifySpawnPoint(point, { type = newPawnType })
 end
 
-function ModifySpawnPoint(point, newSpawnData)
+function Mission:ModifySpawnPoint(point, newSpawnData)
 	assert(newSpawnData)
 	assert(type(newSpawnData) == "table")
 
