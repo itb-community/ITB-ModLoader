@@ -18,7 +18,8 @@ local function enumerateSpawns()
 end
 
 --[[
-	Compute the difference (complement) of two sets of elements
+	Compute the difference (complement) of two sets of elements.
+	This function assumes that setA is a superset of setB.
 --]]
 local function setDifference(setA, setB)
 	assert(setA)
@@ -28,6 +29,8 @@ local function setDifference(setA, setB)
 
 	local result = {}
 
+	-- This won't find elements in B that aren't in A, but
+	-- in our case A is always a superset of B, so this is not an issue.
 	for i, el in ipairs(setA) do
 		if not list_contains(setB, el) then
 			table.insert(result, el)
@@ -54,10 +57,8 @@ local function addSpawnData(self, location, type, id, age)
 		self.QueuedSpawns = {}
 	end
 
-	--[[
-		Vek surface in the order defined in this table, but spawn points
-		appear on the board in reverse order.
-	--]]
+	-- Vek surface in the order defined in this table, but spawn points
+	-- appear on the board in reverse order.
 	table.insert(self.QueuedSpawns, el)
 
 	if self.Initialized then
@@ -68,33 +69,39 @@ local function addSpawnData(self, location, type, id, age)
 	end
 end
 
-function Mission:SpawnPawn(location, type)
-	local pawn = nil
-
-	if type then
-		pawn = PAWN_FACTORY:CreatePawn(type)
-	else
-		pawn = self:NextPawn()
-	end
-
+function Mission:SpawnPawnInternal(location, pawn)
 	Board:SpawnPawn(pawn, location)
 	addSpawnData(self, location, pawn:GetType(), pawn:GetId())
 end
 
+function Mission:SpawnPawn(location, pawnType)
+	local pawn = nil
+	if type(pawnType) == "string" then
+		pawn = PAWN_FACTORY:CreatePawn(pawnType)
+	elseif type(pawnType) == "userdata" and type(pawnType.GetId) == "function" then
+		pawn = pawnType
+	elseif not pawnType then
+		pawn = self:NextPawn()
+	end
+
+	self:SpawnPawnInternal(location, pawn)
+end
+
 function Mission:SpawnPawns(count)
-	local spawns1 = enumerateSpawns()
+	local spawnsStart = enumerateSpawns()
 
 	for i = 1, count do
 		local pawn = self:NextPawn()
 
 		Board:SpawnPawn(pawn)
+
 		-- We have access to the pawn instance here, but its GetSpace()
 		-- function returns (-1, -1), so we can't use it to identify its
 		-- spawn location...
-		local spawns2 = enumerateSpawns()
+		local spawnsEnd = enumerateSpawns()
 
-		local diff = setDifference(spawns2, spawns1)
-		spawns1 = spawns2
+		local diff = setDifference(spawnsEnd, spawnsStart)
+		spawnsStart = spawnsEnd
 
 		addSpawnData(self, diff[1], pawn:GetType(), pawn:GetId())
 	end
@@ -121,6 +128,7 @@ end
 --[[
 	Removes the vek spawn at the specified location. The vek that was
 	supposed to be spawned will not appear.
+	Has no effect if the specified location is not an existing spawn point.
 --]]
 function RemoveSpawnPoint(point, m)
 	local m = m or GetCurrentMission()
@@ -161,15 +169,35 @@ end
 
 --[[
 	Moves the specified spawn point to the specified location.
+	Has no effect if the specified location is not an existing spawn point.
 --]]
-function MoveSpawnPoint(point, to, m)
+function MoveSpawnPoint(point, newLocation, m)
+	ModifySpawnPoint(point, { location = newLocation }, m)
+end
+
+--[[
+	Changes the type of pawn that will be spawned at the specfiied location.
+	Has no effect if the specified location is not an existing spawn point.
+--]]
+function ChangeSpawnPointPawnType(point, newPawnType, m)
+	ModifySpawnPoint(point, { type = newPawnType }, m)
+end
+
+function ModifySpawnPoint(point, newSpawnData, m)
+	assert(newSpawnData)
+	assert(type(newSpawnData) == "table")
+
 	local m = m or GetCurrentMission()
 	local spawn = GetSpawnPointData(point, m)
 
 	if spawn then
+		newSpawnData.type = newSpawnData.type or spawn.type
+		newSpawnData.location = newSpawnData.location or spawn.location
+		newSpawnData.turns = newSpawnData.turns or spawn.turns
+
 		RemoveSpawnPoint(point, m)
 
-		local id = Board:SpawnPawn(spawn.type, to)
-		addSpawnData(m, to, spawn.type, id, spawn.turns)
+		local id = Board:SpawnPawn(newSpawnData.type, newSpawnData.location)
+		addSpawnData(m, newSpawnData.location, newSpawnData.type, id, newSpawnData.turns)
 	end
 end
