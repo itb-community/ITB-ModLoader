@@ -2,13 +2,13 @@
 --[[
 	Scan the game board and return a list of points that have a vek spawning on them.
 --]]
-local function enumerateSpawns()
+function Mission:EnumerateSpawns()
 	local result = {}
-	local size = Board:GetSize()
+	local size = self.Board:GetSize()
 	for y = 0, size.y - 1 do
 		for x = 0, size.x - 1 do
 			local p = Point(x, y)
-			if Board:IsSpawning(p) then
+			if self.Board:IsSpawning(p) then
 				table.insert(result, p)
 			end
 		end
@@ -70,7 +70,7 @@ local function addSpawnData(self, location, type, id, age)
 end
 
 function Mission:SpawnPawnInternal(location, pawn)
-	Board:SpawnPawn(pawn, location)
+	self.Board:SpawnPawn(pawn, location)
 	addSpawnData(self, location, pawn:GetType(), pawn:GetId())
 end
 
@@ -96,30 +96,34 @@ function Mission:SpawnPawn(location, pawnType)
 	self:SpawnPawnInternal(location, pawn)
 end
 
+function Mission:SpawnSpawnAutoInternal()
+	local pawn = self:NextPawn()
+	local location = self:PreprocessSpawningPawn(pawn)
+
+	if location then
+		self:SpawnPawnInternal(location, pawn)
+	else
+		local spawnsStart = self:EnumerateSpawns()
+
+		-- Defer to the game's spawning point-selection logic
+		self.Board:SpawnPawn(pawn)
+
+		-- We have access to the pawn instance here, but its GetSpace()
+		-- function returns (-1, -1), so we can't use it to identify its
+		-- spawn location...
+		-- Next best thing is enumerating all spawn locations, and then
+		-- finding the element that was added.
+		local spawnsEnd = self:EnumerateSpawns()
+		local diff = setDifference(spawnsEnd, spawnsStart)
+
+		addSpawnData(self, diff[1], pawn:GetType(), pawn:GetId())
+	end
+end
+
 function Mission:SpawnPawns(count)
-	local spawnsStart = enumerateSpawns()
-
 	for i = 1, count do
-		local pawn = self:NextPawn()
-
-		local location = self:PreprocessSpawningPawn(pawn)
-
-		if location then
-			self:SpawnPawnInternal(location, pawn)
-		else
-			-- Defer to the game's spawning point-selection logic
-			Board:SpawnPawn(pawn)
-
-			-- We have access to the pawn instance here, but its GetSpace()
-			-- function returns (-1, -1), so we can't use it to identify its
-			-- spawn location...
-			local spawnsEnd = enumerateSpawns()
-
-			local diff = setDifference(spawnsEnd, spawnsStart)
-			spawnsStart = spawnsEnd
-
-			addSpawnData(self, diff[1], pawn:GetType(), pawn:GetId())
-		end
+		-- Spawns appear roughly one second apart
+		modApi:scheduleHook((i - 1) * 1000, doSpawn)
 	end
 end
 
@@ -146,39 +150,37 @@ end
 	supposed to be spawned will not appear.
 	Has no effect if the specified location is not an existing spawn point.
 --]]
-function RemoveSpawnPoint(point, m)
-	local m = m or GetCurrentMission()
+function Mission:RemoveSpawnPoint(point)
+	if self:GetSpawnPointData(point) then
+		local terrain = self.Board:GetTerrain(point)
+		local smoke = self.Board:IsSmoke(point)
+		local acid = self.Board:IsAcid(point)
+		local fire = self.Board:IsFire(point)
 
-	if GetSpawnPointData(point, m) then
-		local terrain = Board:GetTerrain(point)
-		local smoke = Board:IsSmoke(point)
-		local acid = Board:IsAcid(point)
-		local fire = Board:IsFire(point)
-
-		local pawn = Board:GetPawn(point)
+		local pawn = self.Board:GetPawn(point)
 		if pawn then
 			pawn:SetSpace(Point(-1, -1))
 		end
 
-		Board:SetTerrain(point, TERRAIN_HOLE)
+		self.Board:SetTerrain(point, TERRAIN_HOLE)
 
 		-- Need to delay terrain restoration so that a single update tick happens,
 		-- and the game removes the spawn point
 		modApi:runLater(function()
-			Board:SetTerrain(point, terrain)
-			Board:SetSmoke(point, smoke, false)
-			Board:SetAcid(point, acid)
+			self.Board:SetTerrain(point, terrain)
+			self.Board:SetSmoke(point, smoke, false)
+			self.Board:SetAcid(point, acid)
 			if fire then
 				local d = SpaceDamage(point)
 				d.iFIRE = EFFECT_CREATE
-				Board:DamageSpace(d)
+				m.Board:DamageSpace(d)
 			end
 
 			if pawn then
 				pawn:SetSpace(point)
 			end
 
-			m:UpdateQueuedSpawns()
+			self:UpdateQueuedSpawns()
 		end)
 	end
 end
@@ -187,33 +189,55 @@ end
 	Moves the specified spawn point to the specified location.
 	Has no effect if the specified location is not an existing spawn point.
 --]]
-function MoveSpawnPoint(point, newLocation, m)
-	ModifySpawnPoint(point, { location = newLocation }, m)
+function MoveSpawnPoint(point, newLocation)
+	self:ModifySpawnPoint(point, { location = newLocation })
 end
 
 --[[
 	Changes the type of pawn that will be spawned at the specfiied location.
 	Has no effect if the specified location is not an existing spawn point.
 --]]
-function ChangeSpawnPointPawnType(point, newPawnType, m)
-	ModifySpawnPoint(point, { type = newPawnType }, m)
+function ChangeSpawnPointPawnType(point, newPawnType)
+	self:ModifySpawnPoint(point, { type = newPawnType })
 end
 
-function ModifySpawnPoint(point, newSpawnData, m)
+function ModifySpawnPoint(point, newSpawnData)
 	assert(newSpawnData)
 	assert(type(newSpawnData) == "table")
 
-	local m = m or GetCurrentMission()
-	local spawn = GetSpawnPointData(point, m)
+	local spawn = self:GetSpawnPointData(point)
 
 	if spawn then
 		newSpawnData.type = newSpawnData.type or spawn.type
 		newSpawnData.location = newSpawnData.location or spawn.location
 		newSpawnData.turns = newSpawnData.turns or spawn.turns
 
-		RemoveSpawnPoint(point, m)
+		self:RemoveSpawnPoint(point)
 
-		local id = Board:SpawnPawn(newSpawnData.type, newSpawnData.location)
-		addSpawnData(m, newSpawnData.location, newSpawnData.type, id, newSpawnData.turns)
+		local id = self.Board:SpawnPawn(newSpawnData.type, newSpawnData.location)
+		addSpawnData(self, newSpawnData.location, newSpawnData.type, id, newSpawnData.turns)
 	end
+end
+
+
+-- Backwards compatibility
+function GetSpawnPointData(point, m)
+	m = m or GetCurrentMission()
+	m:GetSpawnPointData(point)
+end
+function RemoveSpawnPoint(point, m)
+	m = m or GetCurrentMission()
+	m:RemoveSpawnPoint(point)
+end
+function MoveSpawnPoint(point, newLocation, m)
+	m = m or GetCurrentMission()
+	m:MoveSpawnPoint(point, newLocation)
+end
+function ChangeSpawnPointPawnType(point, newPawnType, m)
+	m = m or GetCurrentMission()
+	m:ChangeSpawnPointPawnType(point, newPawnType)
+end
+function ModifySpawnPoint(point, newSpawnData, m)
+	m = m or GetCurrentMission()
+	m:ModifySpawnPoint(point, newSpawnData)
 end

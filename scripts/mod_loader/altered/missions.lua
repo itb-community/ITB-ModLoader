@@ -2,14 +2,17 @@
 function Mission:OnSerializationStart(t)
 	t.MissionEndImpl = self.MissionEndImpl
 	t.MissionEnd = self.MissionEnd
+	t.Board = self.Board
 
 	self.MissionEndImpl = nil
 	self.MissionEnd = nil
+	self.Board = nil
 end
 
 function Mission:OnSerializationEnd(t)
 	self.MissionEndImpl = t.MissionEndImpl
 	self.MissionEnd = t.MissionEnd
+	self.Board = t.Board
 end
 
 function Mission:UpdateQueuedSpawns()
@@ -174,6 +177,7 @@ function Mission:BaseStart(suppressHooks)
 		end
 	end
 
+	self.Board = Board
 	self.QueuedSpawns = {}
 
 	-- begin oldBaseStart
