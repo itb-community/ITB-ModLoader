@@ -10,12 +10,7 @@ local function saveModConfig()
 		obj.modOrder = mod_loader:getCurrentModOrder()
 	end
 
-	local modcontent = nil
-	if modApi.profileConfig then
-		modcontent = modApi:getCurrentProfilePath().."modcontent.lua"
-	else
-		modcontent = "modcontent.lua"
-	end
+	local modcontent = modApi:getCurrentModcontentPath()
 
 	sdlext.config(modcontent, saveConfig)
 end

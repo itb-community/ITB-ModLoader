@@ -6,7 +6,10 @@
 
 function loadPilotsOrder()
 	local order = {}
-	sdlext.config("modcontent.lua", function(obj)
+
+	local modcontent = modApi:getCurrentModcontentPath()
+
+	sdlext.config(modcontent, function(obj)
 		for k, v in ipairs(obj.pilotOrder or {}) do
 			order[v] = k
 		end
@@ -22,7 +25,9 @@ function loadPilotsOrder()
 end
 
 function savePilotsOrder()
-	sdlext.config("modcontent.lua", function(obj)
+	local modcontent = modApi:getCurrentModcontentPath()
+
+	sdlext.config(modcontent, function(obj)
 		obj.pilotOrder = PilotList
 	end)
 end

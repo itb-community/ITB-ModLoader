@@ -13,7 +13,9 @@ local function saveSquadSelection()
 		selected[i] = name
 	end
 	
-	sdlext.config("modcontent.lua",function(obj)
+	local modcontent = modApi:getCurrentModcontentPath()
+
+	sdlext.config(modcontent,function(obj)
 		obj.selectedSquads = selected
 	end)
 end
@@ -25,9 +27,11 @@ function loadSquadSelection()
 		local name = modApi.squad_text[(i-1)*2+1]
 		map[name] = i
 	end
+	
+	local modcontent = modApi:getCurrentModcontentPath()
 
 	modApi.squadIndices = {}
-	sdlext.config("modcontent.lua",function(obj)
+	sdlext.config(modcontent, function(obj)
 		if not obj.selectedSquads then return end
 		
 		for i=1,maxselected do

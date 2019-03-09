@@ -412,3 +412,11 @@ function modApi:setCurrentMod(mod)
 	self.currentModSquads[mod] = {}
 	self.currentModSquadText[mod] = {}
 end
+
+function modApi:getCurrentModcontentPath()
+	if modApi.profileConfig then
+		return modApi:getCurrentProfilePath().."modcontent.lua"
+	else
+		return "modcontent.lua"
+	end
+end
