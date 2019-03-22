@@ -101,19 +101,19 @@ function modApi:addVekSpawnRemovedHook(fn)
 	table.insert(self.vekSpawnRemovedHooks,fn)
 end
 
-function modApi:addPreVekRetreatingHook(fn)
+function modApi:addPreprocessVekRetreatHook(fn)
 	assert(type(fn) == "function")
-	table.insert(self.preVekRetreatingHooks,fn)
+	table.insert(self.preprocessVekRetreatHooks,fn)
 end
 
-function modApi:addVekRetreatingHook(fn)
+function modApi:addProcessVekRetreatHook(fn)
 	assert(type(fn) == "function")
-	table.insert(self.vekRetreatingHooks,fn)
+	table.insert(self.processVekRetreatHooks,fn)
 end
 
-function modApi:addPostVekRetreatingHook(fn)
+function modApi:addPostprocessVekRetreatHook(fn)
 	assert(type(fn) == "function")
-	table.insert(self.postVekRetreatingHooks,fn)
+	table.insert(self.postprocessVekRetreatHooks,fn)
 end
 
 function modApi:addModsLoadedHook(fn)

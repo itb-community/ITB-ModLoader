@@ -398,9 +398,9 @@ function modApi:resetModContent()
 	self.missionEndHooks = {}
 	self.vekSpawnAddedHooks = {}
 	self.vekSpawnRemovedHooks = {}
-	self.preVekRetreatingHooks = {}
-	self.vekRetreatingHooks = {}
-	self.postVekRetreatingHooks = {}
+	self.preprocessVekRetreatHooks = {}
+	self.processVekRetreatHooks = {}
+	self.postprocessVekRetreatHooks = {}
 	self.modsLoadedHooks = {}
 	self.testMechEnteredHooks = {}
 	self.testMechExitedHooks = {}

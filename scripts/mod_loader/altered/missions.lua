@@ -133,7 +133,7 @@ function Mission:MissionEndImpl()
 	effect.bEvacuate = true
 	effect.fDelay = 0.5
 
-	for i, hook in ipairs(modApi.preVekRetreatingHooks) do
+	for i, hook in ipairs(modApi.preprocessVekRetreatHooks) do
 		hook(self, ret)
 	end
 	
@@ -143,7 +143,7 @@ function Mission:MissionEndImpl()
 		for y = 0, board_size.y - 1  do
 			local p = Point(x, y)
 			if Board:IsPawnTeam(p,TEAM_ENEMY) then
-				for i, hook in ipairs(modApi.vekRetreatingHooks) do
+				for i, hook in ipairs(modApi.processVekRetreatHooks) do
 					hook(self, Board:GetPawn(p), ret)
 				end
 
@@ -154,7 +154,7 @@ function Mission:MissionEndImpl()
 		end
 	end
 
-	for i, hook in ipairs(modApi.postVekRetreatingHooks) do
+	for i, hook in ipairs(modApi.postprocessVekRetreatHooks) do
 		hook(self, ret)
 	end
 	
