@@ -1,5 +1,6 @@
 
-local oldGetDifficulty = GetDifficulty
+GetRealDifficulty = GetDifficulty
+
 function GetDifficulty()
 	if Game and GAME and GAME.CustomDifficulty then
 		return GAME.CustomDifficulty
@@ -10,7 +11,7 @@ function GetDifficulty()
 		end
 	end
 
-	return oldGetDifficulty()
+	return GetRealDifficulty()
 end
 
 -- /////////////////////////////////////////////////////////////////////////////////////
