@@ -144,7 +144,7 @@ function Mission:MissionEndImpl()
 			local p = Point(x, y)
 			if Board:IsPawnTeam(p,TEAM_ENEMY) then
 				for i, hook in ipairs(modApi.processVekRetreatHooks) do
-					hook(self, Board:GetPawn(p), ret)
+					hook(self, ret, Board:GetPawn(p))
 				end
 
 				effect.loc = p
