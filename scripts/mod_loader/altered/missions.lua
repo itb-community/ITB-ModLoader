@@ -39,6 +39,7 @@ end
 local oldBaseNextTurn = Mission.BaseNextTurn
 function Mission:BaseNextTurn()
 	oldBaseNextTurn(self)
+	self.Board = Board
 
 	if Game:GetTeamTurn() == TEAM_PLAYER then
 		self:UpdateQueuedSpawns()
@@ -72,6 +73,7 @@ end
 local oldBaseDeployment = Mission.BaseDeployment
 function Mission:BaseDeployment()
 	oldBaseDeployment(self)
+	self.Board = Board
 
 	for i, hook in ipairs(modApi.missionStartHooks) do
 		hook(self)
@@ -173,6 +175,7 @@ function Mission:MissionEnd()
 	end
 
 	Board:AddEffect(ret)
+	self.Board = nil
 end
 
 function Mission:SetupDifficulty()

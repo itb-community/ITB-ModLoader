@@ -175,6 +175,10 @@ function LoadGame()
 	for i, hook in ipairs(modApi.postLoadGameHooks) do
 		hook()
 	end
+	
+	modApi:runLater(function(mission)
+		mission.Board = Board
+	end)
 end
 
 local oldSaveGame = SaveGame
