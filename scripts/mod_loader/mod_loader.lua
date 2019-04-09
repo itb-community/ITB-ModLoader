@@ -359,6 +359,7 @@ end
 
 function mod_loader:loadModContent(mod_options,savedOrder)
 	LOG("--------LOADING MODS--------")
+	RestoreSkillEffect()
 	
 	self.currentModContent = mod_options
 	
@@ -420,6 +421,8 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 			LOG("A modsLoadedHook failed: ", err)
 		end
 	end
+
+	OverrideSkillEffect()
 end
 
 modApi:init()
