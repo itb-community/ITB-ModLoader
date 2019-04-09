@@ -2,7 +2,7 @@
 -- Adds missing queued functions to SkillEffect, by Lemonymous
 local function AddQueued(name)
     SkillEffect["AddQueued".. name] = function(self, ...)
-        fx = SkillEffect()
+        local fx = SkillEffect()
         fx["Add".. name](fx, ...)
         self.q_effect:push_back(fx.effect:index(1))
     end
