@@ -12,11 +12,49 @@ local function checkGC()
 	end
 end
 
+function hex2rgba(hex)
+	hex = hex:gsub("#","")
+	local l = hex:len()
+	assert(l == 6 or l == 8)
+	
+	local r = tonumber("0x"..hex:sub(1,2))
+	local g = tonumber("0x"..hex:sub(3,4))
+	local b = tonumber("0x"..hex:sub(5,6))
+	if l == 8 then
+		local a = tonumber("0x"..hex:sub(7,8))
+		return r, g, b, a
+	end
+
+    return r, g, b
+end
+
 local oldsdltext = sdl.text
 function sdl.text(font, textset, text)
 	checkGC()
 
 	return oldsdltext(font, textset, text)
+end
+
+local oldsdlrgb = sdl.rgb
+function sdl.rgb(r, g, b)
+	checkGC()
+
+	if type(r) == "string" then
+		return oldsdlrgb(hex2rgba(r))
+	else
+		return oldsdlrgb(r, g, b)
+	end
+end
+
+local oldsdlrgba = sdl.rgba
+function sdl.rgba(r, g, b, a)
+	checkGC()
+
+	if type(r) == "string" then
+		return oldsdlrgba(hex2rgba(r))
+	else
+		return oldsdlrgba(r, g, b, a)
+	end
 end
 
 local resourceDat = sdl.resourceDat("resources/resource.dat")
