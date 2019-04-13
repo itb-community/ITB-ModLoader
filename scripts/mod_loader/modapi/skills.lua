@@ -159,13 +159,16 @@ function RestoreSkillEffect()
 end
 
 -- //////////////////////////////////////////////////////////////////////////
-
 -- Adds missing queued functions to SkillEffect, by Lemonymous
+
 local function AddQueued(name)
     SkillEffect["AddQueued".. name] = function(self, ...)
         local fx = SkillEffect()
         fx["Add".. name](fx, ...)
-        self.q_effect:push_back(fx.effect:index(1))
+
+        for _, v in ipairs(extract_table(fx.effect)) do
+            self.q_effect:push_back(v)
+        end
     end
 end
 
