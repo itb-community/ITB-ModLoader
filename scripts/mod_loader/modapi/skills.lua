@@ -1,5 +1,47 @@
+
+-- //////////////////////////////////////////////////////////////////////////
+-- Replacement of SkillEffect functions to allow detection of grapple,
+-- artillery and projectiles.
+
 -- Store reference to the C++ class so that we don't lose it
 SkillEffectUserdata = SkillEffect
+
+local function addDamageListMetadata(damageList, metadataTable)
+    local metadataInstance = SpaceDamage()
+
+    metadataInstance.sScript = "return " .. save_table(metadataTable)
+    damageList:push_back(metadataInstance)
+end
+
+local function isMetadataDamageInstance(damageInstance)
+    if not damageInstance.sScript then
+        return false
+    end
+    
+    return modApi:stringStartsWith(damageInstance.sScript, "return {")
+end
+
+local function getDamageListMetadata(damageList)
+    local metadata = {}
+
+    for i, v in ipairs(extract_table(damageList)) do
+        if isMetadataDamageInstance(v) then
+            metadata[i] = loadstring(v.sScript)()
+        else
+            metadata[i] = nil
+        end
+    end
+
+    return metadata
+end
+
+function GetSkillMetadata(skill)
+    return getDamageListMetadata(skill.effect)
+end
+
+function GetSkillQueuedMetadata(skill)
+    return getDamageListMetadata(skill.q_effect)
+end
 
 -- Defer the override so that we don't mess with mods that index tables
 -- in the global namespace (modApiExt)
@@ -16,6 +58,8 @@ function OverrideSkillEffect()
     local oldAddGrapple = fx.AddGrapple
     local oldAddArtillery = fx.AddArtillery
     local oldAddProjectile = fx.AddProjectile
+    local oldAddQueuedArtillery = fx.AddQueuedArtillery
+    local oldAddQueuedProjectile = fx.AddQueuedProjectile
 
     -- Create our own SkillEffect constructor where we override functions
     -- We have to override them on each instance we create, since overriding them
@@ -24,25 +68,75 @@ function OverrideSkillEffect()
     function buildSkillEffect()
         local effect = SkillEffectUserdata()
 
-        effect.AddGrapple = function(self, source, target, ...)
-            local fx = SkillEffectUserdata()
-            oldAddGrapple(fx, source, target, ...)
-        
-            local damageInstance = fx.effect:index(1)
-            damageInstance.grappleData = {
-                source = source,
-                target = target
-            }
-        
-            self.effect:push_back(damageInstance)
+        effect.AddGrapple = function(self, source, target, anim, ...)
+            local metadataTable = {}
+            metadataTable.type = "grapple"
+            metadataTable.source = Point(source.x, source.y)
+            metadataTable.target = Point(source.x, source.y)
+            metadataTable.anim = anim
+            addDamageListMetadata(self.effect, metadataTable)
+
+            oldAddGrapple(self, source, target, anim, ...)
         end
 
-        effect.AddProjectile = function(self, ...)
-            oldAddProjectile(self, ...)
+        effect.AddProjectile = function(self, damageInstance, projectileArt, delay, ...)
+            if not delay and damageInstance.loc then
+                delay = PROJ_DELAY
+            end
+
+            local metadataTable = {}
+            metadataTable.type = "projectile"
+            metadataTable.projectileArt = projectileArt
+            metadataTable.source = Pawn and Pawn:GetSpace() or nil
+            metadataTable.target = damageInstance.loc
+            addDamageListMetadata(self.effect, metadataTable)
+
+            oldAddProjectile(self, damageInstance, projectileArt, delay, ...)
         end
 
-        effect.AddArtillery = function(self, ...)
-            oldAddArtillery(self, ...)
+        effect.AddArtillery = function(self, damageInstance, projectileArt, delay, ...)
+            if not delay and damageInstance.loc then
+                delay = PROJ_DELAY
+            end
+
+            local metadataTable = {}
+            metadataTable.type = "artillery"
+            metadataTable.projectileArt = projectileArt
+            metadataTable.source = Pawn and Pawn:GetSpace() or nil
+            metadataTable.target = damageInstance.loc
+            addDamageListMetadata(self.effect, metadataTable)
+
+            oldAddArtillery(self, damageInstance, projectileArt, delay, ...)
+        end
+
+        effect.AddQueuedProjectile = function(self, damageInstance, projectileArt, delay, ...)
+            if not delay and damageInstance.loc then
+                delay = PROJ_DELAY
+            end
+
+            local metadataTable = {}
+            metadataTable.type = "projectile"
+            metadataTable.projectileArt = projectileArt
+            metadataTable.source = Pawn and Pawn:GetSpace() or nil
+            metadataTable.target = damageInstance.loc
+            addDamageListMetadata(self.q_effect, metadataTable)
+
+            oldAddQueuedProjectile(self, damageInstance, projectileArt, delay, ...)
+        end
+
+        effect.AddQueuedArtillery = function(self, damageInstance, projectileArt, delay, ...)
+            if not delay and damageInstance.loc then
+                delay = PROJ_DELAY
+            end
+
+            local metadataTable = {}
+            metadataTable.type = "artillery"
+            metadataTable.projectileArt = projectileArt
+            metadataTable.source = Pawn and Pawn:GetSpace() or nil
+            metadataTable.target = damageInstance.loc
+            addDamageListMetadata(self.q_effect, metadataTable)
+
+            oldAddQueuedArtillery(self, damageInstance, projectileArt, delay, ...)
         end
 
         return effect
