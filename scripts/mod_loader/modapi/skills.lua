@@ -23,7 +23,7 @@ local function getDamageListMetadata(damageList)
         if isMetadataDamageInstance(v) then
             metadata[i] = loadstring(v.sScript)()
         else
-            metadata[i] = {}
+            metadata[i] = false
         end
     end
 
