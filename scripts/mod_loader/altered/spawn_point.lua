@@ -77,6 +77,9 @@ end
 function Mission:PreprocessSpawningPawn(pawn)
 end
 
+local oldSpawnPawn  = Mission.SpawnPawn
+local oldSpawnPawns = Mission.SpawnPawns
+
 function Mission:SpawnPawn(location, pawnType)
 	local pawn = nil
 	if type(pawnType) == "string" then
@@ -119,6 +122,9 @@ function Mission:SpawnPawns(count)
 		modApi:scheduleHook((i - 1) * 1000, function() self:SpawnPawn() end)
 	end
 end
+
+Mission_Test.SpawnPawn  = oldSpawnPawn
+Mission_Test.SpawnPawns = oldSpawnPawns
 
 --[[
 	Returns spawn data of the specified point, or nil if there's no Vek spawning
