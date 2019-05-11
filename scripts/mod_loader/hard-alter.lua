@@ -38,3 +38,6 @@ end
 
 globalizeLocalVariable("scripts/text.lua", "Global_Texts")
 globalizeLocalVariable("scripts/spawner_backend.lua", "WeakPawns")
+
+-- Fix spawner backend's guard sometimes failing, leading to a crash
+replaceFileContent("scripts/spawner_backend.lua", "Board == NULL", "Board == NULL or not Board")
