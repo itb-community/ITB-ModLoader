@@ -197,6 +197,9 @@ function Mission:BaseStart(suppressHooks)
 	self.QueuedSpawns = {}
 
 	-- begin oldBaseStart
+	-- Copy the code rather than calling the original function, since
+	-- we want to insert a new SetupDifficulty() function before
+	-- environment start.
 	self.VoiceEvents = {}
 	
 	if self.AssetId ~= "" then

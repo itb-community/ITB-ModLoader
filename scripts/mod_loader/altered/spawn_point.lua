@@ -77,9 +77,6 @@ end
 function Mission:PreprocessSpawningPawn(pawn)
 end
 
-local oldSpawnPawn  = Mission.SpawnPawn
-local oldSpawnPawns = Mission.SpawnPawns
-
 function Mission:SpawnPawn(location, pawnType)
 	local pawn = nil
 	if type(pawnType) == "string" then
@@ -118,13 +115,16 @@ end
 
 function Mission:SpawnPawns(count)
 	for i = 1, count do
-		-- Spawns appear roughly one second apart
-		modApi:scheduleHook((i - 1) * 1000, function() self:SpawnPawn() end)
+		if self.Initialized then
+			-- Spawns appear roughly one second apart
+			modApi:scheduleHook((i - 1) * 1000, function() self:SpawnPawn() end)
+		else
+			-- Initial spawning of enemies when the mission is created, don't space them out
+			-- so that the spawning points don't pop up one by one in the mission preview
+			self:SpawnPawn()
+		end
 	end
 end
-
-Mission_Test.SpawnPawn  = oldSpawnPawn
-Mission_Test.SpawnPawns = oldSpawnPawns
 
 --[[
 	Returns spawn data of the specified point, or nil if there's no Vek spawning
