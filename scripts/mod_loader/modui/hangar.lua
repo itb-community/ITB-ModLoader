@@ -674,7 +674,7 @@ local function createUi(root)
 		Ui.draw(self, screen)
 	end
 
-	sdlext.addPreKeyDownHook(function(keycode)
+	sdlext.addPostKeyDownHook(function(keycode)
 		if
 			holder.visible             and
 			not btnBack.disabled       and
