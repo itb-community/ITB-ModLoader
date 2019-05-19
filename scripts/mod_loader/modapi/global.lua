@@ -44,12 +44,16 @@ end
 	Returns a savedata table holding information about the region the player
 	is currently in. Returns nil when not in a mission.
 --]]
-function GetCurrentRegion()
-	if RegionData and RegionData.iBattleRegion then
-		if RegionData.iBattleRegion == 20 then
-			return RegionData["final_region"]
+function GetCurrentRegion(data)
+	if not data then
+		data = RegionData
+	end
+
+	if data and data.iBattleRegion then
+		if data.iBattleRegion == 20 then
+			return data["final_region"]
 		else
-			return RegionData["region"..RegionData.iBattleRegion]
+			return data["region"..data.iBattleRegion]
 		end
 	end
 
