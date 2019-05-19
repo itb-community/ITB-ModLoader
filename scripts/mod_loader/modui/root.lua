@@ -85,7 +85,7 @@ function sdlext.addGameExitedHook(fn)
 end
 
 local consoleToggledHooks = {}
-function sdlext.addFrameToggledHook(fn)
+function sdlext.addConsoleToggledHook(fn)
 	assert(type(fn) == "function")
 	table.insert(consoleToggledHooks, fn)
 end
