@@ -202,3 +202,18 @@ function SaveGame()
 	GAME.CreateNextPhase = nil
 	return oldSaveGame()
 end
+
+local oldCreateEffect = CreateEffect
+function CreateEffect(data)
+	local effect = oldCreateEffect(data)
+
+	effect.data = data
+
+	return effect
+end
+
+Effect.GetLuaString = function(self)
+	return string.format("CreateEffect(%s)", save_table(self.data))
+end
+Effect.GetString = Effect.GetLuaString
+
