@@ -216,23 +216,3 @@ Effect.GetLuaString = function(self)
 	return string.format("CreateEffect(%s)", save_table(self.data))
 end
 Effect.GetString = Effect.GetLuaString
-
-function UpdateSaveData(fn)
-	local path = GetSavedataLocation()
-	local saveFile = path.."profile_"..Settings.last_profile.."/saveData.lua"
-
-	if modApi:fileExists(saveFile) then
-		local save = modApi:loadIntoEnv(saveFile)
-
-		fn(save)
-
-		local file = assert(io.open(saveFile, "w"), "Failed to open file: " ..saveFile)
-		for k,v in pairs(save) do
-			file:write(k.." = ")
-			file:write(save_table(v))
-			file:write("\n\n\n")
-		end
-		file:close()
-		file = nil
-	end
-end
