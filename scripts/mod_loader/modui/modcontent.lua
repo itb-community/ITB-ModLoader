@@ -5,9 +5,13 @@
 
 local modContent = {}
 function sdlext.addModContent(text, func, tip)
-	local obj = {caption = text, func = func, tip = tip}
+	local obj = {
+		caption = text,
+		func = func,
+		tip = tip
+	}
 	
-	modContent[#modContent+1] = obj
+	table.insert(modContent, obj)
 	
 	return obj
 end
@@ -29,11 +33,6 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 	buttonModContent.onclicked = function(self, button)
 		if button == 1 then
 			sdlext.showDialog(function(ui, quit)
-				ui.onclicked = function(self, button)
-					quit()
-					return true
-				end
-
 				local frame = Ui()
 					:width(0.4):height(0.8)
 					:posCentered()
