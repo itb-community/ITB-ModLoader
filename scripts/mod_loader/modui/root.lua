@@ -168,6 +168,12 @@ end)
 
 local optionsBox = Boxes.escape_options_box
 local profileBox = Boxes.profile_window
+if type(IsGamepad) == "function" then
+	-- game version 1.1.22
+	optionsBox = Rect2D(optionsBox)
+	optionsBox.w = optionsBox.w + 300
+end
+
 sdlext.addWindowVisibleHook(function(screen, x, y, w, h)
 	if
 		(w == optionsBox.w and h == optionsBox.h) or
