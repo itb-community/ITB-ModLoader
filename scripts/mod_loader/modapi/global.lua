@@ -115,13 +115,11 @@ function UpdateSaveData(fn)
 
 		fn(save)
 
-		local file = assert(io.open(saveFile, "w"), "Failed to open file: " ..saveFile)
-		for k,v in pairs(save) do
-			file:write(k.." = ")
-			file:write(save_table(v))
-			file:write("\n\n\n")
+		local content = ""
+		for k, v in pairs(save) do
+			content = content .. string.format("%s = %s\n\n", k, save_table(v))
 		end
-		file:close()
-		file = nil
+
+		modApi:writeFile(saveFile, content)
 	end
 end
