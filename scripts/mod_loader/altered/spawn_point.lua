@@ -115,7 +115,7 @@ end
 
 function Mission:SpawnPawns(count)
 	for i = 1, count do
-		if self.Initialized then
+		if self.Initialized and self.ID ~= Mission_Test.ID then
 			-- Spawns appear roughly one second apart
 			modApi:scheduleHook((i - 1) * 1000, function() self:SpawnPawn() end)
 		else
