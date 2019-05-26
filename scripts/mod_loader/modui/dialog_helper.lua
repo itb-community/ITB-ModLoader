@@ -68,7 +68,7 @@ local function buildBackgroundPane()
 		return true
 	end
 	pane.keydown = function(self, keycode)
-		if self.dismissible and keycode == 27 then -- Escape
+		if self.dismissible and keycode == SDLKeycodes.ESCAPE then
 			popDialog()
 		end
 		return true

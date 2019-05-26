@@ -97,9 +97,8 @@ local function createUi(root)
 
 	sdlext.addPreKeyDownHook(function(keycode)
 		if
-			holder.visible        and
-			keycode == 13         or   -- main enter
-			keycode == 1073741912 and  -- numpad enter
+			holder.visible and
+			(keycode == SDLKeycodes.RETURN or keycode == SDLKeycodes.RETURN2) and
 			not sdlext.isConsoleOpen()
 		then
 			if pendingConfirm then

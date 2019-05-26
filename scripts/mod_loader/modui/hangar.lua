@@ -676,10 +676,10 @@ local function createUi(root)
 
 	sdlext.addPostKeyDownHook(function(keycode)
 		if
-			holder.visible             and
-			not btnBack.disabled       and
-			keycode == 27              and -- escape
-			not sdlext.isConsoleOpen() and
+			holder.visible                and
+			not btnBack.disabled          and
+			keycode == SDLKeycodes.ESCAPE and
+			not sdlext.isConsoleOpen()    and
 			not leaving
 		then
 			if IsHangarWindowlessState() then

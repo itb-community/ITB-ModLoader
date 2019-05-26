@@ -217,30 +217,30 @@ sdlext.addWindowVisibleHook(function(screen, x, y, w, h)
 end)
 
 sdlext.addPreKeyDownHook(function(keycode)
-	if keycode == 0x400000E1 or keycode == 0x400000E5 then
+	if keycode == SDLKeycodes.SHIFT_LEFT or keycode == SDLKeycodes.SHIFT_RIGHT then
 		isShiftHeld = true
 		for _, hook in ipairs(shiftToggledHooks) do
 			hook(isShiftHeld)
 		end
-	elseif keycode == 0x400000E2 or keycode == 0x400000E6 then
+	elseif keycode == SDLKeycodes.ALT_LEFT or keycode == SDLKeycodes.ALT_RIGHT then
 		isAltHeld = true
 		for _, hook in ipairs(altToggledHooks) do
 			hook(isAltHeld)
 		end
-	elseif keycode == 0x400000E0 or keycode == 0x400000E4 then
+	elseif keycode == SDLKeycodes.CTRL_LEFT or keycode == SDLKeycodes.CTRL_RIGHT then
 		isCtrlHeld = true
 		for _, hook in ipairs(ctrlToggledHooks) do
 			hook(isCtrlHeld)
 		end
 	end
 
-	if keycode == 0x60 then -- tilde/backtick
+	if keycode == SDLKeycodes.BACKQUOTE then
 		consoleOpen = not consoleOpen
 
 		for _, hook in ipairs(consoleToggledHooks) do
 			hook(consoleOpen)
 		end
-	elseif consoleOpen and sdlext.isShiftDown() and (keycode == 0x0D or keycode == 0x4000009E) then -- enter and keypad enter
+	elseif consoleOpen and sdlext.isShiftDown() and (keycode == SDLKeycodes.RETURN or keycode == SDLKeycodes.RETURN2) then
 		consoleOpen = false
 		
 		for _, hook in ipairs(consoleToggledHooks) do
@@ -269,17 +269,17 @@ sdlext.addPreKeyDownHook(function(keycode)
 end)
 
 sdlext.addPreKeyUpHook(function(keycode)
-	if keycode == 0x400000E1 or keycode == 0x400000E5 then
+	if keycode == SDLKeycodes.SHIFT_LEFT or keycode == SDLKeycodes.SHIFT_RIGHT then
 		isShiftHeld = false
 		for _, hook in ipairs(shiftToggledHooks) do
 			hook(isShiftHeld)
 		end
-	elseif keycode == 0x400000E2 or keycode == 0x400000E6 then
+	elseif keycode == SDLKeycodes.ALT_LEFT or keycode == SDLKeycodes.ALT_RIGHT then
 		isAltHeld = false
 		for _, hook in ipairs(altToggledHooks) do
 			hook(isAltHeld)
 		end
-	elseif keycode == 0x400000E0 or keycode == 0x400000E4 then
+	elseif keycode == SDLKeycodes.CTRL_LEFT or keycode == SDLKeycodes.CTRL_RIGHT then
 		isCtrlHeld = false
 		for _, hook in ipairs(ctrlToggledHooks) do
 			hook(isCtrlHeld)
