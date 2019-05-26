@@ -44,7 +44,7 @@ function modApi:pruneExtension(filename)
 	-- gsub() returns multiple values, store the first
 	-- value in a variable so that we correctly ignore
 	-- the retvalues that come after it.
-	local r = string.gsub(filename, "\.[^\.]*$", "")
+	local r = string.gsub(filename, "\.[^.]*$", "")
 	return r
 end
 
