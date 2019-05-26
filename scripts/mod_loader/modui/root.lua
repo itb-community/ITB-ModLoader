@@ -108,6 +108,39 @@ function sdlext.addSettingsChangedHook(fn)
 	table.insert(settingsChangedHooks, fn)
 end
 
+local isShiftHeld = false
+local shiftToggledHooks = {}
+function sdlext.addShiftToggledHook(fn)
+	assert(type(fn) == "function")
+	table.insert(shiftToggledHooks)
+end
+
+function sdlext.isShiftDown()
+	return isShiftHeld
+end
+
+local isAltHeld = false
+local altToggledHooks = {}
+function sdlext.addAltToggledHook(fn)
+	assert(type(fn) == "function")
+	table.insert(altToggledHooks)
+end
+
+function sdlext.isAltDown()
+	return isAltHeld
+end
+
+local isCtrlHeld = false
+local ctrlToggledHooks = {}
+function sdlext.addCtrlToggledHook(fn)
+	assert(type(fn) == "function")
+	table.insert(ctrlToggledHooks)
+end
+
+function sdlext.isCtrlDown()
+	return isCtrlHeld
+end
+
 -- Key hooks are fired WHEREVER in the game you are, whenever
 -- you press a key. So your hooks will need to have a lot of
 -- additional restrictions on when they're supposed to fire.
@@ -184,7 +217,24 @@ sdlext.addWindowVisibleHook(function(screen, x, y, w, h)
 end)
 
 sdlext.addPreKeyDownHook(function(keycode)
-	if keycode == 96 then -- tilde/backtick
+	if keycode == 0x400000E1 or keycode == 0x400000E5 then
+		isShiftHeld = true
+		for _, hook in ipairs(shiftToggledHooks) do
+			hook(isShiftHeld)
+		end
+	elseif keycode == 0x400000E2 or keycode == 0x400000E6 then
+		isAltHeld = true
+		for _, hook in ipairs(altToggledHooks) do
+			hook(isAltHeld)
+		end
+	elseif keycode == 0x400000E0 or keycode == 0x400000E4 then
+		isCtrlHeld = true
+		for _, hook in ipairs(ctrlToggledHooks) do
+			hook(isCtrlHeld)
+		end
+	end
+
+	if keycode == 0x60 then -- tilde/backtick
 		consoleOpen = not consoleOpen
 
 		for _, hook in ipairs(consoleToggledHooks) do
@@ -207,6 +257,32 @@ sdlext.addPreKeyDownHook(function(keycode)
 			"Settings = " .. save_table(Settings)
 		)
 		isOptionsWindow = true
+	end
+
+	return false
+end)
+
+sdlext.addPreKeyUpHook(function(keycode)
+	if keycode == 0x400000E1 or keycode == 0x400000E5 then
+		isShiftHeld = false
+		for _, hook in ipairs(shiftToggledHooks) do
+			hook(isShiftHeld)
+		end
+	elseif keycode == 0x400000E2 or keycode == 0x400000E6 then
+		isAltHeld = false
+		for _, hook in ipairs(altToggledHooks) do
+			hook(isAltHeld)
+		end
+	elseif keycode == 0x400000E0 or keycode == 0x400000E4 then
+		isCtrlHeld = false
+		for _, hook in ipairs(ctrlToggledHooks) do
+			hook(isCtrlHeld)
+		end
+	end
+	
+	-- don't process other keypresses while the console is open
+	if sdlext.isConsoleOpen() then
+		return false
 	end
 
 	return false
