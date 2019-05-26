@@ -240,6 +240,12 @@ sdlext.addPreKeyDownHook(function(keycode)
 		for _, hook in ipairs(consoleToggledHooks) do
 			hook(consoleOpen)
 		end
+	elseif consoleOpen and sdlext.isShiftDown() and keycode == 0x0D then
+		consoleOpen = false
+		
+		for _, hook in ipairs(consoleToggledHooks) do
+			hook(consoleOpen)
+		end
 	end
 
 	-- don't process other keypresses while the console is open
