@@ -25,7 +25,7 @@ BoardPawn.ClearUndoMove = function(self)
 	end
 
 	-- Defer until after the pawn and Board are not busy anymore,
-	-- since other wise it doesn't always work
+	-- since otherwise it doesn't always work
 	modApi:conditionalHook(
 		function()
 			return self and not self:IsBusy() and not Board:IsBusy()
