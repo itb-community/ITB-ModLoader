@@ -240,7 +240,7 @@ sdlext.addPreKeyDownHook(function(keycode)
 		for _, hook in ipairs(consoleToggledHooks) do
 			hook(consoleOpen)
 		end
-	elseif consoleOpen and sdlext.isShiftDown() and keycode == 0x0D then
+	elseif consoleOpen and sdlext.isShiftDown() and (keycode == 0x0D or keycode == 0x4000009E) then -- enter and keypad enter
 		consoleOpen = false
 		
 		for _, hook in ipairs(consoleToggledHooks) do
