@@ -250,11 +250,13 @@ function Mission:ApplyEnvironmentEffect()
 		-- Schedule the post hooks to fire once the board is no longer busy
 		modApi:conditionalHook(
 			function()
-				return not GAME or (Board and not Board:IsBusy())
+				return not Game or not GAME or (Board and not Board:IsBusy())
 			end,
 			function()
 				modLoaderHooksFired = false
-				if not GAME then return end
+				if not Game or not GAME or not Board then
+					return
+				end
 				
 				for _, hook in ipairs(modApi.postEnvironmentHooks) do
 					hook(self)
