@@ -174,7 +174,7 @@ function modApi:processRunLaterQueue(mission)
 end
 
 sdlext.addFrameDrawnHook(function()
-	if not Game and modApi.runLaterQueue ~= nil and #modApi.runLaterQueue > 0 then
+	if (not Game or not Board) and modApi.runLaterQueue ~= nil and #modApi.runLaterQueue > 0 then
 		modApi.runLaterQueue = {}
 	end
 end)
