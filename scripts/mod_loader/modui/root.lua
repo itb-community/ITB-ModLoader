@@ -295,6 +295,12 @@ sdlext.addPreKeyUpHook(function(keycode)
 end)
 
 sdlext.addSettingsChangedHook(function(old, new)
+	-- When deleting the currently active profile, last_profile is nil
+	-- Just copy it over from the previous table, since it holds the correct value
+	if not new.last_profile or new.last_profile == "" then
+		new.last_profile = old.last_profile
+	end
+
 	if old.last_profile ~= new.last_profile then
 		Hangar_lastProfileHadSecretPilots = IsSecretPilotsUnlocked()
 		Profile = modApi:loadProfile()
