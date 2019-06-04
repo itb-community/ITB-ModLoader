@@ -7,6 +7,10 @@ local arrLeft = nil
 local arrRight = nil
 local diffText = nil
 
+local nunitoFont = sdlext.font("fonts/NunitoSans_Bold.ttf", 12)
+local diffTextset = deco.textset(deco.colors.white, nil, nil, true)
+
+
 local function changeDifficulty(newDiff)
 	SetDifficulty(newDiff)
 
@@ -122,11 +126,7 @@ local function createUi(root)
 		:widthpx(156):heightpx(30)
 		:decorate({
 			DecoSolid(deco.colors.framebg),
-			DecoCAlignedText(
-				nil,
-				sdlext.font("fonts/NunitoSans_Bold.ttf", 12),
-				deco.textset(deco.colors.white, nil, nil, true)
-			)
+			DecoCAlignedText(nil, nunitoFont, diffTextset)
 		})
 		:addTo(pane)
 	diffText.translucent = true
