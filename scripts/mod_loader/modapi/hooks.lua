@@ -173,12 +173,6 @@ function modApi:processRunLaterQueue(mission)
 	end
 end
 
-sdlext.addFrameDrawnHook(function()
-	if (not Game or not Board) and modApi.runLaterQueue ~= nil and #modApi.runLaterQueue > 0 then
-		modApi.runLaterQueue = {}
-	end
-end)
-
 --[[
 	Registers a conditional hook which will be
 	executed once the condition function associated
@@ -237,3 +231,7 @@ function modApi:updateScheduledHooks()
 		end
 	end
 end
+
+sdlext.addGameExitedHook(function()
+	modApi.runLaterQueue = {}
+end)

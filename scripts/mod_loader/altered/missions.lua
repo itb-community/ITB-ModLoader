@@ -166,15 +166,16 @@ function Mission:MissionEndImpl()
 end
 
 function Mission:MissionEnd()
-	local ret = SkillEffect()
+	local fx = SkillEffect()
 
 	self:MissionEndImpl()
 
 	for i, hook in ipairs(modApi.missionEndHooks) do
-		hook(self, ret)
+		hook(self, fx)
 	end
+	modApi.runLaterQueue = {}
 
-	Board:AddEffect(ret)
+	Board:AddEffect(fx)
 	self.Board = nil
 end
 
