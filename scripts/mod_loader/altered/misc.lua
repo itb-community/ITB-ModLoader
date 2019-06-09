@@ -216,3 +216,18 @@ Effect.GetLuaString = function(self)
 	return string.format("CreateEffect(%s)", save_table(self.data))
 end
 Effect.GetString = Effect.GetLuaString
+
+function CreatePointList(pointsTable)
+	local result = PointList()
+
+	for _, point in ipairs(pointsTable) do
+		result:push_back(point)
+	end
+
+	return result
+end
+
+PointList.GetLuaString = function(self)
+	return string.format("CreatePointList(%s)", save_table(extract_table(self)))
+end
+PointList.GetString = PointList.GetLuaString
