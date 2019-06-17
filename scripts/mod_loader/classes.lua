@@ -15,6 +15,7 @@ end
 function Class.inherit(base)
 	local o = {}
 	o.__index = o
+	o.__super = base
 	setmetatable(o, {
 		__index = base,
 		__call = function (cls, ...)
