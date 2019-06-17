@@ -322,6 +322,44 @@ local srfBotLeft, srfTopRight
 local function buildUiRoot(screen)
 	uiRoot = UiRoot():widthpx(screen:w()):heightpx(screen:h())
 
+	uiRoot.wheel = function(self, mx, my, scroll)
+		if sdlext.isConsoleOpen() and mod_loader.logger.scroll then
+			if isShiftHeld then
+				scroll = scroll * 20
+			end
+
+			mod_loader.logger:scroll(-scroll)
+			
+			return true
+		end
+
+		return Ui.wheel(self, mx, my, scroll)
+	end
+
+	uiRoot.keydown = function(self, keycode)
+		if sdlext.isConsoleOpen() and mod_loader.logger.scroll then
+			if keycode == SDLKeycodes.PAGEUP then
+				if isShiftHeld then
+					mod_loader.logger:scrollToStart()
+				else
+					mod_loader.logger:scroll(-20)
+				end
+
+				return true
+			elseif keycode == SDLKeycodes.PAGEDOWN then
+				if isShiftHeld then
+					mod_loader.logger:scrollToEnd()
+				else
+					mod_loader.logger:scroll(20)
+				end
+
+				return true
+			end
+		end
+
+		return Ui.keydown(self, keycode)
+	end
+
 	srfBotLeft = sdlext.surface("img/ui/tooltipshadow_0.png")
 	srfTopRight = sdlext.surface("img/ui/tooltipshadow_4.png")
 

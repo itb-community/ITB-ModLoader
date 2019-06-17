@@ -2,7 +2,17 @@
 mod_loader = {}
 
 Logger = require("scripts/mod_loader/logger")
-mod_loader.logger = Logger(BasicLogger)
+
+local BasicLogger = require("scripts/mod_loader/logger_basic")
+local BufferedLogger, BufferedLoggerImpl = unpack(require("scripts/mod_loader/logger_buffered"))
+
+local useBufferedLogger = false
+if useBufferedLogger then
+	mod_loader.logger = BufferedLogger.Interface(BufferedLoggerImpl)
+else
+	mod_loader.logger = Logger(BasicLogger)
+end
+
 
 local oldLog = LOG
 function LOG(...)
