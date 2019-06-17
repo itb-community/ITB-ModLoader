@@ -2,7 +2,7 @@
 mod_loader = {}
 
 Logger = require("scripts/mod_loader/logger")
-mod_loader.logger = Logger()
+mod_loader.logger = Logger(BasicLogger)
 
 local oldLog = LOG
 function LOG(...)
