@@ -2,25 +2,19 @@
 -- Replacement of SkillEffect functions to allow detection of grapple,
 -- artillery and projectiles.
 
-local function addDamageListMetadata(damageList, metadataTable)
-    local metadataInstance = SpaceDamage()
-    metadataInstance.sScript = "return " .. save_table(metadataTable)
-    damageList:push_back(metadataInstance)
-end
-
-local function isMetadataDamageInstance(damageInstance)
-    if not damageInstance.sScript then
+function SpaceDamage:IsMetadata()
+    if not self.sScript then
         return false
     end
     
     return modApi:stringStartsWith(damageInstance.sScript, "return")
 end
 
-local function getDamageListMetadata(damageList)
+function DamageList:GetMetadata()
     local metadata = {}
 
-    for i, v in ipairs(extract_table(damageList)) do
-        if isMetadataDamageInstance(v) then
+    for i, v in ipairs(extract_table(self)) do
+        if v:IsMetadata() then
             metadata[i] = loadstring(v.sScript)()
         else
             metadata[i] = false
@@ -30,11 +24,17 @@ local function getDamageListMetadata(damageList)
     return metadata
 end
 
-SkillEffect.GetMetadata = function(self)
-    return getDamageListMetadata(self.effect)
+function SkillEffect:GetMetadata()
+    return self.effect:GetMetadata()
 end
-SkillEffect.GetQueuedMetadata = function(self)
-    return getDamageListMetadata(self.q_effect)
+function SkillEffect:GetQueuedMetadata()
+    return self.q_effect:GetMetadata()
+end
+
+local function addDamageListMetadata(damageList, metadataTable)
+    local metadataInstance = SpaceDamage()
+    metadataInstance.sScript = "return " .. save_table(metadataTable)
+    damageList:push_back(metadataInstance)
 end
 
 -- Create an initial SkillEffect instance that we use to grab
