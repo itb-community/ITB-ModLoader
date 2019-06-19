@@ -1,4 +1,3 @@
---lfs = require("lfs")
 mod_loader = {}
 
 Logger = require("scripts/mod_loader/logger")
@@ -56,6 +55,14 @@ function mod_loader:init()
 	for i, id in ipairs(orderedMods) do
 		modApi:setCurrentMod(id)
 		self:initMod(id)
+	end
+
+	for i, hook in ipairs(modApi.modsInitializedHooks) do
+		local ok, err = pcall(function() hook() end)
+
+		if not ok then
+			LOG("A modsInitializedHook failed: ", err)
+		end
 	end
 	
 	modApi:finalize()

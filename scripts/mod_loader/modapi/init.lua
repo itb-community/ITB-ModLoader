@@ -402,6 +402,7 @@ function modApi:resetModContent()
 	self.processVekRetreatHooks = {}
 	self.postprocessVekRetreatHooks = {}
 	self.modsLoadedHooks = {}
+	self.modsInitializedHooks = {}
 	self.testMechEnteredHooks = {}
 	self.testMechExitedHooks = {}
 

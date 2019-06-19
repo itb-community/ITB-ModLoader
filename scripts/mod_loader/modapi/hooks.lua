@@ -121,6 +121,11 @@ function modApi:addModsLoadedHook(fn)
 	table.insert(self.modsLoadedHooks,fn)
 end
 
+function modApi:addModsInitializedHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.modsInitializedHooks,fn)
+end
+
 function modApi:addTestMechEnteredHook(fn)
 	assert(type(fn) == "function")
 	table.insert(self.testMechEnteredHooks,fn)
