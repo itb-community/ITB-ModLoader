@@ -76,7 +76,7 @@ end
 --[[
 	Returns an element from the right side of the dequeue (end) without removing it
 --]]
-function List:peekRight()
+function List:peekRight(index)
 	if self.first > self.last then error("list is empty") end
 	if not index then index = 1 end
 	return self[self.last - index + 1]
