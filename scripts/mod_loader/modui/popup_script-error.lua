@@ -11,9 +11,12 @@ local function responseFn(btnIndex)
 end
 
 local function showErrorDialog(text)
+	local maxW = math.max(600, math.min(1000, 0.5 * ScreenSizeX()))
+	local maxH = math.max(400, math.min(800, 0.8 * ScreenSizeY()))
+
 	sdlext.showButtonDialog(
 		modApi:getText("ScriptError_FrameTitle"), text,
-		responseFn, nil, nil,
+		responseFn, maxW, maxH,
 		{ modApi:getText("Button_Ok"), modApi:getText("Button_DisablePopup") },
 		{ "", modApi:getText("ButtonTooltip_DisablePopup") }
 	)

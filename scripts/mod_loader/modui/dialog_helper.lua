@@ -147,11 +147,16 @@ local function buildSimpleDialog(title, text, w, h)
 		:padding(10)
 		:addTo(frame)
 
+	frame:relayout()
+
 	local font = deco.uifont.tooltipTextLarge.font
 	local textset = deco.uifont.tooltipTextLarge.set
 	local wrap = UiWrappedText(text, font, textset)
-		:width(1)
+		:widthpx(scroll.w)
 		:addTo(scroll)
+
+	wrap.pixelWrap = true
+	wrap:rebuild()
 
 	return frame
 end
@@ -179,12 +184,12 @@ function sdlext.showTextDialog(title, text, w, h)
 	end)
 end
 
-function sdlext.showButtonDialog(title, text, responseFn, w, h, buttons, tooltips)
+function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, tooltips)
 	assert(#buttons > 0, "ButtonDialog must have at least one button!")
 	assert(not tooltips or #tooltips == #buttons, "Number of tooltips must be equal to number of buttons. Use empty string (\"\") for no tooltip.")
 
-	w = w or 700
-	h = h or 400
+	maxW = maxW or 700
+	maxH = maxH or 400
 
 	sdlext.showDialog(function(ui, quit)
 		ui.dismissible = false
@@ -195,7 +200,7 @@ function sdlext.showButtonDialog(title, text, responseFn, w, h, buttons, tooltip
 			end
 		end
 
-		local frame = buildSimpleDialog(title, text, w, h)
+		local frame = buildSimpleDialog(title, text, maxW, maxH)
 		local scroll = frame.children[1]
 
 		local line = Ui()
@@ -247,22 +252,22 @@ function sdlext.showButtonDialog(title, text, responseFn, w, h, buttons, tooltip
 
 		frame:relayout()
 
-		if scroll.innerHeight < h - frame.padt - frame.padb then
+		if scroll.innerHeight < maxH - frame.padt - frame.padb then
 			scroll:heightpx(scroll.innerHeight)
 		end
 
 		line:pospx(0, scroll.y + scroll.h)
 
-		w = math.max(w, buttonLayout.w + frame.padl + frame.padr)
-		line:widthpx(w - frame.padl - frame.padr)
-		frame:widthpx(w)
+		maxW = math.max(maxW, buttonLayout.w + frame.padl + frame.padr)
+		line:widthpx(maxW - frame.padl - frame.padr)
+		frame:widthpx(maxW)
 		buttonLayout:pospx((frame.w - frame.padl - frame.padr - buttonLayout.w) / 2, line.y + line.h)
 
-		h = math.min(h, scroll.innerHeight + frame.padt + frame.padb)
-		h = math.max(h, buttonLayout.y + buttonLayout.h + frame.padt + frame.padb)
+		maxH = math.min(maxH, scroll.innerHeight + frame.padt + frame.padb)
+		maxH = math.max(maxH, buttonLayout.y + buttonLayout.h + frame.padt + frame.padb)
 
 		frame
-			:heightpx(h)
+			:heightpx(maxH)
 			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
 			:addTo(ui)
 	end)

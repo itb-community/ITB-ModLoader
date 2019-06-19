@@ -190,8 +190,8 @@ function mod_loader:initMod(id)
 		end,
 		function(e)
 			return string.format(
-				"Initializing mod [%s] with id [%s] failed: %s\n\n%s",
-				mod.name, id, e, debug.traceback()
+				"Initializing mod [%s] with id [%s] failed:\n%s\n\n%s",
+				mod.name, id, e, debug.traceback("", 2)
 			)
 		end
 	)
@@ -226,8 +226,8 @@ function mod_loader:initMetadata(id)
 			end,
 			function(e)
 				return string.format(
-					"Preparing metadata for mod [%s] with id [%s] failed: %s\n\n%s",
-					mod.name, id, e, debug.traceback()
+					"Preparing metadata for mod [%s] with id [%s] failed:\n%s\n\n%s",
+					mod.name, id, e, debug.traceback("", 2)
 				)
 			end
 		)
@@ -405,8 +405,8 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 				end,
 				function(e)
 					return string.format(
-						"Loading mod [%s] with id [%s] failed: %s\n\n%s",
-						mod.name, id, e, debug.traceback()
+						"Loading mod [%s] with id [%s] failed:\n%s\n\n%s",
+						mod.name, id, e, debug.traceback("", 2)
 					)
 				end
 			)
