@@ -31,6 +31,8 @@ function mod_loader:init()
 	self.unmountedMods = {} -- mods which had malformed init.lua
 	self.firsterror = nil
 	
+	modApi.modsInitializedHooks = {}
+	
 	self:enumerateMods()
 
 	if MOD_API_DRAW_HOOK then
@@ -64,6 +66,7 @@ function mod_loader:init()
 			LOG("A modsInitializedHook failed: ", err)
 		end
 	end
+	modApi.modsInitializedHooks = nil
 	
 	modApi:finalize()
 	
