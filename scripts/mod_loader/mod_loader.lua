@@ -4,11 +4,12 @@ mod_loader = {}
 Logger = require("scripts/mod_loader/logger")
 
 local BasicLogger = require("scripts/mod_loader/logger_basic")
-local BufferedLogger, BufferedLoggerImpl = unpack(require("scripts/mod_loader/logger_buffered"))
+local ScrollableLogger = require("scripts/mod_loader/logger_scrollable")
+local BufferedLogger = require("scripts/mod_loader/logger_buffered")
 
 local useBufferedLogger = false
 if useBufferedLogger then
-	mod_loader.logger = BufferedLogger.Interface(BufferedLoggerImpl)
+	mod_loader.logger = ScrollableLogger(BufferedLogger)
 else
 	mod_loader.logger = Logger(BasicLogger)
 end

@@ -12,10 +12,10 @@ Logger.LOG_LEVEL_FILE = 2
 
 function Logger:new(loggerImplClass)
 	assert(loggerImplClass, "Argument #1 must not be nil")
-	self:init(loggerImplClass())
+	self:__init(loggerImplClass())
 end
 
-function Logger:init(loggerImpl)
+function Logger:__init(loggerImpl)
 	self.getLoggingLevel = function(self)
 		return loggerImpl:getLoggingLevel()
 	end

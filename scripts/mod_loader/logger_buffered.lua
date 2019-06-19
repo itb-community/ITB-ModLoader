@@ -1,56 +1,28 @@
 local DequeList = require("scripts/mod_loader/deque_list")
-local LoggerInterface = require("scripts/mod_loader/logger")
 local BasicLogger = require("scripts/mod_loader/logger_basic")
 
 -- Forward declaration
 local BufferedLogger
-local BufferedLoggerImpl
-
--- ///////////////////////////////////////////////////////////////////////
--- BufferedLogger interface
-
-BufferedLogger = Class.inherit(LoggerInterface)
-
-function BufferedLogger:new(loggerImplClass)
-	assert(loggerImplClass, "Argument #1 must not be nil")
-	self:init(loggerImplClass())
-end
-
-function BufferedLogger:init(loggerImpl)
-	LoggerInterface.init(self, loggerImpl)
-
-	self.scrollToStart = function(self)
-		loggerImpl:scrollToStart()
-	end
-
-	self.scrollToEnd = function(self)
-		loggerImpl:scrollToEnd()
-	end
-
-	self.scroll = function(self, scrollAmount)
-		loggerImpl:scroll(scrollAmount)
-	end
-end
 
 -- ///////////////////////////////////////////////////////////////////////
 -- BufferedLogger implementation
 
-BufferedLoggerImpl = Class.inherit(BasicLogger)
+BufferedLogger = Class.inherit(BasicLogger)
 
 local bufferSize = 200
 local pageSize = 20
-function BufferedLoggerImpl:new()
+function BufferedLogger:new()
 	self.bufferOffset = 0
 	self.buffer = DequeList()
 end
 
-function BufferedLoggerImpl:log(...)
+function BufferedLogger:log(...)
 	local message, caller = self:preprocessInput(...)
 	self.bufferOffset = self.buffer:size() - pageSize
 	self:output()
 end
 
-function BufferedLoggerImpl:pushMessage(message)
+function BufferedLogger:pushMessage(message)
 	if self.buffer:size() >= bufferSize then
 		self.buffer:popLeft()
 	end
@@ -59,7 +31,7 @@ function BufferedLoggerImpl:pushMessage(message)
 end
 
 local delimiter = "\n"
-function BufferedLoggerImpl:preprocessInput(...)
+function BufferedLogger:preprocessInput(...)
 	local message, caller = self.__super.preprocessInput(self, ...)
 
     for match in (message..delimiter):gmatch("(.-)"..delimiter) do
@@ -71,7 +43,7 @@ function BufferedLoggerImpl:preprocessInput(...)
 	end
 end
 
-function BufferedLoggerImpl:scroll(scrollAmount)
+function BufferedLogger:scroll(scrollAmount)
 	local oldOffset = self.bufferOffset
 	self.bufferOffset = math.max(0, math.min(self.buffer:size() - pageSize, self.bufferOffset + scrollAmount))
 
@@ -80,17 +52,17 @@ function BufferedLoggerImpl:scroll(scrollAmount)
 	end
 end
 
-function BufferedLoggerImpl:scrollToStart()
+function BufferedLogger:scrollToStart()
 	self.bufferOffset = 0
 	self:output()
 end
 
-function BufferedLoggerImpl:scrollToEnd()
+function BufferedLogger:scrollToEnd()
 	self.bufferOffset = self.buffer:size() - pageSize
 	self:output()
 end
 
-function BufferedLoggerImpl:output()
+function BufferedLogger:output()
 	-- Pad with empty lines in case buffer has too few messages to fill the console
 	for i = 0, pageSize - self.buffer:size() do
 		ConsolePrint("")
@@ -106,4 +78,4 @@ function BufferedLoggerImpl:output()
 	end
 end
 
-return { BufferedLogger, BufferedLoggerImpl }
+return BufferedLogger
