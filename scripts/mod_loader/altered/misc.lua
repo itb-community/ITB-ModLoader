@@ -69,6 +69,10 @@ local function restoreGameVariables(settings)
 		GameData = env.GameData
 		RegionData = env.RegionData
 		SquadData = env.SquadData
+		
+		for _, hook in ipairs(modApi.saveDataUpdatedHooks) do
+			hook()
+		end
 	end
 end
 
