@@ -3,6 +3,7 @@ local scripts = {
 	"global",
 	"ftldat",
 	"misc",
+	"sandbox",
 	"config",
 	"hooks",
 	"data",

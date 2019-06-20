@@ -33,29 +33,6 @@ function modApi:isVersion(version,comparedTo)
 	return #v1 <= #v2
 end
 
---[[
-	Loads the specified file, loading any global variable definitions
-	into the specified table instead of the global namespace (_G).
-	The file can still access variables defined in _G, but not write to
-	them by default (unless specifically doing _G.foo = bar).
-
-	Last arg can be omitted, defaulting to an empty table.
---]]
-function modApi:loadIntoEnv(scriptPath, envTable)
-	envTable = envTable or {}
-	assert(type(envTable) == "table", "Environment must be a table")
-	assert(type(scriptPath) == "string", "Path is not a string")
-
-	setmetatable(envTable, { __index = _G })
-	assert(pcall(setfenv(
-		assert(loadfile(scriptPath)),
-		envTable
-	)))
-	setmetatable(envTable, nil)
-
-	return envTable
-end
-
 function modApi:addGenerationOption(id, name, tip, data)
 	assert(type(id) == "string" or type(id) == "number")
 	assert(type(name) == "string")
