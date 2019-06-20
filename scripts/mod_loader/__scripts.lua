@@ -14,6 +14,8 @@ local scripts = {
 	"ftldat/__scripts",
 	"altered/__scripts",
 	"mod_loader",
+
+	"tests/__scripts",
 }
 
 -- In files loaded via require(), (...) in top-level scope returns
