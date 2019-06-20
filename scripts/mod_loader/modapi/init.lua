@@ -404,6 +404,7 @@ function modApi:resetModContent()
 	self.modsLoadedHooks = {}
 	self.testMechEnteredHooks = {}
 	self.testMechExitedHooks = {}
+	self.saveDataUpdatedHooks = {}
 
 	local name, tbl = debug.getupvalue(oldGetPopulationTexts,1)
 	self.PopEvents = copy_table(tbl)

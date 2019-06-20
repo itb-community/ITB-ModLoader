@@ -136,6 +136,11 @@ function modApi:addTestMechExitedHook(fn)
 	table.insert(self.testMechExitedHooks,fn)
 end
 
+function modApi:addSaveDataUpdatedHook(fn)
+	assert(type(fn) == "function")
+	table.insert(self.saveDataUpdatedHooks,fn)
+end
+
 -- //////////////////////////////////////////////////////////////////////////////
 
 --[[
