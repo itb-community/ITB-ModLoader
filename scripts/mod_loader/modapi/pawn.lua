@@ -46,11 +46,11 @@ local function initializeBoardPawn()
 	BoardPawn.SetNeutral = function(self, neutral)
 		assert(type(neutral) == "boolean", "Expected boolean, got: "..type(neutral))
 
+		oldSetNeutral(self, neutral)
+
 		if not Board or GetCurrentMission() == nil then
 			return
 		end
-
-		oldSetNeutral(self, neutral)
 
 		setSavefileFieldsForPawn(self, { bNeutral = neutral })
 	end
@@ -79,11 +79,12 @@ local function initializeBoardPawn()
 	local oldSetPowered = pawn.SetPowered
 	BoardPawn.SetPowered = function(self, powered)
 		assert(type(powered) == "boolean", "Expected boolean, got: "..type(powered))
+
+		oldSetPowered(self, powered)
+
 		if not Board or GetCurrentMission() == nil then
 			return
 		end
-
-		oldSetPowered(self, powered)
 
 		setSavefileFieldsForPawn(self, { bPowered = powered })
 	end
