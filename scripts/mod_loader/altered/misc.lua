@@ -270,7 +270,7 @@ function SerializeSpaceDamage(self)
 	return result
 end
 
-function DeserializeSpaceDamage(self)
+function CreateSpaceDamage(self)
 	local result = SpaceDamage()
 	
 	for i, v in pairs(self) do
