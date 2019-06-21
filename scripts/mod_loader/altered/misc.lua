@@ -236,7 +236,7 @@ PointList.GetLuaString = function(self)
 end
 PointList.GetString = PointList.GetLuaString
 
-local spaceDamage = {
+local spaceDamageKeys = {
 	"bEvacuate",
 	"bHide",
 	"bHidePath",
