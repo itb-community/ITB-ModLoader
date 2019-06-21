@@ -56,7 +56,7 @@ end
 	Reload data from the save file to obtain up-to-date
 	instances of GameData, RegionData, and SquadData
 --]]
-local function restoreGameVariables(settings)
+function RestoreGameVariables(settings)
 	-- Grab the last profile from settings. It's updated as soon
 	-- as the player switches the profile, so it should be okay.
 	local path = GetSavedataLocation()
@@ -137,7 +137,7 @@ function startNewGame()
 	-- So we can't restore game vars there, cause then we'll have
 	-- competely wrong data.
 	modApi:scheduleHook(50, function()
-		restoreGameVariables(Settings)
+		RestoreGameVariables(Settings)
 		-- Execute hook in the deferred callback, since we want
 		-- postStartGameHook to have access to the savegame data
 		for i, hook in ipairs(modApi.postStartGameHooks) do
@@ -169,7 +169,7 @@ function LoadGame()
 
 	oldLoadGame()
 
-	restoreGameVariables(Settings)
+	RestoreGameVariables(Settings)
 	overrideNextPhase()
 
 	if GAME.CustomDifficulty then
@@ -198,7 +198,7 @@ function SaveGame()
 		-- defined, to prevent grabbing stale data.
 		modApi:scheduleHook(50, function()
 			Settings = modApi:loadSettings()
-			restoreGameVariables(Settings)
+			RestoreGameVariables(Settings)
 			overrideNextPhase()
 		end)
 	end

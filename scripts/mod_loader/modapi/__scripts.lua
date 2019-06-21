@@ -12,6 +12,7 @@ local scripts = {
 	"difficulty",
 	"map",
 	"skills",
+	"savedata",
 	"pawn"
 }
 

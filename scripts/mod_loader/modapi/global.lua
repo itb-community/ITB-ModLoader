@@ -41,26 +41,6 @@ function IsTestMechScenario()
 end
 
 --[[
-	Returns a savedata table holding information about the region the player
-	is currently in. Returns nil when not in a mission.
---]]
-function GetCurrentRegion(data)
-	if not data then
-		data = RegionData
-	end
-
-	if data and data.iBattleRegion then
-		if data.iBattleRegion == 20 then
-			return data["final_region"]
-		else
-			return data["region"..data.iBattleRegion]
-		end
-	end
-
-	return nil
-end
-
---[[
 	Returns the table instance of the current mission. Returns nil when not in a mission.
 --]]
 function GetCurrentMission()
@@ -104,22 +84,4 @@ function compare_tables(tbl1, tbl2)
 	end
 
 	return true
-end
-
-function UpdateSaveData(fn)
-	local path = GetSavedataLocation()
-	local saveFile = path.."profile_"..Settings.last_profile.."/saveData.lua"
-
-	if modApi:fileExists(saveFile) then
-		local save = modApi:loadIntoEnv(saveFile)
-
-		fn(save)
-
-		local content = ""
-		for k, v in pairs(save) do
-			content = content .. string.format("%s = %s\n\n", k, save_table(v))
-		end
-
-		modApi:writeFile(saveFile, content)
-	end
 end
