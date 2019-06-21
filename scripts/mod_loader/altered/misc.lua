@@ -281,6 +281,6 @@ function DeserializeSpaceDamage(self)
 end
 
 SpaceDamage.GetLuaString = function(self)
-    return string.format("DeserializeSpaceDamage(%s)", save_table(SerializeSpaceDamage(self)))
+    return string.format("CreateSpaceDamage(%s)", save_table(SerializeSpaceDamage(self)))
 end
 SpaceDamage.GetString = SpaceDamage.GetLuaString
