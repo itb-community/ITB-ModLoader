@@ -123,7 +123,11 @@ local function initializeBoardPawn()
 	end
 	
 	BoardPawn.IsArmor = function(self)
-		return self:IsAbility("Armored") or self:IsMutation(LEADER_ARMOR)
+		local pilot = self:IsAbility("Armored")
+		local mech = _G[self:GetType()]:GetArmor()
+		local mutation = self:IsMutation(LEADER_ARMOR)
+		
+		return pilot or mech or mutation
 	end
 	
 	BoardPawn.GetQueued = function(self)
