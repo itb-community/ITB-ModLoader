@@ -121,3 +121,4 @@ end
 UpdateSaveData = update
 GetCurrentRegion = getCurrentRegion
 GetSavedataLocation = getDirectory
+GetPawnTable = getPawnTable

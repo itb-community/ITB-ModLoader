@@ -1,20 +1,12 @@
 PawnTable = Pawn
 
-local function isPawnTable(v)
-	return v and type(v) == "table" and v.type and v.name and v.id and (v.undo_ready or v.undoReady)
-end
-
-local function clearUndoMoveInSavefile(pawn)
+local function setSavefileFieldsForPawn(pawn, keyValuesTable)
 	UpdateSaveData(function(save)
-		local id = pawn:GetId()
-
 		local region = GetCurrentRegion(save.RegionData)
+		local ptable = GetPawnTable(pawn:GetId(), region.player.map_data)
 
-		for k, v in pairs(region.player.map_data) do
-			if isPawnTable(v) and v.id == id then
-				v.undo_ready = false
-				v.undoReady = false
-			end
+		for k, v in pairs(keyValuesTable) do
+			ptable[k] = v
 		end
 	end)
 end
@@ -37,7 +29,10 @@ BoardPawn.ClearUndoMove = function(self)
 			modApi:runLater(function()
 				modApi:runLater(function()
 					self:SetNeutral(false)
-					clearUndoMoveInSavefile(self)
+					setSavefileFieldsForPawn(self, {
+						undo_ready = false,
+						undoReady = false
+					})
 				end)
 			end)
 		end
