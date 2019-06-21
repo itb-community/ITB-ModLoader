@@ -105,6 +105,57 @@ local function initializeBoardPawn()
 
 		return powered
 	end
+	
+	BoardPawn.GetMutation = function(self)
+		if not Board or GetCurrentMission() == nil then
+			return
+		end
+		
+		local save = ReadSaveData()
+		local region = GetCurrentRegion(save.RegionData)
+		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+		
+		return ptable.iMutation
+	end
+	
+	BoardPawn.IsMutation = function(self, mutation)
+		return self:GetMutation() == mutation
+	end
+	
+	BoardPawn.IsArmor = function(self)
+		return self:IsAbility("Armored") or self:IsMutation(LEADER_ARMOR)
+	end
+	
+	BoardPawn.GetQueued = function(self)
+		if not Board or GetCurrentMission() == nil then
+			return
+		end
+		
+		local save = ReadSaveData()
+		local region = GetCurrentRegion(save.RegionData)
+		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+		
+		if ptable.iQueuedSkill == -1 then
+			return
+		end
+		
+		return {
+			piOrigin = ptable.piOrigin,
+			piTarget = ptable.piTarget,
+			piQueuedShot = ptable.piQueuedShot,
+			iQueuedSkill = ptable.iQueuedSkill,
+		}
+	end
+	
+	BoardPawn.IsQueued = function(self)
+		local queued = self:GetQueued()
+		
+		if queued == nil then
+			return false
+		end
+		
+		return Board:IsValid(queued.piQueuedShot)
+	end
 
 	pawn = nil
 	InitializeBoardPawn = nil
