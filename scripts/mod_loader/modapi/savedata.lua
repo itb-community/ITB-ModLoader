@@ -114,11 +114,13 @@ local function update(fn)
 
 	modApi:writeFile(saveFile, content)
 
-	RestoreGlobalVariables(Settings)
+	RestoreGameVariables(Settings)
 end
 
 -- Compatibility
-UpdateSaveData = update
-GetCurrentRegion = getCurrentRegion
 GetSavedataLocation = getDirectory
+GetCurrentRegion = getCurrentRegion
 GetPawnTable = getPawnTable
+ReadSaveData = read
+UpdateSaveData = update
+

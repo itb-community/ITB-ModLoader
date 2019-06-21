@@ -38,3 +38,75 @@ BoardPawn.ClearUndoMove = function(self)
 		end
 	)
 end
+
+local function initializeBoardPawn()
+	local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
+	local oldSetNeutral = pawn.SetNeutral
+
+	BoardPawn.SetNeutral = function(self, neutral)
+		assert(type(neutral) == "boolean", "Expected boolean, got: "..type(neutral))
+
+		if not Board or GetCurrentMission() == nil then
+			return
+		end
+
+		oldSetNeutral(self, neutral)
+
+		setSavefileFieldsForPawn(self, { bNeutral = neutral })
+	end
+
+	BoardPawn.IsNeutral = function(self)
+		if not Board or GetCurrentMission() == nil then
+			return
+		end
+
+		local save = ReadSaveData()
+		local region = GetCurrentRegion(save.RegionData)
+		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+		
+		local neutral = ptable.bNeutral
+
+		if neutral == nil then
+			neutral = _G[self:GetType()].Neutral
+		end
+		if neutral == nil then
+			neutral = false
+		end
+
+		return neutral
+	end
+
+	local oldSetPowered = pawn.SetPowered
+	BoardPawn.SetPowered = function(self, powered)
+		assert(type(powered) == "boolean", "Expected boolean, got: "..type(powered))
+		if not Board or GetCurrentMission() == nil then
+			return
+		end
+
+		oldSetPowered(self, powered)
+
+		setSavefileFieldsForPawn(self, { bPowered = powered })
+	end
+
+	BoardPawn.IsPowered = function(self)
+		if not Board or GetCurrentMission() == nil then
+			return
+		end
+
+		local save = ReadSaveData()
+		local region = GetCurrentRegion(save.RegionData)
+		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+
+		local powered = ptable.bPowered
+
+		if powered == nil then
+			powered = true
+		end
+
+		return powered
+	end
+
+	pawn = nil
+	InitializeBoardPawn = nil
+end
+InitializeBoardPawn = initializeBoardPawn

@@ -195,6 +195,12 @@ function modApi:init()
 	sdlext.executeAddModContent()
 end
 
+function modApi:delayedInit()
+	InitializeBoardPawn()
+
+	modApi.delayedInit = nil
+end
+
 function modApi:getText(id)
 	assert(type(id) == "string", "Expected string, got: "..type(id))
 	local result = self.texts[id]
@@ -409,6 +415,15 @@ function modApi:resetModContent()
 	local name, tbl = debug.getupvalue(oldGetPopulationTexts,1)
 	self.PopEvents = copy_table(tbl)
 	self.onGetPopEvent = {}
+	
+	self:conditionalHook(
+		function()
+			return Game ~= nil and modApi.delayedInit ~= nil
+		end,
+		function()
+			modApi:delayedInit()
+		end
+	)
 end
 
 function modApi:setCurrentMod(mod)
