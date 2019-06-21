@@ -6,6 +6,7 @@ local scripts = {
 	"sdlext/serialize",
 	"sdlext/extensions",
 	"sdlext/keycode_lookup",
+	"sdlext/cache_surface",
 
 	"ui/__scripts",
 	"modui/__scripts",

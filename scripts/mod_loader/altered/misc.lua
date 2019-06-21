@@ -235,3 +235,52 @@ PointList.GetLuaString = function(self)
 	return string.format("CreatePointList(%s)", save_table(extract_table(self)))
 end
 PointList.GetString = PointList.GetLuaString
+
+local spaceDamageKeys = {
+	"bEvacuate",
+	"bHide",
+	"bHidePath",
+	"bSimpleMark",
+	"fDelay",
+	"iAcid",
+	"iDamage",
+	"iFire",
+	"iFrozen",
+	"iPawnTeam",
+	"iPush",
+	"iShield",
+	"iSmoke",
+	"iTerrain",
+	"loc",
+	"sAnimation",
+	"sImageMark",
+	"sItem",
+	"sPawn",
+	"sScript",
+	"sSound"
+}
+
+function SpaceDamageToTable(self)
+	local result = {}
+	
+	for _, i in ipairs(spaceDamageKeys) do
+		result[i] = self[i]
+	end
+	
+	return result
+end
+
+function CreateSpaceDamage(self)
+	local result = SpaceDamage()
+	
+	for i, v in pairs(self) do
+		result[i] = v
+	end
+	
+	return result
+end
+
+SpaceDamage.GetLuaString = function(self)
+    return string.format("CreateSpaceDamage(%s)", save_table(SpaceDamageToTable(self)))
+end
+SpaceDamage.GetString = SpaceDamage.GetLuaString
