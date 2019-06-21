@@ -259,7 +259,7 @@ sdlext.addPreKeyDownHook(function(keycode)
 		-- Game doesn't update settings.lua with new fullscreen status...
 		-- Only writes to the file once the options menu is dismissed.
 		modApi:writeFile(
-			GetSavedataLocation() .. "settings.lua",
+			ModApi.Savedata.GetDirectory() .. "settings.lua",
 			"Settings = " .. save_table(Settings)
 		)
 		isOptionsWindow = true

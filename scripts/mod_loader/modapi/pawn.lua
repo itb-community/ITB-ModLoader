@@ -1,9 +1,11 @@
 PawnTable = Pawn
 
+local Savedata = ModApi.Savedata
+
 local function setSavefileFieldsForPawn(pawn, keyValuesTable)
-	UpdateSaveData(function(save)
-		local region = GetCurrentRegion(save.RegionData)
-		local ptable = GetPawnTable(pawn:GetId(), region.player.map_data)
+	Savedata.Update(function(save)
+		local region = Savedata.GetCurrentRegion(save.RegionData)
+		local ptable = Savedata.GetPawnTable(pawn:GetId(), region.player.map_data)
 
 		for k, v in pairs(keyValuesTable) do
 			ptable[k] = v
@@ -60,9 +62,9 @@ local function initializeBoardPawn()
 			return
 		end
 
-		local save = ReadSaveData()
-		local region = GetCurrentRegion(save.RegionData)
-		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+		local save = Savedata.Read()
+		local region = Savedata.GetCurrentRegion(save.RegionData)
+		local ptable = Savedata.GetPawnTable(self:GetId(), region.player.map_data)
 		
 		local neutral = ptable.bNeutral
 
@@ -93,9 +95,9 @@ local function initializeBoardPawn()
 			return
 		end
 
-		local save = ReadSaveData()
-		local region = GetCurrentRegion(save.RegionData)
-		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+		local save = Savedata.Read()
+		local region = Savedata.GetCurrentRegion(save.RegionData)
+		local ptable = Savedata.GetPawnTable(self:GetId(), region.player.map_data)
 
 		local powered = ptable.bPowered
 

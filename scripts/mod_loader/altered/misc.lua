@@ -59,7 +59,7 @@ end
 function RestoreGameVariables(settings)
 	-- Grab the last profile from settings. It's updated as soon
 	-- as the player switches the profile, so it should be okay.
-	local path = GetSavedataLocation()
+	local path = ModApi.Savedata.GetDirectory()
 	local saveFile = path.."profile_"..settings.last_profile.."/saveData.lua"
 	
 	if modApi:fileExists(saveFile) then

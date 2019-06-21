@@ -44,7 +44,7 @@ end
 	Returns the table instance of the current mission. Returns nil when not in a mission.
 --]]
 function GetCurrentMission()
-	local region = GetCurrentRegion()
+	local region = ModApi.Savedata.GetCurrentRegion()
 
 	if region then
 		return GAME:GetMission(region.mission)

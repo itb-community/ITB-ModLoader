@@ -118,7 +118,7 @@ function sdlext.squadPalettes()
 end
 
 function sdlext.config(filename, func)
-	local path = GetSavedataLocation()
+	local path = ModApi.Savedata.GetDirectory()
 	os.mkdir(path)
 
 	local obj = persistence.load(path..filename)

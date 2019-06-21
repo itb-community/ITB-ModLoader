@@ -1,6 +1,13 @@
 
 local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 
+ModApi = {}
+function ModApi.DelayedInit()
+	InitializeBoardPawn()
+
+	ModApi.DelayedInit = nil
+end
+
 modApi = {}
 function modApi:init()
 	Settings = self:loadSettings()
@@ -193,12 +200,6 @@ function modApi:init()
 	)
 
 	sdlext.executeAddModContent()
-end
-
-function modApi:delayedInit()
-	InitializeBoardPawn()
-
-	modApi.delayedInit = nil
 end
 
 function modApi:getText(id)
@@ -418,10 +419,10 @@ function modApi:resetModContent()
 	
 	self:conditionalHook(
 		function()
-			return Game ~= nil and modApi.delayedInit ~= nil
+			return Game ~= nil and ModApi.DelayedInit ~= nil
 		end,
 		function()
-			modApi:delayedInit()
+			ModApi.DelayedInit()
 		end
 	)
 end

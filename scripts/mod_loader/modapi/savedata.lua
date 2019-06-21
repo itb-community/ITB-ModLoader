@@ -120,7 +120,13 @@ end
 -- Compatibility
 GetSavedataLocation = getDirectory
 GetCurrentRegion = getCurrentRegion
-GetPawnTable = getPawnTable
-ReadSaveData = read
-UpdateSaveData = update
 
+-- Exports
+ModApi.Savedata = {
+	GetDirectory = getDirectory,
+	GetCurrentRegion = getCurrentRegion,
+	GetPawnTable = getPawnTable,
+	GetPath = getPath,
+	Read = read,
+	Update = update
+}

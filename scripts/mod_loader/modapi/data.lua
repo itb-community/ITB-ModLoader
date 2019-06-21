@@ -4,7 +4,7 @@
 	from in-game lua scripts.
 --]]
 function modApi:loadSettings()
-	local path = GetSavedataLocation() .. "settings.lua"
+	local path = ModApi.Savedata.GetDirectory() .. "settings.lua"
 	if self:fileExists(path) then
 		local result = self:loadIntoEnv(path).Settings
 
@@ -23,7 +23,7 @@ end
 function modApi:loadProfile()
 	Settings = self:loadSettings()
 
-	local path = GetSavedataLocation() .. "profile_" ..
+	local path = ModApi.Savedata.GetDirectory() .. "profile_" ..
 	             Settings.last_profile ..
 	             "/profile.lua"
 
