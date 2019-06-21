@@ -263,7 +263,7 @@ local spaceDamage = {
 function SerializeSpaceDamage(self)
 	local result = {}
 	
-	for _, i in ipairs(spaceDamage) do
+	for _, i in ipairs(spaceDamageKeys) do
 		result[i] = self[i]
 	end
 	
