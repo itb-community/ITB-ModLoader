@@ -260,7 +260,7 @@ local spaceDamageKeys = {
 	"sSound"
 }
 
-function SerializeSpaceDamage(self)
+function SpaceDamageToTable(self)
 	local result = {}
 	
 	for _, i in ipairs(spaceDamageKeys) do
@@ -281,6 +281,6 @@ function CreateSpaceDamage(self)
 end
 
 SpaceDamage.GetLuaString = function(self)
-    return string.format("CreateSpaceDamage(%s)", save_table(SerializeSpaceDamage(self)))
+    return string.format("CreateSpaceDamage(%s)", save_table(SpaceDamageToTable(self)))
 end
 SpaceDamage.GetString = SpaceDamage.GetLuaString
