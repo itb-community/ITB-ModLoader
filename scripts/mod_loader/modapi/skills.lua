@@ -2,6 +2,52 @@
 -- Replacement of SkillEffect functions to allow detection of grapple,
 -- artillery and projectiles.
 
+function SpaceDamage:ListFields()
+    return {
+        "bEvacuate",
+        "bHide",
+        "bHidePath",
+        "bSimpleMark",
+        "fDelay",
+        "iAcid",
+        "iDamage",
+        "iFire",
+        "iFrozen",
+        "iPawnTeam",
+        "iPush",
+        "iShield",
+        "iSmoke",
+        "iTerrain",
+        "loc",
+        "sAnimation",
+        "sImageMark",
+        "sItem",
+        "sPawn",
+        "sScript",
+        "sSound"
+    }
+end
+
+function SpaceDamage:Clone()
+    local result = SpaceDamage()
+
+    for _, k in ipairs(self:ListFields()) do
+        result[k] = self[k]
+    end
+
+    return result
+end
+
+function SpaceDamage:ToTable()
+	local result = {}
+	
+	for _, k in ipairs(self:ListFields()) do
+		result[k] = self[k]
+	end
+	
+	return result
+end
+
 function SpaceDamage:IsMetadata()
     if not self.sScript then
         return false
