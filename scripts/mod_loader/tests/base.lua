@@ -93,7 +93,6 @@ end
 
 Tests.Testsuite = Class.new()
 
-Tests.Testsuite.STATUS_PENDING = "PENDING"
 Tests.Testsuite.STATUS_READY_TO_RUN_TEST = "READY_TO_RUN_TEST"
 Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH = "WAITING_FOR_TEST_FINISH"
 Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS = "READY_TO_PROCESS_RESULTS"
@@ -106,8 +105,6 @@ end
 function Tests.Testsuite:RunAllTests(testsuiteName)
 	testsuiteName = testsuiteName or findTestsuiteName(self)
 	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
-
-	self.status = Tests.Testsuite.STATUS_PENDING
 
 	local tests = {}
 	local testsuites = {}
@@ -124,7 +121,7 @@ function Tests.Testsuite:RunAllTests(testsuiteName)
 	-- Shuffle the tests table so that we run tests in random order
 	tests = randomize(tests)
 	testsuites = randomize(testsuites)
-	
+
 	local message = string.format("Running testuite '%s'\n", testsuiteName)
 	LOG(string.rep("=", string.len(message)))
 	LOG(message)
