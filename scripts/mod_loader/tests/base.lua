@@ -94,7 +94,27 @@ function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites)
 end
 
 
+-- /////////////////////////////////////////////////////////////////////////////////////////
+-- BoardTestsuite class
 
+Tests.BoardTestsuite = Class.inherit(Tests.Testsuite)
+function Tests.BoardTestsuite:RunTests(tests, resultsHolder)
+	modApi:runLater(function()
+		self.__super.RunTests(self, tests, resultsHolder)
+	end)
+end
+
+function Tests.BoardTestsuite:ProcessResults(testsuiteName, resultsHolder)
+	modApi:runLater(function()
+		self.__super.ProcessResults(self, testsuiteName, resultsHolder)
+	end)
+end
+
+function Tests.BoardTestsuite:RunNestedTestsuites(testsuiteName, testsuites)
+	modApi:runLater(function()
+		self.__super.RunNestedTestsuites(self, testsuiteName, testsuites)
+	end)
+end
 
 
 -- Holder for testsuites
