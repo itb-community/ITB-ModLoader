@@ -158,6 +158,94 @@ local function initializeBoardPawn()
 		return Board:IsValid(queued.piQueuedShot)
 	end
 
+	local damageableTerrain = {
+		[TERRAIN_ICE] = true,
+		[TERRAIN_MOUNTAIN] = true,
+		[TERRAIN_SAND] = true,
+		[TERRAIN_FOREST] = true
+	}
+	BoardPawn.ApplyDamage = function(self, spaceDamage)
+		if not Board or GetCurrentMission() == nil then
+			return
+		end
+
+		-- Appropriated from Tarmean's Kinematics Squad
+
+		local originalLoc = spaceDamage.loc
+		spaceDamage.loc = self:GetSpace()
+
+		local terrain = Board:GetTerrain(spaceDamage.loc)
+		if terrain == TERRAIN_BUILDING then
+			-- buildings don't reset health when re-setting iterrain 
+			-- but they shouldn't overlap with units anyway
+			return
+		end
+
+		local fx = SkillEffect()
+	
+		local isDamaged = Board:IsDamaged(spaceDamage.loc)
+		if isDamaged then
+			-- damaged ice/mountains are healed BEFORE we attack
+			-- then our damage triggers and brings them back down to 1 health
+			local dmg = SpaceDamage(spaceDamage.loc)
+			dmg.iTerrain = Board:GetTerrain(spaceDamage.loc)
+
+			fx:AddDamage(dmg)
+		elseif damageableTerrain[terrain] then
+			local dmg = SpaceDamage(spaceDamage.loc)
+			dmg.iTerrain = TERRAIN_ROAD
+
+			fx:AddDamage(dmg)
+		end
+
+		-- iTerrain doesn't remove the cloud
+		if not Board:IsSmoke(spaceDamage.loc) and spaceDamage.iSmoke ~= EFFECT_CREATE then
+			spaceDamage.iSmoke = EFFECT_REMOVE
+		end
+		-- If a pawn stands on a forest we have to extinguish them as well
+		if not Board:IsFire(spaceDamage.loc) and spaceDamage.iFire ~= EFFECT_CREATE then
+			spaceDamage.iFire = EFFECT_REMOVE
+		end
+		if (not isDamaged) and damageableTerrain[terrain] then
+			-- this heals damageable terrain back up. This includes sand
+			spaceDamage.iTerrain = terrain
+		end
+
+		fx:AddDamage(spaceDamage)
+
+		Board:AddEffect(fx)
+
+		spaceDamage.loc = originalLoc
+	end
+
+	BoardPawn.SetFire = function(self, fire)
+		if not Board or GetCurrentMission() == nil then
+			return
+		end
+
+		local d = SpaceDamage()
+		if fire then
+			d.iFire = EFFECT_CREATE
+		else
+			d.iFire = EFFECT_REMOVE
+		end
+
+		self:ApplyDamage(d)
+	end
+
+	BoardPawn.IsHighlighted = function(self)
+		if not Board or GetCurrentMission() == nil then
+			return
+		end
+
+		local p = Board:GetPawn(mouseTile())
+		if p then
+			return p:GetId() == self:GetId()
+		end
+
+		return false
+	end
+
 	pawn = nil
 	InitializeBoardPawn = nil
 end
