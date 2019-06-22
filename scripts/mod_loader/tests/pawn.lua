@@ -1,26 +1,43 @@
 local pawn = Tests.BoardTestsuite()
 
 local assertEquals = Tests.AssertEquals
-
-local function requireBoard()
-	assert(Board ~= nil, "Error: this test requires a Board to be available")
-end
+local requireBoard = Tests.RequireBoard
+local getTileState = Tests.GetTileState
+local assertTileStateEquals = Tests.AssertTileStateEquals
 
 function pawn.test_1(resultTable)
 	-- The pawn should be correctly damaged
 	requireBoard()
+	resultTable = resultTable or {}
 
+	-- Prepare
 	local pawnId = Board:SpawnPawn("PunchMech")
 	local pawn = Board:GetPawn(pawnId)
+	local loc = pawn:GetSpace()
 
-	local health = pawn:GetHealth()
+	local expectedHealth = pawn:GetHealth() - 1
+	local expectedTileState = getTileState(loc)
 
-	local dmg = SpaceDamage(1)
-	pawn:ApplyDamage(dmg)
+	-- Execute
+	pawn:ApplyDamage(SpaceDamage(1))
 
+	-- Check
 	modApi:runLater(function()
-		local healthAfter = pawn:GetHealth()
-		Board:RemovePawn(pawn)
+		pcall(function()
+			local actualTileState = getTileState(loc)
+			local actualHealth = pawn:GetHealth()
+			
+			Board:RemovePawn(pawn)
+			
+			assertEquals(expectedHealth, actualHealth)
+			assertTileStateEquals(expectedTileState, actualTileState)
+			
+			LOG("SUCCESS")
+			resultTable.result = true
+		end)
+	end)
+end
+
 
 		assertEquals(health - dmg.iDamage, healthAfter)
 

@@ -6,6 +6,45 @@ function Tests.AssertEquals(expected, actual, msg)
 	assert(expected == actual, msg)
 end
 
+function Tests.RequireBoard()
+	assert(Board ~= nil, "Error: this test requires a Board to be available")
+end
+
+function Tests.GetTileState(loc)
+	local state = {}
+
+	state.terrain = Board:GetTerrain(loc)
+	state.damaged = Board:IsDamaged(loc)
+	state.fire = Board:IsFire(loc)
+	state.acid = Board:IsAcid(loc)
+	state.smoke = Board:IsSmoke(loc)
+	state.pod = Board:IsPod(loc)
+	state.frozen = Board:IsFrozen(loc)
+	state.spawning = Board:IsSpawning(loc)
+
+	return state
+end
+
+function Tests.AssertTileStateEquals(expected, actual, msg)
+	local differences = {}
+	for k, v in pairs(expected) do
+		if v ~= actual[k] then
+			table.insert(differences, k)
+		end
+	end
+
+	if not msg then
+		msg = "Tile state mismatch:\n"
+		for _, k in ipairs(differences) do
+			msg = msg .. string.format("- %s: expected %s, but was %s\n", k, expected[k], actual[k])
+		end
+	end
+
+	if #differences > 0 then
+		error(msg)
+	end
+end
+
 -- /////////////////////////////////////////////////////////////////////////////////////////
 -- Testsuite class
 
