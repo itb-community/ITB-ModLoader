@@ -4,6 +4,7 @@ local assertEquals = Tests.AssertEquals
 local requireBoard = Tests.RequireBoard
 local getTileState = Tests.GetTileState
 local assertTileStateEquals = Tests.AssertTileStateEquals
+local safeRunLater = Tests.SafeRunLater
 
 function pawn.test_1(resultTable)
 	-- The pawn should be correctly damaged
@@ -22,25 +23,15 @@ function pawn.test_1(resultTable)
 	pawn:ApplyDamage(SpaceDamage(1))
 
 	-- Check
-	modApi:runLater(function()
-		pcall(function()
-			local actualTileState = getTileState(loc)
-			local actualHealth = pawn:GetHealth()
-			
-			Board:RemovePawn(pawn)
-			
-			assertEquals(expectedHealth, actualHealth)
-			assertTileStateEquals(expectedTileState, actualTileState)
-			
-			LOG("SUCCESS")
-			resultTable.result = true
-		end)
-	end)
-end
-
-
-		assertEquals(health - dmg.iDamage, healthAfter)
-
+	safeRunLater(resultTable, function()
+		local actualTileState = getTileState(loc)
+		local actualHealth = pawn:GetHealth()
+		
+		Board:RemovePawn(pawn)
+		
+		assertEquals(expectedHealth, actualHealth)
+		assertTileStateEquals(expectedTileState, actualTileState)
+		
 		LOG("SUCCESS")
 		resultTable.result = true
 	end)

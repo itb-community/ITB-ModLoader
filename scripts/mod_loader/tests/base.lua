@@ -11,7 +11,27 @@ function Tests.RequireBoard()
 	assert(Board ~= nil, "Error: this test requires a Board to be available")
 end
 
+function Tests.SafeRunLater(resultTable, fn)
+	Tests.AssertEquals(type(resultTable), "table", "Argument #1: ")
+	Tests.AssertEquals(type(fn), "function", "Argument #2: ")
+
+	modApi:runLater(function()
+		local ok, err = xpcall(
+			fn,
+			function(e)
+				return string.format("%s:\n%s", e, debug.traceback("", 2))
+			end
+		)
+
+		if not ok then
+			resultTable.result = err
+		end
+	end)
+end
+
 function Tests.GetTileState(loc)
+	Tests.AssertEquals(type(loc), "userdata", "Argument #1: ")
+
 	local state = {}
 
 	state.terrain = Board:GetTerrain(loc)
@@ -71,7 +91,7 @@ function Tests.Testsuite:RunAllTests(testsuiteName)
 	tests = randomize(tests)
 	testsuites = randomize(testsuites)
 	
-	local message = string.format("Testuite '%s'\n", testsuiteName)
+	local message = string.format("Running testuite '%s'\n", testsuiteName)
 	LOG(string.rep("=", string.len(message)))
 	LOG(message)
 
@@ -100,7 +120,7 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 		end)
 
 		resultTable.ok = ok
-		if not resultTable.result then
+		if resultTable.result == nil then
 			resultTable.result = result
 		end
 
@@ -114,15 +134,19 @@ function Tests.Testsuite:ProcessResults(testsuiteName, results)
 	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
 	Tests.AssertEquals(type(results), "table", "Argument #2: ")
 
-	local successfulTestCount = 0
-
+	local failedTests = {}
 	for _, entry in ipairs(results) do
-		if entry.ok and entry.result then
-			successfulTestCount = successfulTestCount + 1
+		-- 'result' is also used to hold error information, so compare it to true
+		if not (entry.ok and entry.result == true) then
+			table.insert(failedTests, entry)
 		end
 	end
 
-	LOG(string.format("Testsuite '%s' summary: passed %s / %s tests", testsuiteName, successfulTestCount, #results))
+	LOG(string.format("Testsuite '%s' summary: passed %s / %s tests", testsuiteName, #results - #failedTests, #results))
+
+	for _, entry in ipairs(failedTests) do
+		LOG(string.format("%s.%s:", testsuiteName, entry.name), entry.result)
+	end
 end
 
 function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites)
