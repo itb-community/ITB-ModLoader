@@ -117,10 +117,25 @@ local function update(fn)
 	RestoreGameVariables(Settings)
 end
 
+local function doSaveGame()
+    if not Board then
+        error("Game can only be told to save while in a mission")
+    end
+
+    local pawn = Board:GetPawn(0)
+
+    local fx = SkillEffect()
+    fx:AddDamage(SpaceDamage(pawn:GetSpace(), DAMAGE_ZERO))
+
+    Board:AddEffect(fx)
+end
+
+
 -- Compatibility
 GetSavedataLocation = getDirectory
 GetCurrentRegion = getCurrentRegion
 GetPawnTable = getPawnTable
 ReadSaveData = read
 UpdateSaveData = update
+DoSaveGame = doSaveGame
 
