@@ -41,8 +41,8 @@ end
 
 local function initializeBoardPawn()
 	local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
+	
 	local oldSetNeutral = pawn.SetNeutral
-
 	BoardPawn.SetNeutral = function(self, neutral)
 		assert(type(neutral) == "boolean", "Expected boolean, got: "..type(neutral))
 
@@ -60,8 +60,7 @@ local function initializeBoardPawn()
 			return
 		end
 
-		local save = ReadSaveData()
-		local region = GetCurrentRegion(save.RegionData)
+		local region = GetCurrentRegion(RegionData)
 		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
 		
 		local neutral = ptable.bNeutral
@@ -94,8 +93,7 @@ local function initializeBoardPawn()
 			return
 		end
 
-		local save = ReadSaveData()
-		local region = GetCurrentRegion(save.RegionData)
+		local region = GetCurrentRegion(RegionData)
 		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
 
 		local powered = ptable.bPowered
@@ -112,13 +110,12 @@ local function initializeBoardPawn()
 			return
 		end
 		
-		local save = ReadSaveData()
-		local region = GetCurrentRegion(save.RegionData)
+		local region = GetCurrentRegion(RegionData)
 		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
 		
 		return ptable.iMutation
 	end
-	
+
 	BoardPawn.IsMutation = function(self, mutation)
 		return self:GetMutation() == mutation
 	end
@@ -136,8 +133,7 @@ local function initializeBoardPawn()
 			return
 		end
 		
-		local save = ReadSaveData()
-		local region = GetCurrentRegion(save.RegionData)
+		local region = GetCurrentRegion(RegionData)
 		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
 		
 		if ptable.iQueuedSkill == -1 then
@@ -165,4 +161,5 @@ local function initializeBoardPawn()
 	pawn = nil
 	InitializeBoardPawn = nil
 end
+
 InitializeBoardPawn = initializeBoardPawn
