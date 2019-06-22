@@ -1,4 +1,4 @@
-local sandbox = {}
+local sandbox = Tests.Testsuite()
 
 local assertEquals = Tests.AssertEquals
 
