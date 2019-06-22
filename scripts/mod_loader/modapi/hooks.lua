@@ -162,11 +162,19 @@ end
 
 function modApi:processRunLaterQueue(mission)
 	if self.runLaterQueue then
+		local err = nil
 		local q = self.runLaterQueue
 		local n = #q
 		for i = 1, n do
-			q[i](mission)
+			local ok, result = pcall(function()
+				q[i](mission)
+			end)
 			q[i] = nil
+
+			if not ok then
+				err = result
+				break
+			end
 		end
 
 		-- compact the table, if processed hooks also scheduled
@@ -179,6 +187,10 @@ function modApi:processRunLaterQueue(mission)
 			q[j] = q[i]
 			q[i] = nil
 			i = i + 1
+		end
+
+		if err then
+			error(err)
 		end
 	end
 end
