@@ -143,8 +143,12 @@ end
 
 Tests.BoardTestsuite = Class.inherit(Tests.Testsuite)
 function Tests.BoardTestsuite:RunTests(tests, resultsHolder)
+	local log = LOG
+	LOG = function() end
+	
+	self.__super.RunTests(self, tests, resultsHolder)
 	modApi:runLater(function()
-		self.__super.RunTests(self, tests, resultsHolder)
+		LOG = log
 	end)
 end
 
