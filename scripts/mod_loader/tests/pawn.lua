@@ -1,10 +1,14 @@
 local pawn = Tests.Testsuite()
 
 local assertEquals = Tests.AssertEquals
+local assertTableEquals = Tests.AssertTableEquals
+local assertBoardStateEquals = Tests.AssertBoardStateEquals
 local requireBoard = Tests.RequireBoard
 local getTileState = Tests.GetTileState
-local assertTileStateEquals = Tests.AssertTileStateEquals
+local getPawnState = Tests.GetPawnState
 local safeRunLater = Tests.SafeRunLater
+local getBoardState = Tests.GetBoardState
+
 
 function pawn.test_1(resultTable)
 	-- The pawn should be correctly damaged
@@ -12,25 +16,24 @@ function pawn.test_1(resultTable)
 	resultTable = resultTable or {}
 
 	-- Prepare
+	local expectedBoardState = getBoardState()
+
 	local pawnId = Board:SpawnPawn("PunchMech")
 	local pawn = Board:GetPawn(pawnId)
 	local loc = pawn:GetSpace()
 
 	local expectedHealth = pawn:GetHealth() - 1
-	local expectedTileState = getTileState(loc)
 
 	-- Execute
 	pawn:ApplyDamage(SpaceDamage(1))
 
 	-- Check
 	safeRunLater(resultTable, function()
-		local actualTileState = getTileState(loc)
 		local actualHealth = pawn:GetHealth()
-		
 		Board:RemovePawn(pawn)
 		
-		assertEquals(expectedHealth, actualHealth)
-		assertTileStateEquals(expectedTileState, actualTileState)
+		assertEquals(expectedHealth, actualHealth, "Pawn did not take correct amount of damage")
+		assertBoardStateEquals(expectedBoardState, getBoardState(), "Tested operation had side effects")
 		
 		LOG("SUCCESS")
 		resultTable.result = true

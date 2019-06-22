@@ -1,3 +1,5 @@
+-- /////////////////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////////////////
 -- Useful things for tests
 Tests = {}
 
@@ -39,6 +41,7 @@ function Tests.GetTileState(loc)
 
 	local state = {}
 
+	state.loc = loc
 	state.terrain = Board:GetTerrain(loc)
 	state.damaged = Board:IsDamaged(loc)
 	state.fire = Board:IsFire(loc)
@@ -51,7 +54,71 @@ function Tests.GetTileState(loc)
 	return state
 end
 
-function Tests.AssertTileStateEquals(expected, actual, msg)
+function Tests.GetPawnState(arg1)
+	local typ = type(arg1)
+	assert(typ == "userdata" or typ == "number", "Argument #1: Expected userdata or number, but got " .. typ)
+
+	local pawn = nil
+	if typ == "userdata" then
+		if type(arg1.x) == "number" and type(arg1.y) == "number" then
+			-- point
+			pawn = Board:GetPawn(arg1)
+		elseif type(arg1.GetId) == "function" then
+			-- pawn userdata
+			pawn = arg1
+		end
+	else
+		-- id
+		pawn = Board:GetPawn(arg1)
+	end
+
+	local pawnState = {}
+
+	pawnState.id = pawn:GetId()
+	pawnState.loc = pawn:GetSpace()
+	pawnState.health = pawn:GetHealth()
+	pawnState.isFrozen = pawn:IsFrozen()
+	pawnState.isShield = pawn:IsShield()
+	pawnState.isAcid = pawn:IsAcid()
+	pawnState.isDead = pawn:IsDead()
+
+	return pawnState
+end
+
+function Tests.GetBoardState()
+	local result = {}
+	result.tiles = {}
+	result.pawns = {}
+
+	for y = 0, 7 do
+		for x = 0, 7 do
+			local point = Point(x, y)
+
+			table.insert(result.tiles, Tests.GetTileState(point))
+			if Board:IsPawnSpace(point) then
+				table.insert(result.pawns, Tests.GetPawnState(point))
+			end
+		end
+	end
+
+	return result
+end
+
+function Tests.AssertBoardStateEquals(expected, actual, msg)
+	msg = (msg and msg .. ": ") or ""
+
+	for index, expectedState in ipairs(expected.tiles) do
+		local msg = msg .. p2s(expectedState.loc)
+		Tests.AssertTableEquals(expectedState, actual.tiles[index], msg)
+	end
+
+	for index, expectedState in ipairs(expected.pawns) do
+		local msg = msg .. p2s(expectedState.loc)
+		Tests.AssertTableEquals(expectedState, actual.pawns[index], msg)
+	end
+end
+
+function Tests.AssertTableEquals(expected, actual, msg)
 	local differences = {}
 	for k, v in pairs(expected) do
 		if v ~= actual[k] then
@@ -60,7 +127,7 @@ function Tests.AssertTileStateEquals(expected, actual, msg)
 	end
 
 	msg = msg and (msg .. "\n") or ""
-	msg = msg .. "Tile state mismatch:\n"
+	msg = msg .. "Table state mismatch:\n"
 	for _, k in ipairs(differences) do
 		msg = msg .. string.format("- %s: expected %s, but was %s\n", k, expected[k], actual[k])
 	end
@@ -71,6 +138,7 @@ function Tests.AssertTileStateEquals(expected, actual, msg)
 end
 
 
+-- /////////////////////////////////////////////////////////////////////////////////////////
 -- /////////////////////////////////////////////////////////////////////////////////////////
 -- Testsuite class
 
@@ -275,7 +343,10 @@ function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites)
 end
 
 
+-- /////////////////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////////////////
 -- Holder for testsuites
+
 Testsuites = Tests.Testsuite()
 function Testsuites:RunAllTests()
 	self.__index.RunAllTests(self, "Testsuites")
