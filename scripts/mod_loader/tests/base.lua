@@ -116,7 +116,7 @@ function Tests.Testsuite:RunAllTests(testsuiteName)
 	for k, v in pairs(self) do
 		if type(v) == "function" and modApi:stringStartsWith(k, "test_") then
 			table.insert(tests, { name = k, func = v })
-		elseif type(v) == "table" and modApi:stringStartsWith(k, "testsuite_") then
+		elseif type(v) == "table" and v.__index == Tests.Testsuite then
 			table.insert(testsuites, { name = k, suite = v })
 		end
 	end
@@ -129,10 +129,6 @@ function Tests.Testsuite:RunAllTests(testsuiteName)
 	LOG(string.rep("=", string.len(message)))
 	LOG(message)
 
-	-- Suppress log output so that the results stay somewhat readable
-	local log = LOG
-	LOG = function() end
-
 	local resultsHolder = {}
 	self:RunTests(tests, resultsHolder)
 
@@ -140,63 +136,67 @@ function Tests.Testsuite:RunAllTests(testsuiteName)
 
 	self:RunNestedTestsuites(testsuiteName, testsuites)
 
-	modApi:conditionalHook(
-		function()
-			return self.status == Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS
-		end,
-		function()
-			LOG = log
-		end
-	)
+	self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
 end
 
 function Tests.Testsuite:RunTests(tests, resultsHolder)
 	Tests.AssertEquals(type(tests), "table", "Argument #1: ")
 	Tests.AssertEquals(type(resultsHolder), "table", "Argument #2: ")
 
-	self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
+	modApi:conditionalHook(
+		function()
+			return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_TEST
+		end,
+		function()
+			-- Suppress log output so that the results stay somewhat readable
+			local log = LOG
+			LOG = function() end
 
-	local pendingTests = #tests
-	for _, entry in ipairs(tests) do
-		modApi:conditionalHook(
-			function()
-				return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_TEST
-			end,
-			function()
-				self.status = Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH
-
-				local resultTable = {}
-				resultTable.done = false
-				resultTable.name = entry.name
-
-				local ok, result = pcall(function()
-					return entry.func(resultTable)
-				end)
-
-				resultTable.ok = ok
-				resultTable.result = result
-
-				table.insert(resultsHolder, resultTable)
-
+			local pendingTests = #tests
+			for _, entry in ipairs(tests) do
 				modApi:conditionalHook(
 					function()
-						return not (ok and resultTable.result == nil and not resultTable.done)
+						return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_TEST
 					end,
 					function()
-						self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
-						pendingTests = pendingTests - 1
+						self.status = Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH
+
+						local resultTable = {}
+						resultTable.done = false
+						resultTable.name = entry.name
+
+						local ok, result = pcall(function()
+							return entry.func(resultTable)
+						end)
+
+						resultTable.ok = ok
+						resultTable.result = result
+
+						table.insert(resultsHolder, resultTable)
+
+						modApi:conditionalHook(
+							function()
+								return not (ok and resultTable.result == nil and not resultTable.done)
+							end,
+							function()
+								self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
+								pendingTests = pendingTests - 1
+							end
+						)
 					end
 				)
 			end
-		)
-	end
 
-	modApi:conditionalHook(
-		function()
-			return pendingTests == 0
-		end,
-		function()
-			self.status = Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS
+			modApi:conditionalHook(
+				function()
+					return pendingTests == 0
+				end,
+				function()
+					LOG = log
+					log = nil
+					self.status = Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS
+				end
+			)
 		end
 	)
 end
@@ -218,11 +218,15 @@ function Tests.Testsuite:ProcessResults(testsuiteName, results)
 				end
 			end
 
-			LOG(string.format("Testsuite '%s' summary: passed %s / %s tests", testsuiteName, #results - #failedTests, #results))
+			if #results > 0 then
+				LOG(string.format("Testsuite '%s' summary: passed %s / %s tests", testsuiteName, #results - #failedTests, #results))
 
-			for _, entry in ipairs(failedTests) do
-				LOG(string.format("%s.%s:", testsuiteName, entry.name), entry.result)
+				for _, entry in ipairs(failedTests) do
+					LOG(string.format("%s.%s:", testsuiteName, entry.name), entry.result)
+				end
 			end
+
+			self.status = Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
 		end
 	)
 end
@@ -238,7 +242,6 @@ function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites)
 		function()
 			local pendingNestedTests = #testsuites
 			if pendingNestedTests > 0 then
-				LOG(string.format("Testsuite '%s': running %s nested testuites", testsuiteName, #testsuites))
 				for _, entry in ipairs(testsuites) do
 					modApi:conditionalHook(
 						function()
@@ -276,11 +279,15 @@ end
 
 
 -- Holder for testsuites
-Testsuites = {}
-function Testsuites.RunAllTests()
-	for k, v in pairs(Testsuites) do
-		if type(v) == "table" then
-			v:RunAllTests(k)
-		end
-	end
+Testsuites = Tests.Testsuite()
+function Testsuites:RunAllTests()
+	self.__index.RunAllTests(self, "Testsuites")
 end
+
+--[[
+	Usage, in console while in a mission:
+			Testsuites:RunAllTests()
+		or:
+			Testsuites.name_of_testsuite:RunAllTests()
+--]]
+
