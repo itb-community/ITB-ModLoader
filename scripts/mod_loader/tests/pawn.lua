@@ -1,4 +1,4 @@
-local pawn = Tests.BoardTestsuite()
+local pawn = Tests.Testsuite()
 
 local assertEquals = Tests.AssertEquals
 local requireBoard = Tests.RequireBoard

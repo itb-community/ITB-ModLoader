@@ -15,18 +15,23 @@ function Tests.SafeRunLater(resultTable, fn)
 	Tests.AssertEquals(type(resultTable), "table", "Argument #1: ")
 	Tests.AssertEquals(type(fn), "function", "Argument #2: ")
 
-	modApi:runLater(function()
-		local ok, err = xpcall(
-			fn,
-			function(e)
-				return string.format("%s:\n%s", e, debug.traceback("", 2))
-			end
-		)
+	modApi:conditionalHook(
+		function()
+			return Board and not Board:IsBusy()
+		end,
+		function()
+			local ok, err = xpcall(
+				fn,
+				function(e)
+					return string.format("%s:\n%s", e, debug.traceback("", 2))
+				end
+			)
 
-		if not ok then
-			resultTable.result = err
+			if not ok then
+				resultTable.result = err
+			end
 		end
-	end)
+	)
 end
 
 function Tests.GetTileState(loc)
@@ -65,6 +70,7 @@ function Tests.AssertTileStateEquals(expected, actual, msg)
 	end
 end
 
+
 -- /////////////////////////////////////////////////////////////////////////////////////////
 -- Testsuite class
 
@@ -86,12 +92,22 @@ local function findTestsuiteName(testsuite, holder)
 end
 
 Tests.Testsuite = Class.new()
+
+Tests.Testsuite.STATUS_PENDING = "PENDING"
+Tests.Testsuite.STATUS_READY_TO_RUN_TEST = "READY_TO_RUN_TEST"
+Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH = "WAITING_FOR_TEST_FINISH"
+Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS = "READY_TO_PROCESS_RESULTS"
+Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS = "READY_TO_RUN_NESTED_TESTS"
+Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH = "WAITING_FOR_NESTED_FINISH"
+
 function Tests.Testsuite:new()
 end
 
 function Tests.Testsuite:RunAllTests(testsuiteName)
 	testsuiteName = testsuiteName or findTestsuiteName(self)
 	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
+
+	self.status = Tests.Testsuite.STATUS_PENDING
 
 	local tests = {}
 	local testsuites = {}
@@ -113,97 +129,149 @@ function Tests.Testsuite:RunAllTests(testsuiteName)
 	LOG(string.rep("=", string.len(message)))
 	LOG(message)
 
+	-- Suppress log output so that the results stay somewhat readable
+	local log = LOG
+	LOG = function() end
+
 	local resultsHolder = {}
 	self:RunTests(tests, resultsHolder)
 
 	self:ProcessResults(testsuiteName, resultsHolder)
 
 	self:RunNestedTestsuites(testsuiteName, testsuites)
+
+	modApi:conditionalHook(
+		function()
+			return self.status == Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS
+		end,
+		function()
+			LOG = log
+		end
+	)
 end
 
 function Tests.Testsuite:RunTests(tests, resultsHolder)
 	Tests.AssertEquals(type(tests), "table", "Argument #1: ")
 	Tests.AssertEquals(type(resultsHolder), "table", "Argument #2: ")
-	
-	-- Suppress log output so that the results stay somewhat readable
-	local log = LOG
-	LOG = function() end
 
+	self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
+
+	local pendingTests = #tests
 	for _, entry in ipairs(tests) do
-		local resultTable = {}
-		resultTable.name = entry.name
+		modApi:conditionalHook(
+			function()
+				return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_TEST
+			end,
+			function()
+				self.status = Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH
 
-		local ok, result = pcall(function()
-			return entry.func(resultTable)
-		end)
+				local resultTable = {}
+				resultTable.done = false
+				resultTable.name = entry.name
 
-		resultTable.ok = ok
-		if resultTable.result == nil then
-			resultTable.result = result
-		end
+				local ok, result = pcall(function()
+					return entry.func(resultTable)
+				end)
 
-		table.insert(resultsHolder, resultTable)
+				resultTable.ok = ok
+				resultTable.result = result
+
+				table.insert(resultsHolder, resultTable)
+
+				modApi:conditionalHook(
+					function()
+						return not (ok and resultTable.result == nil and not resultTable.done)
+					end,
+					function()
+						self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
+						pendingTests = pendingTests - 1
+					end
+				)
+			end
+		)
 	end
 
-	LOG = log
+	modApi:conditionalHook(
+		function()
+			return pendingTests == 0
+		end,
+		function()
+			self.status = Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS
+		end
+	)
 end
 
 function Tests.Testsuite:ProcessResults(testsuiteName, results)
 	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
 	Tests.AssertEquals(type(results), "table", "Argument #2: ")
 
-	local failedTests = {}
-	for _, entry in ipairs(results) do
-		-- 'result' is also used to hold error information, so compare it to true
-		if not (entry.ok and entry.result == true) then
-			table.insert(failedTests, entry)
+	modApi:conditionalHook(
+		function()
+			return self.status == Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS
+		end,
+		function()
+			local failedTests = {}
+			for _, entry in ipairs(results) do
+				-- 'result' is also used to hold error information, so compare it to true
+				if not (entry.ok and entry.result == true) then
+					table.insert(failedTests, entry)
+				end
+			end
+
+			LOG(string.format("Testsuite '%s' summary: passed %s / %s tests", testsuiteName, #results - #failedTests, #results))
+
+			for _, entry in ipairs(failedTests) do
+				LOG(string.format("%s.%s:", testsuiteName, entry.name), entry.result)
+			end
 		end
-	end
-
-	LOG(string.format("Testsuite '%s' summary: passed %s / %s tests", testsuiteName, #results - #failedTests, #results))
-
-	for _, entry in ipairs(failedTests) do
-		LOG(string.format("%s.%s:", testsuiteName, entry.name), entry.result)
-	end
+	)
 end
 
 function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites)
 	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
 	Tests.AssertEquals(type(testsuites), "table", "Argument #2: ")
 
-	if #testsuites > 0 then
-		LOG(string.format("Testsuite '%s': running %s nested testuites", testsuiteName, #testsuites))
-		for _, entry in ipairs(testsuites) do
-			entry.suite:RunAllTests(string.format("%s.%s", testsuiteName, entry.name))
+	modApi:conditionalHook(
+		function()
+			return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
+		end,
+		function()
+			local pendingNestedTests = #testsuites
+			if pendingNestedTests > 0 then
+				LOG(string.format("Testsuite '%s': running %s nested testuites", testsuiteName, #testsuites))
+				for _, entry in ipairs(testsuites) do
+					modApi:conditionalHook(
+						function()
+							return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
+						end,
+						function()
+							self.status = Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH
+							entry.suite:RunAllTests(string.format("%s.%s", testsuiteName, entry.name))
+
+							modApi:conditionalHook(
+								function()
+									return entry.suite.status == nil
+								end,
+								function()
+									self.status = Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
+									pendingNestedTests = pendingNestedTests - 1
+								end
+							)
+						end
+					)
+				end
+			end
+
+			modApi:conditionalHook(
+				function()
+					return pendingNestedTests == 0
+				end,
+				function()
+					self.status = nil
+				end
+			)
 		end
-	end
-end
-
-
--- /////////////////////////////////////////////////////////////////////////////////////////
--- BoardTestsuite class
-
-Tests.BoardTestsuite = Class.inherit(Tests.Testsuite)
-function Tests.BoardTestsuite:RunTests(tests, resultsHolder)
-	local log = LOG
-	LOG = function() end
-	
-	self.__super.RunTests(self, tests, resultsHolder)
-	modApi:runLater(function()
-		LOG = log
-	end)
-end
-
-function Tests.BoardTestsuite:ProcessResults(testsuiteName, resultsHolder)
-	modApi:runLater(function()
-		self.__super.ProcessResults(self, testsuiteName, resultsHolder)
-	end)
-end
-
-function Tests.BoardTestsuite:RunNestedTestsuites(testsuiteName, testsuites)
-	modApi:runLater(function()
-		self.__super.RunNestedTestsuites(self, testsuiteName, testsuites)
-	end)
+	)
 end
 
 
