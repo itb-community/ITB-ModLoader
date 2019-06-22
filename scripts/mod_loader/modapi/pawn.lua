@@ -16,6 +16,10 @@ BoardPawn.ClearUndoMove = function(self)
 		return
 	end
 
+	if self:IsNeutral() or self:GetTeam() ~= TEAM_PLAYER then
+		return
+	end
+
 	-- Defer until after the pawn and Board are not busy anymore,
 	-- since otherwise it doesn't always work
 	modApi:conditionalHook(
