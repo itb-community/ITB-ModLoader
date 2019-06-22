@@ -37,7 +37,7 @@ function Tests.Testsuite:RunAllTests(testsuiteName)
 	LOG(message)
 
 	local resultsHolder = {}
-	self:RunAllTests(tests, resultsHolder)
+	self:RunTests(tests, resultsHolder)
 
 	self:ProcessResults(testsuiteName, resultsHolder)
 
