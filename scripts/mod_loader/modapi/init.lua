@@ -9,8 +9,6 @@ function modApi:init()
 	self.version = "2.3.5"
 	LOG("MOD-API VERSION "..self.version)
 	self.texts = {}
-	self.currentModSquads = {}
-	self.currentModSquadText = {}
 
 	if not self:fileExists("resources/resource.dat.bak") then
 		LOG("Backing up resource.dat")
@@ -234,7 +232,7 @@ function modApi:setupModLoaderTexts()
 	self.texts["Button_Yes"] = "YES"
 	self.texts["Button_No"] = "NO"
 	self.texts["Button_DisablePopup"] = "GOT IT, DON'T TELL ME AGAIN"
-	self.texts["ButtonTooltip_DisablePopup"] = "This dialog will not be shown anymore. You can re-enable it in Configure Mod Loader."
+	self.texts["ButtonTooltip_DisablePopup"] = "This dialog will not be shown anymore. You can re-enable it in Mod Content > Configure Mod Loader."
 
 	self.texts["MainMenu_Button_ModContent"] = "Mod Content"
 	self.texts["ModContent_FrameTitle"] = "Mod Content"
@@ -396,8 +394,6 @@ function modApi:resetModContent()
 	self.preLoadGameHooks = {}
 	self.postLoadGameHooks = {}
 	self.saveGameHooks = {}
-	self.currentModSquads = {}
-	self.currentModSquadText = {}
 	self.voiceEventHooks = {}
 	self.preIslandSelectionHooks = {}
 	self.postIslandSelectionHooks = {}
@@ -428,8 +424,6 @@ end
 
 function modApi:setCurrentMod(mod)
 	self.currentMod = mod
-	self.currentModSquads[mod] = {}
-	self.currentModSquadText[mod] = {}
 end
 
 function modApi:getCurrentModcontentPath()
