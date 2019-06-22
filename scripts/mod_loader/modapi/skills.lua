@@ -127,6 +127,61 @@ overrideProjectileOrArtillery("AddQueuedProjectile", fx.AddQueuedProjectile)
 overrideProjectileOrArtillery("AddArtillery", fx.AddArtillery)
 overrideProjectileOrArtillery("AddQueuedArtillery", fx.AddQueuedArtillery)
 
+--[[
+    Adds the specified damage instance to this SkillEffect in such a way that
+    only damages a pawn at the specified location, without causing any side
+    effects to the board.
+--]]
+local damageableTerrain = {
+    [TERRAIN_ICE] = true,
+    [TERRAIN_MOUNTAIN] = true,
+    [TERRAIN_SAND] = true,
+    [TERRAIN_FOREST] = true
+}
+SkillEffect.AddSafeDamage = function(self, spaceDamage)
+    -- Appropriated from Tarmean's Kinematics Squad
+
+    spaceDamage = spaceDamage:Clone()
+    local loc = spaceDamage.loc
+
+    local terrain = Board:GetTerrain(loc)
+    if terrain == TERRAIN_BUILDING then
+        -- buildings don't reset health when re-setting iterrain 
+        -- but they shouldn't overlap with units anyway
+        return
+    end
+
+    local isDamaged = Board:IsDamaged(loc)
+    if isDamaged then
+        -- damaged ice/mountains are healed BEFORE we attack
+        -- then our damage triggers and brings them back down to 1 health
+        local dmg = SpaceDamage(loc)
+        dmg.iTerrain = Board:GetTerrain(loc)
+
+        self:AddDamage(dmg)
+    elseif damageableTerrain[terrain] then
+        local dmg = SpaceDamage(loc)
+        dmg.iTerrain = TERRAIN_ROAD
+
+        self:AddDamage(dmg)
+    end
+
+    -- iTerrain doesn't remove the cloud
+    if not Board:IsSmoke(loc) and spaceDamage.iSmoke ~= EFFECT_CREATE then
+        spaceDamage.iSmoke = EFFECT_REMOVE
+    end
+    -- If a pawn stands on a forest we have to extinguish them as well
+    if not Board:IsFire(loc) and spaceDamage.iFire ~= EFFECT_CREATE then
+        spaceDamage.iFire = EFFECT_REMOVE
+    end
+    if (not isDamaged) and damageableTerrain[terrain] then
+        -- this heals damageable terrain back up. This includes sand
+        spaceDamage.iTerrain = terrain
+    end
+
+    self:AddDamage(spaceDamage)
+end
+
 
 -- //////////////////////////////////////////////////////////////////////////
 -- Adds missing queued functions to SkillEffect, by Lemonymous
