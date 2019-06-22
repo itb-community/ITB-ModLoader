@@ -68,11 +68,29 @@ end
 -- /////////////////////////////////////////////////////////////////////////////////////////
 -- Testsuite class
 
+local function findTestsuiteName(testsuite, holder)
+	holder = holder or Testsuites
+	
+	for k, v in pairs(holder) do
+		if v == testsuite then
+			return k, true
+		elseif type(v) == "table" then
+			local name, r = findTestsuiteName(testsuite, v)
+			if r then
+				return name
+			end
+		end
+	end
+
+	return "unknown testsuite", false
+end
+
 Tests.Testsuite = Class.new()
 function Tests.Testsuite:new()
 end
 
 function Tests.Testsuite:RunAllTests(testsuiteName)
+	testsuiteName = testsuiteName or findTestsuiteName(self)
 	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
 
 	local tests = {}
