@@ -128,7 +128,7 @@ overrideProjectileOrArtillery("AddArtillery", fx.AddArtillery)
 overrideProjectileOrArtillery("AddQueuedArtillery", fx.AddQueuedArtillery)
 
 --[[
-    Adds the specified damage instance to this SkillEffect in such a way that
+    Adds the specified damage instance to this damage list in such a way that
     only damages a pawn at the specified location, without causing any side
     effects to the board.
 --]]
@@ -138,7 +138,7 @@ local damageableTerrain = {
     [TERRAIN_SAND] = true,
     [TERRAIN_FOREST] = true
 }
-SkillEffect.AddSafeDamage = function(self, spaceDamage)
+local function addSafeDamage(damageList, spaceDamage)
     -- Appropriated from Tarmean's Kinematics Squad
 
     spaceDamage = spaceDamage:Clone()
@@ -158,12 +158,12 @@ SkillEffect.AddSafeDamage = function(self, spaceDamage)
         local dmg = SpaceDamage(loc)
         dmg.iTerrain = Board:GetTerrain(loc)
 
-        self:AddDamage(dmg)
+        damageList:push_back(dmg)
     elseif damageableTerrain[terrain] then
         local dmg = SpaceDamage(loc)
         dmg.iTerrain = TERRAIN_ROAD
 
-        self:AddDamage(dmg)
+        damageList:push_back(dmg)
     end
 
     -- iTerrain doesn't remove the cloud
@@ -179,7 +179,15 @@ SkillEffect.AddSafeDamage = function(self, spaceDamage)
         spaceDamage.iTerrain = terrain
     end
 
-    self:AddDamage(spaceDamage)
+    damageList:push_back(spaceDamage)
+end
+
+SkillEffect.AddSafeDamage = function(self, spaceDamage)
+    addSafeDamage(self.effect, spaceDamage)
+end
+
+SkillEffect.AddQueuedSafeDamage = function(self, spaceDamage)
+    addSafeDamage(self.q_effect, spaceDamage)
 end
 
 
