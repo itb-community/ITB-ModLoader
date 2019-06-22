@@ -2,7 +2,8 @@
 Tests = {}
 
 function Tests.AssertEquals(expected, actual, msg)
-	msg = msg or string.format("Expected %s, but was %s", tostring(expected), tostring(actual))
+	msg = msg or ""
+	msg = msg .. string.format("Expected %s, but was %s", tostring(expected), tostring(actual))
 	assert(expected == actual, msg)
 end
 
@@ -33,11 +34,10 @@ function Tests.AssertTileStateEquals(expected, actual, msg)
 		end
 	end
 
-	if not msg then
-		msg = "Tile state mismatch:\n"
-		for _, k in ipairs(differences) do
-			msg = msg .. string.format("- %s: expected %s, but was %s\n", k, expected[k], actual[k])
-		end
+	msg = msg and (msg .. "\n") or ""
+	msg = msg .. "Tile state mismatch:\n"
+	for _, k in ipairs(differences) do
+		msg = msg .. string.format("- %s: expected %s, but was %s\n", k, expected[k], actual[k])
 	end
 
 	if #differences > 0 then
@@ -53,7 +53,7 @@ function Tests.Testsuite:new()
 end
 
 function Tests.Testsuite:RunAllTests(testsuiteName)
-	assert(type(testsuiteName) == "string", "Argument #1 must be a string")
+	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
 
 	local tests = {}
 	local testsuites = {}
@@ -84,6 +84,9 @@ function Tests.Testsuite:RunAllTests(testsuiteName)
 end
 
 function Tests.Testsuite:RunTests(tests, resultsHolder)
+	Tests.AssertEquals(type(tests), "table", "Argument #1: ")
+	Tests.AssertEquals(type(resultsHolder), "table", "Argument #2: ")
+	
 	-- Suppress log output so that the results stay somewhat readable
 	local log = LOG
 	LOG = function() end
@@ -108,7 +111,8 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 end
 
 function Tests.Testsuite:ProcessResults(testsuiteName, results)
-	assert(type(testsuiteName) == "string", "Argument #1 must be a string")
+	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
+	Tests.AssertEquals(type(results), "table", "Argument #2: ")
 
 	local successfulTestCount = 0
 
@@ -122,7 +126,8 @@ function Tests.Testsuite:ProcessResults(testsuiteName, results)
 end
 
 function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites)
-	assert(type(testsuiteName) == "string", "Argument #1 must be a string")
+	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
+	Tests.AssertEquals(type(testsuites), "table", "Argument #2: ")
 
 	if #testsuites > 0 then
 		LOG(string.format("Testsuite '%s': running %s nested testuites", testsuiteName, #testsuites))
