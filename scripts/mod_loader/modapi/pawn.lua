@@ -183,6 +183,12 @@ BoardPawn.IsHighlighted = function(self)
 	return false
 end
 
+BoardPawn.GetLuaString = function(self)
+	return string.format("BoardPawn [id = %s, space = %s, name = %s]", self:GetId(), self:GetSpace():GetLuaString(), self:GetMechName())
+end
+BoardPawn.GetString = BoardPawn.GetLuaString
+
+
 local function initializeBoardPawn()
 	-- Overrides of existing functions need to be added at later time, since in
 	-- order to grab a reference to original functions, we require a pawn instance.
