@@ -3,10 +3,15 @@ PawnTable = Pawn
 local function setSavefileFieldsForPawn(pawn, keyValuesTable)
 	UpdateSaveData(function(save)
 		local region = GetCurrentRegion(save.RegionData)
-		local ptable = GetPawnTable(pawn:GetId(), region.player.map_data)
+		local ptable = GetPawnTable(pawn:GetId(), save.SquadData)
+		if not ptable and region then
+			ptable = GetPawnTable(pawn:GetId(), region.player.map_data)
+		end
 
-		for k, v in pairs(keyValuesTable) do
-			ptable[k] = v
+		if ptable then
+			for k, v in pairs(keyValuesTable) do
+				ptable[k] = v
+			end
 		end
 	end)
 end
