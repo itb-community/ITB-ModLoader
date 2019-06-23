@@ -170,9 +170,11 @@ Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH = "WAITING_FOR_NESTED_FINISH"
 function Tests.Testsuite:new()
 end
 
-function Tests.Testsuite:RunAllTests(testsuiteName)
+function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
 	testsuiteName = testsuiteName or findTestsuiteName(self)
+	isSecondaryCall = isSecondaryCall or false
 	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
+	Tests.AssertEquals(type(isSecondaryCall), "boolean", "Argument #2: ")
 
 	local tests = {}
 	local testsuites = {}
@@ -190,7 +192,7 @@ function Tests.Testsuite:RunAllTests(testsuiteName)
 	tests = randomize(tests)
 	testsuites = randomize(testsuites)
 
-	local message = string.format("Running testuite '%s'\n", testsuiteName)
+	local message = string.format("Running testuite '%s'", testsuiteName)
 	LOG(string.rep("=", string.len(message)))
 	LOG(message)
 
@@ -199,7 +201,16 @@ function Tests.Testsuite:RunAllTests(testsuiteName)
 
 	self:ProcessResults(testsuiteName, resultsHolder)
 
-	self:RunNestedTestsuites(testsuiteName, testsuites)
+	self:RunNestedTestsuites(testsuiteName, testsuites, true)
+
+	modApi:conditionalHook(
+		function()
+			return self.status == nil
+		end,
+		function()
+			DoSaveGame()
+		end
+	)
 
 	self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
 end
@@ -296,9 +307,10 @@ function Tests.Testsuite:ProcessResults(testsuiteName, results)
 	)
 end
 
-function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites)
+function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, isSecondaryCall)
 	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
 	Tests.AssertEquals(type(testsuites), "table", "Argument #2: ")
+	Tests.AssertEquals(type(isSecondaryCall), "boolean", "Argument #3: ")
 
 	modApi:conditionalHook(
 		function()
@@ -314,7 +326,7 @@ function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites)
 						end,
 						function()
 							self.status = Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH
-							entry.suite:RunAllTests(string.format("%s.%s", testsuiteName, entry.name))
+							entry.suite:RunAllTests(string.format("%s.%s", testsuiteName, entry.name), isSecondaryCall)
 
 							modApi:conditionalHook(
 								function()
@@ -349,7 +361,7 @@ end
 
 Testsuites = Tests.Testsuite()
 function Testsuites:RunAllTests()
-	self.__index.RunAllTests(self, "Testsuites")
+	self.__index.RunAllTests(self, "Testsuites", false)
 end
 
 --[[
