@@ -85,3 +85,9 @@ function compare_tables(tbl1, tbl2)
 
 	return true
 end
+
+Emitter_Blank = Emitter:new({
+    timer = 0,
+    lifespan = 0,
+    max_particles = 0
+})

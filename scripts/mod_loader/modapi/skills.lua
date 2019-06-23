@@ -166,20 +166,47 @@ local function addSafeDamage(damageList, spaceDamage)
         damageList:push_back(dmg)
     end
 
-    -- iTerrain doesn't remove the cloud
-    if not Board:IsSmoke(loc) and spaceDamage.iSmoke ~= EFFECT_CREATE then
-        spaceDamage.iSmoke = EFFECT_REMOVE
+    if Board:IsFire(loc) and spaceDamage.iFire == EFFECT_REMOVE then
+        -- Can't extinguish pawn without extinguishing the tile,
+        -- the pawn will catch on fire again on the next game update step
+        spaceDamage.iFire = 0
     end
-    -- If a pawn stands on a forest we have to extinguish them as well
-    if not Board:IsFire(loc) and spaceDamage.iFire ~= EFFECT_CREATE then
-        spaceDamage.iFire = EFFECT_REMOVE
+    if not Board:IsSmoke(loc) then
+        -- iTerrain doesn't remove the cloud
+        spaceDamage.iSmoke = EFFECT_REMOVE
     end
     if (not isDamaged) and damageableTerrain[terrain] then
         -- this heals damageable terrain back up. This includes sand
         spaceDamage.iTerrain = terrain
     end
-
     damageList:push_back(spaceDamage)
+    
+    local dmg = SpaceDamage(loc)
+    if
+        not Board:IsFire(loc) and (
+            (spaceDamage.iDamage ~= 0 and spaceDamage.iDamage ~= DAMAGE_ZERO and terrain == TERRAIN_FOREST) or
+            spaceDamage.iFire == EFFECT_CREATE
+        )
+    then
+        -- If a pawn stands on a forest we have to extinguish them as well
+        dmg.sScript = string.format([[
+            modApi:runLater(function()
+                local loc = %s
+                local emitter = Emitter_FireOut
+                Emitter_FireOut = Emitter_Blank
+
+                local d = SpaceDamage(loc)
+                d.iFire = EFFECT_REMOVE
+                local pawn = Board:GetPawn(loc)
+                pawn:SetSpace(Point(-1, -1))
+                Board:DamageSpace(d)
+                pawn:SetSpace(loc)
+
+                Emitter_FireOut = emitter
+            end)
+        ]], loc:GetLuaString())
+    end
+    damageList:push_back(dmg)
 end
 
 SkillEffect.AddSafeDamage = function(self, spaceDamage)
