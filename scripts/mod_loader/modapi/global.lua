@@ -44,17 +44,11 @@ end
 	Returns the table instance of the current mission. Returns nil when not in a mission.
 --]]
 function GetCurrentMission()
-	local region = GetCurrentRegion()
-
-	if region then
-		return GAME:GetMission(region.mission)
-	end
-
 	if IsTestMechScenario() then
 		return Mission_Test
 	end
 
-	return nil
+	return modApi.current_mission
 end
 
 function list_indexof(list, value)

@@ -56,6 +56,7 @@ end
 
 local oldBaseUpdate = Mission.BaseUpdate
 function Mission:BaseUpdate()
+	modApi.current_mission = self
 	modApi:processRunLaterQueue(self)
 
 	oldBaseUpdate(self)
@@ -72,6 +73,7 @@ end
 
 local oldBaseDeployment = Mission.BaseDeployment
 function Mission:BaseDeployment()
+	modApi.current_mission = self
 	oldBaseDeployment(self)
 	self.Board = Board
 
@@ -294,4 +296,10 @@ function Mission_Test:MissionEnd()
 	for i, hook in ipairs(modApi.testMechExitedHooks) do
 		hook(self)
 	end
+	
+	modApi.current_mission = nil
 end
+
+sdlext.addGameExitedHook(function()
+	modApi.current_mission = nil
+end)
