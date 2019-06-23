@@ -136,6 +136,11 @@ function Tests.GetPawnState(arg1)
 	return pawnState
 end
 
+function Tests.PointToIndex(point, rowWidth)
+	rowWidth = rowWidth or 8
+	return point.y * rowWidth + point.x
+end
+
 function Tests.GetBoardState()
 	local result = {}
 	result.tiles = {}
@@ -144,10 +149,11 @@ function Tests.GetBoardState()
 	for y = 0, 7 do
 		for x = 0, 7 do
 			local point = Point(x, y)
+			local index = Tests.PointToIndex(point)
 
-			table.insert(result.tiles, Tests.GetTileState(point))
+			result.tiles[index] = Tests.GetTileState(point)
 			if Board:IsPawnSpace(point) then
-				table.insert(result.pawns, Tests.GetPawnState(point))
+				result.pawns[index] = Tests.GetPawnState(point)
 			end
 		end
 	end
