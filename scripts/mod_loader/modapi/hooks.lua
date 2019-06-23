@@ -2,143 +2,74 @@
 -- //////////////////////////////////////////////////////////////////////////////
 -- Simple hooks
 
-function modApi:addPreMissionAvailableHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.preMissionAvailableHooks,fn)
+modApi.hooks = {}
+
+function modApi:AddHook(name)
+	local Name = name:gsub("^.", string.upper) -- capitalize first letter
+	local name = name:gsub("^.", string.lower) -- lower case first letter
+	
+	table.insert(self.hooks, name)
+	self[name .."Hooks"] = {}
+	
+	self["add".. Name .."Hook"] = function(self, fn)
+		assert(type(fn) == "function")
+		table.insert(self[name .."Hooks"], fn)
+	end
+	
+	self["rem".. Name .."Hook"] = function(self, fn)
+		remove_element(fn, self[name .."Hooks"])
+	end
+	
+	self["fire".. Name .."Hooks"] = function(self, ...)
+		for _, fn in ipairs(self[name .."Hooks"]) do
+			fn(...)
+		end
+	end
 end
 
-function modApi:addPostMissionAvailableHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.postMissionAvailableHooks,fn)
+function modApi:ResetHooks()
+	for _, name in ipairs(self.hooks) do
+		self[name .."Hooks"] = {}
+	end
 end
 
+local hooks = {
+	"PreMissionAvailable",
+	"PostMissionAvailable",
+	"PreEnvironment",
+	"PostEnvironment",
+	"NextTurn",
+	"VoiceEvent",
+	"PreIslandSelection",
+	"PostIslandSelection",
+	"MissionUpdate",
+	"MissionStart",
+	"MissionEnd",
+	"MissionNextPhaseCreated",
+	"PreStartGame",
+	"PostStartGame",
+	"PreLoadGame",
+	"PostLoadGame",
+	"SaveGame",
+	"VekSpawnAdded",
+	"VekSpawnRemoved",
+	"PreprocessVekRetreat",
+	"ProcessVekRetreat",
+	"PostprocessVekRetreat",
+	"ModsLoaded",
+	"ModsInitialized",
+	"TestMechEntered",
+	"TestMechExited",
+	"SaveDataUpdated",
+}
+
+for _, name in ipairs(hooks) do
+	modApi:AddHook(name)
+end
+
+-- backwards compatibility.
 function modApi:addMissionAvailableHook(fn)
 	self:addPostMissionAvailableHook(fn)
-end
-
-function modApi:addPreEnvironmentHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.preEnvironmentHooks,fn)
-end
-
-function modApi:addPostEnvironmentHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.postEnvironmentHooks,fn)
-end
-
-function modApi:addNextTurnHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.nextTurnHooks,fn)
-end
-
-function modApi:addVoiceEventHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.voiceEventHooks,fn)
-end
-
-function modApi:addPreIslandSelectionHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.preIslandSelectionHooks,fn)
-end
-
-function modApi:addPostIslandSelectionHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.postIslandSelectionHooks,fn)
-end
-
-function modApi:addMissionUpdateHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.missionUpdateHooks,fn)
-end
-
-function modApi:addMissionStartHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.missionStartHooks,fn)
-end
-
-function modApi:addMissionEndHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.missionEndHooks,fn)
-end
-
-function modApi:addMissionNextPhaseCreatedHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.missionNextPhaseCreatedHooks,fn)
-end
-
-function modApi:addPreStartGameHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.preStartGameHooks,fn)
-end
-
-function modApi:addPostStartGameHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.postStartGameHooks,fn)
-end
-
-function modApi:addPreLoadGameHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.preLoadGameHooks,fn)
-end
-
-function modApi:addPostLoadGameHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.postLoadGameHooks,fn)
-end
-
-function modApi:addSaveGameHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.saveGameHooks,fn)
-end
-
-function modApi:addVekSpawnAddedHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.vekSpawnAddedHooks,fn)
-end
-
-function modApi:addVekSpawnRemovedHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.vekSpawnRemovedHooks,fn)
-end
-
-function modApi:addPreprocessVekRetreatHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.preprocessVekRetreatHooks,fn)
-end
-
-function modApi:addProcessVekRetreatHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.processVekRetreatHooks,fn)
-end
-
-function modApi:addPostprocessVekRetreatHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.postprocessVekRetreatHooks,fn)
-end
-
-function modApi:addModsLoadedHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.modsLoadedHooks,fn)
-end
-
-function modApi:addModsInitializedHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.modsInitializedHooks,fn)
-end
-
-function modApi:addTestMechEnteredHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.testMechEnteredHooks,fn)
-end
-
-function modApi:addTestMechExitedHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.testMechExitedHooks,fn)
-end
-
-function modApi:addSaveDataUpdatedHook(fn)
-	assert(type(fn) == "function")
-	table.insert(self.saveDataUpdatedHooks,fn)
 end
 
 -- //////////////////////////////////////////////////////////////////////////////
