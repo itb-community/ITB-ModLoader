@@ -6,7 +6,7 @@ local assertBoardStateEquals = Tests.AssertBoardStateEquals
 local requireBoard = Tests.RequireBoard
 local getTileState = Tests.GetTileState
 local getPawnState = Tests.GetPawnState
-local safeRunLater = Tests.SafeRunLater
+local waitUntilBoardNotBusy = Tests.WaitUntilBoardNotBusy
 local getBoardState = Tests.GetBoardState
 
 
@@ -28,10 +28,10 @@ function pawn.test_1(resultTable)
 	pawn:ApplyDamage(SpaceDamage(1))
 
 	-- Check
-	safeRunLater(resultTable, function()
+	waitUntilBoardNotBusy(resultTable, function()
 		local actualHealth = pawn:GetHealth()
 		Board:RemovePawn(pawn)
-		
+
 		assertEquals(expectedHealth, actualHealth, "Pawn did not take correct amount of damage")
 		assertBoardStateEquals(expectedBoardState, getBoardState(), "Tested operation had side effects")
 		

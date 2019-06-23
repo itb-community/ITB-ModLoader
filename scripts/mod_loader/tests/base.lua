@@ -13,7 +13,7 @@ function Tests.RequireBoard()
 	assert(Board ~= nil, "Error: this test requires a Board to be available")
 end
 
-function Tests.SafeRunLater(resultTable, fn)
+function Tests.WaitUntilBoardNotBusy(resultTable, fn)
 	Tests.AssertEquals(type(resultTable), "table", "Argument #1: ")
 	Tests.AssertEquals(type(fn), "function", "Argument #2: ")
 
