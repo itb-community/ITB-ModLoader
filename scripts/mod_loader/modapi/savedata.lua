@@ -38,6 +38,10 @@ end
 	is currently in. Returns nil when not in a mission.
 --]]
 local function getCurrentRegion(sourceTable)
+	if not Game then
+		return
+	end
+	
     if not sourceTable then
         sourceTable = RegionData
     end
