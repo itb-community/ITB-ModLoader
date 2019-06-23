@@ -29,6 +29,8 @@ function SpaceDamage:ListFields()
 end
 
 function SpaceDamage:Clone()
+    Tests.AssertEquals("userdata", type(self), "Argument #0")
+
     local result = SpaceDamage()
 
     for _, k in ipairs(self:ListFields()) do
@@ -39,6 +41,8 @@ function SpaceDamage:Clone()
 end
 
 function SpaceDamage:ToTable()
+    Tests.AssertEquals("userdata", type(self), "Argument #0")
+
 	local result = {}
 	
 	for _, k in ipairs(self:ListFields()) do
@@ -49,6 +53,8 @@ function SpaceDamage:ToTable()
 end
 
 function SpaceDamage:IsMetadata()
+    Tests.AssertEquals("userdata", type(self), "Argument #0")
+
     if not self.sScript then
         return false
     end
