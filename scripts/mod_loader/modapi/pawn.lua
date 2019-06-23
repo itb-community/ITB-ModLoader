@@ -48,7 +48,145 @@ BoardPawn.ClearUndoMove = function(self)
 	)
 end
 
+BoardPawn.IsNeutral = function(self)
+	if not Board or GetCurrentMission() == nil then
+		return
+	end
+
+	local region = GetCurrentRegion(RegionData)
+	local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+	
+	local neutral = ptable.bNeutral
+
+	if neutral == nil then
+		neutral = _G[self:GetType()]:GetNeutral()
+	end
+	if neutral == nil then
+		neutral = false
+	end
+
+	return neutral
+end
+
+BoardPawn.IsPowered = function(self)
+	if not Board or GetCurrentMission() == nil then
+		return
+	end
+
+	local region = GetCurrentRegion(RegionData)
+	local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+
+	local powered = ptable.bPowered
+
+	if powered == nil then
+		powered = true
+	end
+
+	return powered
+end
+	
+BoardPawn.GetMutation = function(self)
+	if not Board or GetCurrentMission() == nil then
+		return
+	end
+	
+	local region = GetCurrentRegion(RegionData)
+	local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+	
+	return ptable.iMutation
+end
+
+BoardPawn.IsMutation = function(self, mutation)
+	return self:GetMutation() == mutation
+end
+
+BoardPawn.IsArmor = function(self)
+	local pilot = self:IsAbility("Armored")
+	local mech = _G[self:GetType()]:GetArmor()
+	local mutation = self:IsMutation(LEADER_ARMOR)
+	-- TODO: Bug: killing an armor psion then respawning it via Board:AddPawn() causes this function to return false
+	-- Need to update the savefile after a new pawn appears on the board
+	
+	return pilot or mech or mutation
+end
+
+BoardPawn.GetQueued = function(self)
+	if not Board or GetCurrentMission() == nil then
+		return
+	end
+	
+	local region = GetCurrentRegion(RegionData)
+	local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+	
+	if ptable.iQueuedSkill == -1 then
+		return
+	end
+	
+	return {
+		piOrigin = ptable.piOrigin,
+		piTarget = ptable.piTarget,
+		piQueuedShot = ptable.piQueuedShot,
+		iQueuedSkill = ptable.iQueuedSkill,
+	}
+end
+
+BoardPawn.IsQueued = function(self)
+	local queued = self:GetQueued()
+	
+	if queued == nil then
+		return false
+	end
+	
+	return Board:IsValid(queued.piQueuedShot)
+end
+
+BoardPawn.ApplyDamage = function(self, spaceDamage)
+	if not Board or GetCurrentMission() == nil then
+		return
+	end
+
+	local loc = spaceDamage.loc
+	spaceDamage.loc = self:GetSpace()
+
+	local fx = SkillEffect()
+	fx:AddSafeDamage(spaceDamage)
+	Board:AddEffect(fx)
+
+	spaceDamage.loc = loc
+end
+
+BoardPawn.SetFire = function(self, fire)
+	if not Board or GetCurrentMission() == nil then
+		return
+	end
+
+	local d = SpaceDamage()
+	if fire then
+		d.iFire = EFFECT_CREATE
+	else
+		d.iFire = EFFECT_REMOVE
+	end
+
+	self:ApplyDamage(d)
+end
+
+BoardPawn.IsHighlighted = function(self)
+	if not Board or GetCurrentMission() == nil then
+		return
+	end
+
+	local p = Board:GetPawn(mouseTile())
+	if p then
+		return p:GetId() == self:GetId()
+	end
+
+	return false
+end
+
 local function initializeBoardPawn()
+	-- Overrides of existing functions need to be added at later time, since in
+	-- order to grab a reference to original functions, we require a pawn instance.
+
 	local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 	
 	local oldSetNeutral = pawn.SetNeutral
@@ -64,26 +202,6 @@ local function initializeBoardPawn()
 		setSavefileFieldsForPawn(self, { bNeutral = neutral })
 	end
 
-	BoardPawn.IsNeutral = function(self)
-		if not Board or GetCurrentMission() == nil then
-			return
-		end
-
-		local region = GetCurrentRegion(RegionData)
-		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
-		
-		local neutral = ptable.bNeutral
-
-		if neutral == nil then
-			neutral = _G[self:GetType()]:GetNeutral()
-		end
-		if neutral == nil then
-			neutral = false
-		end
-
-		return neutral
-	end
-
 	local oldSetPowered = pawn.SetPowered
 	BoardPawn.SetPowered = function(self, powered)
 		assert(type(powered) == "boolean", "Expected boolean, got: "..type(powered))
@@ -95,119 +213,6 @@ local function initializeBoardPawn()
 		end
 
 		setSavefileFieldsForPawn(self, { bPowered = powered })
-	end
-
-	BoardPawn.IsPowered = function(self)
-		if not Board or GetCurrentMission() == nil then
-			return
-		end
-
-		local region = GetCurrentRegion(RegionData)
-		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
-
-		local powered = ptable.bPowered
-
-		if powered == nil then
-			powered = true
-		end
-
-		return powered
-	end
-	
-	BoardPawn.GetMutation = function(self)
-		if not Board or GetCurrentMission() == nil then
-			return
-		end
-		
-		local region = GetCurrentRegion(RegionData)
-		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
-		
-		return ptable.iMutation
-	end
-
-	BoardPawn.IsMutation = function(self, mutation)
-		return self:GetMutation() == mutation
-	end
-	
-	BoardPawn.IsArmor = function(self)
-		local pilot = self:IsAbility("Armored")
-		local mech = _G[self:GetType()]:GetArmor()
-		local mutation = self:IsMutation(LEADER_ARMOR)
-		
-		return pilot or mech or mutation
-	end
-	
-	BoardPawn.GetQueued = function(self)
-		if not Board or GetCurrentMission() == nil then
-			return
-		end
-		
-		local region = GetCurrentRegion(RegionData)
-		local ptable = GetPawnTable(self:GetId(), region.player.map_data)
-		
-		if ptable.iQueuedSkill == -1 then
-			return
-		end
-		
-		return {
-			piOrigin = ptable.piOrigin,
-			piTarget = ptable.piTarget,
-			piQueuedShot = ptable.piQueuedShot,
-			iQueuedSkill = ptable.iQueuedSkill,
-		}
-	end
-	
-	BoardPawn.IsQueued = function(self)
-		local queued = self:GetQueued()
-		
-		if queued == nil then
-			return false
-		end
-		
-		return Board:IsValid(queued.piQueuedShot)
-	end
-
-	BoardPawn.ApplyDamage = function(self, spaceDamage)
-		if not Board or GetCurrentMission() == nil then
-			return
-		end
-
-		local loc = spaceDamage.loc
-		spaceDamage.loc = self:GetSpace()
-
-		local fx = SkillEffect()
-		fx:AddSafeDamage(spaceDamage)
-		Board:AddEffect(fx)
-
-		spaceDamage.loc = loc
-	end
-
-	BoardPawn.SetFire = function(self, fire)
-		if not Board or GetCurrentMission() == nil then
-			return
-		end
-
-		local d = SpaceDamage()
-		if fire then
-			d.iFire = EFFECT_CREATE
-		else
-			d.iFire = EFFECT_REMOVE
-		end
-
-		self:ApplyDamage(d)
-	end
-
-	BoardPawn.IsHighlighted = function(self)
-		if not Board or GetCurrentMission() == nil then
-			return
-		end
-
-		local p = Board:GetPawn(mouseTile())
-		if p then
-			return p:GetId() == self:GetId()
-		end
-
-		return false
 	end
 
 	pawn = nil

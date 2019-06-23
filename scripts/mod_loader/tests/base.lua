@@ -4,9 +4,42 @@
 Tests = {}
 
 function Tests.AssertEquals(expected, actual, msg)
-	msg = msg or ""
+	msg = (msg and msg .. ": ") or ""
 	msg = msg .. string.format("Expected %s, but was %s", tostring(expected), tostring(actual))
 	assert(expected == actual, msg)
+end
+
+function Tests.AssertBoardStateEquals(expected, actual, msg)
+	msg = (msg and msg .. ": ") or ""
+
+	for index, expectedState in ipairs(expected.tiles) do
+		local msg = msg .. p2s(expectedState.loc)
+		Tests.AssertTableEquals(expectedState, actual.tiles[index], msg)
+	end
+
+	for index, expectedState in ipairs(expected.pawns) do
+		local msg = msg .. p2s(expectedState.loc)
+		Tests.AssertTableEquals(expectedState, actual.pawns[index], msg)
+	end
+end
+
+function Tests.AssertTableEquals(expected, actual, msg)
+	local differences = {}
+	for k, v in pairs(expected) do
+		if v ~= actual[k] then
+			table.insert(differences, k)
+		end
+	end
+
+	msg = msg and (msg .. "\n") or ""
+	msg = msg .. "Table state mismatch:\n"
+	for _, k in ipairs(differences) do
+		msg = msg .. string.format("- %s: expected %s, but was %s\n", k, tostring(expected[k]), tostring(actual[k]))
+	end
+
+	if #differences > 0 then
+		error(msg)
+	end
 end
 
 function Tests.RequireBoard()
@@ -34,6 +67,24 @@ function Tests.WaitUntilBoardNotBusy(resultTable, fn)
 			end
 		end
 	)
+end
+
+function Tests.SafeRunLater(resultTable, fn)
+	Tests.AssertEquals(type(resultTable), "table", "Argument #1: ")
+	Tests.AssertEquals(type(fn), "function", "Argument #2: ")
+
+	modApi:runLater(function()
+		local ok, err = xpcall(
+			fn,
+			function(e)
+				return string.format("%s:\n%s", e, debug.traceback("", 2))
+			end
+		)
+
+		if not ok then
+			resultTable.result = err
+		end
+	end)
 end
 
 function Tests.GetTileState(loc)
@@ -102,39 +153,6 @@ function Tests.GetBoardState()
 	end
 
 	return result
-end
-
-function Tests.AssertBoardStateEquals(expected, actual, msg)
-	msg = (msg and msg .. ": ") or ""
-
-	for index, expectedState in ipairs(expected.tiles) do
-		local msg = msg .. p2s(expectedState.loc)
-		Tests.AssertTableEquals(expectedState, actual.tiles[index], msg)
-	end
-
-	for index, expectedState in ipairs(expected.pawns) do
-		local msg = msg .. p2s(expectedState.loc)
-		Tests.AssertTableEquals(expectedState, actual.pawns[index], msg)
-	end
-end
-
-function Tests.AssertTableEquals(expected, actual, msg)
-	local differences = {}
-	for k, v in pairs(expected) do
-		if v ~= actual[k] then
-			table.insert(differences, k)
-		end
-	end
-
-	msg = msg and (msg .. "\n") or ""
-	msg = msg .. "Table state mismatch:\n"
-	for _, k in ipairs(differences) do
-		msg = msg .. string.format("- %s: expected %s, but was %s\n", k, expected[k], actual[k])
-	end
-
-	if #differences > 0 then
-		error(msg)
-	end
 end
 
 

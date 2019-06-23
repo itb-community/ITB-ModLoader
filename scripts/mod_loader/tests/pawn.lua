@@ -6,8 +6,8 @@ local assertBoardStateEquals = Tests.AssertBoardStateEquals
 local requireBoard = Tests.RequireBoard
 local getTileState = Tests.GetTileState
 local getPawnState = Tests.GetPawnState
-local waitUntilBoardNotBusy = Tests.WaitUntilBoardNotBusy
 local getBoardState = Tests.GetBoardState
+local waitUntilBoardNotBusy = Tests.WaitUntilBoardNotBusy
 
 
 function pawn.test_1(resultTable)
