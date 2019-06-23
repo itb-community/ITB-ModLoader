@@ -78,6 +78,14 @@ local function overrideNextPhase()
 	end
 end
 
+local function updateCurrentMission()
+	local region = GetCurrentRegion()
+	
+	if region then
+		modApi.current_mission = GAME:GetMission(region.mission)
+	end
+end
+
 local oldStartNewGame = startNewGame
 function startNewGame()
 	Settings = modApi:loadSettings()
@@ -147,6 +155,7 @@ function LoadGame()
 
 	RestoreGameVariables(Settings)
 	overrideNextPhase()
+	updateCurrentMission()
 
 	if GAME.CustomDifficulty then
 		SetDifficulty(GAME.CustomDifficulty)
