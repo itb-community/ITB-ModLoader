@@ -9,6 +9,12 @@ function Tests.AssertEquals(expected, actual, msg)
 	assert(expected == actual, msg)
 end
 
+function Tests.AssertTypePoint(arg, msg)
+	msg = (msg and msg .. ": ") or ""
+	msg = msg .. string.format("Expected Point, but was %s", tostring(type(arg)))
+	assert(type(arg) == "userdata" and type(arg.x) == "number" and type(arg.y) == "number", msg)
+end
+
 function Tests.AssertBoardStateEquals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
 
@@ -47,8 +53,8 @@ function Tests.RequireBoard()
 end
 
 function Tests.WaitUntilBoardNotBusy(resultTable, fn)
-	Tests.AssertEquals(type(resultTable), "table", "Argument #1: ")
-	Tests.AssertEquals(type(fn), "function", "Argument #2: ")
+	Tests.AssertEquals("table", type(resultTable), "Argument #1")
+	Tests.AssertEquals("function", type(fn), "Argument #2")
 
 	modApi:conditionalHook(
 		function()
@@ -70,8 +76,8 @@ function Tests.WaitUntilBoardNotBusy(resultTable, fn)
 end
 
 function Tests.SafeRunLater(resultTable, fn)
-	Tests.AssertEquals(type(resultTable), "table", "Argument #1: ")
-	Tests.AssertEquals(type(fn), "function", "Argument #2: ")
+	Tests.AssertEquals("table", type(resultTable), "Argument #1")
+	Tests.AssertEquals("function", type(fn), "Argument #2")
 
 	modApi:runLater(function()
 		local ok, err = xpcall(
@@ -88,7 +94,7 @@ function Tests.SafeRunLater(resultTable, fn)
 end
 
 function Tests.GetTileState(loc)
-	Tests.AssertEquals(type(loc), "userdata", "Argument #1: ")
+	Tests.AssertEquals("userdata", type(loc), "Argument #1")
 
 	local state = {}
 
@@ -197,8 +203,8 @@ end
 function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
 	testsuiteName = testsuiteName or findTestsuiteName(self)
 	isSecondaryCall = isSecondaryCall or false
-	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
-	Tests.AssertEquals(type(isSecondaryCall), "boolean", "Argument #2: ")
+	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
+	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #2")
 
 	local tests = {}
 	local testsuites = {}
@@ -240,8 +246,8 @@ function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
 end
 
 function Tests.Testsuite:RunTests(tests, resultsHolder)
-	Tests.AssertEquals(type(tests), "table", "Argument #1: ")
-	Tests.AssertEquals(type(resultsHolder), "table", "Argument #2: ")
+	Tests.AssertEquals("table", type(tests), "Argument #1")
+	Tests.AssertEquals("table", type(resultsHolder), "Argument #2")
 
 	modApi:conditionalHook(
 		function()
@@ -302,8 +308,8 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 end
 
 function Tests.Testsuite:ProcessResults(testsuiteName, results)
-	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
-	Tests.AssertEquals(type(results), "table", "Argument #2: ")
+	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
+	Tests.AssertEquals("table", type(results), "Argument #2")
 
 	modApi:conditionalHook(
 		function()
@@ -332,9 +338,9 @@ function Tests.Testsuite:ProcessResults(testsuiteName, results)
 end
 
 function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, isSecondaryCall)
-	Tests.AssertEquals(type(testsuiteName), "string", "Argument #1: ")
-	Tests.AssertEquals(type(testsuites), "table", "Argument #2: ")
-	Tests.AssertEquals(type(isSecondaryCall), "boolean", "Argument #3: ")
+	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
+	Tests.AssertEquals("table", type(testsuites), "Argument #2")
+	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #3")
 
 	modApi:conditionalHook(
 		function()
