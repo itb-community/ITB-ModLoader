@@ -130,6 +130,31 @@ local function doSaveGame()
     Board:AddEffect(fx)
 end
 
+--[[
+	Reload data from the save file to obtain up-to-date
+	instances of GameData, RegionData, and SquadData
+--]]
+local function restoreGameVariables(settings)
+	-- Grab the last profile from settings. It's updated as soon
+	-- as the player switches the profile, so it should be okay.
+	local path = GetSavedataLocation()
+	settings = settings or Settings
+	local saveFile = path.."profile_"..settings.last_profile.."/saveData.lua"
+	
+	if modApi:fileExists(saveFile) then
+		-- Load the current save file
+		local env = modApi:loadIntoEnv(saveFile)
+		
+		GameData = env.GameData
+		RegionData = env.RegionData
+		SquadData = env.SquadData
+		
+		for _, hook in ipairs(modApi.saveDataUpdatedHooks) do
+			hook()
+		end
+	end
+end
+
 
 -- Compatibility
 GetSavedataLocation = getDirectory
@@ -138,4 +163,4 @@ GetPawnTable = getPawnTable
 ReadSaveData = read
 UpdateSaveData = update
 DoSaveGame = doSaveGame
-
+RestoreGameVariables = restoreGameVariables

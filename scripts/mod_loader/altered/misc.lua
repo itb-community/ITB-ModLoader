@@ -53,30 +53,6 @@ end
 -- ///////////////////////////////////////////////////////////////////
 
 --[[
-	Reload data from the save file to obtain up-to-date
-	instances of GameData, RegionData, and SquadData
---]]
-function RestoreGameVariables(settings)
-	-- Grab the last profile from settings. It's updated as soon
-	-- as the player switches the profile, so it should be okay.
-	local path = GetSavedataLocation()
-	local saveFile = path.."profile_"..settings.last_profile.."/saveData.lua"
-	
-	if modApi:fileExists(saveFile) then
-		-- Load the current save file
-		local env = modApi:loadIntoEnv(saveFile)
-		
-		GameData = env.GameData
-		RegionData = env.RegionData
-		SquadData = env.SquadData
-		
-		for _, hook in ipairs(modApi.saveDataUpdatedHooks) do
-			hook()
-		end
-	end
-end
-
---[[
 	GAME's class is GameObject, defined in game.lua
 	But that class is local to that file, so we can't access
 	it here. We have to override the function on the instance
