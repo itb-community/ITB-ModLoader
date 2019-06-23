@@ -194,14 +194,7 @@ local function addSafeDamage(damageList, spaceDamage)
                 local loc = %s
                 local emitter = Emitter_FireOut
                 Emitter_FireOut = Emitter_Blank
-
-                local d = SpaceDamage(loc)
-                d.iFire = EFFECT_REMOVE
-                local pawn = Board:GetPawn(loc)
-                pawn:SetSpace(Point(-1, -1))
-                Board:DamageSpace(d)
-                pawn:SetSpace(loc)
-
+                Board:SetFire(loc, false)
                 Emitter_FireOut = emitter
             end)
         ]], loc:GetLuaString())

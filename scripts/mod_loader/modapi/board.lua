@@ -3,6 +3,7 @@ local DequeList = require("scripts/mod_loader/deque_list")
 BoardClass = Board
 
 BoardClass.MovePawnsFromTile = function(self, loc)
+	-- In case there are multiple pawns on the same tile
 	local pawnStack = DequeList()
 	local point = Point(-1, -1)
 
