@@ -9,57 +9,72 @@ local getPawnState = Tests.GetPawnState
 local getBoardState = Tests.GetBoardState
 local waitUntilBoardNotBusy = Tests.WaitUntilBoardNotBusy
 
+-- Builder function for pawn tests, handling most of the common boilerplate
+local buildPawnTest = function(prepare, execute, check)
+	return function(resultTable)
+		requireBoard()
+		resultTable = resultTable or {}
 
-function pawn.test_1(resultTable)
+		local fenv = setmetatable({}, { __index = _G })
+		setfenv(prepare, fenv)
+		setfenv(execute, fenv)
+		setfenv(check, fenv)
+
+		-- Prepare
+		local expectedBoardState = getBoardState()
+
+		prepare()
+
+		-- Execute
+		execute()
+
+		-- Check
+		waitUntilBoardNotBusy(resultTable, function()
+			check()
+
+			assertBoardStateEquals(expectedBoardState, getBoardState(), "Tested operation had side effects")
+
+			LOG("SUCCESS")
+			resultTable.result = true
+		end)
+	end
+end
+
+
+pawn.test_1 = buildPawnTest(
 	-- The pawn should be correctly damaged
-	requireBoard()
-	resultTable = resultTable or {}
+	function()
+		pawnId = Board:SpawnPawn("PunchMech")
+		pawn = Board:GetPawn(pawnId)
+		loc = pawn:GetSpace()
 
-	-- Prepare
-	local expectedBoardState = getBoardState()
-
-	local pawnId = Board:SpawnPawn("PunchMech")
-	local pawn = Board:GetPawn(pawnId)
-	local loc = pawn:GetSpace()
-
-	local expectedHealth = pawn:GetHealth() - 1
-
-	-- Execute
-	pawn:ApplyDamage(SpaceDamage(1))
-
-	-- Check
-	waitUntilBoardNotBusy(resultTable, function()
+		expectedHealth = pawn:GetHealth() - 1
+	end,
+	function()
+		pawn:ApplyDamage(SpaceDamage(1))
+	end,
+	function()
 		local actualHealth = pawn:GetHealth()
 		Board:RemovePawn(pawn)
 
 		assertEquals(expectedHealth, actualHealth, "Pawn did not take correct amount of damage")
-		assertBoardStateEquals(expectedBoardState, getBoardState(), "Tested operation had side effects")
+	end
+)
 
-		LOG("SUCCESS")
-		resultTable.result = true
-	end)
-end
-
-function pawn.test_2(resultTable)
+pawn.test_2 = buildPawnTest(
 	-- When standing on a forest and receiving safe damage, the pawn should not be set on fire
-	requireBoard()
-	resultTable = resultTable or {}
-
-	-- Prepare
-	local expectedBoardState = getBoardState()
-
-	local pawnId = Board:SpawnPawn("PunchMech")
-	local pawn = Board:GetPawn(pawnId)
-	local loc = pawn:GetSpace()
-
-	local terrain = Board:GetTerrain(loc)
-	Board:SetTerrain(loc, TERRAIN_FOREST)
-
-	-- Execute
-	pawn:ApplyDamage(SpaceDamage(1))
-
-	-- Check
-	waitUntilBoardNotBusy(resultTable, function()
+	function()
+		pawnId = Board:SpawnPawn("PunchMech")
+		pawn = Board:GetPawn(pawnId)
+		loc = pawn:GetSpace()
+	
+		terrain = Board:GetTerrain(loc)
+		Board:SetTerrain(loc, TERRAIN_FOREST)
+	end,
+	function()
+		pawn:ApplyDamage(SpaceDamage(1))
+	end,
+	function()
 		local actualFire = pawn:IsFire()
 		local actualTerrain = Board:GetTerrain(loc)
 		Board:SetTerrain(loc, terrain)
@@ -67,65 +82,45 @@ function pawn.test_2(resultTable)
 
 		assertEquals(false, actualFire, "Pawn had been set on fire")
 		assertEquals(TERRAIN_FOREST, actualTerrain, "Terrain type has been changed")
-		assertBoardStateEquals(expectedBoardState, getBoardState(), "Tested operation had side effects")
-		
-		LOG("SUCCESS")
-		resultTable.result = true
-	end)
-end
+	end
+)
 
-function pawn.test_3(resultTable)
+pawn.test_3 = buildPawnTest(
 	-- Setting a pawn on fire using SetFire(true) should set the pawn on fire, but leave the board unaffected
-	requireBoard()
-	resultTable = resultTable or {}
-
-	-- Prepare
-	local expectedBoardState = getBoardState()
-
-	local pawnId = Board:SpawnPawn("PunchMech")
-	local pawn = Board:GetPawn(pawnId)
-	local loc = pawn:GetSpace()
-	-- Set the terrain to road, in case the pawn spawns on a forest
-	-- Since the pawn is set on fire, the forest catches fire as well on next game tick, causing the test to fail
-	local terrain = Board:GetTerrain(loc)
-	Board:SetTerrain(loc, TERRAIN_ROAD)
-	
-	-- Execute
-	pawn:SetFire(true)
-
-	-- Check
-	waitUntilBoardNotBusy(resultTable, function()
+	function()
+		pawnId = Board:SpawnPawn("PunchMech")
+		pawn = Board:GetPawn(pawnId)
+		loc = pawn:GetSpace()
+		-- Set the terrain to road, in case the pawn spawns on a forest
+		-- Since the pawn is set on fire, the forest catches fire as well on next game tick, causing the test to fail
+		terrain = Board:GetTerrain(loc)
+		Board:SetTerrain(loc, TERRAIN_ROAD)
+	end,
+	function()
+		pawn:SetFire(true)
+	end,
+	function()
 		local actualFire = pawn:IsFire()
 		Board:RemovePawn(pawn)
 		Board:SetTerrain(loc, terrain)
 
 		assertEquals(true, actualFire, "Pawn had not been set on fire")
-		assertBoardStateEquals(expectedBoardState, getBoardState(), "Tested operation had side effects")
-		
-		LOG("SUCCESS")
-		resultTable.result = true
-	end)
-end
+	end
+)
 
-function pawn.test_4(resultTable)
+pawn.test_4 = buildPawnTest(
 	-- Attempting to extinguish a pawn on fire while it is standing on a fire tile should have no effect
-	requireBoard()
-	resultTable = resultTable or {}
-
-	-- Prepare
-	local expectedBoardState = getBoardState()
-
-	local pawnId = Board:SpawnPawn("PunchMech")
-	local pawn = Board:GetPawn(pawnId)
-	local loc = pawn:GetSpace()
-	local terrain = Board:GetTerrain(loc)
-	Board:SetFire(loc, true)
-	
-	-- Execute
-	pawn:SetFire(false)
-
-	-- Check
-	waitUntilBoardNotBusy(resultTable, function()
+	function()
+		pawnId = Board:SpawnPawn("PunchMech")
+		pawn = Board:GetPawn(pawnId)
+		loc = pawn:GetSpace()
+		terrain = Board:GetTerrain(loc)
+		Board:SetFire(loc, true)
+	end,
+	function()
+		pawn:SetFire(false)
+	end,
+	function()
 		local actualPawnFire = pawn:IsFire()
 		local actualBoardFire = Board:IsFire(loc)
 		Board:RemovePawn(pawn)
@@ -134,12 +129,7 @@ function pawn.test_4(resultTable)
 
 		assertEquals(true, actualPawnFire, "Pawn had been extinguished")
 		assertEquals(true, actualBoardFire, "Board had been extinguished")
-		assertBoardStateEquals(expectedBoardState, getBoardState(), "Tested operation had side effects")
-		
-		LOG("SUCCESS")
-		resultTable.result = true
-	end)
-end
-
+	end
+)
 
 Testsuites.pawn = pawn
