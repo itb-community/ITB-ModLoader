@@ -122,7 +122,7 @@ local function doSaveGame()
         error("Game can only be told to save while in a mission")
     end
 
-    local pawn = Board:GetPawn(0)
+	local pawn = Board:GetPawn(Board:GetAnotherPlayerPawn(-1, -1))
 
     local fx = SkillEffect()
     fx:AddDamage(SpaceDamage(pawn:GetSpace(), DAMAGE_ZERO))
