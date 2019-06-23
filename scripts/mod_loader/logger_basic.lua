@@ -80,7 +80,17 @@ end
 
 function BasicLoggerImpl:preprocessInput(...)
 	for i = 1, #arg do
-		arg[i] = tostring(arg[i])
+		local a = arg[i]
+		
+		if type(a) == "userdata" then
+			if type(a.GetLuaString) == "function" then
+				a = a:GetLuaString()
+			elseif type(a.GetString) == "function" then
+				a = a:GetString()
+			end
+		end
+
+		arg[i] = tostring(a)
 	end
 
 	local message = table.concat(arg, " ")
