@@ -48,7 +48,7 @@ function GetCurrentMission()
 		return Mission_Test
 	end
 
-	return modApi.current_mission
+	return Board and Board.mission
 end
 
 function list_indexof(list, value)
