@@ -53,9 +53,9 @@ end
 BoardClass.GetString = BoardClass.GetLuaString
 	
 BoardClass.IsMissionBoard = function(self)
-	return Board.isMission == true
+	return Board.mission ~= nil
 end
 
 BoardClass.IsTipImage = function(self)
-	return Board.isMission == nil
+	return Board.mission == nil
 end
