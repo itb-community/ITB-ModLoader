@@ -56,6 +56,7 @@ end
 
 local oldBaseUpdate = Mission.BaseUpdate
 function Mission:BaseUpdate()
+	Board.isMission = true
 	modApi.current_mission = self
 	modApi:processRunLaterQueue(self)
 
@@ -196,6 +197,7 @@ function Mission:BaseStart(suppressHooks)
 		end
 	end
 
+	Board.isMission = true
 	self.Board = Board
 	self.QueuedSpawns = {}
 

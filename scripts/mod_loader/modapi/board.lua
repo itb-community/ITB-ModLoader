@@ -52,13 +52,10 @@ BoardClass.GetLuaString = function(self)
 end
 BoardClass.GetString = BoardClass.GetLuaString
 	
-BoardClass.IsMissionBoard = function(self, mission)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+BoardClass.IsMissionBoard = function(self)
+	return Board.isMission == true
+end
 
-	mission = mission or GetCurrentMission()
-	if not mission then
-		return false
-	end
-
-	return mission.Board == self
+BoardClass.IsTipImage = function(self)
+	return Board.isMission == nil
 end
