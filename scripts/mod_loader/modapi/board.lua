@@ -51,14 +51,15 @@ BoardClass.GetLuaString = function(self)
 	return string.format("Board [width = %s, height = %s]", size.x, size.y)
 end
 BoardClass.GetString = BoardClass.GetLuaString
-	
-BoardClass.IsMissionBoard = function(self, mission)
+
+BoardClass.IsMissionBoard = function(self)
 	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	
+	return self.isMission == true
+end
 
-	mission = mission or GetCurrentMission()
-	if not mission then
-		return false
-	end
-
-	return mission.Board == self
+BoardClass.IsTipImage = function(self)
+	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	
+	return self.isMission == nil
 end

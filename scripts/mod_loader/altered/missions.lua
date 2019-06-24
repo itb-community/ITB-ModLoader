@@ -56,6 +56,8 @@ end
 
 local oldBaseUpdate = Mission.BaseUpdate
 function Mission:BaseUpdate()
+	Board.isMission = true
+	modApi.current_mission = self
 	modApi:processRunLaterQueue(self)
 
 	oldBaseUpdate(self)
@@ -196,6 +198,7 @@ function Mission:BaseStart(suppressHooks)
 		end
 	end
 
+	Board.isMission = true
 	self.Board = Board
 	self.QueuedSpawns = {}
 
@@ -280,6 +283,7 @@ end
 -- ////////////////////////////////////////////////////////////////////
 
 function Mission_Test:BaseStart()
+	Board.isMission = true
 	Mission.BaseStart(self, true)
 
 	for i, hook in ipairs(modApi.testMechEnteredHooks) do
