@@ -56,7 +56,6 @@ end
 
 local oldBaseUpdate = Mission.BaseUpdate
 function Mission:BaseUpdate()
-	modApi.current_mission = self
 	modApi:processRunLaterQueue(self)
 
 	oldBaseUpdate(self)
@@ -179,6 +178,7 @@ function Mission:MissionEnd()
 
 	Board:AddEffect(fx)
 	self.Board = nil
+	modApi.current_mission = nil
 end
 
 function Mission:SetupDifficulty()
@@ -296,8 +296,6 @@ function Mission_Test:MissionEnd()
 	for i, hook in ipairs(modApi.testMechExitedHooks) do
 		hook(self)
 	end
-	
-	modApi.current_mission = nil
 end
 
 sdlext.addGameExitedHook(function()
