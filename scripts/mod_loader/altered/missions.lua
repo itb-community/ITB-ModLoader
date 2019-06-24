@@ -30,9 +30,7 @@ function Mission:UpdateQueuedSpawns()
 	for i = #removed, 1, -1 do
 		local spawn = removed[i]
 
-		for _, hook in ipairs(modApi.vekSpawnRemovedHooks) do
-			hook(self, spawn)
-		end
+		modApi:fireVekSpawnRemovedHooks(self, spawn)
 	end
 end
 
@@ -49,9 +47,7 @@ function Mission:BaseNextTurn()
 		end
 	end
 
-	for i, hook in ipairs(modApi.nextTurnHooks) do
-		hook(self)
-	end
+	modApi:fireNextTurnHooks(self)
 end
 
 local oldBaseUpdate = Mission.BaseUpdate
@@ -66,9 +62,7 @@ function Mission:BaseUpdate()
 		self:UpdateQueuedSpawns()
 	end
 
-	for i, hook in ipairs(modApi.missionUpdateHooks) do
-		hook(self)
-	end
+	modApi:fireMissionUpdateHooks(self)
 end
 
 local oldBaseDeployment = Mission.BaseDeployment
@@ -77,9 +71,7 @@ function Mission:BaseDeployment()
 	oldBaseDeployment(self)
 	self.Board = Board
 
-	for i, hook in ipairs(modApi.missionStartHooks) do
-		hook(self)
-	end	
+	modApi:fireMissionStartHooks(self)
 end
 
 local function overrideMissionEnd(self)
@@ -137,9 +129,7 @@ function Mission:MissionEndImpl()
 	effect.bEvacuate = true
 	effect.fDelay = 0.5
 
-	for i, hook in ipairs(modApi.preprocessVekRetreatHooks) do
-		hook(self, ret)
-	end
+	modApi:firePreprocessVekRetreatHooks(self, ret)
 	
 	local retreated = 0
 	local board_size = Board:GetSize()
@@ -147,9 +137,7 @@ function Mission:MissionEndImpl()
 		for y = 0, board_size.y - 1  do
 			local p = Point(x, y)
 			if Board:IsPawnTeam(p,TEAM_ENEMY) then
-				for i, hook in ipairs(modApi.processVekRetreatHooks) do
-					hook(self, ret, Board:GetPawn(p))
-				end
+				modApi:fireProcessVekRetreatHooks(self, ret, Board:GetPawn(p))
 
 				effect.loc = p
 				ret:AddDamage(effect)
@@ -158,9 +146,7 @@ function Mission:MissionEndImpl()
 		end
 	end
 
-	for i, hook in ipairs(modApi.postprocessVekRetreatHooks) do
-		hook(self, ret)
-	end
+	modApi:firePostprocessVekRetreatHooks(self, ret)
 	
 	ret:AddDelay(math.max(0,4 - retreated * 0.5))
 		
@@ -172,9 +158,7 @@ function Mission:MissionEnd()
 
 	self:MissionEndImpl()
 
-	for i, hook in ipairs(modApi.missionEndHooks) do
-		hook(self, fx)
-	end
+	modApi:fireMissionEndHooks(self, fx)
 	modApi.runLaterQueue = {}
 
 	Board:AddEffect(fx)
@@ -191,9 +175,7 @@ function Mission:BaseStart(suppressHooks)
 	suppressHooks = suppressHooks or false
 
 	if not suppressHooks then
-		for i, hook in ipairs(modApi.preMissionAvailableHooks) do
-			hook(self)
-		end
+		modApi:firePreMissionAvailableHooks(self)
 	end
 
 	self.Board = Board
@@ -224,9 +206,7 @@ function Mission:BaseStart(suppressHooks)
 	self.QueuedSpawns = {}
 
 	if not suppressHooks then
-		for i, hook in ipairs(modApi.postMissionAvailableHooks) do
-			hook(self)
-		end
+		modApi:firePostMissionAvailableHooks(self)
 	end
 
 	self.Initialized = true
@@ -236,9 +216,7 @@ local modLoaderHooksFired = false
 local oldApplyEnvironmentEffect = Mission.ApplyEnvironmentEffect
 function Mission:ApplyEnvironmentEffect()
 	if not modLoaderHooksFired then
-		for _, hook in ipairs(modApi.preEnvironmentHooks) do
-			hook(self)
-		end
+		modApi:firePreEnvironmentHooks(self)
 	end
 	
 	-- ApplyEnvironmentEffect() is supposed to return true once
@@ -261,9 +239,7 @@ function Mission:ApplyEnvironmentEffect()
 					return
 				end
 				
-				for _, hook in ipairs(modApi.postEnvironmentHooks) do
-					hook(self)
-				end
+				modApi:firePostEnvironmentHooks(self)
 			end
 		)
 		
@@ -282,9 +258,7 @@ end
 function Mission_Test:BaseStart()
 	Mission.BaseStart(self, true)
 
-	for i, hook in ipairs(modApi.testMechEnteredHooks) do
-		hook(self)
-	end
+	modApi:fireTestMechEnteredHooks(self)
 end
 
 -- MissionEnd is not actually called when exiting test mech scenario;
@@ -293,9 +267,7 @@ function Mission_Test:MissionEnd()
 	-- DON'T call the default MissionEnd
 	-- Mission.MissionEnd(self)
 
-	for i, hook in ipairs(modApi.testMechExitedHooks) do
-		hook(self)
-	end
+	modApi:fireTestMechExitedHooks(self)
 	
 	modApi.current_mission = nil
 end
