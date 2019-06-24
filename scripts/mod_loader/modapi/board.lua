@@ -44,6 +44,16 @@ BoardClass.SetFire = function(self, loc, fire)
 	self:RestorePawnsToTile(loc, pawnStack)
 end
 
+BoardClass.SetShield = function(self, loc, shield)
+	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Tests.AssertTypePoint(loc, "Argument #1")
+	Tests.AssertEquals("boolean", type(shield), "Argument #2")
+
+	local dmg = SpaceDamage(loc)
+	dmg.iShield = shield and EFFECT_CREATE or EFFECT_REMOVE
+	self:DamageSpace(dmg)
+end
+
 BoardClass.GetLuaString = function(self)
 	Tests.AssertEquals("userdata", type(self), "Argument #0")
 	
