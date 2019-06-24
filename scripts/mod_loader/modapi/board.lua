@@ -63,3 +63,24 @@ BoardClass.IsTipImage = function(self)
 	
 	return self.isMission == nil
 end
+
+BoardClass.GetHighlighted = function(self)
+	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	
+	if GetCurrentMission() == nil then
+		return
+	end
+	
+	return mouseTile()
+end
+
+BoardClass.IsHighlighted = function(self, loc)
+	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Tests.AssertEquals("userdata", type(loc), "Argument #1")
+	
+	if GetCurrentMission() == nil then
+		return
+	end
+	
+	return loc == mouseTile()
+end
