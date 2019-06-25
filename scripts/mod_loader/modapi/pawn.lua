@@ -123,6 +123,31 @@ BoardPawn.IsArmor = function(self)
 	return pilot or mech or mutation
 end
 
+BoardPawn.IsIgnoreWeb = function(self)
+	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	
+	return self:IsAbility("Disable_Immunity")
+end
+
+BoardPawn.IsIgnoreSmoke = function(self)
+	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	
+	local pilot = self:IsAbility("Disable_Immunity")
+	local unit = _G[self:GetType()].IgnoreSmoke
+	
+	return pilot or unit
+end
+
+BoardPawn.IsIgnoreFire = function(self)
+	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	
+	local passive = self:IsMech() and IsPassiveSkill("Flame_Immune")
+	local pilot = self:IsAbility("Rock_Skill")
+	local unit = _G[self:GetType()].IgnoreFire
+	
+	return passive or pilot or unit
+end
+
 BoardPawn.GetQueued = function(self)
 	Tests.AssertEquals("userdata", type(self), "Argument #0")
 

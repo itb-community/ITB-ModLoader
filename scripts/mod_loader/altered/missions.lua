@@ -52,6 +52,7 @@ end
 
 local oldBaseUpdate = Mission.BaseUpdate
 function Mission:BaseUpdate()
+	Board.isMission = true
 	modApi.current_mission = self
 	modApi:processRunLaterQueue(self)
 
@@ -163,6 +164,7 @@ function Mission:MissionEnd()
 
 	Board:AddEffect(fx)
 	self.Board = nil
+	modApi.current_mission = nil
 end
 
 function Mission:SetupDifficulty()
@@ -178,6 +180,7 @@ function Mission:BaseStart(suppressHooks)
 		modApi:firePreMissionAvailableHooks(self)
 	end
 
+	Board.isMission = true
 	self.Board = Board
 	self.QueuedSpawns = {}
 
@@ -256,6 +259,7 @@ end
 -- ////////////////////////////////////////////////////////////////////
 
 function Mission_Test:BaseStart()
+	Board.isMission = true
 	Mission.BaseStart(self, true)
 
 	modApi:fireTestMechEnteredHooks(self)
