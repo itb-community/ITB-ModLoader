@@ -86,7 +86,7 @@ end
 
 BoardClass.IsHighlighted = function(self, loc)
 	Tests.AssertEquals("userdata", type(self), "Argument #0")
-	Tests.AssertEquals("userdata", type(loc), "Argument #1")
+	Tests.AssertTypePoint(loc, "Argument #1")
 	
 	if GetCurrentMission() == nil then
 		return
