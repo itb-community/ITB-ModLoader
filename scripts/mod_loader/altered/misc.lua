@@ -39,15 +39,11 @@ end
 
 local oldCreateIncidents = createIncidents
 function createIncidents(corporation, island)
-	for i, hook in ipairs(modApi.preIslandSelectionHooks) do
-		hook(corporation, island)
-	end
+	modApi:firePreIslandSelectionHooks(corporation, island)
 
 	oldCreateIncidents(corporation, island)
 
-	for i, hook in ipairs(modApi.postIslandSelectionHooks) do
-		hook(corporation, island)
-	end
+	modApi:firePostIslandSelectionHooks(corporation, island)
 end
 
 -- ///////////////////////////////////////////////////////////////////
@@ -71,9 +67,7 @@ local function overrideNextPhase()
 			local nextMission = _G[nxtId]
 			nextMission.ID = nxtId
 
-			for i, hook in ipairs(modApi.missionNextPhaseCreatedHooks) do
-				hook(prevMission, nextMission)
-			end
+			modApi:fireMissionNextPhaseCreatedHooks(prevMission, nextMission)
 		end
 	end
 end
@@ -97,9 +91,7 @@ function startNewGame()
 	local modOptions = mod_loader:getCurrentModContent()
 	local savedOrder = mod_loader:getCurrentModOrder()
 
-	for i, hook in ipairs(modApi.preStartGameHooks) do
-		hook()
-	end
+	modApi:firePreStartGameHooks()
 
 	oldStartNewGame()
 
@@ -124,9 +116,7 @@ function startNewGame()
 		RestoreGameVariables(Settings)
 		-- Execute hook in the deferred callback, since we want
 		-- postStartGameHook to have access to the savegame data
-		for i, hook in ipairs(modApi.postStartGameHooks) do
-			hook()
-		end
+		modApi:firePostStartGameHooks()
 	end)
 end
 
@@ -145,9 +135,7 @@ function LoadGame()
 		end
 	end
 
-	for i, hook in ipairs(modApi.preLoadGameHooks) do
-		hook()
-	end
+	modApi:firePreLoadGameHooks()
 
 	GAME.CreateNextPhase = nil
 
@@ -161,9 +149,7 @@ function LoadGame()
 		SetDifficulty(GAME.CustomDifficulty)
 	end
 
-	for i, hook in ipairs(modApi.postLoadGameHooks) do
-		hook()
-	end
+	modApi:firePostLoadGameHooks()
 	
 	modApi:runLater(function(mission)
 		mission.Board = Board
@@ -172,9 +158,7 @@ end
 
 local oldSaveGame = SaveGame
 function SaveGame()
-	for i, hook in ipairs(modApi.saveGameHooks) do
-		hook()
-	end
+	modApi:fireSaveGameHooks()
 
 	if Game and GameData then
 		-- Reload the save, since sometimes the savefile

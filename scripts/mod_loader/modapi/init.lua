@@ -287,32 +287,7 @@ function modApi:resetModContent()
 
 	self.conditionalHooks = {}
 	self.scheduledHooks = {}
-	self.nextTurnHooks = {}
-	self.missionUpdateHooks = {}
-	self.missionStartHooks = {}
-	self.missionNextPhaseCreatedHooks = {}
-	self.preMissionAvailableHooks = {}
-	self.postMissionAvailableHooks = {}
-	self.preEnvironmentHooks = {}
-	self.postEnvironmentHooks = {}
-	self.preStartGameHooks = {}
-	self.postStartGameHooks = {}
-	self.preLoadGameHooks = {}
-	self.postLoadGameHooks = {}
-	self.saveGameHooks = {}
-	self.voiceEventHooks = {}
-	self.preIslandSelectionHooks = {}
-	self.postIslandSelectionHooks = {}
-	self.missionEndHooks = {}
-	self.vekSpawnAddedHooks = {}
-	self.vekSpawnRemovedHooks = {}
-	self.preprocessVekRetreatHooks = {}
-	self.processVekRetreatHooks = {}
-	self.postprocessVekRetreatHooks = {}
-	self.modsLoadedHooks = {}
-	self.testMechEnteredHooks = {}
-	self.testMechExitedHooks = {}
-	self.saveDataUpdatedHooks = {}
+	self:ResetHooks()
 
 	local name, tbl = debug.getupvalue(oldGetPopulationTexts,1)
 	self.PopEvents = copy_table(tbl)
