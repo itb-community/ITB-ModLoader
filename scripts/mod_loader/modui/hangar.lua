@@ -141,15 +141,16 @@ local function overrideGetImages()
 				oldGetImages[k] = defaultGetImage
 			end
 
-			v.GetImage = function(self)
+			v.GetImage = function(self, parent)
 				if
+					not parent                and
 					IsHangarWindowlessState() and
 					#fetchedMechs < 3
 				then
 					table.insert(fetchedMechs, k)
 				end
 
-				return oldGetImages[k](self)
+				return oldGetImages[k](self, true)
 			end
 		end
 	end
