@@ -18,43 +18,46 @@ end
 -- Tweak existing code to work with custom difficulty levels
 -- Replacing instances of GetDifficulty() with GetRealDifficulty()
 
-local functions = {
-	{"Mission_Final", "StartMission"},
-	{"getEnvironmentChance"},
-	{"Mission_SpiderBoss", "SpawnSpiderlings"},
-	{"Mission", "GetKillBonus"},
-	{"Mission", "GetStartingPawns"},
-	{"Mission", "GetSpawnsPerTurn"},
-	{"Mission", "GetMaxEnemy"},
-	{"Mission", "GetSpawnCount"}
+local functionsToReplace = {
+    _G = { "getEnvironmentChance" },
+    Mission_Final = { "StartMission" },
+    Mission_SpiderBoss = { "SpawnSpiderlings" },
+    Mission = {
+        "GetKillBonus",
+        "GetStartingPawns",
+        "GetSpawnsPerTurn",
+        "GetMaxEnemy",
+        "GetSpawnCount"
+    }
 }
 
-for _, v in ipairs(functions) do
-	local fn = _G
-	local key = nil
-	
-	for _, tbl in ipairs(v) do
-		if type(fn[tbl]) == 'function' then
-			key = tbl
-			break
-		elseif type(fn[tbl]) == 'table' then
-			fn = fn[tbl]
-		else
-			break
-		end
-	end
-	
-	if key ~= nil then
-		local oldFn = fn[key]
-		fn[key] = function(...)
-			local oldGetDiff = GetDifficulty
-			GetDifficulty = GetRealDifficulty
-			
-			local ret = oldFn(...)
-			
-			GetDifficulty = oldGetDiff
-			
-			return ret
-		end
-	end
+local function buildReplacementFunction(sourceFn)
+    return function(...)
+        local oldGetDiff = GetDifficulty
+
+        -- Only replace if we need to, to account for
+        -- nested function calls
+        if GetDifficulty ~= GetRealDifficulty then
+            GetDifficulty = GetRealDifficulty
+        end
+
+        local result = sourceFn(...)
+
+        if GetDifficulty == GetRealDifficulty then
+            GetDifficulty = oldGetDiff
+        end
+
+        return result
+    end
+end
+
+for tableName, functionList in pairs(functionsToReplace) do
+    local tbl = _G[tableName]
+
+    for _, functionName in ipairs(functionList) do
+        local fn = tbl[functionName]
+        if type(fn) == "function" then
+            tbl[functionName] = buildReplacementFunction(fn)
+        end
+    end
 end
