@@ -130,9 +130,10 @@ end
 
 local function overrideGetImages()
 	pawns = {}
-
+	local wasPrimaryCallExecuted = false
+	
 	for k, v in pairs(_G) do
-		if type(v) == "table" and v.Health and v.Image then
+		if type(v) == "table" and v ~= PawnTable and v.Health and v.Image then
 			table.insert(pawns, k)
 
 			if v.GetImage then
@@ -142,14 +143,25 @@ local function overrideGetImages()
 			end
 
 			v.GetImage = function(self)
+				local isPrimaryCall = not wasPrimaryCallExecuted
+
 				if
+					isPrimaryCall             and
 					IsHangarWindowlessState() and
 					#fetchedMechs < 3
 				then
 					table.insert(fetchedMechs, k)
 				end
 
-				return oldGetImages[k](self)
+				if isPrimaryCall then
+					wasPrimaryCallExecuted = true
+				end
+				local result = oldGetImages[k](self)
+				if isPrimaryCall then
+					wasPrimaryCallExecuted = false
+				end
+
+				return result
 			end
 		end
 	end
