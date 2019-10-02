@@ -113,6 +113,10 @@ local function overrideProjectileOrArtillery(funcName, oldFunc)
     assert(metadataType == "projectile" or metadataType == "artillery", "This function only works for projectile or artillery weapons")
 
     SkillEffect[funcName] = function(self, damageInstance, projectileArt, delay, ...)
+		if type(damageInstance) ~= 'userdata' then
+			damageInstance = {}
+		end
+		
         if not delay and damageInstance.loc then
             delay = PROJ_DELAY
         end

@@ -128,8 +128,19 @@ local function defaultGetImage(self)
 	return self.Image
 end
 
-local function overrideGetImages()
+local function restoreGetImages()
+	for _, id in ipairs(pawns) do
+		_G[id].GetImage = oldGetImages[id]
+	end
+	
 	pawns = {}
+end
+
+local function overrideGetImages()
+	if #pawns ~= 0 then
+		restoreGetImages()
+	end
+	
 	local wasPrimaryCallExecuted = false
 	
 	for k, v in pairs(_G) do
@@ -164,12 +175,6 @@ local function overrideGetImages()
 				return result
 			end
 		end
-	end
-end
-
-local function restoreGetImages()
-	for _, id in ipairs(pawns) do
-		_G[id].GetImage = oldGetImages[id]
 	end
 end
 
