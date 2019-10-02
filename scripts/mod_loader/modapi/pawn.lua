@@ -16,6 +16,16 @@ local function setSavefileFieldsForPawn(pawn, keyValuesTable)
 	end)
 end
 
+BoardPawn.GetPawnTable = function(self)
+	local region = GetCurrentRegion(RegionData)
+	
+	if region == nil then
+		return {}
+	end
+	
+	return GetPawnTable(self:GetId(), region.player.map_data) or {}
+end
+
 BoardPawn.ClearUndoMove = function(self)
 	Tests.AssertEquals("userdata", type(self), "Argument #0")
 
@@ -56,10 +66,8 @@ BoardPawn.IsNeutral = function(self)
 	if not Board or GetCurrentMission() == nil then
 		return
 	end
-
-	local region = GetCurrentRegion(RegionData)
-	local ptable = GetPawnTable(self:GetId(), region.player.map_data)
 	
+	local ptable = self:GetPawnTable()
 	local neutral = ptable.bNeutral
 
 	if neutral == nil then
@@ -78,10 +86,8 @@ BoardPawn.IsPowered = function(self)
 	if not Board or GetCurrentMission() == nil then
 		return
 	end
-
-	local region = GetCurrentRegion(RegionData)
-	local ptable = GetPawnTable(self:GetId(), region.player.map_data)
-
+	
+	local ptable = self:GetPawnTable()
 	local powered = ptable.bPowered
 
 	if powered == nil then
@@ -98,8 +104,7 @@ BoardPawn.GetMutation = function(self)
 		return
 	end
 	
-	local region = GetCurrentRegion(RegionData)
-	local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+	local ptable = self:GetPawnTable()
 	
 	return ptable.iMutation
 end
@@ -155,8 +160,7 @@ BoardPawn.GetQueued = function(self)
 		return
 	end
 	
-	local region = GetCurrentRegion(RegionData)
-	local ptable = GetPawnTable(self:GetId(), region.player.map_data)
+	local ptable = self:GetPawnTable()
 	
 	if ptable.iQueuedSkill == -1 then
 		return
@@ -175,7 +179,7 @@ BoardPawn.IsQueued = function(self)
 
 	local queued = self:GetQueued()
 	
-	if queued == nil then
+	if queued == nil or queued.piQueuedShot == nil then
 		return false
 	end
 	
@@ -221,7 +225,7 @@ end
 BoardPawn.IsHighlighted = function(self)
 	Tests.AssertEquals("userdata", type(self), "Argument #0")
 
-	if not Board or GetCurrentMission() == nil then
+	if not Board or GetCurrentMission() == nil or not mouseTile() then
 		return
 	end
 
