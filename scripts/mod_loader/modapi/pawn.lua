@@ -225,11 +225,12 @@ end
 BoardPawn.IsHighlighted = function(self)
 	Tests.AssertEquals("userdata", type(self), "Argument #0")
 
-	if not Board or GetCurrentMission() == nil or not mouseTile() then
+	if not Board or GetCurrentMission() == nil then
 		return
 	end
 
-	local p = Board:GetPawn(mouseTile())
+	local loc = mouseTile()
+	local p = loc and Board:GetPawn(loc)
 	if p then
 		return p:GetId() == self:GetId()
 	end
