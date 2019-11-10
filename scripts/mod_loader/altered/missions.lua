@@ -154,17 +154,29 @@ function Mission:MissionEndImpl()
 	Board:AddEffect(ret)
 end
 
+function BuildIsBoardBusyPredicate(board)
+	return function()
+		return not Game or not GAME or (board and not board:IsBusy())
+	end
+end
+
 function Mission:MissionEnd()
-	local fx = SkillEffect()
-
 	self:MissionEndImpl()
-
+	
+	local fx = SkillEffect()
 	modApi:fireMissionEndHooks(self, fx)
-	modApi.runLaterQueue = {}
-
+	fx:AddScript([[
+		modApi.runLaterQueue = {}
+		
+		modApi:conditionalHook(
+			BuildIsBoardBusyPredicate(modApi.current_mission.Board),
+			function()
+				modApi.current_mission.Board = nil
+				modApi.current_mission = nil
+			end
+		)
+	]])
 	Board:AddEffect(fx)
-	self.Board = nil
-	modApi.current_mission = nil
 end
 
 function Mission:SetupDifficulty()
@@ -233,9 +245,7 @@ function Mission:ApplyEnvironmentEffect()
 	if not modLoaderHooksFired then
 		-- Schedule the post hooks to fire once the board is no longer busy
 		modApi:conditionalHook(
-			function()
-				return not Game or not GAME or (Board and not Board:IsBusy())
-			end,
+			BuildIsBoardBusyPredicate(Board),
 			function()
 				modLoaderHooksFired = false
 				if not Game or not GAME or not Board then

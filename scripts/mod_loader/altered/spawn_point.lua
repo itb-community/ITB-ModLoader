@@ -4,6 +4,7 @@
 --]]
 function Mission:EnumerateSpawns()
 	local result = {}
+
 	local size = self.Board:GetSize()
 	for y = 0, size.y - 1 do
 		for x = 0, size.x - 1 do
