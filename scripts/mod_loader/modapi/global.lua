@@ -85,3 +85,94 @@ Emitter_Blank = Emitter:new({
     lifespan = 0,
     max_particles = 0
 })
+
+
+---------------------------------------------------------------
+-- Screenpoint to tile conversion
+
+GetUiScale = function() return 1 end
+
+--[[
+	Returns currently highlighted board tile, or nil.
+--]]
+function mouseTile()
+	-- Use custom table instead of the existing Point class, since Point
+	-- can only hold integer values and automatically rounds them.
+	return screenPointToTile({ x = sdl.mouse.x(), y = sdl.mouse.y() })
+end
+
+function getScreenRefs(screen, scale)
+	scale = scale or GetBoardScale()
+	local uiScale = GetUiScale()
+
+	local tw = 28 * uiScale
+	local th = 21 * uiScale
+
+	-- Top corner of the (0, 0) tile
+	local tile00 = {
+		x = screen:w() / 2,
+		y = screen:h() / 2 - 8 * th * scale
+	}
+
+	if scale == 2 then
+		tile00.y = tile00.y + 5 * scale * uiScale + 0.5
+	end
+
+	local lineX = function(x) return x * th/tw end
+	local lineY = function(x) return -lineX(x) end
+
+	return tile00, lineX, lineY, tw, th
+end
+
+local function isPointAboveLine(point, lineFn)
+	return point.y >= lineFn(point.x)
+end
+
+local function tileContains(tilex, tiley, tilew, tileh, point)
+	local np = {
+		x = point.x - tilew * (tilex - tiley),
+		y = point.y - tileh * (tilex + tiley)
+	}
+	return isPointAboveLine(np, lineX)
+		and isPointAboveLine(np, lineY)
+end
+
+--[[
+	Returns a board tile at the specified point on the screen, or nil.
+--]]
+function screenPointToTile(screenPoint)
+	if not Board then return nil end
+
+	local screen = sdl.screen()
+	local scale = GetBoardScale()
+	local uiScale = GetUiScale()
+
+	local tile00, lineX, lineY, tw, th = getScreenRefs(screen, scale)
+
+	-- Change screenPoint to be relative to the (0, 0) tile
+	-- and move to unscaled space.
+	local relPoint = {}
+	relPoint.x = (screenPoint.x - tile00.x) / scale
+	relPoint.y = (screenPoint.y - tile00.y) / scale
+
+	-- Start at the end of the board and move backwards.
+	-- That way we only need to check 2 lines instead of 4 on each tile.
+	-- The tradeoff is that we need to check an additional row and column
+	-- of tiles outside of the board.
+	local bsize = Board:GetSize()
+	for tileY = bsize.y, 0, -1 do
+		for tileX = bsize.x, 0, -1 do
+			if tileContains(tileX, tileY, tw, th, relPoint) then
+				if tileY == bsize.y or tileX == bsize.x then
+					-- outside of the board
+					return nil
+				end
+				
+				return Point(tileX, tileY)
+			end
+		end
+	end
+
+	return nil
+end
+
