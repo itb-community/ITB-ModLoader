@@ -124,23 +124,52 @@ function getScreenRefs(screen, scale)
 	return tile00, lineX, lineY, tw, th
 end
 
+local function computeTile(tilex, tiley, tilew, tileh, sourcePointBoardSpace)
+	return {
+		x = sourcePointBoardSpace.x - tilew * (tilex - tiley),
+		y = sourcePointBoardSpace.y - tileh * (tilex + tiley)
+	}
+end
+
 local function isPointAboveLine(point, lineFn)
 	return point.y >= lineFn(point.x)
 end
 
-local function tileContains(tilex, tiley, tilew, tileh, lineX, lineY, point)
-	local np = {
-		x = point.x - tilew * (tilex - tiley),
-		y = point.y - tileh * (tilex + tiley)
+local function tileContains(tile, lineX, lineY)
+	return isPointAboveLine(tile, lineX)
+		and isPointAboveLine(tile, lineY)
+end
+
+local function computeClosestTileEdge(sourcePointTileSpaceTop, tileh)
+	local sourcePointTileSpaceCenter = {
+		x = sourcePointTileSpaceTop.x,
+		y = sourcePointTileSpaceTop.y - tileh
 	}
-	return isPointAboveLine(np, lineX)
-		and isPointAboveLine(np, lineY)
+
+	if
+		sourcePointTileSpaceCenter.x >= 0 and
+		sourcePointTileSpaceCenter.y <  0
+	then
+		return DIR_UP
+	elseif
+		sourcePointTileSpaceCenter.x >= 0 and
+		sourcePointTileSpaceCenter.y >= 0
+	then
+		return DIR_RIGHT
+	elseif
+		sourcePointTileSpaceCenter.x <  0 and
+		sourcePointTileSpaceCenter.y >= 0
+	then
+		return DIR_DOWN
+	else
+		return DIR_LEFT
+	end
 end
 
 --[[
 	Returns a board tile at the specified point on the screen, or nil.
 --]]
-function screenPointToTile(screenPoint)
+function screenPointToTile(sourcePointScreenSpace)
 	if not Board then return nil end
 
 	local screen = sdl.screen()
@@ -149,11 +178,12 @@ function screenPointToTile(screenPoint)
 
 	local tile00, lineX, lineY, tw, th = getScreenRefs(screen, scale)
 
-	-- Change screenPoint to be relative to the (0, 0) tile
+	-- Change sourcePointScreenSpace to be relative to the (0, 0) tile
 	-- and move to unscaled space.
-	local relPoint = {}
-	relPoint.x = (screenPoint.x - tile00.x) / scale
-	relPoint.y = (screenPoint.y - tile00.y) / scale
+	local sourcePointBoardSpace = {
+		x = (sourcePointScreenSpace.x - tile00.x) / scale,
+		y = (sourcePointScreenSpace.y - tile00.y) / scale
+	}
 
 	-- Start at the end of the board and move backwards.
 	-- That way we only need to check 2 lines instead of 4 on each tile.
@@ -162,13 +192,16 @@ function screenPointToTile(screenPoint)
 	local bsize = Board:GetSize()
 	for tileY = bsize.y, 0, -1 do
 		for tileX = bsize.x, 0, -1 do
-			if tileContains(tileX, tileY, tw, th, lineX, lineY, relPoint) then
+			local tile = computeTile(tileX, tileY, tw, th, sourcePointBoardSpace)
+			if tileContains(tile, lineX, lineY) then
 				if tileY == bsize.y or tileX == bsize.x then
 					-- outside of the board
 					return nil
 				end
+
+				local closestTileEdge = computeClosestTileEdge(tile, th, sourcePointBoardSpace)
 				
-				return Point(tileX, tileY)
+				return Point(tileX, tileY), closestTileEdge
 			end
 		end
 	end
