@@ -128,7 +128,7 @@ local function isPointAboveLine(point, lineFn)
 	return point.y >= lineFn(point.x)
 end
 
-local function tileContains(tilex, tiley, tilew, tileh, point)
+local function tileContains(tilex, tiley, tilew, tileh, lineX, lineY, point)
 	local np = {
 		x = point.x - tilew * (tilex - tiley),
 		y = point.y - tileh * (tilex + tiley)
@@ -162,7 +162,7 @@ function screenPointToTile(screenPoint)
 	local bsize = Board:GetSize()
 	for tileY = bsize.y, 0, -1 do
 		for tileX = bsize.x, 0, -1 do
-			if tileContains(tileX, tileY, tw, th, relPoint) then
+			if tileContains(tileX, tileY, tw, th, lineX, lineY, relPoint) then
 				if tileY == bsize.y or tileX == bsize.x then
 					-- outside of the board
 					return nil
