@@ -105,20 +105,35 @@ local function read(arg)
 	error("Could not read save file because file does not exist: "..saveFile)
 end
 
-local function update(fn)
-	local saveFile = getPath(Settings)
-	local save = read(saveFile)
-
-	fn(save)
-
-	local content = ""
-	for k, v in pairs(save) do
-		content = content .. string.format("%s = %s\n\n", k, save_table(v))
+local function update(fn, retryCounter)
+	if not retryCounter then
+		retryCounter = 0
 	end
 
-	modApi:writeFile(saveFile, content)
+	local saveFilePath = getPath(Settings)
+	local ok, saveTabie = pcall(function() return read(saveFilePath) end)
+	
+	if ok then
+		fn(saveTabie)
 
-	RestoreGameVariables(Settings)
+		local content = ""
+		for k, v in pairs(saveTabie) do
+			content = content .. string.format("%s = %s\n\n", k, save_table(v))
+		end
+	
+		modApi:writeFile(saveFilePath, content)
+	
+		RestoreGameVariables(Settings)
+	else
+		-- We failed to read the save file, retry later
+		if retryCounter >= 3 then
+			error("Failed to update save file! Backed off after 3 attempts")
+		end
+
+		modApi:scheduleHook(100, function()
+			update(fn, retryCounter + 1)
+		end)
+	end
 end
 
 local function doSaveGame()
