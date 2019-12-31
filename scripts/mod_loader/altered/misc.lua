@@ -219,3 +219,8 @@ SpaceDamage.GetLuaString = function(self)
     return string.format("CreateSpaceDamage(%s)", save_table(self:ToTable()))
 end
 SpaceDamage.GetString = SpaceDamage.GetLuaString
+
+GL_Color.GetLuaString = function(self)
+	return string.format("GL_Color(%s, %s, %s, %s)", self.r, self.g, self.b, self.a)
+end
+GL_Color.GetString = GL_Color.GetLuaString
