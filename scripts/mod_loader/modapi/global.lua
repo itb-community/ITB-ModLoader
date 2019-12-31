@@ -98,7 +98,14 @@ GetUiScale = function() return 1 end
 function mouseTile()
 	-- Use custom table instead of the existing Point class, since Point
 	-- can only hold integer values and automatically rounds them.
-	return screenPointToTile({ x = sdl.mouse.x(), y = sdl.mouse.y() })
+	return screenPointToTile({ x = sdl.mouse.x(), y = sdl.mouse.y() }, false)
+end
+
+--[[
+	Returns currently highlighted board tile and closest tile edge as DIR, or nil.
+--]]
+function mouseTileAndEdge()
+	return screenPointToTile({ x = sdl.mouse.x(), y = sdl.mouse.y() }, true)
 end
 
 function getScreenRefs(screen, scale)
@@ -169,7 +176,7 @@ end
 --[[
 	Returns a board tile at the specified point on the screen, or nil.
 --]]
-function screenPointToTile(sourcePointScreenSpace)
+function screenPointToTile(sourcePointScreenSpace, findTileEdge)
 	if not Board then return nil end
 
 	local screen = sdl.screen()
@@ -199,13 +206,16 @@ function screenPointToTile(sourcePointScreenSpace)
 					return nil
 				end
 
-				local closestTileEdge = computeClosestTileEdge(tile, th, sourcePointBoardSpace)
+				if findTileEdge then
+					local closestTileEdge = computeClosestTileEdge(tile, th, sourcePointBoardSpace)
 				
-				return Point(tileX, tileY), closestTileEdge
+					return Point(tileX, tileY), closestTileEdge
+				else
+					return Point(tileX, tileY)
+				end
 			end
 		end
 	end
 
 	return nil
 end
-
