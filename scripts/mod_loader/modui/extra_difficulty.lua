@@ -145,7 +145,7 @@ local function createUi(root)
 			arrLeft:pospx (origin.x + 4          , origin.y + 4 )
 			arrRight:pospx(origin.x + 28 + 90 + 4, origin.y + 4 )
 			diffText:pospx(origin.x              , origin.y + 11)
-			mask:pospx    (origin.x              , origin.y + 11 )
+			mask:pospx    (origin.x              , origin.y + 11)
 
 			local hideDifficultyUi = IsHangarWindowState() or
 				(leaving and not mask.animations.fadeIn:isStarted())
@@ -175,6 +175,10 @@ local function createUi(root)
 		leaving = false
 		mask.animations.fadeIn:stop()
 		mask.decorations[1].color = deco.colors.transparent
+	end)
+
+	sdlext.addGameWindowResizedHook(function(screen)
+		pane:width(1):height(1)
 	end)
 end
 

@@ -734,6 +734,10 @@ local function createUi(root)
 			btnStart.disabled = false
 		end)
 	end)
+
+	sdlext.addGameWindowResizedHook(function(screen)
+		holder:width(1):height(1)
+	end)
 end
 
 sdlext.addUiRootCreatedHook(function(screen, root)
