@@ -20,7 +20,7 @@ Since people unfamiliar with GitHub are often confused where to click:
 
 ## Installation
 
-Extract the zip file into the game's base directory, overwriting files as necessary. The zip includes original copies of the overwritten files so you can easily revert, if need be.
+Extract the zip file into the game's base directory (eg. for Steam, this is typically `C:\Program Files (x86)\Steam\steamapps\common\Into the Breach`), overwriting files as necessary. The zip includes original copies of the overwritten files so you can easily revert, if need be.
 
 If you're upgrading from a previous version of the modloader and encounter issues, the nuclear option of doing a clean reinstall of the game will solve all of them. If not, come ask your question either on [Into the Breach Discord server in `#modding-discussion` channel](https://discord.gg/trrNB6p), or [on the Subset forums](https://www.subsetgames.com/forum/viewtopic.php?f=26&t=33119).
 
