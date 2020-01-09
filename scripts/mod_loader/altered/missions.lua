@@ -171,8 +171,12 @@ function Mission:MissionEnd()
 		modApi:conditionalHook(
 			BuildIsBoardBusyPredicate(modApi.current_mission.Board),
 			function()
-				modApi.current_mission.Board = nil
-				modApi.current_mission = nil
+				-- BoardBusyPredicate defined above will yield true once we exit to main menu,
+				-- but when that happens, current_mission is reset to nil.
+				if modApi.current_mission then
+					modApi.current_mission.Board = nil
+					modApi.current_mission = nil
+				end
 			end
 		)
 	]])
