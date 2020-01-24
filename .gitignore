@@ -2,3 +2,4 @@ _wip/
 _res/
 release/
 *.code-workspace
+.idea/
