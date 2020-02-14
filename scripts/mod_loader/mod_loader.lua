@@ -73,13 +73,25 @@ function mod_loader:init()
 	self:loadModContent(self:getModConfig(), self:getSavedModOrder())
 end
 
-function mod_loader:enumerateMods()
+function mod_loader:enumerateDirectory(dirPathRelativeToGameDir)
 	if os and os.listdirs then
-		self.mod_dirs = os.listdirs("mods")
+		return os.listdirs(dirPathRelativeToGameDir)
 	else
-		for dir in io.popen([[dir ".\mods\" /b /ad]]):lines() do table.insert(self.mod_dirs,dir) end
+		local result = {}
+		local directory = io.popen(string.format([[dir ".\%s\" /b /ad]], dirPathRelativeToGameDir))
+		for dir in directory:lines() do
+			table.insert(result, dir)
+		end
+
+		directory:close()
+
+		return result
 	end
-	
+end
+
+function mod_loader:enumerateMods()
+	self.mod_dirs = self:enumerateDirectory("mods")
+
 	for i, dir in pairs(self.mod_dirs) do
 		local err = ""
 		local path = string.format("mods/%s/scripts/init.lua",dir)
