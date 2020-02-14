@@ -44,7 +44,9 @@ function mod_loader:init()
 		-- mouse pointer movement.
 		modApi:appendAsset("img/mouse/pointer.png","resources/mods/ui/pointer-dummy.png")
 	end
-	
+
+	self:loadAdditionalSprites()
+
 	-- Process all mods for metadata first.
 	-- orderMods only returns a list with enabled mods, so we iterate over the
 	-- list of all mods here.
@@ -73,24 +75,20 @@ function mod_loader:init()
 	self:loadModContent(self:getModConfig(), self:getSavedModOrder())
 end
 
-function mod_loader:enumerateDirectory(dirPathRelativeToGameDir)
-	if os and os.listdirs then
-		return os.listdirs(dirPathRelativeToGameDir)
-	else
-		local result = {}
-		local directory = io.popen(string.format([[dir ".\%s\" /b /ad]], dirPathRelativeToGameDir))
-		for dir in directory:lines() do
-			table.insert(result, dir)
-		end
+function mod_loader:loadAdditionalSprites()
+	local baseDir = "./resources/mods/game/img"
 
-		directory:close()
+	modApi:appendAsset("img/units/mission/train_w_broken.png",baseDir.."img/units/mission/train_w_broken.png")
+	modApi:appendAsset("img/units/mission/missilesilo_w_broken.png",baseDir.."img/units/mission/missilesilo_w_broken.png")
+	modApi:appendAsset("img/units/mission/generator_3_w_broken.png",baseDir.."img/units/mission/generator_3_w_broken.png")
 
-		return result
-	end
+	ANIMS.train_dual_damagedw_broken = ANIMS.BaseUnit:new{ Image = "units/mission/train_w_broken.png", PosX = -51, PosY = 3 }
+	ANIMS.missilew_broken = ANIMS.BaseUnit:new{ Image = "units/mission/missilesilo_w_broken.png", PosX = -8, PosY = 5}
+	ANIMS.generator3w_broken = ANIMS.BaseUnit:new{ Image = "units/mission/generator_3_w_broken.png", PosX = -17, PosY = -10 }
 end
 
 function mod_loader:enumerateMods()
-	self.mod_dirs = self:enumerateDirectory("mods")
+	self.mod_dirs = self:enumerateDirectoriesIn("mods")
 
 	for i, dir in pairs(self.mod_dirs) do
 		local err = ""
@@ -176,6 +174,24 @@ function mod_loader:enumerateMods()
 			LOG(string.format("Unable to mount mod at [%s]: %s",dir,err))
 			self.unmountedMods[dir] = err
 		end
+	end
+end
+
+function mod_loader:enumerateDirectoriesIn(dirPathRelativeToGameDir)
+	dirPathRelativeToGameDir = dirPathRelativeToGameDir:gsub("/", "\\")
+
+	if os and os.listdirs then
+		return os.listdirs(dirPathRelativeToGameDir)
+	else
+		local result = {}
+		local directory = io.popen(string.format([[dir ".\%s\" /B /AD]], dirPathRelativeToGameDir))
+		for dir in directory:lines() do
+			table.insert(result, dir)
+		end
+
+		directory:close()
+
+		return result
 	end
 end
 
