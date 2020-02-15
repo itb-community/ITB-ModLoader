@@ -16,13 +16,18 @@ function CreatePilotPersonality(label, name)
 	return t
 end
 
+PilotListExtended = shallow_copy(PilotList)
+
 function CreatePilot(data)
 	_G[data.Id] = Pilot:new(data)
 
 	-- Make sure we don't create duplicates if the PilotList
 	-- already contains entry for this pilot
 	if data.Rarity ~= 0 and not list_contains(PilotList, data.Id) then
-		PilotList[#PilotList + 1] = data.Id
+		if #PilotList < 13 then
+			PilotList[#PilotList + 1] = data.Id
+		end
+		PilotListExtended[#PilotListExtended + 1] = data.Id
 	end
 end
 

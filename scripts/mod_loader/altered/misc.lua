@@ -185,6 +185,28 @@ function CreateEffect(data)
 	return effect
 end
 
+local oldGetPilotDrop = getPilotDrop
+function getPilotDrop()
+	local oldPilotList = PilotList
+	PilotList = PilotListExtended
+	
+	local result = oldGetPilotDrop()
+	
+	PilotList = oldPilotList
+	
+	return result
+end
+
+local oldInitializeDecks = initializeDecks
+function initializeDecks()
+	local oldPilotList = PilotList
+	PilotList = PilotListExtended
+	
+	oldInitializeDecks()
+	
+	PilotList = oldPilotList
+end
+
 Effect.GetLuaString = function(self)
 	return string.format("CreateEffect(%s)", save_table(self.data))
 end
