@@ -76,7 +76,7 @@ function mod_loader:init()
 end
 
 function mod_loader:loadAdditionalSprites()
-	local baseDir = "./resources/mods/game/img"
+	local baseDir = "resources/mods/game/"
 
 	modApi:appendAsset("img/units/mission/train_w_broken.png",baseDir.."img/units/mission/train_w_broken.png")
 	modApi:appendAsset("img/units/mission/missilesilo_w_broken.png",baseDir.."img/units/mission/missilesilo_w_broken.png")
