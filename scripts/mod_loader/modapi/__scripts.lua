@@ -1,5 +1,6 @@
 local scripts = {
 	"init",
+	"events/__scripts",
 	"global",
 	"ftldat",
 	"misc",
