@@ -71,6 +71,7 @@ function mod_loader:init()
 	modApi:finalize()
 	
 	self:loadModContent(self:getModConfig(), self:getSavedModOrder())
+	self:loadPilotList()
 end
 
 function mod_loader:enumerateMods()
@@ -440,6 +441,16 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 		if not ok then
 			LOG("A modsLoadedHook failed: ", err)
 		end
+	end
+end
+
+function mod_loader:loadPilotList()
+	loadPilotsOrder()
+	PilotList = {}
+	
+	local max_pilots = 13
+	for i = 1, max_pilots do
+		PilotList[i] = PilotListExtended[i]
 	end
 end
 

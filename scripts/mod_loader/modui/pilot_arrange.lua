@@ -4,6 +4,8 @@
 	for selection in the hangar.
 --]]
 
+local MAX_PILOTS = 13
+
 function loadPilotsOrder()
 	local order = {}
 
@@ -14,12 +16,12 @@ function loadPilotsOrder()
 			order[v] = k
 		end
 	end)
-	for k, v in ipairs(PilotList) do
+	for k, v in ipairs(PilotListExtended) do
 		if order[v] == nil then
 			order[v] = 10000 + k
 		end
 	end
-	table.sort(PilotList,function(a,b)
+	table.sort(PilotListExtended,function(a,b)
 		return order[a] < order[b]
 	end)
 end
@@ -38,7 +40,7 @@ local function createUi()
 	local onExit = function(self)
 		PilotList = {}
 
-		for i = 1, #pilotButtons do
+		for i = 1, MAX_PILOTS do
 			PilotList[i] = pilotButtons[i].pilotId
 		end
 		
@@ -170,8 +172,8 @@ local function createUi()
 		end
 		
 		local dupes = {}
-		for i = 1, #PilotList do
-			local pilotId = PilotList[i]
+		for i = 1, #PilotListExtended do
+			local pilotId = PilotListExtended[i]
 			if not dupes[pilotId] then 
 				dupes[pilotId] = 1
 				addPilotButton(#pilotButtons + 1, pilotId)
