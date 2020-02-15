@@ -1,18 +1,39 @@
 
-function Mission:OnSerializationStart(t)
-	t.MissionEndImpl = self.MissionEndImpl
-	t.MissionEnd = self.MissionEnd
-	t.Board = self.Board
+-- this file contains modifications to original functions
+-- as well as additional useful Mission functions.
 
-	self.MissionEndImpl = nil
-	self.MissionEnd = nil
-	self.Board = nil
+local function isSerializable(v)
+	local t = type(v)
+	
+	if t == "table" then
+		return true
+	elseif t == "userdata" then
+		if v.GetLuaString ~= nil then
+			return true
+		end
+	elseif t ~= "function" then
+		return true
+	end
+	
+	return false
+end
+
+function Mission:OnSerializationStart(t)
+	for i, v in pairs(self) do
+		if i == "Board" or not isSerializable(v) then
+			t[i] = v
+		end
+	end
+	
+	for i, _ in pairs(t) do
+		self[i] = nil
+	end
 end
 
 function Mission:OnSerializationEnd(t)
-	self.MissionEndImpl = t.MissionEndImpl
-	self.MissionEnd = t.MissionEnd
-	self.Board = t.Board
+	for i, v in pairs(t) do
+		self[i] = v
+	end
 end
 
 function Mission:UpdateQueuedSpawns()
@@ -34,79 +55,30 @@ function Mission:UpdateQueuedSpawns()
 	end
 end
 
-local oldBaseNextTurn = Mission.BaseNextTurn
-function Mission:BaseNextTurn()
-	oldBaseNextTurn(self)
-	self.Board = Board
+function Mission:SetupDifficulty()
+	-- Can be used to setup the difficulty of this mission
+	-- with regard to value returned by GetDifficulty()
+end
 
-	if Game:GetTeamTurn() == TEAM_PLAYER then
-		self:UpdateQueuedSpawns()
-
-		for i, el in ipairs(self.QueuedSpawns) do
-			el.turns = el.turns + 1
-		end
+function Mission:BaseStart()
+	self.VoiceEvents = {}
+	
+	if self.AssetId ~= "" then
+		self.AssetLoc = Board:AddUniqueBuilding(_G[self.AssetId].Image)
 	end
+	
+	self.LiveEnvironment = _G[self.Environment]:new()
+	self:SetupDifficulty()
 
-	modApi:fireNextTurnHooks(self)
+	self.LiveEnvironment:Start()
+	self:StartMission()
+	
+	self:SetupDiffMod()
+	
+	self:SpawnPawns(self:GetStartingPawns())
 end
 
-local oldBaseUpdate = Mission.BaseUpdate
-function Mission:BaseUpdate()
-	Board.isMission = true
-	modApi.current_mission = self
-	modApi:processRunLaterQueue(self)
-
-	oldBaseUpdate(self)
-
-	if Board:GetBusyState() == 6 then
-		-- BusyState 6 happens when Vek are burrowing out of the ground
-		self:UpdateQueuedSpawns()
-	end
-
-	modApi:fireMissionUpdateHooks(self)
-end
-
-local oldBaseDeployment = Mission.BaseDeployment
-function Mission:BaseDeployment()
-	modApi.current_mission = self
-	oldBaseDeployment(self)
-	self.Board = Board
-
-	modApi:fireMissionStartHooks(self)
-end
-
-local function overrideMissionEnd(self)
-	local mlEnd = Mission.MissionEnd
-	local mEnd = self.MissionEnd
-
-	if mEnd and mEnd ~= mlEnd then
-		self.MissionEndImpl = mEnd
-		self.MissionEnd = mlEnd
-	end
-end
-
-local oldCreateMission = CreateMission
-function CreateMission(mission)
-	local mObject = oldCreateMission(mission)
-	mObject.Initialized = false
-
-	overrideMissionEnd(mObject)
-
-	return mObject
-end
-
-local oldReloadMissions = ReloadMissions
-function ReloadMissions(missions)
-	oldReloadMissions(missions)
-
-	if missions then
-		for i, mission in pairs(GAME.Missions) do
-			overrideMissionEnd(mission)
-		end
-	end
-end
-
-function Mission:MissionEndImpl()
+function Mission:MissionEnd()
 	local ret = SkillEffect()
 	local enemy_count = Board:GetEnemyCount()
 	
@@ -160,134 +132,27 @@ function BuildIsBoardBusyPredicate(board)
 	end
 end
 
-function Mission:MissionEnd()
-	self:MissionEndImpl()
-	
-	local fx = SkillEffect()
-	modApi:fireMissionEndHooks(self, fx)
-	fx:AddScript([[
-		modApi.runLaterQueue = {}
-		
-		modApi:conditionalHook(
-			BuildIsBoardBusyPredicate(modApi.current_mission.Board),
-			function()
-				-- BoardBusyPredicate defined above will yield true once we exit to main menu,
-				-- but when that happens, current_mission is reset to nil.
-				if modApi.current_mission then
-					modApi.current_mission.Board = nil
-					modApi.current_mission = nil
-				end
-			end
-		)
-	]])
-	Board:AddEffect(fx)
-end
-
-function Mission:SetupDifficulty()
-	-- Can be used to setup the difficulty of this mission
-	-- with regard to value returned by GetDifficulty()
-end
-
-local oldBaseStart = Mission.BaseStart
-function Mission:BaseStart(suppressHooks)
-	suppressHooks = suppressHooks or false
-
-	if not suppressHooks then
-		modApi:firePreMissionAvailableHooks(self)
-	end
-
-	Board.isMission = true
-	self.Board = Board
-	self.QueuedSpawns = {}
-
-	-- begin oldBaseStart
-	-- Copy the code rather than calling the original function, since
-	-- we want to insert a new SetupDifficulty() function before
-	-- environment start.
-	self.VoiceEvents = {}
-	
-	if self.AssetId ~= "" then
-		self.AssetLoc = Board:AddUniqueBuilding(_G[self.AssetId].Image)
-	end
-	
-	self.LiveEnvironment = _G[self.Environment]:new()
-	self:SetupDifficulty()
-
-	self.LiveEnvironment:Start()
-	self:StartMission()
-	
-	self:SetupDiffMod()
-	
-	self:SpawnPawns(self:GetStartingPawns())
-	-- end oldBaseStart
-
-	-- Clear QueuedSpawns, since the Vek burrow out immediately when entering the mission
-	self.QueuedSpawns = {}
-
-	if not suppressHooks then
-		modApi:firePostMissionAvailableHooks(self)
-	end
-
-	self.Initialized = true
-end
-
-local modLoaderHooksFired = false
-local oldApplyEnvironmentEffect = Mission.ApplyEnvironmentEffect
-function Mission:ApplyEnvironmentEffect()
-	if not modLoaderHooksFired then
-		modApi:firePreEnvironmentHooks(self)
-	end
-	
-	-- ApplyEnvironmentEffect() is supposed to return true once
-	-- it's done applying its effects, but the game's own environments
-	-- don't follow this rule...
-	local isDone = false
-	if self.LiveEnvironment:IsEffect() then
-		isDone = oldApplyEnvironmentEffect(self)
-	end
-	
-	if not modLoaderHooksFired then
-		-- Schedule the post hooks to fire once the board is no longer busy
-		modApi:conditionalHook(
-			BuildIsBoardBusyPredicate(Board),
-			function()
-				modLoaderHooksFired = false
-				if not Game or not GAME or not Board then
-					return
-				end
-				
-				modApi:firePostEnvironmentHooks(self)
-			end
-		)
-		
-		modLoaderHooksFired = true
-	end
-	
-	return isDone
-end
-
-function Mission:IsEnvironmentEffect()
-	return true
-end
-
--- ////////////////////////////////////////////////////////////////////
-
-function Mission_Test:BaseStart()
-	Board.isMission = true
-	Mission.BaseStart(self, true)
-
-	modApi:fireTestMechEnteredHooks(self)
-end
+-- Why have this function been changed to always return true?
+--function Mission:IsEnvironmentEffect()
+--	return true
+--end
 
 -- MissionEnd is not actually called when exiting test mech scenario;
 -- we call it manually when we detect the player leaving the test mech scenario.
+--[[function Mission_Test:MissionEnd()
+	-- DON'T call the default MissionEnd
+	-- Mission.MissionEnd(self)
+
+	modApi:fireTestMechExitedHooks(self)
+end]]
+
+Mission_Test = CreateMission("Mission")
+
 function Mission_Test:MissionEnd()
 	-- DON'T call the default MissionEnd
 	-- Mission.MissionEnd(self)
 
 	modApi:fireTestMechExitedHooks(self)
-	
-	modApi.current_mission = nil
 end
 
 sdlext.addGameExitedHook(function()

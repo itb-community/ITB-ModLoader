@@ -2,6 +2,7 @@ local scripts = {
 	"difficulty",
 	"misc",
 	"missions",
+	"missions_additional",
 	"skills",
 	"spawn_point",
 	"squad",
