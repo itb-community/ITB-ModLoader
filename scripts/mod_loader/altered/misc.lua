@@ -237,6 +237,17 @@ function CreateSpaceDamage(self)
 	return result
 end
 
+local oldGetSkillInfo = GetSkillInfo
+function GetSkillInfo(skill)
+	local result = oldGetSkillInfo(skill)
+	
+	if result == nil then
+		return PilotSkill()
+	end
+	
+	return result
+end
+
 SpaceDamage.GetLuaString = function(self)
     return string.format("CreateSpaceDamage(%s)", save_table(self:ToTable()))
 end
