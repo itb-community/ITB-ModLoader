@@ -52,7 +52,7 @@ local function createUi()
 		
 		local portraitW = 122 + 8
 		local portraitH = 122 + 8
-		local gap = 10
+		local gap = 16
 		local cellW = portraitW + gap
 		local cellH = portraitH + gap
 
@@ -111,13 +111,30 @@ local function createUi()
 			end
 		end
 		
+		local function addHangarButton(i)
+			local col = (i - 1) % portraitsPerRow
+			local row = math.floor((i - 1) / portraitsPerRow)
+			
+			local surface = sdlext.surface("resources/mods/ui/pilot_arrange_hangar.png")
+			local button
+			button = Ui()
+				:widthpx(portraitW):heightpx(portraitH)
+				:pospx(cellW * col, cellH * row)
+				:decorate({
+					DecoAlign(0,-4),
+					DecoSurface(surface)
+				})
+				:addTo(scrollarea)
+		end
+		
 		local function addPilotButton(i, pilotId)
 			local pilot = _G[pilotId]
 			local col = (i - 1) % portraitsPerRow
 			local row = math.floor((i - 1) / portraitsPerRow)
 			
 			local surface = sdl.scaled(2, sdlext.surface("img/portraits/pilots/"..pilotId..".png"))
-			local button = Ui()
+			local button
+			button = Ui()
 				:widthpx(portraitW):heightpx(portraitH)
 				:pospx(cellW * col, cellH * row)
 				:settooltip(pilot.Name)
@@ -127,6 +144,14 @@ local function createUi()
 					DecoSurface(surface)
 				})
 				:addTo(scrollarea)
+				--[[
+			if i <14 then				
+				button.decorations[1].color = sdl.rgb(13, 15, 23)
+				button.decorations[1].hlcolor = hlcolor or deco.colors.buttonhl
+				button.decorations[1].bordercolor = sdl.rgb(35, 42, 59)
+				button.decorations[1].borderhlcolor = borderhlcolor or deco.colors.buttonborderhl
+			end
+			--]]
 			
 			button:registerDragMove()
 			button.pilotId = pilotId
@@ -179,6 +204,10 @@ local function createUi()
 				addPilotButton(#pilotButtons + 1, pilotId)
 			end
 		end
+		for i = 1, 13 do
+			addHangarButton(i)
+		end
+		
 	end)
 end
 
