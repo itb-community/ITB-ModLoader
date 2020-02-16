@@ -1,5 +1,6 @@
 local scripts = {
 	"hard-alter",
+	"Cutils",
 	
 	"classes",
 
