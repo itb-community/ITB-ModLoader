@@ -6,7 +6,7 @@
 -- Technically this doesn't work for vanilla pilots who have custom repair abilities
 -- (Mantis and Repairman), but we assume that no one will want to override those.
 -- (Since you can do that by just replacing the image file)
-local repairIcon = sdlext.surface("img/weapons/repair.png")
+local repairIcon = sdlext.getSurface({ path = "img/weapons/repair.png" })
 
 local iconHolder = nil
 local repairReplacementIcons = {}
@@ -14,7 +14,7 @@ local repairReplacementIcons = {}
 function RegisterRepairIconReplacement(personalityId, iconPath)
 	assert(personalityId and type(personalityId) == "string")
 	assert(iconPath == nil or type(iconPath) == "string")
-	repairReplacementIcons[personalityId] = (iconPath and sdlext.surface(iconPath)) or nil
+	repairReplacementIcons[personalityId] = (iconPath and sdlext.getSurface({ path = iconPath })) or nil
 end
 
 sdlext.addUiRootCreatedHook(function(screen, uiRoot)

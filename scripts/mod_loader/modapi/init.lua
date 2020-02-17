@@ -7,7 +7,7 @@ function modApi:init()
 	Settings = self:loadSettings()
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
-	self.version = "2.4.0"
+	self.version = "2.4.1"
 	LOG("MOD-API VERSION "..self.version)
 	self.texts = {}
 
@@ -225,11 +225,11 @@ function modApi:setupModLoaderTexts()
 
 	self.texts["Difficulty_Custom_Note"] = "Note: this is a modded difficulty level. It won't change anything without mods providing content for this difficulty."
 
-	self.texts["Difficulty_Name_VeryHard"] = "Very Hard"
+	self.texts["Difficulty_Name_VeryHard"] = "V. Hard"
 	self.texts["Difficulty_Title_VeryHard"] = "Very Hard Mode"
 	self.texts["Difficulty_Description_VeryHard"] = "Intended for veteran Commanders looking for a challenge."
 
-	self.texts["Difficulty_Name_Impossible"] = "Impossible"
+	self.texts["Difficulty_Name_Impossible"] = "Imposs."
 	self.texts["Difficulty_Title_Impossible"] = "Impossible Mode"
 	self.texts["Difficulty_Description_Impossible"] = "A punishing difficulty allowing no mistakes."
 end

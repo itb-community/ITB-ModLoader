@@ -13,7 +13,7 @@ end
 local srf = nil
 sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 	if not srf and modApi.showResourceWarning then
-		srf = sdlext.surface("img/nullResource.png")
+		srf = sdlext.getSurface({ path = "img/nullResource.png" })
 		srf:wasDrawn()
 
 		modApi:scheduleHook(50, function()

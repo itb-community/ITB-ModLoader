@@ -7,8 +7,9 @@ local arrLeft = nil
 local arrRight = nil
 local diffText = nil
 
-local nunitoFont = sdlext.font("fonts/NunitoSans_Bold.ttf", 12)
-local diffTextset = deco.textset(deco.colors.white, nil, nil, true)
+--Closest match to the vanilla font; one pixel too wide.
+local justinFont = sdlext.font("fonts/Justin15.ttf", 14)
+local diffTextset = deco.textset(deco.colors.white, nil, nil, false)
 
 
 local function changeDifficulty(newDiff)
@@ -17,7 +18,7 @@ local function changeDifficulty(newDiff)
 	arrLeft.disabled = newDiff <= 0
 	arrRight.disabled = newDiff >= (#DifficultyLevels - 1)
 
-	diffText.decorations[2]:setsurface(GetDifficultyFaceName(newDiff))
+	diffText.decorations[2]:setsurface(GetDifficultyFaceName(newDiff):upper())
 end
 
 local function createUi(root)
@@ -56,9 +57,9 @@ local function createUi(root)
 	arrLeft = Ui()
 		:widthpx(28):heightpx(44)
 		:decorate({ DecoSurfaceButton(
-			sdlext.surface("img/ui/hangar/small_arrow_left_on.png"),
-			sdlext.surface("img/ui/hangar/small_arrow_left_select.png"),
-			sdlext.surface("img/ui/hangar/small_arrow_left_off.png")
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_left_on.png" }),
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_left_select.png" }),
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_left_off.png" })
 		) })
 		:addTo(pane)
 
@@ -93,9 +94,9 @@ local function createUi(root)
 	arrRight = Ui()
 		:widthpx(28):heightpx(44)
 		:decorate({ DecoSurfaceButton(
-			sdlext.surface("img/ui/hangar/small_arrow_right_on.png"),
-			sdlext.surface("img/ui/hangar/small_arrow_right_select.png"),
-			sdlext.surface("img/ui/hangar/small_arrow_right_off.png")
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_right_on.png" }),
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_right_select.png" }),
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_right_off.png" })
 		) })
 		:addTo(pane)
 
@@ -126,7 +127,7 @@ local function createUi(root)
 		:widthpx(156):heightpx(30)
 		:decorate({
 			DecoSolid(deco.colors.framebg),
-			DecoCAlignedText(nil, nunitoFont, diffTextset)
+			DecoCAlignedText(nil, justinFont, diffTextset)
 		})
 		:addTo(pane)
 	diffText.translucent = true
@@ -144,7 +145,7 @@ local function createUi(root)
 
 			arrLeft:pospx (origin.x + 4          , origin.y + 4 )
 			arrRight:pospx(origin.x + 28 + 90 + 4, origin.y + 4 )
-			diffText:pospx(origin.x              , origin.y + 11)
+			diffText:pospx(origin.x              , origin.y + 13)
 			mask:pospx    (origin.x              , origin.y + 11)
 
 			local hideDifficultyUi = IsHangarWindowState() or
