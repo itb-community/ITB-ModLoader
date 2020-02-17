@@ -5,7 +5,7 @@
 --]]
 
 local MAX_PILOTS = 13
-local hangar_backdrop = sdlext.surface("resources/mods/ui/pilot_arrange_hangar.png")
+local hangar_backdrop = sdlext.getSurface({ path = "resources/mods/ui/pilot-arrange-hangar.png" })
 
 function loadPilotsOrder()
 	local order = {}
@@ -112,7 +112,7 @@ local function createUi()
 			end
 		end
 		
-		local function addHangarButton(i)
+		local function addHangarBackdrop(i)
 			local col = (i - 1) % portraitsPerRow
 			local row = math.floor((i - 1) / portraitsPerRow)
 			
@@ -131,7 +131,10 @@ local function createUi()
 			local col = (i - 1) % portraitsPerRow
 			local row = math.floor((i - 1) / portraitsPerRow)
 			
-			local surface = sdl.scaled(2, sdlext.surface("img/portraits/pilots/"..pilotId..".png"))
+			local surface = sdlext.getSurface({
+				path = "img/portraits/pilots/"..pilotId..".png",
+				scale = 2
+			})
 			local button = Ui()
 				:widthpx(portraitW):heightpx(portraitH)
 				:pospx(cellW * col, cellH * row)
@@ -195,7 +198,7 @@ local function createUi()
 			end
 		end
 		for i = 1, 13 do
-			addHangarButton(i)
+			addHangarBackdrop(i)
 		end
 		
 	end)
