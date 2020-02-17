@@ -5,6 +5,7 @@
 --]]
 
 local MAX_PILOTS = 13
+local hangar_backdrop = sdlext.surface("resources/mods/ui/pilot_arrange_hangar.png")
 
 function loadPilotsOrder()
 	local order = {}
@@ -52,7 +53,7 @@ local function createUi()
 		
 		local portraitW = 122 + 8
 		local portraitH = 122 + 8
-		local gap = 10
+		local gap = 16
 		local cellW = portraitW + gap
 		local cellH = portraitH + gap
 
@@ -109,6 +110,20 @@ local function createUi()
 			if placeholderIndex ~= nil and draggedElement ~= nil then
 			
 			end
+		end
+		
+		local function addHangarButton(i)
+			local col = (i - 1) % portraitsPerRow
+			local row = math.floor((i - 1) / portraitsPerRow)
+			
+			local button = Ui()
+				:widthpx(portraitW):heightpx(portraitH)
+				:pospx(cellW * col, cellH * row)
+				:decorate({
+					DecoAlign(0,-4),
+					DecoSurface(hangar_backdrop)
+				})
+				:addTo(scrollarea)
 		end
 		
 		local function addPilotButton(i, pilotId)
@@ -179,6 +194,10 @@ local function createUi()
 				addPilotButton(#pilotButtons + 1, pilotId)
 			end
 		end
+		for i = 1, 13 do
+			addHangarButton(i)
+		end
+		
 	end)
 end
 
