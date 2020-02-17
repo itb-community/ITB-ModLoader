@@ -24,7 +24,7 @@ function DecoAnimSheet:setAnim(pawnClass)
 		return
 	end
 
-	local surface = sdlext.surface("img/"..animData.Image)
+	local surface = sdlext.getSurface({ path = "img/"..animData.Image })
 
 	self.clipRect.w = surface:w()
 	if getmetatable(animData) == ANIMS.MechUnit then

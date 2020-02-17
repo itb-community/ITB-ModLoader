@@ -130,7 +130,7 @@ local function createUi()
 			local col = (i-1) % 2
 			local row = math.floor((i-1) / 2)
 			
-			local surface = sdlext.surface(modApi.squad_icon[i] or "")
+			local surface = sdlext.getSurface({ path = modApi.squad_icon[i] or "" })
 			
 			if i>1 and i<=8 then
 				local colorTable = {}

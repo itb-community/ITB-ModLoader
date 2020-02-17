@@ -2,10 +2,10 @@
 	Root UI object provided by the modloader. 
 --]]
 
-local bgRobot = sdlext.surface("img/main_menus/bg3.png")
-local bgHangar = sdlext.surface("img/strategy/hangar_main.png")
-local loading = sdlext.surface("img/main_menus/Loading_main.png")
-local cursor = sdl.surface("resources/mods/ui/pointer-large.png")
+local bgRobot = sdlext.getSurface({ path = "img/main_menus/bg3.png" })
+local bgHangar = sdlext.getSurface({ path = "img/strategy/hangar_main.png" })
+local loading = sdlext.getSurface({ path = "img/main_menus/Loading_main.png" })
+local cursor = sdlext.getSurface({ path = "resources/mods/ui/pointer-large.png" })
 
 -- //////////////////////////////////////////////////////////////////////
 
@@ -360,8 +360,8 @@ local function buildUiRoot(screen)
 		return Ui.keydown(self, keycode)
 	end
 
-	srfBotLeft = sdlext.surface("img/ui/tooltipshadow_0.png")
-	srfTopRight = sdlext.surface("img/ui/tooltipshadow_4.png")
+	srfBotLeft = sdlext.getSurface({ path = "img/ui/tooltipshadow_0.png" })
+	srfTopRight = sdlext.getSurface({ path = "img/ui/tooltipshadow_4.png" })
 
 	for i, hook in ipairs(uiRootCreatedHooks) do
 		hook(screen, uiRoot)

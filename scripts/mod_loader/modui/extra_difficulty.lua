@@ -57,9 +57,9 @@ local function createUi(root)
 	arrLeft = Ui()
 		:widthpx(28):heightpx(44)
 		:decorate({ DecoSurfaceButton(
-			sdlext.surface("img/ui/hangar/small_arrow_left_on.png"),
-			sdlext.surface("img/ui/hangar/small_arrow_left_select.png"),
-			sdlext.surface("img/ui/hangar/small_arrow_left_off.png")
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_left_on.png" }),
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_left_select.png" }),
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_left_off.png" })
 		) })
 		:addTo(pane)
 
@@ -94,9 +94,9 @@ local function createUi(root)
 	arrRight = Ui()
 		:widthpx(28):heightpx(44)
 		:decorate({ DecoSurfaceButton(
-			sdlext.surface("img/ui/hangar/small_arrow_right_on.png"),
-			sdlext.surface("img/ui/hangar/small_arrow_right_select.png"),
-			sdlext.surface("img/ui/hangar/small_arrow_right_off.png")
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_right_on.png" }),
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_right_select.png" }),
+			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_right_off.png" })
 		) })
 		:addTo(pane)
 
