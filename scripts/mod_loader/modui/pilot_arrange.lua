@@ -5,6 +5,7 @@
 --]]
 
 local MAX_PILOTS = 13
+local hangar_backdrop = sdlext.surface("resources/mods/ui/pilot_arrange_hangar.png")
 
 function loadPilotsOrder()
 	local order = {}
@@ -115,14 +116,12 @@ local function createUi()
 			local col = (i - 1) % portraitsPerRow
 			local row = math.floor((i - 1) / portraitsPerRow)
 			
-			local surface = sdlext.surface("resources/mods/ui/pilot_arrange_hangar.png")
-			local button
-			button = Ui()
+			local button = Ui()
 				:widthpx(portraitW):heightpx(portraitH)
 				:pospx(cellW * col, cellH * row)
 				:decorate({
 					DecoAlign(0,-4),
-					DecoSurface(surface)
+					DecoSurface(hangar_backdrop)
 				})
 				:addTo(scrollarea)
 		end
@@ -133,8 +132,7 @@ local function createUi()
 			local row = math.floor((i - 1) / portraitsPerRow)
 			
 			local surface = sdl.scaled(2, sdlext.surface("img/portraits/pilots/"..pilotId..".png"))
-			local button
-			button = Ui()
+			local button = Ui()
 				:widthpx(portraitW):heightpx(portraitH)
 				:pospx(cellW * col, cellH * row)
 				:settooltip(pilot.Name)
@@ -144,14 +142,6 @@ local function createUi()
 					DecoSurface(surface)
 				})
 				:addTo(scrollarea)
-				--[[
-			if i <14 then				
-				button.decorations[1].color = sdl.rgb(13, 15, 23)
-				button.decorations[1].hlcolor = hlcolor or deco.colors.buttonhl
-				button.decorations[1].bordercolor = sdl.rgb(35, 42, 59)
-				button.decorations[1].borderhlcolor = borderhlcolor or deco.colors.buttonborderhl
-			end
-			--]]
 			
 			button:registerDragMove()
 			button.pilotId = pilotId
