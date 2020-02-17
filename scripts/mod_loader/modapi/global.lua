@@ -31,6 +31,100 @@ function CreatePilot(data)
 	end
 end
 
+local ProfileDataAffirmed = false
+
+sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
+	if Profile == nil then
+		return
+	end
+	
+	if ProfileDataAffirmed then
+		return
+	end
+	
+	ProfileDataAffirmed = true
+	
+	local function affirmPilot(pilot)
+		if pilot == "" then
+			return
+		end
+		
+		Personality[pilot] = Personality[pilot] or CreatePilotPersonality("NULL", "default")
+	end
+	
+	local function affirmMech(mech)
+		if mech == "" then
+			return
+		end
+		
+		_G[mech] = _G[mech] or PunchMech:new{}
+	end
+	
+	local function affirmEnemy(enemy)
+		if enemy == "" then
+			return
+		end
+		
+		_G[enemy] = _G[enemy] or Hornet1:new{}
+	end
+	
+	local function affirmWeapon(weapon)
+		if weapon == "" then
+			return
+		end
+		
+		_G[weapon] = _G[weapon] or Prime_Punchmech:new{}
+	end
+	
+	for _, pilot in ipairs(Profile.pilots) do
+		affirmPilot(pilot)
+	end
+	
+	local i = 0
+	local stat_tracker = Profile.stat_tracker
+	local score = stat_tracker["current"]
+	
+	if not score then
+		score = stat_tracker["score".. i]
+		i = i + 1
+	end
+	
+	while score do
+		for _, mech in ipairs(score.mechs) do
+			affirmMech(mech)
+		end
+		
+		for _, weapon in ipairs(score.weapons) do
+			affirmWeapon(weapon)
+		end
+		
+		local j = 0
+		while true do
+			local pilot = score["pilot".. j]
+			
+			if pilot == nil then
+				break
+			end
+			
+			affirmPilot(pilot.id)
+			
+			j = j + 1
+		end
+		
+		score = stat_tracker["score".. i]
+		
+		i = i + 1
+	end
+	
+	for pilot, _ in ipairs(stat_tracker.pilots) do
+		affirmPilot(pilot)
+	end
+	
+	for enemy, _ in ipairs(stat_tracker.enemies) do
+		affirmEnemy(enemy)
+	end
+end)
+
 function IsTestMechScenario()
 	if not Game then return false end
 
