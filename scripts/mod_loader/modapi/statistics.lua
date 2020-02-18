@@ -2,7 +2,7 @@
 Placeholder_Mech = PunchMech:new{Image = "placeholder_mech"}
 Placeholder_Pilot = Pilot:new{}
 Placeholder_Weapon = Skill:new{Icon = "weapons/placeholder_weapon.png"}
-Placeholder_Enemy = Hornet1:new{Image = "placeholder_enemy"}
+Placeholder_Enemy = Hornet1:new{Name = "Missing Mod", Image = "placeholder_enemy"}
 Placeholder_Personality = CreatePilotPersonality("NULL", "placeholder")
 
 local ProfileDataAffirmed = false
@@ -52,7 +52,7 @@ function modApi:affirmProfileData()
 			return
 		end
 		
-		_G[id] = _G[id] or placeholder
+		_G[id] = _G[id] or placeholder:new()
 	end
 	
 	local profile_list = self:getProfileList()
@@ -100,12 +100,12 @@ function modApi:affirmProfileData()
 			affirmPersonality(pilot, Placeholder_Personality)
 		end
 		
-		for pilot, _ in ipairs(stat_tracker.pilots) do
+		for pilot, _ in pairs(stat_tracker.pilots) do
 			affirmUnit(pilot, Placeholder_Pilot)
 			affirmPersonality(pilot, Placeholder_Personality)
 		end
 		
-		for enemy, _ in ipairs(stat_tracker.enemies) do
+		for enemy, _ in pairs(stat_tracker.enemies) do
 			affirmUnit(enemy, Placeholder_Enemy)
 		end
 	end
