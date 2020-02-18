@@ -30,6 +30,10 @@ function modApi:loadProfile()
 	if self:fileExists(path) then
 		local result = self:loadIntoEnv(path).Profile
 
+		-- Gut the stat tracker, cause it takes a boatload
+		-- of space, and is fairly useless.
+		result.stat_tracker = nil
+
 		return result
 	end
 
