@@ -78,6 +78,7 @@ function mod_loader:init()
 	
 	self:loadModContent(self:getModConfig(), self:getSavedModOrder())
 	self:loadPilotList()
+	modApi:affirmProfileData()
 end
 
 function mod_loader:loadAdditionalSprites()
@@ -90,6 +91,13 @@ function mod_loader:loadAdditionalSprites()
 	ANIMS.train_dual_damagedw_broken = ANIMS.BaseUnit:new{ Image = "units/mission/train_w_broken.png", PosX = -51, PosY = 3 }
 	ANIMS.missilew_broken = ANIMS.BaseUnit:new{ Image = "units/mission/missilesilo_w_broken.png", PosX = -8, PosY = 5}
 	ANIMS.generator3w_broken = ANIMS.BaseUnit:new{ Image = "units/mission/generator_3_w_broken.png", PosX = -17, PosY = -10 }
+	
+	modApi:appendAsset("img/units/placeholder_mech.png",baseDir.."img/placeholders/mech.png")
+	modApi:appendAsset("img/weapons/placeholder_weapon.png",baseDir.."img/placeholders/weapon.png")
+	modApi:appendAsset("img/units/placeholder_enemy.png",baseDir.."img/placeholders/enemy.png")
+	
+	ANIMS.placeholder_mech = ANIMS.SingleImage:new{Image = "units/placeholder_mech.png"}
+	ANIMS.placeholder_enemy = ANIMS.SingleImage:new{Image = "units/placeholder_enemy.png"}
 end
 
 function mod_loader:enumerateMods()

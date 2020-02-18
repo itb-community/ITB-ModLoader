@@ -1,6 +1,7 @@
 local scripts = {
 	"init",
 	"global",
+	"statistics",
 	"ftldat",
 	"misc",
 	"sandbox",
