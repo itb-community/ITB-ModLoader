@@ -519,6 +519,7 @@ end]]
 
 
 function InitializeBoardClass(board)
+	-- modify existing board functions here
 	
 	local oldSetLava = board.SetLava
 	BoardClass.SetLava = function(self, loc, lava, sink)
@@ -661,8 +662,6 @@ function InitializeBoardClass(board)
 	end
 	
 	-- TODO: add function SetAcid(board, bool, bool) with instant acid application/removal
-	
-	-- additional board overrides here.
 end
 
 local board_metatable
