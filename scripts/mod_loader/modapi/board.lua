@@ -474,10 +474,6 @@ BoardClass.GetLuaString = function(self)
 end
 BoardClass.GetString = BoardClass.GetLuaString
 
-local function isTipImage(board)
-	return CUtils.IsGameboard(board)
-end
-
 BoardClass.IsGameBoard = function(self)
 	Tests.AssertSignature{
 		ret = "boolean",
@@ -486,7 +482,7 @@ BoardClass.IsGameBoard = function(self)
 		{ "userdata|GameBoard&" }
 	}
 	
-	return not self:IsTipImage()
+	return CUtils.IsGameboard(self)
 end
 
 BoardClass.IsTipImage = function(self)
@@ -497,7 +493,7 @@ BoardClass.IsTipImage = function(self)
 		{ "userdata|GameBoard&" }
 	}
 	
-	return isTipImage(self)
+	return not CUtils.IsGameboard(self)
 end
 
 -- GetCurrentMission is not accurate enough.
