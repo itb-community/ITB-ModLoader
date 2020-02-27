@@ -1,7 +1,6 @@
 local scripts = {
 	"hard-alter",
 	
-	"cutils",
 	"classes",
 
 	"sdlext/serialize",
