@@ -1,5 +1,7 @@
 mod_loader = {}
 
+assert(package.loadlib("Cutils.dll", "luaopen_utils"), "cannot find C-Utils dll")()
+
 Logger = require("scripts/mod_loader/logger")
 
 local BasicLogger = require("scripts/mod_loader/logger_basic")
