@@ -1,7 +1,7 @@
-deco.surfaces.checkboxChecked = sdl.surface("resources/mods/ui/checkbox-checked.png")
-deco.surfaces.checkboxUnchecked = sdl.surface("resources/mods/ui/checkbox-unchecked.png")
-deco.surfaces.checkboxHoveredChecked = sdl.surface("resources/mods/ui/checkbox-hovered-checked.png")
-deco.surfaces.checkboxHoveredUnchecked = sdl.surface("resources/mods/ui/checkbox-hovered-unchecked.png")
+deco.surfaces.checkboxChecked = sdlext.getSurface({ path = "resources/mods/ui/checkbox-checked.png" })
+deco.surfaces.checkboxUnchecked = sdlext.getSurface({ path = "resources/mods/ui/checkbox-unchecked.png" })
+deco.surfaces.checkboxHoveredChecked = sdlext.getSurface({ path = "resources/mods/ui/checkbox-hovered-checked.png" })
+deco.surfaces.checkboxHoveredUnchecked = sdlext.getSurface({ path = "resources/mods/ui/checkbox-hovered-unchecked.png" })
 
 
 DecoCheckbox = Class.inherit(DecoSurface)

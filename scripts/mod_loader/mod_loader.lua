@@ -25,6 +25,10 @@ function LOG(...)
 	end
 end
 
+function LOGF(...)
+	LOG(string.format(...))
+end
+
 function mod_loader:init()
 	self.mod_dirs = {}
 	self.mods = {}

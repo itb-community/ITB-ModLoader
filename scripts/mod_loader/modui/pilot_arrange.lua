@@ -5,6 +5,8 @@
 --]]
 
 local MAX_PILOTS = 13
+local hangarBackdrop = sdlext.getSurface({ path = "resources/mods/ui/pilot-arrange-hangar.png" })
+local pilotSurfaces = {}
 
 function loadPilotsOrder()
 	local order = {}
@@ -34,6 +36,19 @@ function savePilotsOrder()
 	end)
 end
 
+local function getOrCreatePilotSurface(pilotId)
+	local surface = pilotSurfaces[pilotId]
+	if not surface then
+		surface = sdlext.getSurface({
+			path = "img/portraits/pilots/"..pilotId..".png",
+			scale = 2
+		})
+		pilotSurfaces[pilotId] = surface
+	end
+
+	return surface
+end
+
 local function createUi()
 	local pilotButtons = {}
 
@@ -52,7 +67,7 @@ local function createUi()
 		
 		local portraitW = 122 + 8
 		local portraitH = 122 + 8
-		local gap = 10
+		local gap = 16
 		local cellW = portraitW + gap
 		local cellH = portraitH + gap
 
@@ -111,12 +126,26 @@ local function createUi()
 			end
 		end
 		
+		local function addHangarBackdrop(i)
+			local col = (i - 1) % portraitsPerRow
+			local row = math.floor((i - 1) / portraitsPerRow)
+
+			local button = Ui()
+				:widthpx(portraitW):heightpx(portraitH)
+				:pospx(cellW * col, cellH * row)
+				:decorate({
+					DecoAlign(0,-4),
+					DecoSurface(hangarBackdrop)
+				})
+				:addTo(scrollarea)
+		end
+		
 		local function addPilotButton(i, pilotId)
 			local pilot = _G[pilotId]
 			local col = (i - 1) % portraitsPerRow
 			local row = math.floor((i - 1) / portraitsPerRow)
 			
-			local surface = sdl.scaled(2, sdlext.surface("img/portraits/pilots/"..pilotId..".png"))
+			local surface = getOrCreatePilotSurface(pilotId)
 			local button = Ui()
 				:widthpx(portraitW):heightpx(portraitH)
 				:pospx(cellW * col, cellH * row)
@@ -179,6 +208,10 @@ local function createUi()
 				addPilotButton(#pilotButtons + 1, pilotId)
 			end
 		end
+		for i = 1, 13 do
+			addHangarBackdrop(i)
+		end
+		
 	end)
 end
 

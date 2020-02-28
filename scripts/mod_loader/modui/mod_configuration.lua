@@ -119,7 +119,7 @@ local function createUi()
 						optionbox:hide()
 					end
 					
-					configboxes[configuringMod].decorations[2].surface = sdl.surface("resources/mods/ui/config-unchecked.png")
+					configboxes[configuringMod].decorations[2].surface = sdlext.getSurface({ path = "resources/mods/ui/config-unchecked.png" })
 				end
 				
 				if self.configi == configuringMod then
@@ -128,7 +128,7 @@ local function createUi()
 					configuringMod = self.configi
 					local numOptions = #optionboxes[configuringMod]
 					
-					configboxes[configuringMod].decorations[2].surface = sdl.surface("resources/mods/ui/config-checked.png")
+					configboxes[configuringMod].decorations[2].surface = sdlext.getSurface({ path = "resources/mods/ui/config-checked.png" })
 					
 					for i, optionbox in pairs(optionboxes[configuringMod]) do
 						optionbox:show()
@@ -172,7 +172,7 @@ local function createUi()
 							DecoButton(),
 							DecoCheckbox(),
 							DecoSurfaceOutlined(
-								sdlext.surface(mod.icon or "resources/mods/squads/unknown.png"),
+								sdlext.getSurface({ path = mod.icon or "resources/mods/squads/unknown.png" }),
 								nil,
 								nil,
 								nil,
@@ -191,7 +191,7 @@ local function createUi()
 						:widthpx(41):heightpx(41)
 						:decorate({
 							DecoButton(),
-							DecoSurface(sdl.surface("resources/mods/ui/config-unchecked.png"))
+							DecoSurface(sdlext.getSurface({ path = "resources/mods/ui/config-unchecked.png" }))
 						})
 						:addTo(entryHeader)
 					
@@ -253,7 +253,7 @@ local function createUi()
 							DecoButton(),
 							DecoCheckbox(),
 							DecoSurfaceOutlined(
-								sdlext.surface(mod.icon or "resources/mods/squads/unknown.png"),
+								sdlext.getSurface({ path = mod.icon or "resources/mods/squads/unknown.png" }),
 								nil,
 								nil,
 								nil,
