@@ -93,7 +93,7 @@ function startNewGame()
 
 	modApi:firePreStartGameHooks()
 
-	Game.SetMaxPow(7)
+	CUtils.SetMaxPower(7)
 	oldStartNewGame()
 
 	overrideNextPhase()
