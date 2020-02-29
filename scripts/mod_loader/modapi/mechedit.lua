@@ -1,6 +1,9 @@
 
 local mechedit = {}
 
+Region = Region or {}
+Region.MechEdit = mechedit
+
 modApi:AddHook("RegionMechHighlighted")
 modApi:AddHook("RegionMechUnhighlighted")
 modApi:AddHook("RegionMechDeselected")
@@ -28,155 +31,288 @@ local function update_mechedit()
 	CUtils.SetMechEditMoveIconHighlightable(true)
 end
 
+
 -- Highlightable
 function mechedit.IsTestHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditTestHighlightable()
 end
 
 function mechedit.IsClassHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditClassHighlightable()
 end
 
 function mechedit.IsNameHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditNameHighlightable()
 end
 
 function mechedit.IsPilotNameHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditPilotNameHighlightable()
 end
 
 function mechedit.IsInstallHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditInstallCoreHighlightable()
 end
 
 function mechedit.IsUndoHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditUndoHighlightable()
 end
 
 function mechedit.IsHealthHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditHealthHighlightable()
 end
 
 function mechedit.IsHealthIconHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditHealthIconHighlightable()
 end
 
 function mechedit.IsMoveHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditMoveHighlightable()
 end
 
 function mechedit.IsMoveIconHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditMoveIconHighlightable()
 end
 
 function mechedit.IsInventoryHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditInventoryHighlightable()
 end
 
 function mechedit.IsInventoryUpHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditInventoryUpHighlightable()
 end
 
 function mechedit.IsInventoryDownHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditInventoryDownHighlightable()
 end
 
 function mechedit.IsSkill1Highlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditSkill1Highlightable()
 end
 
 function mechedit.IsSkill2Highlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditSkill2Highlightable()
 end
 
 function mechedit.IsAbilityHighlightable()
+	if not Game then
+		return nil
+	end
+	
 	return CUtils.IsMechEditAbilityHighlightable()
 end
 
 -- Highlighted/Hovered
 function mechedit.IsTestHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditTestHovered()
 end
 
 function mechedit.IsClassHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditClassHovered()
 end
 
 function mechedit.IsNameHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditNameHovered()
 end
 
 function mechedit.IsPilotNameHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditPilotNameHovered()
 end
 
 function mechedit.IsInstallHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditInstallCoreHovered()
 end
 
 function mechedit.IsReactorHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditCoresHovered()
 end
 
 function mechedit.IsUndoHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditUndoHovered()
 end
 
 function mechedit.IsHealthHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditHealthHovered()
 end
 
 function mechedit.IsHealthIconHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditHealthIconHovered()
 end
 
 function mechedit.IsMoveHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditMoveHovered()
 end
 
 function mechedit.IsMoveIconHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditMoveIconHovered()
 end
 
 function mechedit.IsInventoryHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditInventoryHovered()
 end
 
 function mechedit.IsInventoryUpHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditInventoryUpHovered()
 end
 
 function mechedit.IsInventoryDownHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditInventoryDownHovered()
 end
 
 function mechedit.IsSkill1Highlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditSkill1Hovered()
 end
 
 function mechedit.IsSkill2Highlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditSkill2Hovered()
 end
 
 function mechedit.IsAbilityHighlighted()
+	if not Game then
+		return false
+	end
+	
 	return CUtils.IsMechEditAbilityHovered()
 end
 
 
-function mechedit.GetSelectedMech()
+function Region.GetSelectedMech()
 	if not Game then
-		return
+		return nil
 	end
 	
-	return Game:GetPawn(CUtils.GetRegionMechSelected())
+	return Game:GetPawn((CUtils.GetRegionMechSelected()))
 end
 
-function mechedit.GetHoveredMech()
+function Region.GetHoveredMech()
 	if not Game then
-		return
+		return nil
 	end
 	
-	return Game:GetPawn(CUtils.GetRegionMechHovered())
+	return Game:GetPawn((CUtils.GetRegionMechHovered()))
 end
 
 sdlext.addFrameDrawnHook(function(screen)
@@ -235,6 +371,3 @@ sdlext.addFrameDrawnHook(function(screen)
 		hovered_mech_prev = hovered_mech
 	end
 end)
-
-Region = Region or {}
-Region.MechEdit = mechedit
