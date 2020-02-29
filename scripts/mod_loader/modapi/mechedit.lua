@@ -298,6 +298,126 @@ function mechedit.IsAbilityHighlighted()
 	return CUtils.IsMechEditAbilityHovered()
 end
 
+function mechedit.SetTestHighlightable(highlightable)
+	Tests.AssertSignature{
+		ret = "void",
+		func = "SetTestHighlightable",
+		params = { highlightable },
+		{ "boolean|bool" }
+	}
+	
+	if not Game then
+		return
+	end
+	
+	CUtils.SetMechEditTestHighlightable(highlightable)
+end
+
+function mechedit.SetClassHighlightable(highlightable)
+	Tests.AssertSignature{
+		ret = "void",
+		func = "SetClassHighlightable",
+		params = { highlightable },
+		{ "boolean|bool" }
+	}
+	
+	if not Game then
+		return
+	end
+	
+	CUtils.SetMechEditClassHighlightable(highlightable)
+end
+
+function mechedit.SetHealthIconHighlightable(highlightable)
+	Tests.AssertSignature{
+		ret = "void",
+		func = "SetHealthIconHighlightable",
+		params = { highlightable },
+		{ "boolean|bool" }
+	}
+	
+	if not Game then
+		return
+	end
+	
+	CUtils.SetMechEditHealthIconHighlightable(highlightable)
+end
+
+function mechedit.SetMoveHighlightable(highlightable)
+	Tests.AssertSignature{
+		ret = "void",
+		func = "SetMoveHighlightable",
+		params = { highlightable },
+		{ "boolean|bool" }
+	}
+	
+	if not Game then
+		return
+	end
+	
+	CUtils.SetMechEditMoveHighlightable(highlightable)
+end
+
+function mechedit.SetMoveIconHighlightable(highlightable)
+	Tests.AssertSignature{
+		ret = "void",
+		func = "SetMoveIconHighlightable",
+		params = { highlightable },
+		{ "boolean|bool" }
+	}
+	
+	if not Game then
+		return
+	end
+	
+	CUtils.SetMechEditMoveIconHighlightable(highlightable)
+end
+
+function mechedit.SetNameHighlightable(highlightable)
+	Tests.AssertSignature{
+		ret = "void",
+		func = "SetNameHighlightable",
+		params = { highlightable },
+		{ "boolean|bool" }
+	}
+	
+	if not Game then
+		return
+	end
+	
+	CUtils.SetMechEditNameHighlightable(highlightable)
+end
+
+function mechedit.SetPilotNameHighlightable(highlightable)
+	Tests.AssertSignature{
+		ret = "void",
+		func = "SetPilotNameHighlightable",
+		params = { highlightable },
+		{ "boolean|bool" }
+	}
+	
+	if not Game then
+		return
+	end
+	
+	CUtils.SetMechEditPilotNameHighlightable(highlightable)
+end
+
+function mechedit.SetInstallHighlightable(highlightable)
+	Tests.AssertSignature{
+		ret = "void",
+		func = "SetInstallHighlightable",
+		params = { highlightable },
+		{ "boolean|bool" }
+	}
+	
+	if not Game then
+		return
+	end
+	
+	CUtils.SetMechEditInstallHighlightable(highlightable)
+end
+
 
 function Region.GetSelectedMech()
 	if not Game then
