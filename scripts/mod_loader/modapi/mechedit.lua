@@ -32,6 +32,22 @@ local function update_mechedit()
 end
 
 
+function mechedit.GetItemOnCursor()
+	if not Game then
+		return nil
+	end
+	
+	return CUtils.GetMechEditItemOnCursor()
+end
+
+function mechedit.IsTipImage()
+	if not Game then
+		return false
+	end
+	
+	return CUtils.IsMechEditTipImage()
+end
+
 -- Highlightable
 function mechedit.IsTestHighlightable()
 	if not Game then
