@@ -7,7 +7,7 @@ function modApi:init()
 	Settings = self:loadSettings()
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
-	self.version = "2.4.1"
+	self.version = "2.4.1.DEV"
 	LOG("MOD-API VERSION "..self.version)
 	self.texts = {}
 
