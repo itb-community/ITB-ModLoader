@@ -431,7 +431,7 @@ function mechedit.SetInstallHighlightable(highlightable)
 		return
 	end
 	
-	CUtils.SetMechEditInstallHighlightable(highlightable)
+	CUtils.SetMechEditInstallCoreHighlightable(highlightable)
 end
 
 
