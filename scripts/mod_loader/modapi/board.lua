@@ -47,7 +47,7 @@ BoardClass.IsForestFire = function(self, loc)
 		{ "userdata|GameBoard&", "userdata|Point" }
 	}
 	
-	return CUtils.IsForestFire(self, loc)
+	return CUtils.IsTileForestFire(self, loc)
 end
 
 BoardClass.IsShield = function(self, loc)
