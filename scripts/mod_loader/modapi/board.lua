@@ -233,7 +233,7 @@ BoardClass.SetMaxHealth = function(self, loc, hp_max)
 			hp_max = math.max(1, math.min(4, hp_max))
 		end
 		
-		local hp = CUtils.GetTileHealth(self, loc.x, loc.y)
+		local hp = CUtils.GetTileHealth(self, loc)
 		
 		self:SetBuilding(loc, hp, hp_max)
 	end
