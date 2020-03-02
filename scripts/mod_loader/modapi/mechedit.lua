@@ -179,7 +179,7 @@ end
 
 -- Hovered
 function mechedit.IsTestHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -187,7 +187,7 @@ function mechedit.IsTestHovered()
 end
 
 function mechedit.IsClassHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -195,7 +195,7 @@ function mechedit.IsClassHovered()
 end
 
 function mechedit.IsNameHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -203,7 +203,7 @@ function mechedit.IsNameHovered()
 end
 
 function mechedit.IsPilotNameHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -211,7 +211,7 @@ function mechedit.IsPilotNameHovered()
 end
 
 function mechedit.IsInstallHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -219,7 +219,7 @@ function mechedit.IsInstallHovered()
 end
 
 function mechedit.IsReactorHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -227,7 +227,7 @@ function mechedit.IsReactorHovered()
 end
 
 function mechedit.IsUndoHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -235,7 +235,7 @@ function mechedit.IsUndoHovered()
 end
 
 function mechedit.IsHealthHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -243,7 +243,7 @@ function mechedit.IsHealthHovered()
 end
 
 function mechedit.IsHealthIconHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -251,7 +251,7 @@ function mechedit.IsHealthIconHovered()
 end
 
 function mechedit.IsMoveHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -259,7 +259,7 @@ function mechedit.IsMoveHovered()
 end
 
 function mechedit.IsMoveIconHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -267,7 +267,7 @@ function mechedit.IsMoveIconHovered()
 end
 
 function mechedit.IsInventoryHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -275,7 +275,7 @@ function mechedit.IsInventoryHovered()
 end
 
 function mechedit.IsInventoryUpHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -283,7 +283,7 @@ function mechedit.IsInventoryUpHovered()
 end
 
 function mechedit.IsInventoryDownHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -291,7 +291,7 @@ function mechedit.IsInventoryDownHovered()
 end
 
 function mechedit.IsSkill1Hovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -299,7 +299,7 @@ function mechedit.IsSkill1Hovered()
 end
 
 function mechedit.IsSkill2Hovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
@@ -307,7 +307,7 @@ function mechedit.IsSkill2Hovered()
 end
 
 function mechedit.IsAbilityHovered()
-	if not Game then
+	if not Game or not GameState.IsRegion() then
 		return false
 	end
 	
