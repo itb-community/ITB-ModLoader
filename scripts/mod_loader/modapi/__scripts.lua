@@ -13,6 +13,7 @@ local scripts = {
 	"map",
 	"skills",
 	"savedata",
+	"gamestate",
 	"game",
 	"board",
 	"pawn",
