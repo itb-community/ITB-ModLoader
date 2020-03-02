@@ -112,10 +112,6 @@ GameClass.SubGridDef = function(grid_def)
 	GameClass.AddGridDef(-grid_def)
 end
 
-GameClass.GridBlink = function()
-	CUtils.DoGridBlink()
-end
-
 
 GameClass.IsCogHovered = function()
 	return CUtils.IsCogHovered()
