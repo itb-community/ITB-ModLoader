@@ -351,7 +351,7 @@ BoardPawn.IsMovementAvailable = function(self)
 		{ "userdata|BoardPawn&" }
 	}
 	
-	return not CUtils.SetPawnMovementSpent(self)
+	return not CUtils.IsPawnMovementSpent(self)
 end
 
 BoardPawn.SetMovementAvailable = function(self, movementAvailable)
