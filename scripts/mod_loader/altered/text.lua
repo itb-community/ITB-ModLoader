@@ -48,10 +48,10 @@ function GetPopulationTexts(event, count)
 end
 
 local oldGetText = GetText
-function GetText(id)
+function GetText(id, r1, r2, r3)
 	if modApi.textOverrides and modApi.textOverrides[id] then
 		return modApi.textOverrides[id]
 	end
 	
-	return oldGetText(id)
+	return oldGetText(id, r1, r2, r3)
 end
