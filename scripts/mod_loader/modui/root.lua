@@ -112,7 +112,7 @@ local isShiftHeld = false
 local shiftToggledHooks = {}
 function sdlext.addShiftToggledHook(fn)
 	assert(type(fn) == "function")
-	table.insert(shiftToggledHooks)
+	table.insert(shiftToggledHooks, fn)
 end
 
 function sdlext.isShiftDown()
@@ -123,7 +123,7 @@ local isAltHeld = false
 local altToggledHooks = {}
 function sdlext.addAltToggledHook(fn)
 	assert(type(fn) == "function")
-	table.insert(altToggledHooks)
+	table.insert(altToggledHooks, fn)
 end
 
 function sdlext.isAltDown()
@@ -134,7 +134,7 @@ local isCtrlHeld = false
 local ctrlToggledHooks = {}
 function sdlext.addCtrlToggledHook(fn)
 	assert(type(fn) == "function")
-	table.insert(ctrlToggledHooks)
+	table.insert(ctrlToggledHooks, fn)
 end
 
 function sdlext.isCtrlDown()
