@@ -131,23 +131,34 @@ end
 	executed once the condition function associated
 	with it returns true.
 --]]
-function modApi:conditionalHook(conditionFn, fn, remove)
+function modApi:conditionalHook(conditionFn, fn, removeFn)
 	assert(type(conditionFn) == "function")
 	assert(type(fn) == "function")
-	remove = remove == nil and true or remove
-	assert(type(remove) == "boolean")
+
+	-- Compatibility with earlier versions of this function
+	if removeFn == nil then
+		removeFn = function()
+			return true
+		end
+	elseif type(removeFn) == "boolean" then
+		local removeArg = removeFn
+		removeFn = function()
+			return removeArg
+		end
+	end
+	assert(type(removeFn) == "function")
 
 	table.insert(self.conditionalHooks, {
 		condition = conditionFn,
 		hook = fn,
-		remove = remove
+		remove = removeFn
 	})
 end
 
 function modApi:evaluateConditionalHooks()
 	for i, tbl in ipairs(self.conditionalHooks) do
 		if tbl.condition() then
-			if tbl.remove then
+			if tbl.remove() then
 				table.remove(self.conditionalHooks, i)
 			end
 			tbl.hook()
