@@ -98,7 +98,7 @@ local function createUi()
 		local function rearrange()
 			local index = list_indexof(pilotButtons, placeholder)
 			if index ~= nil and draggedElement ~= nil then
-				local col = math.floor(draggedElement.x / cellW + 0.5)
+				local col = math.floor(draggedElement.x / cellW + 0.5)-1
 				local row = math.floor(draggedElement.y / cellH + 0.5)
 				local desiredIndex = 1 + col + row * portraitsPerRow
 				if desiredIndex < 1 then desiredIndex = 1 end
@@ -111,8 +111,8 @@ local function createUi()
 			end
 			
 			for i = 1, #pilotButtons do
-				local col = (i - 1) % portraitsPerRow
-				local row = math.floor((i - 1) / portraitsPerRow)
+				local col = (i) % portraitsPerRow
+				local row = math.floor((i) / portraitsPerRow)
 				local button = pilotButtons[i]
 				
 				button:pospx(cellW * col, cellH * row)
@@ -126,9 +126,40 @@ local function createUi()
 			end
 		end
 		
+		local function addRandomButton()
+			local bheight = 40
+		
+			local button = Ui()
+				:widthpx(portraitW):heightpx(bheight)
+				:pospx(0, (portraitH - bheight) * 0.5)
+				:settooltip("Randomize Pilot order.")
+				:decorate({
+					DecoButton(),
+					DecoAlign(9),
+					DecoText("Randomize"),
+				})
+				:addTo(scrollarea)
+				
+			button.onclicked = function()
+				for i = #pilotButtons, 2, -1 do
+					local j = math.random(i)
+					pilotButtons[i], pilotButtons[j] = pilotButtons[j], pilotButtons[i]
+				end
+
+				for i = 1, #pilotButtons do
+					local col = (i) % portraitsPerRow
+					local row = math.floor((i) / portraitsPerRow)
+					local button0 = pilotButtons[i]
+					
+					button0:pospx(cellW * col, cellH * row)
+				end
+				return true
+			end
+		end
+		
 		local function addHangarBackdrop(i)
-			local col = (i - 1) % portraitsPerRow
-			local row = math.floor((i - 1) / portraitsPerRow)
+			local col = (i) % portraitsPerRow
+			local row = math.floor((i) / portraitsPerRow)
 
 			local button = Ui()
 				:widthpx(portraitW):heightpx(portraitH)
@@ -142,8 +173,8 @@ local function createUi()
 		
 		local function addPilotButton(i, pilotId)
 			local pilot = _G[pilotId]
-			local col = (i - 1) % portraitsPerRow
-			local row = math.floor((i - 1) / portraitsPerRow)
+			local col = (i) % portraitsPerRow
+			local row = math.floor((i) / portraitsPerRow)
 			
 			local surface = getOrCreatePilotSurface(pilotId)
 			local button = Ui()
@@ -200,6 +231,8 @@ local function createUi()
 			end
 		end
 		
+		addRandomButton()
+		
 		local dupes = {}
 		for i = 1, #PilotListExtended do
 			local pilotId = PilotListExtended[i]
@@ -208,7 +241,7 @@ local function createUi()
 				addPilotButton(#pilotButtons + 1, pilotId)
 			end
 		end
-		for i = 1, 13 do
+		for i = 1, MAX_PILOTS do
 			addHangarBackdrop(i)
 		end
 		
