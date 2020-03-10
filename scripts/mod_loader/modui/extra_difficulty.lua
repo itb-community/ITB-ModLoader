@@ -40,7 +40,7 @@ local function createUi(root)
 	end
 
 	local mask = Ui()
-		:widthpx(156):heightpx(30)
+		:widthpx(156):heightpx(35)
 		:decorate({ DecoSolid(deco.colors.transparent) })
 		:addTo(pane)
 	mask.translucent = true
@@ -140,13 +140,13 @@ local function createUi(root)
 
 		if self.visible then
 			local origin = GetHangarOrigin()
-			origin.x = origin.x + 640
+			origin.x = origin.x + 635
 			origin.y = origin.y + 30
 
-			arrLeft:pospx (origin.x + 4          , origin.y + 4 )
-			arrRight:pospx(origin.x + 28 + 90 + 4, origin.y + 4 )
-			diffText:pospx(origin.x              , origin.y + 13)
-			mask:pospx    (origin.x              , origin.y + 11)
+			arrLeft:pospx (origin.x - 2           , origin.y + 4 )
+			arrRight:pospx(origin.x + 28 + 90 + 10, origin.y + 4 )
+			diffText:pospx(origin.x               , origin.y + 13)
+			mask:pospx    (origin.x               , origin.y + 11)
 
 			local hideDifficultyUi = IsHangarWindowState() or
 				(leaving and not mask.animations.fadeIn:isStarted())

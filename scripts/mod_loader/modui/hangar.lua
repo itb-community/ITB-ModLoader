@@ -636,7 +636,7 @@ local function createUi(root)
 	end
 
 	local btnBack = Ui()
-		:widthpx(120):heightpx(65)
+		:widthpx(103):heightpx(65)
 		:addTo(holder)
 	btnBack.translucent = true
 	btnBack.mousedown = function(self, x, y, button)
@@ -654,7 +654,7 @@ local function createUi(root)
 	end
 
 	local btnStart = Ui()
-		:widthpx(120):heightpx(65)
+		:widthpx(117):heightpx(65)
 		:addTo(holder)
 	btnStart.translucent = true
 	btnStart.mousedown = function(self, x, y, button)
@@ -676,7 +676,7 @@ local function createUi(root)
 	holder.draw = function(self, screen)
 		local origin = GetHangarOrigin()
 		btnBack:pospx(origin.x + 520, origin.y + 10)
-		btnStart:pospx(origin.x + 800, origin.y + 10)
+		btnStart:pospx(origin.x + 803, origin.y + 10)
 
 		self.visible = sdlext.isHangar()
 		-- The game doesn't register clicks if the button isn't "primed", ie.
