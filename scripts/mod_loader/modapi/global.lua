@@ -62,7 +62,8 @@ function list_indexof(list, value)
 			return k
 		end
 	end
-	return nil
+
+	return -1
 end
 
 -- Returns true if tables are equal, false otherwise
