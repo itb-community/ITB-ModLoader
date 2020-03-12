@@ -132,21 +132,71 @@ local function createUi()
 			labelcount:caption(count.."/"..maxselected)
 		end
 
-        local buttonHeight = 41
+		local buttonHeight = 41
+		for i = 1, #modApi.mod_squads do
+			local col = (i - 1) % 2
+			local row = math.floor((i - 1) / 2)
+
+			local surface = sdlext.getSurface({ path = modApi.squad_icon[i] or "" })
+
+			if i > 1 and i <= 8 then
+				local colorTable = {}
+				for j = 1, #squadPalettes[1] do
+					colorTable[(j - 1) * 2 + 1] = squadPalettes[1][j]
+					colorTable[(j - 1) * 2 + 2] = squadPalettes[i][j]
+				end
+
+				surface = sdl.colormapped(surface, colorTable)
+			end
+
+			local checkbox = UiCheckbox()
+                :pos(0.5 * col, 0)
+                :setypx(80 * row)
+                :heightpx(buttonHeight)
+                :width(0.48)
+                :settooltip(modApi.squad_text[i * 2])
+                :decorate({
+                    DecoButton(),
+                    DecoCheckbox(),
+                    DecoSurfaceOutlined(surface),
+                    DecoAlign(0, 2),
+                    DecoText(modApi.squad_text[i * 2 - 1])
+                })
+
+			scrollarea:add(checkbox)
+
+			checkbox.onclicked = function(self, button)
+				updatecount()
+				return true
+			end
+
+			table.insert(checkboxes, checkbox)
+		end
+
+		ui:relayout()
+
+		local line = Ui()
+            :width(1):heightpx(frametop.decorations[1].bordersize)
+            :decorate({ DecoSolid(frametop.decorations[1].bordercolor) })
+            :addTo(frametop)
+
+		local buttonLayout = UiBoxLayout()
+            :hgap(20)
+            :padding(24)
+            :width(1)
+            :addTo(frametop)
+		buttonLayout:heightpx(buttonHeight + buttonLayout.padt + buttonLayout.padb)
 
 		-- default button: selects all vanilla squads
 		local defaultBtn = Ui()
-			:pos(0, 0)
-			:setypx(0)
-			:heightpx(buttonHeight)
-			:width(0.48)
-			:settooltip("Select only vanilla squads.")
-			:decorate({
-				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText("Default")
-			})
-			:addTo(scrollarea)
+            :heightpx(buttonHeight)
+            :settooltip("Select only vanilla squads.")
+            :decorate({
+                DecoButton(),
+                DecoAlign(0, 2),
+                DecoText("Default")
+            })
+            :addTo(buttonLayout)
 
 		function defaultBtn.onclicked()
 			-- check first 8 vanilla squads
@@ -165,17 +215,14 @@ local function createUi()
 
 		-- random button: selects random 8 squads
 		local randomBtn = Ui()
-			:pos(0.5, 0)
-			:setypx(0)
-			:heightpx(buttonHeight)
-			:width(0.48)
-			:settooltip("Randomize selected squads.")
-			:decorate({
-				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText("Randomize")
-			})
-			:addTo(scrollarea)
+            :heightpx(buttonHeight)
+            :settooltip("Randomize selected squads.")
+            :decorate({
+                DecoButton(),
+                DecoAlign(0, 2),
+                DecoText("Randomize")
+            })
+            :addTo(buttonLayout)
 
 		function randomBtn.onclicked()
 			-- create a list of indexes that we can modify
@@ -197,48 +244,18 @@ local function createUi()
 
 			-- always have 8 required squads selected
 			labelcount:caption(maxselected.."/"..maxselected)
+
 			return true
 		end
 
-		for i = 1, #modApi.mod_squads do
-			local col = (i - 1) % 2
-			local row = math.floor((i + 1) / 2)
+		ui:relayout()
+		scrollarea:heightpx(scrollarea.h - (buttonLayout.h + line.h))
 
-			local surface = sdlext.getSurface({ path = modApi.squad_icon[i] or "" })
-
-			if i > 1 and i <= 8 then
-				local colorTable = {}
-				for j = 1, #squadPalettes[1] do
-					colorTable[(j - 1) * 2 + 1] = squadPalettes[1][j]
-					colorTable[(j - 1) * 2 + 2] = squadPalettes[i][j]
-				end
-
-				surface = sdl.colormapped(surface, colorTable)
-			end
-
-			local checkbox = UiCheckbox()
-				:pos(0.5 * col, 0)
-				:setypx(80 * row)
-				:heightpx(buttonHeight)
-				:width(0.48)
-				:settooltip(modApi.squad_text[i*2])
-				:decorate({
-					DecoButton(),
-					DecoCheckbox(),
-					DecoSurfaceOutlined(surface),
-					DecoAlign(0, 2),
-					DecoText(modApi.squad_text[i*2-1])
-				})
-			
-			scrollarea:add(checkbox)
-
-			checkbox.onclicked = function(self, button)
-				updatecount()
-				return true
-			end
-
-			table.insert(checkboxes, checkbox)
-		end
+		line:pospx(0, scrollarea.y + scrollarea.h)
+		buttonLayout:pospx(0, line.y + line.h)
+		local buttonWidth = (frametop.w - buttonLayout.gapHorizontal - buttonLayout.padl - buttonLayout.padr) / 2
+		defaultBtn:widthpx(buttonWidth)
+		randomBtn:widthpx(buttonWidth)
 
 		for i = 1, maxselected do
 			if modApi.squadIndices == nil then
