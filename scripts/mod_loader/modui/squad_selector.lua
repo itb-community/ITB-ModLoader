@@ -7,34 +7,36 @@ local maxselected = 8
 
 local function saveSquadSelection()
 	local selected = {}
-	for i=1,maxselected do
+	for i = 1, maxselected do
 		local index = modApi.squadIndices[i]
-		local name = modApi.squad_text[(index-1)*2+1]
+		local name = modApi.squad_text[(index - 1) * 2 + 1]
 		selected[i] = name
 	end
-	
+
 	local modcontent = modApi:getCurrentModcontentPath()
 
-	sdlext.config(modcontent,function(obj)
+	sdlext.config(modcontent, function(obj)
 		obj.selectedSquads = selected
 	end)
 end
 
 function loadSquadSelection()
 	local map = {}
-	
-	for i=1,#modApi.squad_icon do
-		local name = modApi.squad_text[(i-1)*2+1]
+
+	for i = 1, #modApi.squad_icon do
+		local name = modApi.squad_text[(i - 1) * 2 + 1]
 		map[name] = i
 	end
-	
+
 	local modcontent = modApi:getCurrentModcontentPath()
 
 	modApi.squadIndices = {}
 	sdlext.config(modcontent, function(obj)
-		if not obj.selectedSquads then return end
-		
-		for i=1,maxselected do
+		if not obj.selectedSquads then
+			return
+		end
+
+		for i = 1, maxselected do
 			local name = obj.selectedSquads[i]
 			local index = map[name]
 			if index ~= nil then
@@ -42,15 +44,15 @@ function loadSquadSelection()
 			end
 		end
 	end)
-	
-	for i=1,maxselected do
+
+	for i = 1, maxselected do
 		if modApi.squadIndices[i] == nil then
 			modApi.squadIndices[i] = i
 		end
 	end
 end
 
-local largefont = sdlext.font("fonts/NunitoSans_Bold.ttf",44)
+local largefont = sdlext.font("fonts/NunitoSans_Bold.ttf", 44)
 local squadPalettes = sdlext.squadPalettes()
 local function createUi()
 	local checkboxes = {}
@@ -58,7 +60,7 @@ local function createUi()
 	local onExit = function(self)
 		modApi.squadIndices = {}
 		local assignIndex = function(n)
-			for i=1,maxselected do
+			for i = 1, maxselected do
 				if modApi.squadIndices[i] == nil then
 					modApi.squadIndices[i] = n
 					return true
@@ -67,25 +69,27 @@ local function createUi()
 			return false
 		end
 
-		for i=1,maxselected do
+		for i = 1, maxselected do
 			if checkboxes[i].checked then
 				modApi.squadIndices[i] = i
 			end
 		end
-		
-		for i=maxselected+1,#checkboxes do
-			if checkboxes[i].checked and not assignIndex(i) then break end
+
+		for i = maxselected + 1, #checkboxes do
+			if checkboxes[i].checked and not assignIndex(i) then
+				break
+			end
 		end
-		
-		for i=1,maxselected do
+
+		for i = 1, maxselected do
 			if modApi.squadIndices[i] == nil then
 				modApi.squadIndices[i] = i
 			end
 		end
-		
+
 		saveSquadSelection()
 	end
-	
+
 	sdlext.showDialog(function(ui, quit)
 		ui.onDialogExit = onExit
 
@@ -97,8 +101,8 @@ local function createUi()
 			:addTo(ui)
 
 		Ui()
-			:width(0.3):height(0.05)
-			:pos(0.7,0.925)
+            :width(0.3):height(0.05)
+			:pos(0.7, 0.925)
 			:caption(modApi:getText("SquadSelect_Total"))
 			:decorate({ DecoCaption() })
 			:addTo(ui)
@@ -117,15 +121,17 @@ local function createUi()
 
 		local updatecount = function()
 			local count = 0
-			
-			for i=1,#checkboxes do
+
+			for i = 1, #checkboxes do
 				local checkbox = checkboxes[i]
-				if checkbox.checked then count=count+1 end
+				if checkbox.checked then
+					count = count + 1
+				end
 			end
 			
 			labelcount:caption(count.."/"..maxselected)
 		end
-		
+
 		-- default button: selects all vanilla squads
 		local defaultBtn = Ui()
 			:pos(0, 0)
@@ -141,11 +147,11 @@ local function createUi()
 			:addTo(scrollarea)
 		function defaultBtn.onclicked()
 			-- check first 8 vanilla squads
-			for i=1,maxselected do
+			for i = 1, maxselected do
 				checkboxes[i].checked = true
 			end
 			-- uncheck all remaining squads
-			for i=maxselected+1,#checkboxes do
+			for i = maxselected + 1, #checkboxes do
 				checkboxes[i].checked = false
 			end
 
@@ -168,18 +174,20 @@ local function createUi()
 			})
 			:addTo(scrollarea)
 		function randomBtn.onclicked()
-		  -- create a list of indexes that we can modify
+			-- create a list of indexes that we can modify
 			local indexes = {}
-			for i = 1, #checkboxes do indexes[i] = i end
+			for i = 1, #checkboxes do
+				indexes[i] = i
+			end
 			-- choose 8 random indexes from the list
-			for i=1, maxselected do
+			for i = 1, maxselected do
 				local check = math.random(#indexes)
 				checkboxes[indexes[check]].checked = true
 				-- remove index so we don't hit it twice
 				table.remove(indexes, check)
 			end
 			-- any remaining index should be unchecked
-			for i=1,#indexes do
+			for i = 1, #indexes do
 				checkboxes[indexes[i]].checked = false
 			end
 
@@ -188,22 +196,22 @@ local function createUi()
 			return true
 		end
 
-		for i=1,#modApi.mod_squads do
-			local col = (i-1) % 2
-			local row = math.floor((i+1) / 2)
-			
+		for i = 1, #modApi.mod_squads do
+			local col = (i - 1) % 2
+			local row = math.floor((i + 1) / 2)
+
 			local surface = sdlext.getSurface({ path = modApi.squad_icon[i] or "" })
-			
-			if i>1 and i<=8 then
+
+			if i > 1 and i <= 8 then
 				local colorTable = {}
-				for j=1,#squadPalettes[1] do
-					colorTable[(j-1)*2 + 1] = squadPalettes[1][j]
-					colorTable[(j-1)*2 + 2] = squadPalettes[i][j]
+				for j = 1, #squadPalettes[1] do
+					colorTable[(j - 1) * 2 + 1] = squadPalettes[1][j]
+					colorTable[(j - 1) * 2 + 2] = squadPalettes[i][j]
 				end
-				
+
 				surface = sdl.colormapped(surface, colorTable)
 			end
-			
+
 			local checkbox = UiCheckbox()
 				:pos(0.5 * col, 0)
 				:setypx(80 * row)
@@ -219,28 +227,29 @@ local function createUi()
 				})
 			
 			scrollarea:add(checkbox)
-			
+
 			checkbox.onclicked = function(self, button)
 				updatecount()
 				return true
 			end
-			
+
 			table.insert(checkboxes, checkbox)
 		end
-		
-		for i=1,maxselected do
+
+		for i = 1, maxselected do
 			if modApi.squadIndices == nil then
 				checkboxes[i].checked = true
 			else
 				checkboxes[modApi.squadIndices[i]].checked = true
 			end
 		end
+
 		updatecount()
 	end)
 end
 
 function SelectSquads()
 	loadSquadSelection()
-	
+
 	createUi()
 end
