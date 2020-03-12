@@ -132,11 +132,13 @@ local function createUi()
 			labelcount:caption(count.."/"..maxselected)
 		end
 
+        local buttonHeight = 41
+
 		-- default button: selects all vanilla squads
 		local defaultBtn = Ui()
 			:pos(0, 0)
 			:setypx(0)
-			:heightpx(41)
+			:heightpx(buttonHeight)
 			:width(0.48)
 			:settooltip("Select only vanilla squads.")
 			:decorate({
@@ -145,6 +147,7 @@ local function createUi()
 				DecoText("Default")
 			})
 			:addTo(scrollarea)
+
 		function defaultBtn.onclicked()
 			-- check first 8 vanilla squads
 			for i = 1, maxselected do
@@ -164,7 +167,7 @@ local function createUi()
 		local randomBtn = Ui()
 			:pos(0.5, 0)
 			:setypx(0)
-			:heightpx(41)
+			:heightpx(buttonHeight)
 			:width(0.48)
 			:settooltip("Randomize selected squads.")
 			:decorate({
@@ -173,6 +176,7 @@ local function createUi()
 				DecoText("Randomize")
 			})
 			:addTo(scrollarea)
+
 		function randomBtn.onclicked()
 			-- create a list of indexes that we can modify
 			local indexes = {}
@@ -215,7 +219,7 @@ local function createUi()
 			local checkbox = UiCheckbox()
 				:pos(0.5 * col, 0)
 				:setypx(80 * row)
-				:heightpx(41)
+				:heightpx(buttonHeight)
 				:width(0.48)
 				:settooltip(modApi.squad_text[i*2])
 				:decorate({
