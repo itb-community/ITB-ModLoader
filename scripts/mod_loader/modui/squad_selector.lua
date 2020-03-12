@@ -126,9 +126,71 @@ local function createUi()
 			labelcount:caption(count.."/"..maxselected)
 		end
 		
+		-- default button: selects all vanilla squads
+		local defaultBtn = Ui()
+			:pos(0, 0)
+			:setypx(0)
+			:heightpx(41)
+			:width(0.48)
+			:settooltip("Select only vanilla squads.")
+			:decorate({
+				DecoButton(),
+				DecoAlign(0, 2),
+				DecoText("Default")
+			})
+			:addTo(scrollarea)
+		function defaultBtn.onclicked()
+			-- check first 8 vanilla squads
+			for i=1,maxselected do
+				checkboxes[i].checked = true
+			end
+			-- uncheck all remaining squads
+			for i=maxselected+1,#checkboxes do
+				checkboxes[i].checked = false
+			end
+
+			-- always have 8 required squads selected
+			labelcount:caption(maxselected.."/"..maxselected)
+			return true
+		end
+
+		-- random button: selects random 8 squads
+		local randomBtn = Ui()
+			:pos(0.5, 0)
+			:setypx(0)
+			:heightpx(41)
+			:width(0.48)
+			:settooltip("Randomize selected squads.")
+			:decorate({
+				DecoButton(),
+				DecoAlign(0, 2),
+				DecoText("Randomize")
+			})
+			:addTo(scrollarea)
+		function randomBtn.onclicked()
+		  -- create a list of indexes that we can modify
+			local indexes = {}
+			for i = 1, #checkboxes do indexes[i] = i end
+			-- choose 8 random indexes from the list
+			for i=1, maxselected do
+				local check = math.random(#indexes)
+				checkboxes[indexes[check]].checked = true
+				-- remove index so we don't hit it twice
+				table.remove(indexes, check)
+			end
+			-- any remaining index should be unchecked
+			for i=1,#indexes do
+				checkboxes[indexes[i]].checked = false
+			end
+
+			-- always have 8 required squads selected
+			labelcount:caption(maxselected.."/"..maxselected)
+			return true
+		end
+
 		for i=1,#modApi.mod_squads do
 			local col = (i-1) % 2
-			local row = math.floor((i-1) / 2)
+			local row = math.floor((i+1) / 2)
 			
 			local surface = sdlext.getSurface({ path = modApi.squad_icon[i] or "" })
 			
