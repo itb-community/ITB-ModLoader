@@ -59,7 +59,7 @@ function SpaceDamage:IsMetadata()
         return false
     end
     
-    return modApi:stringStartsWith(damageInstance.sScript, "return")
+    return modApi:stringStartsWith(self.sScript, "return")
 end
 
 function DamageList:GetMetadata()
