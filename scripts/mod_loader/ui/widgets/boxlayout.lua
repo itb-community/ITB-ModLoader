@@ -1,6 +1,6 @@
 --[[
 	A UI element which lays its children out sequentially one after another,
-	either horizontally or vertically. Width of height of this UI element
+	either horizontally or vertically. Width or height of this UI element
 	is adjusted dynamically to contain all of its children (along the laid
 	out axis). The other axis (height when laying out horizontally, and width
 	when laying out vertically) is NOT adjusted, and has to be set manually.
