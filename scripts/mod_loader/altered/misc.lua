@@ -93,6 +93,7 @@ function startNewGame()
 
 	modApi:firePreStartGameHooks()
 
+	CUtils.SetMaxPower(7)
 	oldStartNewGame()
 
 	overrideNextPhase()
@@ -205,6 +206,11 @@ function initializeDecks()
 	oldInitializeDecks()
 	
 	PilotList = oldPilotList
+end
+
+local oldGetCityPower = getCityPower
+function getCityPower()
+	return Game and CUtils.GetMaxPower() or oldGetCityPower()
 end
 
 Effect.GetLuaString = function(self)
