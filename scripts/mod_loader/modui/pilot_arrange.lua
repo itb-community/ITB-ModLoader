@@ -96,11 +96,96 @@ local function createUi()
 			:width((portraitsPerRow * cellW + scrollarea.padl + scrollarea.padr) / ui.w)
 			:posCentered()
 
+		ui:relayout()
+
+		local function refreshPilotButtons()
+			for i = 1, #pilotButtons do
+				local col = (i - 1) % portraitsPerRow
+				local row = math.floor((i - 1) / portraitsPerRow)
+				local button = pilotButtons[i]
+
+				button:pospx(cellW * col, cellH * row)
+			end
+		end
+
+		local line = Ui()
+				:width(1):heightpx(frametop.decorations[1].bordersize)
+				:decorate({ DecoSolid(frametop.decorations[1].bordercolor) })
+				:addTo(frametop)
+
+		local buttonHeight = 40
+		local buttonLayout = UiBoxLayout()
+				:hgap(20)
+				:padding(24)
+				:width(1)
+				:addTo(frametop)
+		buttonLayout:heightpx(buttonHeight + buttonLayout.padt + buttonLayout.padb)
+
+		ui:relayout()
+		scrollarea:heightpx(scrollarea.h - (buttonLayout.h + line.h))
+
+		line:pospx(0, scrollarea.y + scrollarea.h)
+		buttonLayout:pospx(0, line.y + line.h)
+
+		local defaultButton = Ui()
+			:widthpx(portraitW * 2):heightpx(buttonHeight)
+			:settooltip("Restore default pilot order")
+			:decorate({
+				DecoButton(),
+				DecoAlign(0, 2),
+				DecoText("Default"),
+			})
+			:addTo(buttonLayout)
+
+		defaultButton.onclicked = function()
+			table.sort(pilotButtons, function(a, b)
+				-- get index in default order, nil otherwise
+				local indexA = list_indexof(PilotListDefault, a.pilotId)
+				local indexB = list_indexof(PilotListDefault, b.pilotId)
+				if indexA == -1 then
+					indexA = INT_MAX
+				end
+				if indexB == -1 then
+					indexB = INT_MAX
+				end
+
+				-- equal means they are non-vanilla, so sort by ID
+				if indexA == indexB then
+					return a.pilotId < b.pilotId
+				end
+				-- unequal means one is vanilla, order vanilla
+				return indexA < indexB
+			end)
+
+			refreshPilotButtons()
+			return true
+		end
+
+		local randomizeButton = Ui()
+			:widthpx(portraitW * 2):heightpx(buttonHeight)
+			:settooltip("Randomize pilot order")
+			:decorate({
+				DecoButton(),
+				DecoAlign(0, 2),
+				DecoText("Randomize"),
+			})
+			:addTo(buttonLayout)
+
+		randomizeButton.onclicked = function()
+			for i = #pilotButtons, 2, -1 do
+				local j = math.random(i)
+				pilotButtons[i], pilotButtons[j] = pilotButtons[j], pilotButtons[i]
+			end
+
+			refreshPilotButtons()
+			return true
+		end
+
 		local draggedElement
 		local function rearrange()
 			local index = list_indexof(pilotButtons, placeholder)
 			if index ~= nil and draggedElement ~= nil then
-				local col = math.floor(draggedElement.x / cellW + 0.5)-1
+				local col = math.floor(draggedElement.x / cellW + 0.5)
 				local row = math.floor(draggedElement.y / cellH + 0.5)
 				local desiredIndex = 1 + col + row * portraitsPerRow
 				if desiredIndex < 1 then desiredIndex = 1 end
@@ -113,8 +198,8 @@ local function createUi()
 			end
 
 			for i = 1, #pilotButtons do
-				local col = (i) % portraitsPerRow
-				local row = math.floor((i) / portraitsPerRow)
+				local col = (i - 1) % portraitsPerRow
+				local row = math.floor((i - 1) / portraitsPerRow)
 				local button = pilotButtons[i]
 
 				button:pospx(cellW * col, cellH * row)
@@ -122,87 +207,13 @@ local function createUi()
 					placeholderIndex = i
 				end
 			end
-
-			if placeholderIndex ~= nil and draggedElement ~= nil then
-
-			end
-		end
-
-		local function refreshPilotButtons()
-			for i = 1, #pilotButtons do
-				local col = (i) % portraitsPerRow
-				local row = math.floor((i) / portraitsPerRow)
-				local button = pilotButtons[i]
-
-				button:pospx(cellW * col, cellH * row)
-			end
-		end
-
-		local function addDefaultButton()
-			local bheight = 40
-			local button = Ui()
-				:widthpx(portraitW):heightpx(bheight)
-				:pospx(0, (portraitH - 2*bheight) * 0.3)
-				:settooltip("Set default pilot order.")
-				:decorate({
-					DecoButton(),
-					DecoAlign(9),
-					DecoText("Default"),
-				})
-				:addTo(scrollarea)
-
-			button.onclicked = function()
-				table.sort(pilotButtons, function(a, b)
-					-- get index in default order, nil otherwise
-					local indexA = list_indexof(PilotListDefault, a.pilotId)
-					local indexB = list_indexof(PilotListDefault, b.pilotId)
-					-- replace nil (modloader) and -1 (modApiExt) with a large value so it goes after vanilla
-					indexA = (not indexA or indexA == -1) and 10000 or indexA
-					indexB = (not indexB or indexB == -1) and 10000 or indexB
-
-					-- equal means they are non-vanilla, so sort by ID
-					if indexA == indexB then
-						return a.pilotId < b.pilotId
-					end
-					-- unequal means one is vanilla, order vanilla
-					return indexA < indexB
-				end)
-
-				refreshPilotButtons()
-				return true
-			end
-		end
-
-		local function addRandomButton()
-			local bheight = 40
-
-			local button = Ui()
-				:widthpx(portraitW):heightpx(bheight)
-				:pospx(0, (portraitH - 2*bheight) * 0.6+bheight)
-				:settooltip("Randomize Pilot order.")
-				:decorate({
-					DecoButton(),
-					DecoAlign(9),
-					DecoText("Randomize"),
-				})
-				:addTo(scrollarea)
-
-			button.onclicked = function()
-				for i = #pilotButtons, 2, -1 do
-					local j = math.random(i)
-					pilotButtons[i], pilotButtons[j] = pilotButtons[j], pilotButtons[i]
-				end
-
-				refreshPilotButtons()
-				return true
-			end
 		end
 
 		local function addHangarBackdrop(i)
-			local col = (i) % portraitsPerRow
-			local row = math.floor((i) / portraitsPerRow)
+			local col = (i - 1) % portraitsPerRow
+			local row = math.floor((i - 1) / portraitsPerRow)
 
-			local button = Ui()
+			local backdrop = Ui()
 				:widthpx(portraitW):heightpx(portraitH)
 				:pospx(cellW * col, cellH * row)
 				:decorate({
@@ -214,8 +225,8 @@ local function createUi()
 
 		local function addPilotButton(i, pilotId)
 			local pilot = _G[pilotId]
-			local col = (i) % portraitsPerRow
-			local row = math.floor((i) / portraitsPerRow)
+			local col = (i - 1) % portraitsPerRow
+			local row = math.floor((i - 1) / portraitsPerRow)
 
 			local surface = getOrCreatePilotSurface(pilotId)
 			local button = Ui()
@@ -272,9 +283,6 @@ local function createUi()
 			end
 		end
 
-		addDefaultButton()
-		addRandomButton()
-
 		local dupes = {}
 		for i = 1, #PilotListExtended do
 			local pilotId = PilotListExtended[i]
@@ -286,7 +294,6 @@ local function createUi()
 		for i = 1, MAX_PILOTS do
 			addHangarBackdrop(i)
 		end
-
 	end)
 end
 
