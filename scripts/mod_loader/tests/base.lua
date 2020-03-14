@@ -228,6 +228,42 @@ function Tests.Testsuite:EnumerateTests()
 	return tests, testsuites
 end
 
+--[[
+	Returns a string representation of this testsuite, listing all tests it contains
+	and nested testsuites.
+
+	Usage:
+		LOG(Testsuites:GetString())
+--]]
+function Tests.Testsuite:GetString(holder, indent)
+	indent = indent or 0
+	local buildIndent = function() return string.rep("    ", indent) end
+
+	local testsuiteName = findTestsuiteName(self, holder)
+
+	local tests, testsuites = self:EnumerateTests()
+
+	local testsMsg = ""
+	for _, entry in ipairs(tests) do
+		testsMsg = testsMsg .. string.format(
+				"\n%s- %s",
+				buildIndent(),
+				entry.name
+		)
+	end
+
+	local testsuitesMsg = ""
+	for _, entry in pairs(testsuites) do
+		testsuitesMsg = testsuitesMsg .. string.format(
+				"\n%s- %s",
+				buildIndent(),
+				entry.suite:GetString(self, indent + 1)
+		)
+	end
+
+	return testsuiteName .. ": " .. testsMsg .. testsuitesMsg
+end
+
 function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
 	testsuiteName = testsuiteName or findTestsuiteName(self)
 	isSecondaryCall = isSecondaryCall or false
