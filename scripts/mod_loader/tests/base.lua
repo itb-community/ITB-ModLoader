@@ -200,12 +200,19 @@ Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH = "WAITING_FOR_NESTED_FINISH"
 function Tests.Testsuite:new()
 end
 
-function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
-	testsuiteName = testsuiteName or findTestsuiteName(self)
-	isSecondaryCall = isSecondaryCall or false
-	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
-	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #2")
+--[[
+	Lists all tests in this Testsuite.
+	All functions that start with "test_" are considered as tests.
+	All tables whose __index is set to the Testsuite class are considered as testsuites.
 
+	Returns two tables with the schema:
+	- tests: [ { name, func } ]
+	- testsuites: [ { name, suite } ]
+
+	Usage:
+		local tests, testsuites = myTestsuite:EnumerateTests()
+--]]
+function Tests.Testsuite:EnumerateTests()
 	local tests = {}
 	local testsuites = {}
 
@@ -217,6 +224,17 @@ function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
 			table.insert(testsuites, { name = k, suite = v })
 		end
 	end
+
+	return tests, testsuites
+end
+
+function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
+	testsuiteName = testsuiteName or findTestsuiteName(self)
+	isSecondaryCall = isSecondaryCall or false
+	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
+	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #2")
+
+	local tests, testsuites = self:EnumerateTests()
 
 	-- Shuffle the tests table so that we run tests in random order
 	tests = randomize(tests)
