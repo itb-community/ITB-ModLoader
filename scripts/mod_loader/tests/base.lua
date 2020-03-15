@@ -187,13 +187,15 @@ function Tests.BuildPawnTest(prepare, execute, check)
 		execute()
 
 		-- Check
-		Tests.WaitUntilBoardNotBusy(resultTable, function()
-			check()
+		modApi:runLater(function()
+			Tests.WaitUntilBoardNotBusy(resultTable, function()
+				check()
 
-			Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
+				Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
 
-			LOG("SUCCESS")
-			resultTable.result = true
+				LOG("SUCCESS")
+				resultTable.result = true
+			end)
 		end)
 	end
 end
