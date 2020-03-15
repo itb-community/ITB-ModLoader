@@ -6,6 +6,7 @@ IF EXIST log.txt DEL /q log.txt
 DEL /q lua5.1.dll
 DEL /q opengl32.dll
 DEL /q SDL2.dll
+DEL /q Cutils.dll
 DEL /q scripts\scripts.lua
 IF EXIST resources\resource.dat.bak DEL /q resources\resource.dat
 RMDIR /q /s resources\mods
