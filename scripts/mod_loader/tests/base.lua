@@ -167,6 +167,36 @@ function Tests.GetBoardState()
 	return result
 end
 
+-- Builder function for pawn tests, handling most of the common boilerplate
+function Tests.BuildPawnTest(prepare, execute, check)
+	return function(resultTable)
+		Tests.RequireBoard()
+		resultTable = resultTable or {}
+
+		local fenv = setmetatable({}, { __index = _G })
+		setfenv(prepare, fenv)
+		setfenv(execute, fenv)
+		setfenv(check, fenv)
+
+		-- Prepare
+		local expectedBoardState = Tests.GetBoardState()
+
+		prepare()
+
+		-- Execute
+		execute()
+
+		-- Check
+		Tests.WaitUntilBoardNotBusy(resultTable, function()
+			check()
+
+			Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
+
+			LOG("SUCCESS")
+			resultTable.result = true
+		end)
+	end
+end
 
 -- /////////////////////////////////////////////////////////////////////////////////////////
 -- /////////////////////////////////////////////////////////////////////////////////////////
@@ -437,21 +467,3 @@ function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, isSecond
 		end
 	)
 end
-
-
--- /////////////////////////////////////////////////////////////////////////////////////////
--- /////////////////////////////////////////////////////////////////////////////////////////
--- Holder for testsuites
-
-Testsuites = Tests.Testsuite()
-function Testsuites:RunAllTests()
-	self.__index.RunAllTests(self, "Testsuites", false)
-end
-
---[[
-	Usage, in console while in a mission:
-			Testsuites:RunAllTests()
-		or:
-			Testsuites.name_of_testsuite:RunAllTests()
---]]
-

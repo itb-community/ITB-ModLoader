@@ -1,47 +1,10 @@
-local pawn = Tests.Testsuite()
+local testsuite = Tests.Testsuite()
 
 local assertEquals = Tests.AssertEquals
-local assertTableEquals = Tests.AssertTableEquals
-local assertBoardStateEquals = Tests.AssertBoardStateEquals
-local requireBoard = Tests.RequireBoard
-local getTileState = Tests.GetTileState
-local getPawnState = Tests.GetPawnState
-local getBoardState = Tests.GetBoardState
-local waitUntilBoardNotBusy = Tests.WaitUntilBoardNotBusy
-
--- Builder function for pawn tests, handling most of the common boilerplate
-local buildPawnTest = function(prepare, execute, check)
-	return function(resultTable)
-		requireBoard()
-		resultTable = resultTable or {}
-
-		local fenv = setmetatable({}, { __index = _G })
-		setfenv(prepare, fenv)
-		setfenv(execute, fenv)
-		setfenv(check, fenv)
-
-		-- Prepare
-		local expectedBoardState = getBoardState()
-
-		prepare()
-
-		-- Execute
-		execute()
-
-		-- Check
-		waitUntilBoardNotBusy(resultTable, function()
-			check()
-
-			assertBoardStateEquals(expectedBoardState, getBoardState(), "Tested operation had side effects")
-
-			LOG("SUCCESS")
-			resultTable.result = true
-		end)
-	end
-end
+local buildPawnTest = Tests.BuildPawnTest
 
 
-pawn.test_1 = buildPawnTest(
+testsuite.test_1 = buildPawnTest(
 	-- The pawn should be correctly damaged
 	function()
 		pawnId = Board:SpawnPawn("PunchMech")
@@ -61,7 +24,7 @@ pawn.test_1 = buildPawnTest(
 	end
 )
 
-pawn.test_2 = buildPawnTest(
+testsuite.test_2 = buildPawnTest(
 	-- When standing on a forest and receiving safe damage, the pawn should not be set on fire
 	function()
 		pawnId = Board:SpawnPawn("PunchMech")
@@ -85,7 +48,7 @@ pawn.test_2 = buildPawnTest(
 	end
 )
 
-pawn.test_3 = buildPawnTest(
+testsuite.test_3 = buildPawnTest(
 	-- Setting a pawn on fire using SetFire(true) should set the pawn on fire, but leave the board unaffected
 	function()
 		pawnId = Board:SpawnPawn("PunchMech")
@@ -108,13 +71,14 @@ pawn.test_3 = buildPawnTest(
 	end
 )
 
-pawn.test_4 = buildPawnTest(
+testsuite.test_4 = buildPawnTest(
 	-- Attempting to extinguish a pawn on fire while it is standing on a fire tile should have no effect
 	function()
 		pawnId = Board:SpawnPawn("PunchMech")
 		pawn = Board:GetPawn(pawnId)
 		loc = pawn:GetSpace()
 		terrain = Board:GetTerrain(loc)
+		Board:SetTerrain(loc, TERRAIN_ROAD)
 		Board:SetFire(loc, true)
 	end,
 	function()
@@ -132,4 +96,4 @@ pawn.test_4 = buildPawnTest(
 	end
 )
 
-Testsuites.pawn = pawn
+return testsuite
