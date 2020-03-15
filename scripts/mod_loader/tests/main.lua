@@ -7,6 +7,7 @@ end
 
 testsuite.pawn = require(rootpath.."pawn")
 testsuite.sandbox = require(rootpath.."sandbox")
+testsuite.cutil = require(rootpath.."cutil/main")
 
 --[[
 	Usage, in console while in a mission:
