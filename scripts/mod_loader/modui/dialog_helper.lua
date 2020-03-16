@@ -291,47 +291,32 @@ function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, t
 			end
 		end
 
-		local frame = sdlext.buildTextDialog(title, text, maxW, maxH)
-		local scroll = frame.children[1]
+		local frame = sdlext.buildButtonDialog(
+			title, maxW, maxH,
+			function(scroll)
+				local font = deco.uifont.tooltipTextLarge.font
+				local textset = deco.uifont.tooltipTextLarge.set
+				local wrap = UiWrappedText(text, font, textset)
+					:widthpx(scroll.w)
+					:addTo(scroll)
 
-		local line = Ui()
-			:width(1):heightpx(frame.decorations[1].bordersize)
-			:decorate({ DecoSolid(frame.decorations[1].bordercolor) })
-			:addTo(frame)
+				wrap.pixelWrap = true
+				wrap:rebuild()
+			end,
+			function(buttonLayout)
+				for i, text in ipairs(buttons) do
+					local tooltip = tooltips and tooltips[i]
+					local btn = sdlext.buildButton(text, tooltip, function()
+						ui.response = i
+						quit()
+					end)
 
-		local buttonLayout = UiBoxLayout()
-			:hgap(50)
-			:padding(18)
-			:addTo(frame)
-		buttonLayout:heightpx(45 + buttonLayout.padt + buttonLayout.padb)
-
-		for i, text in ipairs(buttons) do
-			local tooltip = tooltips and tooltips[i]
-			local btn = sdlext.buildButton(text, tooltip, function()
-				ui.response = i
-				quit()
-			end)
-
-			btn:addTo(buttonLayout)
-		end
-
-		frame:relayout()
-
-		if scroll.innerHeight < maxH - frame.padt - frame.padb then
-			scroll:heightpx(scroll.innerHeight)
-		end
-
-		line:pospx(0, scroll.y + scroll.h)
-
-		maxW = math.max(maxW, buttonLayout.w + frame.padl + frame.padr)
-		frame:widthpx(maxW)
-		buttonLayout:pospx((frame.w - frame.padl - frame.padr - buttonLayout.w) / 2, line.y + line.h)
-
-		maxH = math.min(maxH, scroll.innerHeight + frame.padt + frame.padb)
-		maxH = math.max(maxH, buttonLayout.y + buttonLayout.h + frame.padt + frame.padb)
+					btn:addTo(buttonLayout)
+				end
+			end
+		)
 
 		frame
-			:heightpx(maxH)
 			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
 			:addTo(ui)
 	end)
