@@ -136,18 +136,25 @@ end
 
 -- //////////////////////////////////////////////////////////////////////
 
-local function buildTextDialog(title, text, w, h)
+local function buildSimpleDialog(title, w, h)
 	local frame = Ui()
-		:widthpx(w):heightpx(h)
-		:decorate({ DecoFrameHeader(), DecoFrame() })
-		:caption(title)
+			:widthpx(w):heightpx(h)
+			:decorate({ DecoFrameHeader(), DecoFrame() })
+			:caption(title)
 
 	local scroll = UiScrollArea()
-		:width(1):height(1)
-		:padding(10)
-		:addTo(frame)
+			:width(1):height(1)
+			:padding(10)
+			:addTo(frame)
 
 	frame:relayout()
+
+	return frame
+end
+
+local function buildTextDialog(title, text, w, h)
+	local frame = buildSimpleDialog(title, w, h)
+	local scroll = frame.children[1]
 
 	local font = deco.uifont.tooltipTextLarge.font
 	local textset = deco.uifont.tooltipTextLarge.set
