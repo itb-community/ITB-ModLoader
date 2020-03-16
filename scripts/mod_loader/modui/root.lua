@@ -234,20 +234,6 @@ sdlext.addPreKeyDownHook(function(keycode)
 		end
 	end
 
-	if keycode == SDLKeycodes.BACKQUOTE then
-		consoleOpen = not consoleOpen
-
-		for _, hook in ipairs(consoleToggledHooks) do
-			hook(consoleOpen)
-		end
-	elseif consoleOpen and sdlext.isShiftDown() and (keycode == SDLKeycodes.RETURN or keycode == SDLKeycodes.RETURN2) then
-		consoleOpen = false
-		
-		for _, hook in ipairs(consoleToggledHooks) do
-			hook(consoleOpen)
-		end
-	end
-
 	-- don't process other keypresses while the console is open
 	if sdlext.isConsoleOpen() then
 		return false
@@ -470,6 +456,22 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	end
 end)
 
+local function evaluateConsoleToggled(keycode)
+	if keycode == SDLKeycodes.BACKQUOTE then
+		consoleOpen = not consoleOpen
+
+		for _, hook in ipairs(consoleToggledHooks) do
+			hook(consoleOpen)
+		end
+	elseif consoleOpen and sdlext.isShiftDown() and (keycode == SDLKeycodes.RETURN or keycode == SDLKeycodes.RETURN2) then
+		consoleOpen = false
+
+		for _, hook in ipairs(consoleToggledHooks) do
+			hook(consoleOpen)
+		end
+	end
+end
+
 MOD_API_EVENT_HOOK = sdl.eventHook(function(event)
 	local type = event:type()
 	local keycode = event:keycode()
@@ -497,6 +499,8 @@ MOD_API_EVENT_HOOK = sdl.eventHook(function(event)
 					return true
 				end
 			end
+
+			evaluateConsoleToggled(keycode)
 		elseif type == sdl.events.keyup then
 			for i, hook in ipairs(postKeyUpHooks) do
 				if hook(keycode) then
