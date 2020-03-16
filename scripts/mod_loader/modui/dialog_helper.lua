@@ -136,7 +136,7 @@ end
 
 -- //////////////////////////////////////////////////////////////////////
 
-local function buildSimpleDialog(title, w, h)
+function sdlext.buildSimpleDialog(title, w, h)
 	local frame = Ui()
 			:widthpx(w):heightpx(h)
 			:decorate({ DecoFrameHeader(), DecoFrame() })
@@ -152,8 +152,8 @@ local function buildSimpleDialog(title, w, h)
 	return frame
 end
 
-local function buildTextDialog(title, text, w, h)
-	local frame = buildSimpleDialog(title, w, h)
+function sdlext.buildTextDialog(title, text, w, h)
+	local frame = sdlext.buildSimpleDialog(title, w, h)
 	local scroll = frame.children[1]
 
 	local font = deco.uifont.tooltipTextLarge.font
@@ -164,6 +164,53 @@ local function buildTextDialog(title, text, w, h)
 
 	wrap.pixelWrap = true
 	wrap:rebuild()
+
+	return frame
+end
+
+function sdlext.buildButtonDialog(title, w, h, contentBuilderFn, buttonsBuilderFn)
+	w = w or 700
+	h = h or 400
+
+	local frame = sdlext.buildSimpleDialog(title, w, h)
+	local scroll = frame.children[1]
+
+	if contentBuilderFn then
+		contentBuilderFn(scroll)
+		frame:relayout()
+	end
+
+	local line = Ui()
+			:width(1):heightpx(frame.decorations[1].bordersize)
+			:decorate({ DecoSolid(frame.decorations[1].bordercolor) })
+			:addTo(frame)
+
+	local buttonLayout = UiBoxLayout()
+			:hgap(50)
+			:padding(18)
+			:addTo(frame)
+	buttonLayout:heightpx(45 + buttonLayout.padt + buttonLayout.padb)
+
+	if buttonsBuilderFn then
+		buttonsBuilderFn(buttonLayout)
+	end
+
+	frame:relayout()
+
+	if scroll.innerHeight < h - frame.padt - frame.padb then
+		scroll:heightpx(scroll.innerHeight)
+	end
+
+	line:pospx(0, scroll.y + scroll.h)
+
+	w = math.max(w, buttonLayout.w + frame.padl + frame.padr)
+	frame:widthpx(w)
+	buttonLayout:pospx((frame.w - frame.padl - frame.padr - buttonLayout.w) / 2, line.y + line.h)
+
+	h = math.min(h, scroll.innerHeight + frame.padt + frame.padb)
+	h = math.max(h, buttonLayout.y + buttonLayout.h + frame.padt + frame.padb)
+
+	frame:heightpx(h)
 
 	return frame
 end
@@ -210,7 +257,7 @@ function sdlext.showTextDialog(title, text, w, h)
 	h = h or 400
 
 	sdlext.showDialog(function(ui, quit)
-		local frame = buildTextDialog(title, text, w, h)
+		local frame = sdlext.buildTextDialog(title, text, w, h)
 		local scroll = frame.children[1]
 
 		frame:relayout()
@@ -244,7 +291,7 @@ function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, t
 			end
 		end
 
-		local frame = buildTextDialog(title, text, maxW, maxH)
+		local frame = sdlext.buildTextDialog(title, text, maxW, maxH)
 		local scroll = frame.children[1]
 
 		local line = Ui()
