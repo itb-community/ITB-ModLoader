@@ -168,35 +168,60 @@ function Tests.GetBoardState()
 end
 
 -- Builder function for pawn tests, handling most of the common boilerplate
-function Tests.BuildPawnTest(prepare, execute, check)
+function Tests.BuildPawnTest(testFunctionsTable)
 	return function(resultTable)
 		Tests.RequireBoard()
 		resultTable = resultTable or {}
+
+		local noop = function() end
+		local handleError = function(err)
+			resultTable.ok = false
+			resultTable.result = err
+		end
+
+		local globalSetup = testFunctionsTable.globalSetup or noop
+		local prepare = testFunctionsTable.prepare or noop
+		local execute = testFunctionsTable.execute or noop
+		local check = testFunctionsTable.check or noop
+		local cleanup = testFunctionsTable.cleanup or noop
+		local globalCleanup = testFunctionsTable.globalCleanup or noop
 
 		local fenv = setmetatable({}, { __index = _G })
 		setfenv(prepare, fenv)
 		setfenv(execute, fenv)
 		setfenv(check, fenv)
+		setfenv(cleanup, fenv)
 
-		-- Prepare
 		local expectedBoardState = Tests.GetBoardState()
 
-		prepare()
+		try(function()
+			globalSetup()
 
-		-- Execute
-		execute()
+			prepare()
 
-		-- Check
-		modApi:runLater(function()
-			Tests.WaitUntilBoardNotBusy(resultTable, function()
-				check()
-
-				Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
-
-				LOG("SUCCESS")
-				resultTable.result = true
-			end)
+			execute()
 		end)
+		:catch(handleError)
+
+		if resultTable.ok == nil and resultTable.result == nil then
+			modApi:runLater(function()
+				Tests.WaitUntilBoardNotBusy(resultTable, function()
+					check()
+
+					cleanup()
+
+					globalCleanup()
+
+					Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
+
+					LOG("SUCCESS")
+					resultTable.result = true
+				end)
+			end)
+		else
+			try(cleanup)
+			:finally(globalCleanup)
+		end
 	end
 end
 
@@ -361,14 +386,14 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 							return entry.func(resultTable)
 						end)
 
-						resultTable.ok = ok
-						resultTable.result = result
+						resultTable.ok = resultTable.ok or ok
+						resultTable.result = resultTable.result or result
 
 						table.insert(resultsHolder, resultTable)
 
 						modApi:conditionalHook(
 							function()
-								return not (ok and resultTable.result == nil and not resultTable.done)
+								return not ok or not resultTable.ok or resultTable.result ~= nil or resultTable.done
 							end,
 							function()
 								self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
