@@ -119,4 +119,39 @@ testsuite.test_WeaponCount_ShouldCountWeapons_WhenTwoWeapons = buildPawnTest({
 	end
 })
 
+testsuite.test_SpawnedMinions_ShouldHaveOwnerSetToPawnThatCreatedThem = buildPawnTest({
+	prepare = function()
+		caster = PAWN_FACTORY:CreatePawn("Spider1")
+		caster:SetTeam(TEAM_PLAYER)
+		Board:AddPawn(caster)
+		casterLoc = caster:GetSpace()
+		expectedOwnerId = caster:GetId()
+
+		local weaponType = caster:GetWeaponType(1)
+		local weaponTable = _G[weaponType]
+		local plist = weaponTable:GetTargetArea(caster:GetSpace())
+		targetLoc = random_element(extract_table(plist))
+
+		casterTerrain = Board:GetTerrain(casterLoc)
+		targetTerrain = Board:GetTerrain(targetLoc)
+		Board:SetTerrain(casterLoc, TERRAIN_ROAD)
+		Board:SetTerrain(targetLoc, TERRAIN_ROAD)
+	end,
+	execute = function()
+		caster:FireWeapon(targetLoc, 1)
+	end,
+	check = function()
+		target = Board:GetPawn(targetLoc)
+		ownerId = target:GetOwner()
+
+		assertEquals(expectedOwnerId, ownerId, "GetOwner() reported incorrect owner")
+	end,
+	cleanup = function()
+		Board:RemovePawn(caster)
+		Board:RemovePawn(target)
+		Board:SetTerrain(casterLoc, casterTerrain)
+		Board:SetTerrain(targetLoc, targetTerrain)
+	end
+})
+
 return testsuite
