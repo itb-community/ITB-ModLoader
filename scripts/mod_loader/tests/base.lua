@@ -5,8 +5,14 @@ Tests = {}
 
 function Tests.AssertEquals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected %s, but was %s", tostring(expected), tostring(actual))
+	msg = msg .. string.format("Expected '%s', but was '%s'", tostring(expected), tostring(actual))
 	assert(expected == actual, msg)
+end
+
+function Tests.AssertNotEquals(notExpected, actual, msg)
+	msg = (msg and msg .. ": ") or ""
+	msg = msg .. string.format("Expected '%s' to not be equal to '%s'", tostring(actual), tostring(notExpected))
+	assert(notExpected ~= actual, msg)
 end
 
 function Tests.AssertTypePoint(arg, msg)
