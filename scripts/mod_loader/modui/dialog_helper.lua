@@ -161,6 +161,43 @@ local function buildSimpleDialog(title, text, w, h)
 	return frame
 end
 
+function sdlext.buildButton(text, tooltip, clickHandler)
+	local decoText = DecoCAlignedText(text)
+	-- JustinFont has some weird issues causing the sdl.surface to report
+	-- slightly bigger width than it should have. Correct for this.
+	-- Calculate the excess width (0.0375), and then halve it twice;
+	-- once to get the centering offset, twice to get the correction offset
+	local offset = math.floor(0.0375 * decoText.surface:w() / 4)
+
+	local btn = Ui()
+			:widthpx(math.max(95, decoText.surface:w() + 30))
+			:heightpx(40)
+			:decorate({ DecoButton(), DecoAlign(-6 + offset, 2), decoText })
+
+	if tooltip and tooltip ~= "" then
+		btn:settooltip(tooltip)
+	end
+
+	btn.onMouseEnter = function(self)
+		if Game then
+			Game:TriggerSound("/ui/general/highlight_button")
+		end
+	end
+
+	btn.onclicked = function(self, button)
+		if button == 1 then
+			if Game then
+				Game:TriggerSound("/ui/general/button_confirm")
+			end
+
+			clickHandler()
+		end
+		return true
+	end
+
+	return btn
+end
+
 function sdlext.showTextDialog(title, text, w, h)
 	w = w or 700
 	h = h or 400
@@ -215,39 +252,13 @@ function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, t
 		buttonLayout:heightpx(45 + buttonLayout.padt + buttonLayout.padb)
 
 		for i, text in ipairs(buttons) do
-			local decoText = DecoCAlignedText(text)
-			-- JustinFont has some weird issues causing the sdl.surface to report
-			-- slightly bigger width than it should have. Correct for this.
-			-- Calculate the excess width (0.0375), and then halve it twice;
-			-- once to get the centering offset, twice to get the correction offset
-			local offset = math.floor(0.0375 * decoText.surface:w() / 4)
+			local tooltip = tooltips and tooltips[i]
+			local btn = sdlext.buildButton(text, tooltip, function()
+				ui.response = i
+				quit()
+			end)
 
-			local btn = Ui()
-				:widthpx(math.max(95, decoText.surface:w() + 30)):height(1)
-				:decorate({ DecoButton(), DecoAlign(-6 + offset, 2), decoText })
-				:addTo(buttonLayout)
-
-			if tooltips and tooltips[i] ~= "" then
-				btn:settooltip(tooltips[i])
-			end
-
-			btn.onMouseEnter = function(self)
-				if Game then
-					Game:TriggerSound("/ui/general/highlight_button")
-				end
-			end
-
-			btn.onclicked = function(self, button)
-				if button == 1 then
-					if Game then
-						Game:TriggerSound("/ui/general/button_confirm")
-					end
-
-					ui.response = i
-					quit()
-				end
-				return true
-			end
+			btn:addTo(buttonLayout)
 		end
 
 		frame:relayout()
@@ -259,7 +270,6 @@ function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, t
 		line:pospx(0, scroll.y + scroll.h)
 
 		maxW = math.max(maxW, buttonLayout.w + frame.padl + frame.padr)
-		line:widthpx(maxW - frame.padl - frame.padr)
 		frame:widthpx(maxW)
 		buttonLayout:pospx((frame.w - frame.padl - frame.padr - buttonLayout.w) / 2, line.y + line.h)
 
