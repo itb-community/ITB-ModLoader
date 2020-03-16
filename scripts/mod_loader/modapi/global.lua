@@ -246,16 +246,21 @@ end
 --]]
 function try(func)
 	local ok, err = pcall(func)
+	local handled = ok
 	return {
 		catch = function(self, handle)
-			if not ok and handle then
-				handle(err)
+			if not ok then
+				if handle then
+					handle(err)
+					handled = true
+				end
 			end
 			return self
 		end,
 		finally = function(self, handle)
-			if handle then
-				handle()
+			handle()
+			if not handled then
+				error(err)
 			end
 			return self
 		end

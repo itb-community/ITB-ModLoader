@@ -206,16 +206,16 @@ function Tests.BuildPawnTest(testFunctionsTable)
 		if resultTable.ok == nil and resultTable.result == nil then
 			modApi:runLater(function()
 				Tests.WaitUntilBoardNotBusy(resultTable, function()
-					check()
+					try(function()
+						try(check)
+						:finally(cleanup)
 
-					cleanup()
+						Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
 
-					globalCleanup()
-
-					Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
-
-					LOG("SUCCESS")
-					resultTable.result = true
+						LOG("SUCCESS")
+						resultTable.result = true
+					end)
+					:finally(globalCleanup)
 				end)
 			end)
 		else
