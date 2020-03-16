@@ -57,4 +57,66 @@ testsuite.test_WhenIncreasingMaxHealth_ShouldSurviveHitForOldMaxHealth = buildPa
 	end
 })
 
+testsuite.test_WeaponCount_ShouldCountWeapons_WhenNoWeapons = buildPawnTest({
+	globalSetup = function()
+		Testsuites_NoWeaponPawn = PunchMech:new({
+			SkillList = {}
+		})
+	end,
+	prepare = function()
+		pawnId = Board:SpawnPawn("Testsuites_NoWeaponPawn")
+		pawn = Board:GetPawn(pawnId)
+
+		expectedWeaponCount = 0
+	end,
+	execute = function()
+		actualWeaponCount = pawn:GetWeaponCount()
+	end,
+	check = function()
+		assertEquals(expectedWeaponCount, actualWeaponCount, "GetWeaponCount() reported incorrect number of weapons")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+	end,
+	globalCleanup = function()
+		Testsuites_NoWeaponPawn = nil
+	end
+})
+
+testsuite.test_WeaponCount_ShouldCountWeapons_WhenOneWeapon = buildPawnTest({
+	prepare = function()
+		pawnId = Board:SpawnPawn("PunchMech")
+		pawn = Board:GetPawn(pawnId)
+
+		expectedWeaponCount = 1
+	end,
+	execute = function()
+		actualWeaponCount = pawn:GetWeaponCount()
+	end,
+	check = function()
+		assertEquals(expectedWeaponCount, actualWeaponCount, "GetWeaponCount() reported incorrect number of weapons")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+	end
+})
+
+testsuite.test_WeaponCount_ShouldCountWeapons_WhenTwoWeapons = buildPawnTest({
+	prepare = function()
+		pawnId = Board:SpawnPawn("RocketMech")
+		pawn = Board:GetPawn(pawnId)
+
+		expectedWeaponCount = 2
+	end,
+	execute = function()
+		actualWeaponCount = pawn:GetWeaponCount()
+	end,
+	check = function()
+		assertEquals(expectedWeaponCount, actualWeaponCount, "GetWeaponCount() reported incorrect number of weapons")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+	end
+})
+
 return testsuite
