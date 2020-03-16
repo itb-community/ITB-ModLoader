@@ -2,7 +2,7 @@ local testsuite = Tests.Testsuite()
 
 local assertEquals = Tests.AssertEquals
 
-function testsuite.test_1()
+function testsuite.test_GlobalTablesChanges_ShouldNotLeak()
 	-- Changes to fields of global tables should not leak out to the real environment
 	test = {}
 	test.a = 5
@@ -29,7 +29,7 @@ function testsuite.test_1()
 	end
 end
 
-function testsuite.test_2()
+function testsuite.test_GlobalChanges_ShouldNotLeak()
 	-- Changes to globals should not leak out to the real environment
 	a = 5
 	test = function()
@@ -54,7 +54,7 @@ function testsuite.test_2()
 	end
 end
 
-function testsuite.test_3()
+function testsuite.test_UpvalueChanges_ShouldNotLeak()
 	-- Changes to upvalues should not leak out into the real environment
 	local a = 5
 
@@ -77,7 +77,7 @@ function testsuite.test_3()
 	end
 end
 
-function testsuite.test_4()
+function testsuite.test_ShouldReturnMultipleValues()
 	-- Functions returning multiple values should have those values properly passed to the caller
 	test1 = function()
 		return 1, 2, 3
@@ -104,7 +104,7 @@ function testsuite.test_4()
 	end
 end
 
-function testsuite.test_5()
+function testsuite.test_ShouldRestoreNilUpvalues()
 	-- nil upvalues should be restored to nil
 	local a = 5
 	local b = nil
@@ -130,7 +130,7 @@ function testsuite.test_5()
 	end
 end
 
-function testsuite.test_6()
+function testsuite.test_ShouldPersistUpvalues_ThroughSameFunctionCalls()
 	-- Upvalues should persist through multiple calls to the same function
 	local a = 5
 	test = function()
@@ -156,7 +156,7 @@ function testsuite.test_6()
 	end
 end
 
-function testsuite.test_7()
+function testsuite.test_ShouldPersistUpvalues_ThroughDifferentFunctionCalls()
 	-- Upvalues should persist through calls to different functions that use them
 	local a = 1
 	test = function()
@@ -183,7 +183,7 @@ function testsuite.test_7()
 	end
 end
 
-function testsuite.test_8()
+function testsuite.test_ShouldPersistUpvalues_ThroughDifferentNestedFunctionCalls()
 	-- Upvalues should persist through nested calls to different functions
 	-- Local variables should not leak out
 	local a = 1
@@ -221,7 +221,7 @@ function testsuite.test_8()
 	end
 end
 
-function testsuite.test_9()
+function testsuite.test_RunInEnv_ShouldWorkWithFunctionReferences()
 	-- modApi:runInEnv() should also work with function references
 	local a = 1
 	local test = function()
@@ -241,7 +241,7 @@ function testsuite.test_9()
 	end
 end
 
-function testsuite.test_10()
+function testsuite.test_ScriptErrors_ShouldNotBreakSandbox()
 	-- Scripts that error out should not break the sandbox
 	local a = 1
 	test = function()
@@ -266,7 +266,7 @@ function testsuite.test_10()
 	end
 end
 
-function testsuite.test_11()
+function testsuite.test_ShouldPersistUpvalues_ThroughNestedScopes()
 	-- Nested upvalues should persist through calls to nested functions defined within the upvalues' scope.
 	local test = function()
 		local a = 1
