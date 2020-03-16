@@ -486,10 +486,6 @@ BoardPawn.GetWeaponCount = function(self)
 	return CUtils.PawnGetWeaponCount(self)
 end
 
-BoardPawn.GetWeaponName = function(self, index)
-	return CUtils.PawnGetWeaponName(self, index)
-end
-
 BoardPawn.GetWeaponType = function(self, index)
 	return CUtils.PawnGetWeaponType(self, index)
 end
