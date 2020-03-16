@@ -4,7 +4,7 @@ local assertEquals = Tests.AssertEquals
 local buildPawnTest = Tests.BuildPawnTest
 
 
-testsuite.test_1 = buildPawnTest(
+testsuite.test_ApplyDamage_ShouldReduceHealth = buildPawnTest(
 	-- The pawn should be correctly damaged
 	function()
 		pawnId = Board:SpawnPawn("PunchMech")
@@ -24,7 +24,7 @@ testsuite.test_1 = buildPawnTest(
 	end
 )
 
-testsuite.test_2 = buildPawnTest(
+testsuite.test_SafeDamageOnForest_ShouldNotCreateFire = buildPawnTest(
 	-- When standing on a forest and receiving safe damage, the pawn should not be set on fire
 	function()
 		pawnId = Board:SpawnPawn("PunchMech")
@@ -48,7 +48,7 @@ testsuite.test_2 = buildPawnTest(
 	end
 )
 
-testsuite.test_3 = buildPawnTest(
+testsuite.test_PawnSetFire_ShouldNotSetBoardFire = buildPawnTest(
 	-- Setting a pawn on fire using SetFire(true) should set the pawn on fire, but leave the board unaffected
 	function()
 		pawnId = Board:SpawnPawn("PunchMech")
@@ -71,7 +71,7 @@ testsuite.test_3 = buildPawnTest(
 	end
 )
 
-testsuite.test_4 = buildPawnTest(
+testsuite.test_PawnExtinguishOnFireTile_ShouldRemainOnFire = buildPawnTest(
 	-- Attempting to extinguish a pawn on fire while it is standing on a fire tile should have no effect
 	function()
 		pawnId = Board:SpawnPawn("PunchMech")
