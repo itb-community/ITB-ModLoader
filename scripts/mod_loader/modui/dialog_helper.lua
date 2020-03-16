@@ -136,7 +136,7 @@ end
 
 -- //////////////////////////////////////////////////////////////////////
 
-local function buildSimpleDialog(title, text, w, h)
+local function buildTextDialog(title, text, w, h)
 	local frame = Ui()
 		:widthpx(w):heightpx(h)
 		:decorate({ DecoFrameHeader(), DecoFrame() })
@@ -203,7 +203,7 @@ function sdlext.showTextDialog(title, text, w, h)
 	h = h or 400
 
 	sdlext.showDialog(function(ui, quit)
-		local frame = buildSimpleDialog(title, text, w, h)
+		local frame = buildTextDialog(title, text, w, h)
 		local scroll = frame.children[1]
 
 		frame:relayout()
@@ -237,7 +237,7 @@ function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, t
 			end
 		end
 
-		local frame = buildSimpleDialog(title, text, maxW, maxH)
+		local frame = buildTextDialog(title, text, maxW, maxH)
 		local scroll = frame.children[1]
 
 		local line = Ui()
