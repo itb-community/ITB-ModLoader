@@ -215,6 +215,26 @@ function sdlext.buildButtonDialog(title, w, h, contentBuilderFn, buttonsBuilderF
 	return frame
 end
 
+function sdlext.addButtonSoundHandlers(uiElement, clickHandler)
+	uiElement.onMouseEnter = function(self)
+		if Game then
+			Game:TriggerSound("/ui/general/highlight_button")
+		end
+	end
+
+	uiElement.onclicked = function(self, button)
+		if button == 1 then
+			if Game then
+				Game:TriggerSound("/ui/general/button_confirm")
+			end
+
+			clickHandler()
+		end
+
+		return true
+	end
+end
+
 function sdlext.buildButton(text, tooltip, clickHandler)
 	local decoText = DecoCAlignedText(text)
 	-- JustinFont has some weird issues causing the sdl.surface to report
@@ -232,22 +252,7 @@ function sdlext.buildButton(text, tooltip, clickHandler)
 		btn:settooltip(tooltip)
 	end
 
-	btn.onMouseEnter = function(self)
-		if Game then
-			Game:TriggerSound("/ui/general/highlight_button")
-		end
-	end
-
-	btn.onclicked = function(self, button)
-		if button == 1 then
-			if Game then
-				Game:TriggerSound("/ui/general/button_confirm")
-			end
-
-			clickHandler()
-		end
-		return true
-	end
+	sdlext.addButtonSoundHandlers(btn, clickHandler)
 
 	return btn
 end
