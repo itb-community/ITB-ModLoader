@@ -232,6 +232,10 @@ function modApi:setupModLoaderTexts()
 	self.texts["Difficulty_Name_Impossible"] = "Imposs."
 	self.texts["Difficulty_Title_Impossible"] = "Impossible Mode"
 	self.texts["Difficulty_Description_Impossible"] = "A punishing difficulty allowing no mistakes."
+
+	self.texts["TestingConsole_ToggleButton_Text"] = "TESTING CONSOLE"
+	self.texts["TestingConsole_ToggleButton_Tooltip"] = "Opens a console for running mod loader integration tests."
+	self.texts["TestingConsole_FrameTitle"] = "Testing Console"
 end
 
 -- Maintain sanity

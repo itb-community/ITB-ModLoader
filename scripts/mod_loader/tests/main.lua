@@ -2,7 +2,7 @@ local rootpath = GetParentPath(...)
 
 local testsuite = Tests.Testsuite()
 function testsuite:RunAllTests()
-	self.__index.RunAllTests(self, "Testsuites", false)
+	self.__index.RunAllTests(self, "Root Testsuite", false)
 end
 
 testsuite.pawn = require(rootpath.."pawn")

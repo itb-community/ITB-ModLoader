@@ -15,6 +15,7 @@ local scripts = {
 	"modcontent",
 	"extra_difficulty",
 	"repair_icon_replace",
+	"tests_console",
 	
 	"mod_configuration",
 	"pilot_arrange",
