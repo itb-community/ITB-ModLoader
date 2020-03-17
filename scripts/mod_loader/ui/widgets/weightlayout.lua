@@ -5,6 +5,10 @@
 
 	Cannot be laid out if it doesn't have width or height set in pixels, either
 	via widthpx()/heightpx(), or call to relayout() on its parent.
+
+	Useful when you have a mix of fixed-size and percent-size elements, and want
+	the percent-size elements to take up the remainder of space left by the
+	fixed-size elements.
 --]]
 UiWeightLayout = Class.inherit(Ui)
 

@@ -1,6 +1,11 @@
 --[[
 	A UI element which lays its children out sequentially one after another,
-	either horizontally or vertically.
+	either horizontally or vertically. Overflowing elements are moved to the
+	next "line" -- very similar to how text commonly is laid out, for example
+	in this comment.
+
+	Useful when you have multiple elements with fixed size, but don't know how
+	many of them there are ahead of time.
 --]]
 UiFlowLayout = Class.inherit(Ui)
 
