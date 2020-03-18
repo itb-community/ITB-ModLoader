@@ -27,14 +27,16 @@ function UiWeightLayout:relayout()
 
 	assert(type(self.horizontal) == "boolean")
 
-	local remainingSpaceW = self.w - self.padl - self.padr - (#self.children - 1) * self.gapHorizontal
-	local remainingSpaceH = self.h - self.padt - self.padb - (#self.children - 1) * self.gapVertical
+	local remainingSpaceW = self.w - self.padl - self.padr
+	local remainingSpaceH = self.h - self.padt - self.padb
 	local weightSumW = 0
 	local weightSumH = 0
 
+	local visibleChildrenCount = 0
 	for i = 1, #self.children do
 		local child = self.children[i]
 		if child.visible then
+			visibleChildrenCount = visibleChildrenCount + 1
 			if self.horizontal then
 				if child.wPercent == nil then
 					remainingSpaceW = math.max(0, remainingSpaceW - child.w)
@@ -50,6 +52,9 @@ function UiWeightLayout:relayout()
 			end
 		end
 	end
+
+	remainingSpaceW = remainingSpaceW - (visibleChildrenCount - 1) * self.gapHorizontal
+	remainingSpaceH = remainingSpaceH - (visibleChildrenCount - 1) * self.gapVertical
 
 	for i = 1, #self.children do
 		local child = self.children[i]
