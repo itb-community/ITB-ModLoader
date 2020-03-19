@@ -259,8 +259,20 @@ Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH = "WAITING_FOR_TEST_FINISH"
 Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS = "READY_TO_PROCESS_RESULTS"
 Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS = "READY_TO_RUN_NESTED_TESTS"
 Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH = "WAITING_FOR_NESTED_FINISH"
+Tests.Testsuite.STATUS_COMPLETED = "COMPLETED"
 
 function Tests.Testsuite:new()
+	self.onTestStarted = Event()
+	self.onTestSuccess = Event()
+	self.onTestFailed = Event()
+	self.onStatusChanged = Event()
+end
+
+function Tests.Testsuite:ChangeStatus(newStatus)
+	local oldStatus = self.status
+	self.status = newStatus
+
+	self.onStatusChanged:fire(oldStatus, newStatus)
 end
 
 --[[
@@ -352,14 +364,14 @@ function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
 
 	modApi:conditionalHook(
 		function()
-			return self.status == nil
+			return self.status == Tests.Testsuite.STATUS_COMPLETED
 		end,
 		function()
 			DoSaveGame()
 		end
 	)
 
-	self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
+	self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_TEST)
 end
 
 function Tests.Testsuite:RunTests(tests, resultsHolder)
@@ -372,9 +384,6 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 		end,
 		function()
 			-- Suppress log output so that the results stay somewhat readable
-			local log = LOG
-			LOG = function() end
-
 			local pendingTests = #tests
 			for _, entry in ipairs(tests) do
 				modApi:conditionalHook(
@@ -382,7 +391,8 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 						return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_TEST
 					end,
 					function()
-						self.status = Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH
+						self:ChangeStatus(Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH)
+						self.onTestStarted:fire(entry)
 
 						local resultTable = {}
 						resultTable.done = false
@@ -402,7 +412,12 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 								return not ok or not resultTable.ok or resultTable.result ~= nil or resultTable.done
 							end,
 							function()
-								self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
+								self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_TEST)
+								if resultTable.ok and resultTable.result == true then
+									self.onTestSuccess:fire(entry)
+								else
+									self.onTestFailed:fire(entry)
+								end
 								pendingTests = pendingTests - 1
 							end
 						)
@@ -415,9 +430,7 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 					return pendingTests == 0
 				end,
 				function()
-					LOG = log
-					log = nil
-					self.status = Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS
+					self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS)
 				end
 			)
 		end
@@ -449,7 +462,7 @@ function Tests.Testsuite:ProcessResults(testsuiteName, results)
 				end
 			end
 
-			self.status = Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
+			self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS)
 		end
 	)
 end
@@ -472,15 +485,15 @@ function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, isSecond
 							return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
 						end,
 						function()
-							self.status = Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH
+							self:ChangeStatus(Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH)
 							entry.suite:RunAllTests(string.format("%s.%s", testsuiteName, entry.name), isSecondaryCall)
 
 							modApi:conditionalHook(
 								function()
-									return entry.suite.status == nil
+									return entry.suite.status == nil or entry.suite.status == Tests.Testsuite.STATUS_COMPLETED
 								end,
 								function()
-									self.status = Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
+									self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS)
 									pendingNestedTests = pendingNestedTests - 1
 								end
 							)
@@ -494,7 +507,7 @@ function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, isSecond
 					return pendingNestedTests == 0
 				end,
 				function()
-					self.status = nil
+					self:ChangeStatus(Tests.Testsuite.STATUS_COMPLETED)
 				end
 			)
 		end
