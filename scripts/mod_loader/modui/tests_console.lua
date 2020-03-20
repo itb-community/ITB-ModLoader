@@ -210,13 +210,77 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 	return entryBoxHolder
 end
 
+---------------------------------------------------------
+
+rootTestsuiteHolder = nil
+local function findHolderForTestsuite(testsuite, holder)
+	holder = holder or rootTestsuiteHolder
+	if testsuite == Testsuites then
+		return rootTestsuiteHolder
+	end
+
+	if holder.entry.suite == testsuite then
+		return holder
+	elseif not holder.content then
+		return nil
+	else
+		for _, child in ipairs(holder.content.children) do
+			local result = findHolderForTestsuite(testsuite, child)
+			if result then
+				return result
+			end
+		end
+	end
+
+	return nil
+end
+
+local function isSelected(holder, testFunc)
+	if testFunc then
+		for _, child in ipairs(holder.content.children) do
+			if child.entry.func == testFunc then
+				return child.checkbox.checked
+			end
+		end
+
+		return false
+	else
+		return holder.header and holder.header.checkbox and holder.header.checkbox.checked
+	end
+end
+
+local function enumerateSelectedTests(testsuite)
+	local tests = {}
+	local testsuites = {}
+
+	local holder = findHolderForTestsuite(testsuite)
+	if not isSelected(holder) then
+		return tests, testsuites
+	end
+
+	-- Enumerate all selected tests
+	for k, v in pairs(testsuite) do
+		if type(v) == "function" and modApi:stringStartsWith(k, "test_") then
+			if isSelected(holder, v) then
+				table.insert(tests, { name = k, func = v })
+			end
+		elseif type(v) == "table" and v.__index == Tests.Testsuite then
+			if isSelected(findHolderForTestsuite(v, holder)) then
+				table.insert(testsuites, { name = k, suite = v })
+			end
+		end
+	end
+
+	return tests, testsuites
+end
+
 local function buildTestingConsoleContent(scroll)
 	local entry = {
 		name = "Root Testsuite",
 		suite = Testsuites
 	}
 
-	buildTestsuiteUi(entry)
+	rootTestsuiteHolder = buildTestsuiteUi(entry)
 		:addTo(scroll)
 end
 
@@ -237,8 +301,7 @@ local function buildTestingConsoleButtons(buttonLayout)
 		nil,
 		function()
 			resetEvent:fire()
-			-- TODO
-			LOG("Run Selected clicked")
+			Testsuites:RunAllTests(enumerateSelectedTests)
 		end
 	)
 	btnRunSelected:heightpx(40)
@@ -263,7 +326,7 @@ local function showTestingConsole()
 	end)
 end
 
-local function calculateToggleButtonPosition()
+local function calculateOpenTestingConsoleButtonPosition()
 	-- Use the Buttons element maintained by the game itself.
 	-- This way we don't have to worry about calculating locations
 	-- for our UI, we can just offset based on the game's own UI
@@ -272,7 +335,7 @@ local function calculateToggleButtonPosition()
 	return btnEndTurn.pos.x, btnEndTurn.pos.y
 end
 
-local function createToggleButton(root)
+local function createOpenTestingConsoleButton(root)
 	local button = sdlext.buildButton(
 		modApi:getText("TestingConsole_ToggleButton_Text"),
 		modApi:getText("TestingConsole_ToggleButton_Tooltip"),
@@ -281,7 +344,7 @@ local function createToggleButton(root)
 		end
 	)
 	:widthpx(302):heightpx(40)
-	:pospx(calculateToggleButtonPosition())
+	:pospx(calculateOpenTestingConsoleButtonPosition())
 	:addTo(root)
 
 	button.draw = function(self, screen)
@@ -292,15 +355,15 @@ local function createToggleButton(root)
 	end
 
 	sdlext.addSettingsChangedHook(function()
-		button:pospx(calculateToggleButtonPosition())
+		button:pospx(calculateOpenTestingConsoleButtonPosition())
 	end)
 
 	sdlext.addGameWindowResizedHook(function()
-		button:pospx(calculateToggleButtonPosition())
+		button:pospx(calculateOpenTestingConsoleButtonPosition())
 	end)
 end
 
 sdlext.addUiRootCreatedHook(function(screen, root)
 	resetEvent = Event()
-	createToggleButton(root)
+	createOpenTestingConsoleButton(root)
 end)
