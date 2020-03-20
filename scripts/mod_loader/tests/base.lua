@@ -5,19 +5,19 @@ Tests = {}
 
 function Tests.AssertEquals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected '%s', but was '%s'", tostring(expected), tostring(actual))
+	msg = msg .. string.format("Expected '%s', but was '%s'\n%s", tostring(expected), tostring(actual), debug.traceback())
 	assert(expected == actual, msg)
 end
 
 function Tests.AssertNotEquals(notExpected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected '%s' to not be equal to '%s'", tostring(actual), tostring(notExpected))
+	msg = msg .. string.format("Expected '%s' to not be equal to '%s'\n%s", tostring(actual), tostring(notExpected), debug.traceback())
 	assert(notExpected ~= actual, msg)
 end
 
 function Tests.AssertTypePoint(arg, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected Point, but was %s", tostring(type(arg)))
+	msg = msg .. string.format("Expected Point, but was %s\n%s", tostring(type(arg)), debug.traceback())
 	assert(type(arg) == "userdata" and type(arg.x) == "number" and type(arg.y) == "number", msg)
 end
 
@@ -25,12 +25,12 @@ function Tests.AssertBoardStateEquals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
 
 	for index, expectedState in ipairs(expected.tiles) do
-		local msg = msg .. expectedState.loc:GetLuaString()
+		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback()
 		Tests.AssertTableEquals(expectedState, actual.tiles[index], msg)
 	end
 
 	for index, expectedState in ipairs(expected.pawns) do
-		local msg = msg .. expectedState.loc:GetLuaString()
+		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback()
 		Tests.AssertTableEquals(expectedState, actual.pawns[index], msg)
 	end
 end
@@ -50,12 +50,12 @@ function Tests.AssertTableEquals(expected, actual, msg)
 	end
 
 	if #differences > 0 then
-		error(msg)
+		error(msg .. "\n" .. debug.traceback())
 	end
 end
 
 function Tests.RequireBoard()
-	assert(Board ~= nil, "Error: this test requires a Board to be available")
+	assert(Board ~= nil, "Error: this test requires a Board to be available" .. "\n" .. debug.traceback())
 end
 
 function Tests.WaitUntilBoardNotBusy(resultTable, fn)
