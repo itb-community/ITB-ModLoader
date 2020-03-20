@@ -228,7 +228,9 @@ function sdlext.addButtonSoundHandlers(uiElement, clickHandler)
 				Game:TriggerSound("/ui/general/button_confirm")
 			end
 
-			clickHandler()
+			if clickHandler then
+				clickHandler()
+			end
 		end
 
 		return true
