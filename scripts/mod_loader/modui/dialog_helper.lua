@@ -215,6 +215,16 @@ function sdlext.buildButtonDialog(title, w, h, contentBuilderFn, buttonsBuilderF
 	return frame
 end
 
+--[[
+	Registers sound effects to be played when the button is
+	hovered over and clicked. Sound effects cannot be played
+	in the main menu / hangar.
+
+	This function overwrites the onclicked property of the UI
+	element; use the second argument (clickHandler) to pass
+	your own function that should perform actions when the
+	element is clicked.
+--]]
 function sdlext.addButtonSoundHandlers(uiElement, clickHandler)
 	uiElement.onMouseEnter = function(self)
 		if Game and not self.disabled then
