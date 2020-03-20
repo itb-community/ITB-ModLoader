@@ -5,13 +5,19 @@ Tests = {}
 
 function Tests.AssertEquals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected %s, but was %s", tostring(expected), tostring(actual))
+	msg = msg .. string.format("Expected '%s', but was '%s'\n%s", tostring(expected), tostring(actual), debug.traceback())
 	assert(expected == actual, msg)
+end
+
+function Tests.AssertNotEquals(notExpected, actual, msg)
+	msg = (msg and msg .. ": ") or ""
+	msg = msg .. string.format("Expected '%s' to not be equal to '%s'\n%s", tostring(actual), tostring(notExpected), debug.traceback())
+	assert(notExpected ~= actual, msg)
 end
 
 function Tests.AssertTypePoint(arg, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected Point, but was %s", tostring(type(arg)))
+	msg = msg .. string.format("Expected Point, but was %s\n%s", tostring(type(arg)), debug.traceback())
 	assert(type(arg) == "userdata" and type(arg.x) == "number" and type(arg.y) == "number", msg)
 end
 
@@ -19,12 +25,12 @@ function Tests.AssertBoardStateEquals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
 
 	for index, expectedState in ipairs(expected.tiles) do
-		local msg = msg .. p2s(expectedState.loc)
+		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback()
 		Tests.AssertTableEquals(expectedState, actual.tiles[index], msg)
 	end
 
 	for index, expectedState in ipairs(expected.pawns) do
-		local msg = msg .. p2s(expectedState.loc)
+		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback()
 		Tests.AssertTableEquals(expectedState, actual.pawns[index], msg)
 	end
 end
@@ -44,12 +50,12 @@ function Tests.AssertTableEquals(expected, actual, msg)
 	end
 
 	if #differences > 0 then
-		error(msg)
+		error(msg .. "\n" .. debug.traceback())
 	end
 end
 
 function Tests.RequireBoard()
-	assert(Board ~= nil, "Error: this test requires a Board to be available")
+	assert(Board ~= nil, "Error: this test requires a Board to be available" .. "\n" .. debug.traceback())
 end
 
 function Tests.WaitUntilBoardNotBusy(resultTable, fn)
@@ -64,7 +70,7 @@ function Tests.WaitUntilBoardNotBusy(resultTable, fn)
 			local ok, err = xpcall(
 				fn,
 				function(e)
-					return string.format("%s:\n%s", e, debug.traceback("", 2))
+					return string.format("%s:\n%s", e, debug.traceback())
 				end
 			)
 
@@ -83,7 +89,7 @@ function Tests.SafeRunLater(resultTable, fn)
 		local ok, err = xpcall(
 			fn,
 			function(e)
-				return string.format("%s:\n%s", e, debug.traceback("", 2))
+				return string.format("%s:\n%s", e, debug.traceback())
 			end
 		)
 
@@ -167,6 +173,63 @@ function Tests.GetBoardState()
 	return result
 end
 
+-- Builder function for pawn tests, handling most of the common boilerplate
+function Tests.BuildPawnTest(testFunctionsTable)
+	return function(resultTable)
+		Tests.RequireBoard()
+		resultTable = resultTable or {}
+
+		local noop = function() end
+		local handleError = function(err)
+			resultTable.ok = false
+			resultTable.result = err
+		end
+
+		local globalSetup = testFunctionsTable.globalSetup or noop
+		local prepare = testFunctionsTable.prepare or noop
+		local execute = testFunctionsTable.execute or noop
+		local check = testFunctionsTable.check or noop
+		local cleanup = testFunctionsTable.cleanup or noop
+		local globalCleanup = testFunctionsTable.globalCleanup or noop
+
+		local fenv = setmetatable({}, { __index = _G })
+		setfenv(prepare, fenv)
+		setfenv(execute, fenv)
+		setfenv(check, fenv)
+		setfenv(cleanup, fenv)
+
+		local expectedBoardState = Tests.GetBoardState()
+
+		try(function()
+			globalSetup()
+
+			prepare()
+
+			execute()
+		end)
+		:catch(handleError)
+
+		if resultTable.ok == nil and resultTable.result == nil then
+			modApi:runLater(function()
+				Tests.WaitUntilBoardNotBusy(resultTable, function()
+					try(function()
+						try(check)
+						:finally(cleanup)
+
+						Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
+
+						LOG("SUCCESS")
+						resultTable.result = true
+					end)
+					:finally(globalCleanup)
+				end)
+			end)
+		else
+			try(cleanup)
+			:finally(globalCleanup)
+		end
+	end
+end
 
 -- /////////////////////////////////////////////////////////////////////////////////////////
 -- /////////////////////////////////////////////////////////////////////////////////////////
@@ -196,16 +259,40 @@ Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH = "WAITING_FOR_TEST_FINISH"
 Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS = "READY_TO_PROCESS_RESULTS"
 Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS = "READY_TO_RUN_NESTED_TESTS"
 Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH = "WAITING_FOR_NESTED_FINISH"
+Tests.Testsuite.STATUS_COMPLETED = "COMPLETED"
 
 function Tests.Testsuite:new()
+	self.onTestsuiteStarting = Event()
+	self.onTestsuiteCompleted = Event()
+	self.onTestSubmitted = Event()
+	self.onTestStarted = Event()
+	self.onTestSuccess = Event()
+	self.onTestFailed = Event()
+	self.onStatusChanged = Event()
+
+	self.status = Tests.Testsuite.STATUS_COMPLETED
 end
 
-function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
-	testsuiteName = testsuiteName or findTestsuiteName(self)
-	isSecondaryCall = isSecondaryCall or false
-	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
-	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #2")
+function Tests.Testsuite:ChangeStatus(newStatus)
+	local oldStatus = self.status
+	self.status = newStatus
 
+	self.onStatusChanged:fire(oldStatus, newStatus)
+end
+
+--[[
+	Lists all tests in this Testsuite.
+	All functions that start with "test_" are considered as tests.
+	All tables whose __index is set to the Testsuite class are considered as testsuites.
+
+	Returns two tables with the schema:
+	- tests: [ { name, func } ]
+	- testsuites: [ { name, suite } ]
+
+	Usage:
+		local tests, testsuites = myTestsuite:EnumerateTests()
+--]]
+function Tests.Testsuite:EnumerateTests()
 	local tests = {}
 	local testsuites = {}
 
@@ -217,6 +304,56 @@ function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
 			table.insert(testsuites, { name = k, suite = v })
 		end
 	end
+
+	return tests, testsuites
+end
+
+--[[
+	Returns a string representation of this testsuite, listing all tests it contains
+	and nested testsuites.
+
+	Usage:
+		LOG(Testsuites:GetString())
+--]]
+function Tests.Testsuite:GetString(holder, indent)
+	indent = indent or 0
+	local buildIndent = function() return string.rep("    ", indent) end
+
+	local testsuiteName = findTestsuiteName(self, holder)
+
+	local tests, testsuites = self:EnumerateTests()
+
+	local testsMsg = ""
+	for _, entry in ipairs(tests) do
+		testsMsg = testsMsg .. string.format(
+				"\n%s- %s",
+				buildIndent(),
+				entry.name
+		)
+	end
+
+	local testsuitesMsg = ""
+	for _, entry in pairs(testsuites) do
+		testsuitesMsg = testsuitesMsg .. string.format(
+				"\n%s- %s",
+				buildIndent(),
+				entry.suite:GetString(self, indent + 1)
+		)
+	end
+
+	return testsuiteName .. ": " .. testsMsg .. testsuitesMsg
+end
+
+function Tests.Testsuite:RunAllTests(testsuiteName, testEnumeratorFn, isSecondaryCall)
+	testsuiteName = testsuiteName or findTestsuiteName(self)
+	testEnumeratorFn = testEnumeratorFn or self.EnumerateTests
+	isSecondaryCall = isSecondaryCall or false
+	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
+	Tests.AssertEquals("function", type(testEnumeratorFn), "Argument #2")
+	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #3")
+
+	local tests, testsuites = testEnumeratorFn(self)
+	self.onTestsuiteStarting:fire(self, tests, testsuites)
 
 	-- Shuffle the tests table so that we run tests in random order
 	tests = randomize(tests)
@@ -231,18 +368,19 @@ function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
 
 	self:ProcessResults(testsuiteName, resultsHolder)
 
-	self:RunNestedTestsuites(testsuiteName, testsuites, true)
+	self:RunNestedTestsuites(testsuiteName, testsuites, testEnumeratorFn, true)
 
 	modApi:conditionalHook(
 		function()
-			return self.status == nil
+			return self.status == Tests.Testsuite.STATUS_COMPLETED
 		end,
 		function()
 			DoSaveGame()
+			self.onTestsuiteCompleted:fire(self)
 		end
 	)
 
-	self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
+	self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_TEST)
 end
 
 function Tests.Testsuite:RunTests(tests, resultsHolder)
@@ -255,17 +393,17 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 		end,
 		function()
 			-- Suppress log output so that the results stay somewhat readable
-			local log = LOG
-			LOG = function() end
-
 			local pendingTests = #tests
 			for _, entry in ipairs(tests) do
+				self.onTestSubmitted:fire(entry)
+
 				modApi:conditionalHook(
 					function()
 						return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_TEST
 					end,
 					function()
-						self.status = Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH
+						self:ChangeStatus(Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH)
+						self.onTestStarted:fire(entry)
 
 						local resultTable = {}
 						resultTable.done = false
@@ -275,17 +413,22 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 							return entry.func(resultTable)
 						end)
 
-						resultTable.ok = ok
-						resultTable.result = result
+						resultTable.ok = resultTable.ok or ok
+						resultTable.result = resultTable.result or result
 
 						table.insert(resultsHolder, resultTable)
 
 						modApi:conditionalHook(
 							function()
-								return not (ok and resultTable.result == nil and not resultTable.done)
+								return not ok or not resultTable.ok or resultTable.result ~= nil or resultTable.done
 							end,
 							function()
-								self.status = Tests.Testsuite.STATUS_READY_TO_RUN_TEST
+								self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_TEST)
+								if resultTable.ok and resultTable.result == true then
+									self.onTestSuccess:fire(entry, resultTable)
+								else
+									self.onTestFailed:fire(entry, resultTable)
+								end
 								pendingTests = pendingTests - 1
 							end
 						)
@@ -298,9 +441,7 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 					return pendingTests == 0
 				end,
 				function()
-					LOG = log
-					log = nil
-					self.status = Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS
+					self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS)
 				end
 			)
 		end
@@ -332,15 +473,16 @@ function Tests.Testsuite:ProcessResults(testsuiteName, results)
 				end
 			end
 
-			self.status = Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
+			self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS)
 		end
 	)
 end
 
-function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, isSecondaryCall)
+function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, testEnumeratorFn, isSecondaryCall)
 	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
 	Tests.AssertEquals("table", type(testsuites), "Argument #2")
-	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #3")
+	Tests.AssertEquals("function", type(testEnumeratorFn), "Argument #3")
+	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #4")
 
 	modApi:conditionalHook(
 		function()
@@ -355,15 +497,15 @@ function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, isSecond
 							return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
 						end,
 						function()
-							self.status = Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH
-							entry.suite:RunAllTests(string.format("%s.%s", testsuiteName, entry.name), isSecondaryCall)
+							self:ChangeStatus(Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH)
+							entry.suite:RunAllTests(string.format("%s.%s", testsuiteName, entry.name), testEnumeratorFn, isSecondaryCall)
 
 							modApi:conditionalHook(
 								function()
-									return entry.suite.status == nil
+									return entry.suite.status == nil or entry.suite.status == Tests.Testsuite.STATUS_COMPLETED
 								end,
 								function()
-									self.status = Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
+									self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS)
 									pendingNestedTests = pendingNestedTests - 1
 								end
 							)
@@ -377,27 +519,9 @@ function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, isSecond
 					return pendingNestedTests == 0
 				end,
 				function()
-					self.status = nil
+					self:ChangeStatus(Tests.Testsuite.STATUS_COMPLETED)
 				end
 			)
 		end
 	)
 end
-
-
--- /////////////////////////////////////////////////////////////////////////////////////////
--- /////////////////////////////////////////////////////////////////////////////////////////
--- Holder for testsuites
-
-Testsuites = Tests.Testsuite()
-function Testsuites:RunAllTests()
-	self.__index.RunAllTests(self, "Testsuites", false)
-end
-
---[[
-	Usage, in console while in a mission:
-			Testsuites:RunAllTests()
-		or:
-			Testsuites.name_of_testsuite:RunAllTests()
---]]
-

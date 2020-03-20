@@ -1,8 +1,6 @@
 local scripts = {
 	"base",
-	
-	"sandbox",
-	"pawn"
+	"main"
 }
 
 local rootpath = GetParentPath(...)

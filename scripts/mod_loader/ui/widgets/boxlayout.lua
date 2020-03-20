@@ -4,6 +4,9 @@
 	is adjusted dynamically to contain all of its children (along the laid
 	out axis). The other axis (height when laying out horizontally, and width
 	when laying out vertically) is NOT adjusted, and has to be set manually.
+
+	Useful when you have multiple elements with fixed size, but don't know how
+	many of them there are ahead of time.
 --]]
 UiBoxLayout = Class.inherit(Ui)
 

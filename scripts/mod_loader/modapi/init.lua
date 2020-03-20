@@ -170,6 +170,9 @@ function modApi:setupModLoaderTexts()
 	self.texts["ModLoaderConfig_Text_Caller"] = "Print Caller Information"
 	self.texts["ModLoaderConfig_Tooltip_Caller"] = "Include timestamp and stacktrace in LOG messages."
 
+	self.texts["ModLoaderConfig_Text_DevMode"] = "Development Mode"
+	self.texts["ModLoaderConfig_Tooltip_DevMode"] = "Enable debug mod loader features. May disrupt normal gameplay.\n\nYou shouldn't enable this, unless you're a mod creator or mod loader maintainer."
+
 	self.texts["ModLoaderConfig_Text_FloatyTooltips"] = "Attach Tooltips To Mouse Cursor"
 	self.texts["ModLoaderConfig_Tooltip_FloatyTooltips_On"] = "Tooltips follow the mouse cursor around."
 	self.texts["ModLoaderConfig_Tooltip_FloatyTooltips_Off"] = "Tooltips show to the side of the UI element that spawned them, similar to the game's own tooltips."
@@ -232,6 +235,15 @@ function modApi:setupModLoaderTexts()
 	self.texts["Difficulty_Name_Impossible"] = "Imposs."
 	self.texts["Difficulty_Title_Impossible"] = "Impossible Mode"
 	self.texts["Difficulty_Description_Impossible"] = "A punishing difficulty allowing no mistakes."
+
+	self.texts["TestingConsole_ToggleButton_Text"] = "TESTING CONSOLE"
+	self.texts["TestingConsole_ToggleButton_Tooltip"] = "Opens a console for running mod loader integration tests."
+	self.texts["TestingConsole_FrameTitle"] = "Testing Console"
+	self.texts["TestingConsole_RunAll"] = "Run All"
+	self.texts["TestingConsole_RunSelected"] = "Run Selected"
+	self.texts["TestingConsole_RootTestsuite"] = "Root Testsuite"
+	self.texts["TestingConsole_FailSummary_FrameTitle"] = "Failure Summary"
+	self.texts["TestingConsole_FailSummary_Tooltip"] = "This test has failed. Click to bring up a detailed summary."
 end
 
 -- Maintain sanity

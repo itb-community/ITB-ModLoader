@@ -1,4 +1,5 @@
 local scripts = {
+	"event",
 	"init",
 	"global",
 	"statistics",

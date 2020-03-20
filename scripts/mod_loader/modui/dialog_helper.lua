@@ -136,18 +136,25 @@ end
 
 -- //////////////////////////////////////////////////////////////////////
 
-local function buildSimpleDialog(title, text, w, h)
+function sdlext.buildSimpleDialog(title, w, h)
 	local frame = Ui()
-		:widthpx(w):heightpx(h)
-		:decorate({ DecoFrameHeader(), DecoFrame() })
-		:caption(title)
+			:widthpx(w):heightpx(h)
+			:decorate({ DecoFrameHeader(), DecoFrame() })
+			:caption(title)
 
 	local scroll = UiScrollArea()
-		:width(1):height(1)
-		:padding(10)
-		:addTo(frame)
+			:width(1):height(1)
+			:padding(10)
+			:addTo(frame)
 
 	frame:relayout()
+
+	return frame
+end
+
+function sdlext.buildTextDialog(title, text, w, h)
+	local frame = sdlext.buildSimpleDialog(title, w, h)
+	local scroll = frame.children[1]
 
 	local font = deco.uifont.tooltipTextLarge.font
 	local textset = deco.uifont.tooltipTextLarge.set
@@ -161,12 +168,113 @@ local function buildSimpleDialog(title, text, w, h)
 	return frame
 end
 
+function sdlext.buildButtonDialog(title, w, h, contentBuilderFn, buttonsBuilderFn)
+	w = w or 700
+	h = h or 400
+
+	local frame = sdlext.buildSimpleDialog(title, w, h)
+	local scroll = frame.children[1]
+
+	if contentBuilderFn then
+		contentBuilderFn(scroll)
+		frame:relayout()
+	end
+
+	local line = Ui()
+			:width(1):heightpx(frame.decorations[1].bordersize)
+			:decorate({ DecoSolid(frame.decorations[1].bordercolor) })
+			:addTo(frame)
+
+	local buttonLayout = UiBoxLayout()
+			:hgap(50)
+			:padding(18)
+			:addTo(frame)
+	buttonLayout:heightpx(45 + buttonLayout.padt + buttonLayout.padb)
+
+	if buttonsBuilderFn then
+		buttonsBuilderFn(buttonLayout)
+	end
+
+	frame:relayout()
+
+	if scroll.innerHeight < h - frame.padt - frame.padb then
+		scroll:heightpx(scroll.innerHeight)
+	end
+
+	line:pospx(0, scroll.y + scroll.h)
+
+	w = math.max(w, buttonLayout.w + frame.padl + frame.padr)
+	frame:widthpx(w)
+	buttonLayout:pospx((frame.w - frame.padl - frame.padr - buttonLayout.w) / 2, line.y + line.h)
+
+	h = math.min(h, scroll.innerHeight + frame.padt + frame.padb)
+	h = math.max(h, buttonLayout.y + buttonLayout.h + frame.padt + frame.padb)
+
+	frame:heightpx(h)
+
+	return frame
+end
+
+--[[
+	Registers sound effects to be played when the button is
+	hovered over and clicked. Sound effects cannot be played
+	in the main menu / hangar.
+
+	This function overwrites the onclicked property of the UI
+	element; use the second argument (clickHandler) to pass
+	your own function that should perform actions when the
+	element is clicked.
+--]]
+function sdlext.addButtonSoundHandlers(uiElement, clickHandler)
+	uiElement.onMouseEnter = function(self)
+		if Game and not self.disabled then
+			Game:TriggerSound("/ui/general/highlight_button")
+		end
+	end
+
+	uiElement.onclicked = function(self, button)
+		if button == 1 then
+			if Game and not self.disabled then
+				Game:TriggerSound("/ui/general/button_confirm")
+			end
+
+			if clickHandler then
+				clickHandler()
+			end
+		end
+
+		return true
+	end
+end
+
+function sdlext.buildButton(text, tooltip, clickHandler)
+	local decoText = DecoCAlignedText(text)
+	-- JustinFont has some weird issues causing the sdl.surface to report
+	-- slightly bigger width than it should have. Correct for this.
+	-- Calculate the excess width (0.0375), and then halve it twice;
+	-- once to get the centering offset, twice to get the correction offset
+	local offset = math.floor(0.0375 * decoText.surface:w() / 4)
+
+	local btn = Ui()
+			:widthpx(math.max(95, decoText.surface:w() + 30))
+			:heightpx(40)
+			:decorate({ DecoButton(), DecoAlign(-6 + offset, 2), decoText })
+
+	if tooltip and tooltip ~= "" then
+		btn:settooltip(tooltip)
+	end
+
+	sdlext.addButtonSoundHandlers(btn, clickHandler)
+
+	return btn
+end
+
 function sdlext.showTextDialog(title, text, w, h)
 	w = w or 700
 	h = h or 400
 
 	sdlext.showDialog(function(ui, quit)
-		local frame = buildSimpleDialog(title, text, w, h)
+		local frame = sdlext.buildTextDialog(title, text, w, h)
 		local scroll = frame.children[1]
 
 		frame:relayout()
@@ -200,74 +308,32 @@ function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, t
 			end
 		end
 
-		local frame = buildSimpleDialog(title, text, maxW, maxH)
-		local scroll = frame.children[1]
+		local frame = sdlext.buildButtonDialog(
+			title, maxW, maxH,
+			function(scroll)
+				local font = deco.uifont.tooltipTextLarge.font
+				local textset = deco.uifont.tooltipTextLarge.set
+				local wrap = UiWrappedText(text, font, textset)
+					:widthpx(scroll.w)
+					:addTo(scroll)
 
-		local line = Ui()
-			:width(1):heightpx(frame.decorations[1].bordersize)
-			:decorate({ DecoSolid(frame.decorations[1].bordercolor) })
-			:addTo(frame)
+				wrap.pixelWrap = true
+				wrap:rebuild()
+			end,
+			function(buttonLayout)
+				for i, text in ipairs(buttons) do
+					local tooltip = tooltips and tooltips[i]
+					local btn = sdlext.buildButton(text, tooltip, function()
+						ui.response = i
+						quit()
+					end)
 
-		local buttonLayout = UiBoxLayout()
-			:hgap(50)
-			:padding(18)
-			:addTo(frame)
-		buttonLayout:heightpx(45 + buttonLayout.padt + buttonLayout.padb)
-
-		for i, text in ipairs(buttons) do
-			local decoText = DecoCAlignedText(text)
-			-- JustinFont has some weird issues causing the sdl.surface to report
-			-- slightly bigger width than it should have. Correct for this.
-			-- Calculate the excess width (0.0375), and then halve it twice;
-			-- once to get the centering offset, twice to get the correction offset
-			local offset = math.floor(0.0375 * decoText.surface:w() / 4)
-
-			local btn = Ui()
-				:widthpx(math.max(95, decoText.surface:w() + 30)):height(1)
-				:decorate({ DecoButton(), DecoAlign(-6 + offset, 2), decoText })
-				:addTo(buttonLayout)
-
-			if tooltips and tooltips[i] ~= "" then
-				btn:settooltip(tooltips[i])
-			end
-
-			btn.onMouseEnter = function(self)
-				if Game then
-					Game:TriggerSound("/ui/general/highlight_button")
+					btn:addTo(buttonLayout)
 				end
 			end
-
-			btn.onclicked = function(self, button)
-				if button == 1 then
-					if Game then
-						Game:TriggerSound("/ui/general/button_confirm")
-					end
-
-					ui.response = i
-					quit()
-				end
-				return true
-			end
-		end
-
-		frame:relayout()
-
-		if scroll.innerHeight < maxH - frame.padt - frame.padb then
-			scroll:heightpx(scroll.innerHeight)
-		end
-
-		line:pospx(0, scroll.y + scroll.h)
-
-		maxW = math.max(maxW, buttonLayout.w + frame.padl + frame.padr)
-		line:widthpx(maxW - frame.padl - frame.padr)
-		frame:widthpx(maxW)
-		buttonLayout:pospx((frame.w - frame.padl - frame.padr - buttonLayout.w) / 2, line.y + line.h)
-
-		maxH = math.min(maxH, scroll.innerHeight + frame.padt + frame.padb)
-		maxH = math.max(maxH, buttonLayout.y + buttonLayout.h + frame.padt + frame.padb)
+		)
 
 		frame
-			:heightpx(maxH)
 			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
 			:addTo(ui)
 	end)
