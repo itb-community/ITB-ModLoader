@@ -339,13 +339,15 @@ function Tests.Testsuite:GetString(holder, indent)
 	return testsuiteName .. ": " .. testsMsg .. testsuitesMsg
 end
 
-function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
+function Tests.Testsuite:RunAllTests(testsuiteName, testEnumeratorFn, isSecondaryCall)
 	testsuiteName = testsuiteName or findTestsuiteName(self)
+	testEnumeratorFn = testEnumeratorFn or self.EnumerateTests
 	isSecondaryCall = isSecondaryCall or false
 	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
-	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #2")
+	Tests.AssertEquals("function", type(testEnumeratorFn), "Argument #2")
+	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #3")
 
-	local tests, testsuites = self:EnumerateTests()
+	local tests, testsuites = testEnumeratorFn(self)
 
 	-- Shuffle the tests table so that we run tests in random order
 	tests = randomize(tests)
@@ -360,7 +362,7 @@ function Tests.Testsuite:RunAllTests(testsuiteName, isSecondaryCall)
 
 	self:ProcessResults(testsuiteName, resultsHolder)
 
-	self:RunNestedTestsuites(testsuiteName, testsuites, true)
+	self:RunNestedTestsuites(testsuiteName, testsuites, testEnumeratorFn, true)
 
 	modApi:conditionalHook(
 		function()
@@ -467,10 +469,11 @@ function Tests.Testsuite:ProcessResults(testsuiteName, results)
 	)
 end
 
-function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, isSecondaryCall)
+function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, testEnumeratorFn, isSecondaryCall)
 	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
 	Tests.AssertEquals("table", type(testsuites), "Argument #2")
-	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #3")
+	Tests.AssertEquals("function", type(testEnumeratorFn), "Argument #3")
+	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #4")
 
 	modApi:conditionalHook(
 		function()
@@ -486,7 +489,7 @@ function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, isSecond
 						end,
 						function()
 							self:ChangeStatus(Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH)
-							entry.suite:RunAllTests(string.format("%s.%s", testsuiteName, entry.name), isSecondaryCall)
+							entry.suite:RunAllTests(string.format("%s.%s", testsuiteName, entry.name), testEnumeratorFn, isSecondaryCall)
 
 							modApi:conditionalHook(
 								function()

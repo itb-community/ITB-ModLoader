@@ -1,8 +1,8 @@
 local rootpath = GetParentPath(...)
 
 local testsuite = Tests.Testsuite()
-function testsuite:RunAllTests()
-	self.__index.RunAllTests(self, "Root Testsuite", false)
+function testsuite:RunAllTests(testEnumeratorFn)
+	self.__index.RunAllTests(self, "Root Testsuite", testEnumeratorFn)
 end
 
 testsuite.pawn = require(rootpath.."pawn")
