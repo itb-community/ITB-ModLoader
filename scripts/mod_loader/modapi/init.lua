@@ -170,6 +170,9 @@ function modApi:setupModLoaderTexts()
 	self.texts["ModLoaderConfig_Text_Caller"] = "Print Caller Information"
 	self.texts["ModLoaderConfig_Tooltip_Caller"] = "Include timestamp and stacktrace in LOG messages."
 
+	self.texts["ModLoaderConfig_Text_DevMode"] = "Development Mode"
+	self.texts["ModLoaderConfig_Tooltip_DevMode"] = "Enable debug mod loader features. May disrupt normal gameplay.\n\nYou shouldn't enable this, unless you're a mod creator or mod loader maintainer."
+
 	self.texts["ModLoaderConfig_Text_FloatyTooltips"] = "Attach Tooltips To Mouse Cursor"
 	self.texts["ModLoaderConfig_Tooltip_FloatyTooltips_On"] = "Tooltips follow the mouse cursor around."
 	self.texts["ModLoaderConfig_Tooltip_FloatyTooltips_Off"] = "Tooltips show to the side of the UI element that spawned them, similar to the game's own tooltips."

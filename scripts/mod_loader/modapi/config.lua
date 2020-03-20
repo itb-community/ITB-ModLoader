@@ -4,6 +4,7 @@ function CurrentModLoaderConfig()
 
 	data.logLevel            = mod_loader.logger:getLoggingLevel()
 	data.printCallerInfo     = mod_loader.logger:getPrintCallerInfo()
+	data.developmentMode     = modApi.developmentMode
 
 	data.profileConfig       = modApi.profileConfig
 	data.floatyTooltips      = modApi.floatyTooltips
@@ -48,6 +49,8 @@ function DefaultModLoaderConfig()
 	return {
 		logLevel            = 1, -- log to console by default
 		printCallerInfo     = true,
+		developmentMode     = false,
+
 		floatyTooltips      = true,
 		profileConfig       = false,
 
@@ -91,6 +94,7 @@ end
 function ApplyModLoaderConfig(config)
 	mod_loader.logger:setLoggingLevel(config.logLevel)
 	mod_loader.logger:setPrintCallerInfo(config.printCallerInfo)
+	modApi.developmentMode        = config.developmentMode
 
 	modApi.floatyTooltips         = config.floatyTooltips
 	modApi.profileConfig          = config.profileConfig

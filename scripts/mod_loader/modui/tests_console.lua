@@ -352,8 +352,7 @@ local function createOpenTestingConsoleButton(root)
 	:addTo(root)
 
 	button.draw = function(self, screen)
-		-- TODO mod loader config option to enable development mode
-		self.visible = not sdlext.isConsoleOpen() and IsTestMechScenario()
+		self.visible = not sdlext.isConsoleOpen() and modApi.developmentMode and IsTestMechScenario()
 
 		Ui.draw(self, screen)
 	end

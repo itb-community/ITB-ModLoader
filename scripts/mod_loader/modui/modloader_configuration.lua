@@ -6,6 +6,7 @@
 local function createUi()
 	local ddLogLevel = nil
 	local cboxCaller = nil
+	local cboxDevelopmentMode = nil
 	local cboxFloatyTooltips = nil
 	local cboxProfileConfig = nil
 	local cboxErrorFrame = nil
@@ -19,6 +20,7 @@ local function createUi()
 		local data = {
 			logLevel            = ddLogLevel.value,
 			printCallerInfo     = cboxCaller.checked,
+			developmentMode     = cboxDevelopmentMode.checked,
 			floatyTooltips      = cboxFloatyTooltips.checked,
 			profileConfig       = cboxProfileConfig.checked,
 
@@ -37,6 +39,7 @@ local function createUi()
 	local uiSetSettings = function(config)
 		ddLogLevel.value            = config.logLevel
 		ddLogLevel.choice           = ddLogLevel.value + 1
+		cboxDevelopmentMode.checked = config.developmentMode
 		cboxCaller.checked          = config.printCallerInfo
 		cboxFloatyTooltips.checked  = config.floatyTooltips
 		cboxProfileConfig.checked   = config.profileConfig
@@ -145,6 +148,13 @@ local function createUi()
 		cboxCaller = createCheckboxOption(
 			modApi:getText("ModLoaderConfig_Text_Caller"),
 			modApi:getText("ModLoaderConfig_Tooltip_Caller")
+		):addTo(layout)
+
+		-- ////////////////////////////////////////////////////////////////////////
+		-- Development Mode
+		cboxDevelopmentMode = createCheckboxOption(
+			modApi:getText("ModLoaderConfig_Text_DevMode"),
+			modApi:getText("ModLoaderConfig_Tooltip_DevMode")
 		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
