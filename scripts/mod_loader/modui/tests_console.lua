@@ -57,10 +57,16 @@ local function buildTestUi(testEntry)
 		:addTo(entryHolder)
 	statusBox.disabled = true
 
-	entryHolder.entry = testEntry
+	-- Add child ui elements as fields in the parent object,
+	-- for convenient access
 	entryHolder.checkbox = checkbox
 	entryHolder.statusBox = statusBox
 
+	entryHolder.entry = testEntry
+
+	-- Add event handlers as fields in the ui object, that way
+	-- it's not our responsibility to register them correctly,
+	-- and we can reduce the scope of this function.
 	entryHolder.onReset = function()
 		statusBox.decorations[1].bordercolor = deco.colors.buttonborder
 		statusBox.decorations[2].surface = nil
@@ -167,7 +173,7 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 	sdlext.addButtonSoundHandlers(checkbox)
 
 	local statusBox = Ui()
-		:widthpx(200):heightpx(41)
+		:widthpx(400):heightpx(41)
 		:decorate({
 			DecoButton(),
 			DecoAlign(0, 2),
@@ -175,9 +181,56 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 		})
 		:addTo(entryHeaderHolder)
 	statusBox.disabled = true
+	statusBox.text = statusBox.decorations[3]
 
-	sdlext.addButtonSoundHandlers(statusBox)
+	local testsCounter = {}
+	statusBox.updateStatus = function()
+		local message = nil
+		if testsCounter.failed > 0 then
+			message = string.format(
+					"Failed %s, passed %s of %s tests",
+					testsCounter.failed,
+					testsCounter.success,
+					testsCounter.total
+			)
+			statusBox.text:setcolor(TestConsole.colors.border_fail)
+		else
+			message = string.format(
+					"Passed %s of %s tests",
+					testsCounter.success,
+					testsCounter.total
+			)
+			statusBox.text:setcolor(TestConsole.colors.border_ok)
+		end
+		statusBox.text:setsurface(message)
+	end
+	table.insert(subscriptions, resetEvent:subscribe(function()
+		testsCounter = {}
+		testsCounter.ignored = 0
+		testsCounter.failed = 0
+		testsCounter.success = 0
+		testsCounter.total = 0
+		statusBox.text:setsurface("")
+	end))
 
+	local onTestSubmitted = function()
+		testsCounter.total = testsCounter.total + 1
+	end
+	local onTestSuccess = function()
+		testsCounter.success = testsCounter.success + 1
+		statusBox.updateStatus()
+	end
+	local onTestFailed = function()
+		testsCounter.failed = testsCounter.failed + 1
+		statusBox.updateStatus()
+	end
+
+	table.insert(subscriptions, testsuiteEntry.suite.onTestSubmitted:subscribe(onTestSubmitted))
+	table.insert(subscriptions, testsuiteEntry.suite.onTestSuccess:subscribe(onTestSuccess))
+	table.insert(subscriptions, testsuiteEntry.suite.onTestFailed:subscribe(onTestFailed))
+
+	-- Add child ui elements as fields in the parent object,
+	-- for convenient access
 	entryHeaderHolder.collapse = collapse
 	entryHeaderHolder.checkbox = checkbox
 	entryHeaderHolder.statusBox = statusBox
@@ -200,11 +253,16 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 			:addTo(entryContentHolder)
 
 		table.insert(subscriptions, checkbox.onToggled:subscribe(testsuiteUi.onParentToggled))
+
+		table.insert(subscriptions, entry.suite.onTestSubmitted:subscribe(onTestSubmitted))
+		table.insert(subscriptions, entry.suite.onTestSuccess:subscribe(onTestSuccess))
+		table.insert(subscriptions, entry.suite.onTestFailed:subscribe(onTestFailed))
 	end
 
-	entryBoxHolder.entry = testsuiteEntry
 	entryBoxHolder.header = entryHeaderHolder
 	entryBoxHolder.content = entryContentHolder
+
+	entryBoxHolder.entry = testsuiteEntry
 
 	entryBoxHolder.onParentToggled = function(checked)
 		checkbox.checked = checked

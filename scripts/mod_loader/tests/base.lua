@@ -264,6 +264,7 @@ Tests.Testsuite.STATUS_COMPLETED = "COMPLETED"
 function Tests.Testsuite:new()
 	self.onTestsuiteStarting = Event()
 	self.onTestsuiteCompleted = Event()
+	self.onTestSubmitted = Event()
 	self.onTestStarted = Event()
 	self.onTestSuccess = Event()
 	self.onTestFailed = Event()
@@ -394,6 +395,8 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 			-- Suppress log output so that the results stay somewhat readable
 			local pendingTests = #tests
 			for _, entry in ipairs(tests) do
+				self.onTestSubmitted:fire(entry)
+
 				modApi:conditionalHook(
 					function()
 						return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_TEST
