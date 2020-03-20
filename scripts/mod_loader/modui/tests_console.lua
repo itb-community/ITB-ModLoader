@@ -310,6 +310,18 @@ local function buildTestingConsoleButtons(buttonLayout)
 	)
 	btnRunSelected:heightpx(40)
 	btnRunSelected:addTo(buttonLayout)
+
+	btnRunAll.disabled = Testuites.status ~= Tests.Testsuite.STATUS_COMPLETED
+	btnRunSelected.disabled = Testuites.status ~= Tests.Testsuite.STATUS_COMPLETED
+
+	table.insert(subscriptions, Testsuites.onTestsuiteStarting:subscribe(function(suite, tests, testsuites)
+		btnRunAll.disabled = true
+		btnRunSelected.disabled = true
+	end))
+	table.insert(subscriptions, Testsuites.onTestsuiteCompleted:subscribe(function(suite, tests, testsuites)
+		btnRunAll.disabled = false
+		btnRunSelected.disabled = false
+	end))
 end
 
 local function showTestingConsole()

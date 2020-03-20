@@ -262,10 +262,14 @@ Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH = "WAITING_FOR_NESTED_FINISH"
 Tests.Testsuite.STATUS_COMPLETED = "COMPLETED"
 
 function Tests.Testsuite:new()
+	self.onTestsuiteStarting = Event()
+	self.onTestsuiteCompleted = Event()
 	self.onTestStarted = Event()
 	self.onTestSuccess = Event()
 	self.onTestFailed = Event()
 	self.onStatusChanged = Event()
+
+	self.status = Tests.Testsuite.STATUS_COMPLETED
 end
 
 function Tests.Testsuite:ChangeStatus(newStatus)
@@ -348,6 +352,7 @@ function Tests.Testsuite:RunAllTests(testsuiteName, testEnumeratorFn, isSecondar
 	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #3")
 
 	local tests, testsuites = testEnumeratorFn(self)
+	self.onTestsuiteStarting:fire(self, tests, testsuites)
 
 	-- Shuffle the tests table so that we run tests in random order
 	tests = randomize(tests)
@@ -370,6 +375,7 @@ function Tests.Testsuite:RunAllTests(testsuiteName, testEnumeratorFn, isSecondar
 		end,
 		function()
 			DoSaveGame()
+			self.onTestsuiteCompleted:fire(self)
 		end
 	)
 
