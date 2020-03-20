@@ -86,10 +86,14 @@ local function buildTestUi(testEntry)
 			statusBox.decorations[1].bordercolor = deco.colors.buttonborder
 			statusBox.decorations[2].surface = deco.surfaces.markCross
 			statusBox.disabled = false
-			statusBox:settooltip("This test has failed. Click to bring up a detailed summary.")
+			statusBox:settooltip(modApi:getText("TestingConsole_FailSummary_Tooltip"))
 
 			sdlext.addButtonSoundHandlers(statusBox, function ()
-				sdlext.showTextDialog("Failure Summary", resultTable.result, 1000, 1000)
+				sdlext.showTextDialog(
+						modApi:getText("TestingConsole_FailSummary_FrameTitle"),
+						resultTable.result,
+						1000, 1000
+				)
 			end)
 		end
 	end
@@ -276,7 +280,7 @@ end
 
 local function buildTestingConsoleContent(scroll)
 	local entry = {
-		name = "Root Testsuite",
+		name = modApi:getText("TestingConsole_RootTestsuite"),
 		suite = Testsuites
 	}
 
@@ -286,7 +290,7 @@ end
 
 local function buildTestingConsoleButtons(buttonLayout)
 	local btnRunAll = sdlext.buildButton(
-		"Run All",
+		modApi:getText("TestingConsole_RunAll"),
 		nil,
 		function()
 			resetEvent:fire()
@@ -297,7 +301,7 @@ local function buildTestingConsoleButtons(buttonLayout)
 	btnRunAll:addTo(buttonLayout)
 
 	local btnRunSelected = sdlext.buildButton(
-		"Run Selected",
+		modApi:getText("TestingConsole_RunSelected"),
 		nil,
 		function()
 			resetEvent:fire()

@@ -236,6 +236,11 @@ function modApi:setupModLoaderTexts()
 	self.texts["TestingConsole_ToggleButton_Text"] = "TESTING CONSOLE"
 	self.texts["TestingConsole_ToggleButton_Tooltip"] = "Opens a console for running mod loader integration tests."
 	self.texts["TestingConsole_FrameTitle"] = "Testing Console"
+	self.texts["TestingConsole_RunAll"] = "Run All"
+	self.texts["TestingConsole_RunSelected"] = "Run Selected"
+	self.texts["TestingConsole_RootTestsuite"] = "Root Testsuite"
+	self.texts["TestingConsole_FailSummary_FrameTitle"] = "Failure Summary"
+	self.texts["TestingConsole_FailSummary_Tooltip"] = "This test has failed. Click to bring up a detailed summary."
 end
 
 -- Maintain sanity
