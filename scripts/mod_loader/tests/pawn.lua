@@ -18,9 +18,11 @@ testsuite.test_ApplyDamage_ShouldReduceHealth = buildPawnTest({
 	end,
 	check = function()
 		local actualHealth = pawn:GetHealth()
-		Board:RemovePawn(pawn)
 
 		assertEquals(expectedHealth, actualHealth, "Pawn did not take correct amount of damage")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
 	end
 })
 
@@ -40,11 +42,13 @@ testsuite.test_SafeDamageOnForest_ShouldNotCreateFire = buildPawnTest({
 	check = function()
 		local actualFire = pawn:IsFire()
 		local actualTerrain = Board:GetTerrain(loc)
-		Board:SetTerrain(loc, terrain)
-		Board:RemovePawn(pawn)
 
 		assertEquals(false, actualFire, "Pawn had been set on fire")
 		assertEquals(TERRAIN_FOREST, actualTerrain, "Terrain type has been changed")
+	end,
+	cleanup = function()
+		Board:SetTerrain(loc, terrain)
+		Board:RemovePawn(pawn)
 	end
 })
 
@@ -64,10 +68,12 @@ testsuite.test_PawnSetFire_ShouldNotSetBoardFire = buildPawnTest({
 	end,
 	check = function()
 		local actualFire = pawn:IsFire()
-		Board:RemovePawn(pawn)
-		Board:SetTerrain(loc, terrain)
 
 		assertEquals(true, actualFire, "Pawn had not been set on fire")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+		Board:SetTerrain(loc, terrain)
 	end
 })
 
@@ -87,12 +93,14 @@ testsuite.test_PawnExtinguishOnFireTile_ShouldRemainOnFire = buildPawnTest({
 	check = function()
 		local actualPawnFire = pawn:IsFire()
 		local actualBoardFire = Board:IsFire(loc)
-		Board:RemovePawn(pawn)
-		Board:SetFire(loc, false)
-		Board:SetTerrain(loc, terrain)
 
 		assertEquals(true, actualPawnFire, "Pawn had been extinguished")
 		assertEquals(true, actualBoardFire, "Board had been extinguished")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+		Board:SetFire(loc, false)
+		Board:SetTerrain(loc, terrain)
 	end
 })
 
