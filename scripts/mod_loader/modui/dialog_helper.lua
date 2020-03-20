@@ -217,14 +217,14 @@ end
 
 function sdlext.addButtonSoundHandlers(uiElement, clickHandler)
 	uiElement.onMouseEnter = function(self)
-		if Game then
+		if Game and not self.disabled then
 			Game:TriggerSound("/ui/general/highlight_button")
 		end
 	end
 
 	uiElement.onclicked = function(self, button)
 		if button == 1 then
-			if Game then
+			if Game and not self.disabled then
 				Game:TriggerSound("/ui/general/button_confirm")
 			end
 
