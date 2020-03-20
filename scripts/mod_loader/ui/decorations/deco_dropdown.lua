@@ -1,6 +1,8 @@
 deco.surfaces.dropdownOpen = sdlext.getSurface({ path = "resources/mods/ui/dropdown-arrow-opened.png" })
+deco.surfaces.dropdownOpenRight = sdlext.getSurface({ path = "resources/mods/ui/dropdown-arrow-opened-right.png" })
 deco.surfaces.dropdownClosed = sdlext.getSurface({ path = "resources/mods/ui/dropdown-arrow-closed.png" })
 deco.surfaces.dropdownOpenHovered = sdlext.getSurface({ path = "resources/mods/ui/dropdown-arrow-opened-hovered.png" })
+deco.surfaces.dropdownOpenRightHovered = sdlext.getSurface({ path = "resources/mods/ui/dropdown-arrow-opened-right-hovered.png" })
 deco.surfaces.dropdownClosedHovered = sdlext.getSurface({ path = "resources/mods/ui/dropdown-arrow-closed-hovered.png" })
 
 
