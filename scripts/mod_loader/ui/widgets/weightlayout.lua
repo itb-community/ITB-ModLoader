@@ -63,7 +63,6 @@ function UiWeightLayout:relayout()
 			if self.horizontal then
 				if child.wPercent ~= nil then
 					child.w = remainingSpaceW * (child.wPercent / weightSumW)
-					remainingSpaceW = remainingSpaceW - child.w
 					child.wPercent = nil
 				end
 				if child.hPercent ~= nil then
@@ -77,7 +76,6 @@ function UiWeightLayout:relayout()
 				end
 				if child.hPercent ~= nil then
 					child.h = remainingSpaceH * (child.hPercent / weightSumH)
-					remainingSpaceH = remainingSpaceH - child.h
 					child.hPercent = nil
 				end
 			end
