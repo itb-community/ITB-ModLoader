@@ -3,6 +3,38 @@
 -- figure out a cleaner way to handle which tests are selected for running
 -- collapse/expand buttons facing the right way
 
+TestConsole = {}
+
+TestConsole.colors = {}
+TestConsole.colors.border_ok = sdl.rgb(64, 196, 64)
+TestConsole.colors.border_running = sdl.rgb(192, 192, 64)
+TestConsole.colors.border_fail = sdl.rgb(192, 32, 32)
+
+deco.surfaces.markTick = sdlext.getSurface({
+	path = "resources/mods/ui/mark-tick.png",
+	colormap = {
+		sdl.rgb(255, 255, 255),
+		TestConsole.colors.border_ok
+	}
+})
+deco.surfaces.markCross = sdlext.getSurface({
+	path = "resources/mods/ui/mark-cross.png",
+	colormap = {
+		sdl.rgb(255, 255, 255),
+		TestConsole.colors.border_fail
+	}
+})
+
+local resetEvent = nil
+
+local subscriptions = {}
+local function cleanup()
+	for _, sub in ipairs(subscriptions) do
+		sub:unsubscribe()
+	end
+	subscriptions = {}
+end
+
 local selectedTestsMap = nil
 local function toggleSelection(entry)
 	if selectedTestsMap[entry] == nil then
@@ -21,6 +53,14 @@ local function isTestSuiteElement(element)
 	return element.__index == UiBoxLayout
 end
 
+local function updateSelectedTest(testHolder, checked)
+	local checkbox = testHolder.children[1]
+
+	checkbox.checked = checked
+	selectedTestsMap[testHolder.entry] = checked
+end
+
+local updateSelectedItems = nil
 local function updateSelectedTestsuite(testsuiteHolder, checked)
 	local header = testsuiteHolder.children[1]
 	local content = testsuiteHolder.children[2]
@@ -29,29 +69,27 @@ local function updateSelectedTestsuite(testsuiteHolder, checked)
 	selectedTestsMap[testsuiteHolder.entry] = checked
 
 	for _, child in ipairs(content.children) do
-		if isTestSuiteElement(child) then
-			updateSelectedTestsuite(child, checked)
-		else
-			child.checked = checked
-			selectedTestsMap[child.entry] = checked
-		end
+		updateSelectedItems(child, checked)
 	end
 end
 
 local rootTestsuiteHolder = nil
-local function updateSelectedItems(holder, checked)
+updateSelectedItems = function(holder, checked)
 	holder = holder or rootTestsuiteHolder
 	checked = checked or isSelected(holder.entry)
 
 	if isTestSuiteElement(holder) then
 		updateSelectedTestsuite(holder, checked)
 	else
-		holder.checked = checked
-		selectedTestsMap[holder.entry] = checked
+		updateSelectedTest(holder, checked)
 	end
 end
 
 local function buildTestUi(testEntry)
+	local entryHolder = UiWeightLayout()
+			:width(1):heightpx(41)
+			:addTo(entryBoxHolder)
+
 	local checkbox = UiCheckbox()
 		:width(1):heightpx(41)
 		:decorate({
@@ -60,15 +98,61 @@ local function buildTestUi(testEntry)
 			DecoAlign(4, 2),
 			DecoText(testEntry.name)
 		})
+		:addTo(entryHolder)
 	checkbox.checked = true
-	checkbox.entry = testEntry
 
 	sdlext.addButtonSoundHandlers(checkbox, function()
 		toggleSelection(testEntry)
-		updateSelectedItems(checkbox)
+		updateSelectedItems(entryHolder)
 	end)
 
-	return checkbox
+	local statusBox = Ui()
+		:widthpx(41):heightpx(41)
+		:decorate({
+			DecoButton(),
+			DecoSurface()
+		})
+		:addTo(entryHolder)
+	statusBox.disabled = true
+
+	entryHolder.entry = testEntry
+	entryHolder.checkbox = checkbox
+	entryHolder.statusBox = statusBox
+
+	entryHolder.onReset = function()
+		statusBox.decorations[1].bordercolor = deco.colors.buttonborder
+		statusBox.decorations[2].surface = nil
+		statusBox.disabled = true
+		statusBox:settooltip("")
+
+		statusBox.onMouseEnter = Ui.onMouseEnter
+		statusBox.onclicked = Ui.onMouseEnter
+	end
+	entryHolder.onTestStarted = function(entry)
+		if entry.name == testEntry.name then
+			statusBox.decorations[1].bordercolor = TestConsole.colors.border_running
+		end
+	end
+	entryHolder.onTestSuccess = function(entry, resultTable)
+		if entry.name == testEntry.name then
+			statusBox.decorations[1].bordercolor = deco.colors.buttonborder
+			statusBox.decorations[2].surface = deco.surfaces.markTick
+		end
+	end
+	entryHolder.onTestFailed = function(entry, resultTable)
+		if entry.name == testEntry.name then
+			statusBox.decorations[1].bordercolor = deco.colors.buttonborder
+			statusBox.decorations[2].surface = deco.surfaces.markCross
+			statusBox.disabled = false
+			statusBox:settooltip("This test has failed. Click to bring up a detailed summary.")
+
+			sdlext.addButtonSoundHandlers(statusBox, function ()
+				sdlext.showTextDialog("Failure Summary", resultTable.result, 1000, 1000)
+			end)
+		end
+	end
+
+	return entryHolder
 end
 
 local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
@@ -104,9 +188,9 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 		:decorate({
 			DecoButton(),
 			DecoCheckbox(
-				deco.surfaces.dropdownOpen,
+				deco.surfaces.dropdownOpenRight,
 				deco.surfaces.dropdownClosed,
-				deco.surfaces.dropdownOpenHovered,
+				deco.surfaces.dropdownOpenRightHovered,
 				deco.surfaces.dropdownClosedHovered
 			)
 		})
@@ -137,10 +221,30 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 		updateSelectedItems(entryBoxHolder)
 	end)
 
+	local statusBox = Ui()
+		:widthpx(200):heightpx(41)
+		:decorate({
+			DecoButton(),
+			DecoAlign(0, 2),
+			DecoText()
+		})
+		:addTo(entryHeaderHolder)
+
+	sdlext.addButtonSoundHandlers(statusBox, function() end)
+
+	entryHeaderHolder.collapse = collapse
+	entryHeaderHolder.checkbox = checkbox
+	entryHeaderHolder.statusBox = statusBox
+
 	-- Build ui elements for tests in this testsuite
 	for _, entry in ipairs(tests) do
-		buildTestUi(entry)
+		local testUi = buildTestUi(entry)
 			:addTo(entryContentHolder)
+
+		table.insert(subscriptions, resetEvent:subscribe(testUi.onReset))
+		table.insert(subscriptions, testsuiteEntry.suite.onTestStarted:subscribe(testUi.onTestStarted))
+		table.insert(subscriptions, testsuiteEntry.suite.onTestSuccess:subscribe(testUi.onTestSuccess))
+		table.insert(subscriptions, testsuiteEntry.suite.onTestFailed:subscribe(testUi.onTestFailed))
 	end
 
 	-- Recursively build ui elements for nested testsuites in this testsuite
@@ -150,6 +254,8 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 	end
 
 	entryBoxHolder.entry = testsuiteEntry
+	entryBoxHolder.header = entryHeaderHolder
+	entryBoxHolder.content = entryContentHolder
 
 	return entryBoxHolder
 end
@@ -169,6 +275,7 @@ local function buildTestingConsoleButtons(buttonLayout)
 		"Run All",
 		nil,
 		function()
+			resetEvent:fire()
 			Testsuites:RunAllTests()
 		end
 	)
@@ -179,6 +286,7 @@ local function buildTestingConsoleButtons(buttonLayout)
 		"Run Selected",
 		nil,
 		function()
+			resetEvent:fire()
 			-- TODO
 			LOG("Run Selected clicked")
 		end
@@ -190,6 +298,7 @@ end
 local function showTestingConsole()
 	sdlext.showDialog(function(ui, quit)
 		ui.onDialogExit = function()
+			cleanup()
 			rootTestsuiteHolder = nil
 			selectedTestsMap = nil
 		end
@@ -245,5 +354,6 @@ local function createToggleButton(root)
 end
 
 sdlext.addUiRootCreatedHook(function(screen, root)
+	resetEvent = Event()
 	createToggleButton(root)
 end)

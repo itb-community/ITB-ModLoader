@@ -70,7 +70,7 @@ function Tests.WaitUntilBoardNotBusy(resultTable, fn)
 			local ok, err = xpcall(
 				fn,
 				function(e)
-					return string.format("%s:\n%s", e, debug.traceback("", 2))
+					return string.format("%s:\n%s", e, debug.traceback())
 				end
 			)
 
@@ -89,7 +89,7 @@ function Tests.SafeRunLater(resultTable, fn)
 		local ok, err = xpcall(
 			fn,
 			function(e)
-				return string.format("%s:\n%s", e, debug.traceback("", 2))
+				return string.format("%s:\n%s", e, debug.traceback())
 			end
 		)
 
@@ -414,9 +414,9 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 							function()
 								self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_TEST)
 								if resultTable.ok and resultTable.result == true then
-									self.onTestSuccess:fire(entry)
+									self.onTestSuccess:fire(entry, resultTable)
 								else
-									self.onTestFailed:fire(entry)
+									self.onTestFailed:fire(entry, resultTable)
 								end
 								pendingTests = pendingTests - 1
 							end
