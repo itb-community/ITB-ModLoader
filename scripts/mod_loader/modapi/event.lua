@@ -49,6 +49,10 @@ function Event:unsubscribeAll()
 	end
 end
 
+local function isStackOverflowError(err)
+	return string.find(err, "C stack overflow")
+end
+
 local function pack2(...) return {n=select('#', ...), ...} end
 local function unpack2(t) return unpack(t, 1, t.n) end
 function Event:fire(...)
@@ -57,7 +61,11 @@ function Event:fire(...)
 		local ok, err = pcall(function() fn(unpack2(args)) end)
 
 		if not ok then
-			LOG("An event callback failed: ", err)
+			if isStackOverflowError(err) then
+				error(err)
+			else
+				LOG("An event callback failed: ", err)
+			end
 		end
 	end
 end

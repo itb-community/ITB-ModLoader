@@ -22,10 +22,7 @@ function testsuite.test_GlobalTablesChanges_ShouldNotLeak()
 	assertEquals(7, env.test.a)
 
 	if ok then
-		LOG("SUCCESS")
 		return true
-	else
-		LOG("FAILURE:", result)
 	end
 end
 
@@ -47,10 +44,7 @@ function testsuite.test_GlobalChanges_ShouldNotLeak()
 	assertEquals(7, env.a)
 
 	if ok then
-		LOG("SUCCESS")
 		return true
-	else
-		LOG("FAILURE:", result)
 	end
 end
 
@@ -70,10 +64,7 @@ function testsuite.test_UpvalueChanges_ShouldNotLeak()
 	assertEquals(5, a)
 
 	if ok then
-		LOG("SUCCESS")
 		return true
-	else
-		LOG("FAILURE:", result)
 	end
 end
 
@@ -97,10 +88,7 @@ function testsuite.test_ShouldReturnMultipleValues()
 	test = nil
 
 	if ok then
-		LOG("SUCCESS")
 		return true
-	else
-		LOG("FAILURE:", result)
 	end
 end
 
@@ -123,10 +111,7 @@ function testsuite.test_ShouldRestoreNilUpvalues()
 	assertEquals(nil, b)
 
 	if ok then
-		LOG("SUCCESS")
 		return true
-	else
-		LOG("FAILURE:", result)
 	end
 end
 
@@ -149,10 +134,7 @@ function testsuite.test_ShouldPersistUpvalues_ThroughSameFunctionCalls()
 	assertEquals(2, env.counter)
 
 	if ok then
-		LOG("SUCCESS")
 		return true
-	else
-		LOG("FAILURE:", result)
 	end
 end
 
@@ -176,10 +158,7 @@ function testsuite.test_ShouldPersistUpvalues_ThroughDifferentFunctionCalls()
 	assertEquals(1, a)
 
 	if ok then
-		LOG("SUCCESS")
 		return true
-	else
-		LOG("FAILURE:", result)
 	end
 end
 
@@ -214,10 +193,7 @@ function testsuite.test_ShouldPersistUpvalues_ThroughDifferentNestedFunctionCall
 	assertEquals(nil, c)
 
 	if ok then
-		LOG("SUCCESS")
 		return true
-	else
-		LOG("FAILURE:", result)
 	end
 end
 
@@ -234,10 +210,7 @@ function testsuite.test_RunInEnv_ShouldWorkWithFunctionReferences()
 	assertEquals(1, a)
 
 	if ok then
-		LOG("SUCCESS")
 		return true
-	else
-		LOG("FAILURE:", result)
 	end
 end
 
@@ -259,10 +232,7 @@ function testsuite.test_ScriptErrors_ShouldNotBreakSandbox()
 
 	-- Expected failure
 	if not ok then
-		LOG("SUCCESS")
 		return true
-	else
-		LOG("FAILURE")
 	end
 end
 
@@ -300,10 +270,7 @@ function testsuite.test_ShouldPersistUpvalues_ThroughNestedScopes()
 	assertEquals(nil, b)
 
 	if ok then
-		LOG("SUCCESS")
 		return true
-	else
-		LOG("FAILURE:", result)
 	end
 end
 

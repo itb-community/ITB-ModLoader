@@ -184,6 +184,7 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 	statusBox.text = statusBox.decorations[3]
 
 	local testsCounter = {}
+	statusBox.onStatusChanged = Event()
 	statusBox.updateStatus = function()
 		local message = nil
 		if testsCounter.failed > 0 then
@@ -210,19 +211,29 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 		testsCounter.failed = 0
 		testsCounter.success = 0
 		testsCounter.total = 0
-		statusBox.text:setsurface("")
+		statusBox.updateStatus()
 	end))
 
 	local onTestSubmitted = function()
+		local old = testsCounter.total
 		testsCounter.total = testsCounter.total + 1
+		statusBox.updateStatus()
+
+		statusBox.onStatusChanged:fire("total", old, testsCounter.total)
 	end
 	local onTestSuccess = function()
+		local old = testsCounter.success
 		testsCounter.success = testsCounter.success + 1
 		statusBox.updateStatus()
+
+		statusBox.onStatusChanged:fire("success", old, testsCounter.success)
 	end
 	local onTestFailed = function()
+		local old = testsCounter.failed
 		testsCounter.failed = testsCounter.failed + 1
 		statusBox.updateStatus()
+
+		statusBox.onStatusChanged:fire("failed", old, testsCounter.failed)
 	end
 
 	table.insert(subscriptions, testsuiteEntry.suite.onTestSubmitted:subscribe(onTestSubmitted))
@@ -253,10 +264,13 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 			:addTo(entryContentHolder)
 
 		table.insert(subscriptions, checkbox.onToggled:subscribe(testsuiteUi.onParentToggled))
+		table.insert(subscriptions, testsuiteUi.header.statusBox.onStatusChanged:subscribe(function(status, childOld, childNew)
+			local old = testsCounter[status]
+			testsCounter[status] = testsCounter[status] + (childNew - childOld)
+			statusBox.updateStatus()
 
-		table.insert(subscriptions, entry.suite.onTestSubmitted:subscribe(onTestSubmitted))
-		table.insert(subscriptions, entry.suite.onTestSuccess:subscribe(onTestSuccess))
-		table.insert(subscriptions, entry.suite.onTestFailed:subscribe(onTestFailed))
+			statusBox.onStatusChanged:fire(status, old, testsCounter[status])
+		end))
 	end
 
 	entryBoxHolder.header = entryHeaderHolder
@@ -326,7 +340,7 @@ local function enumerateSelectedTests(testsuite)
 			if isSelected(holder, v) then
 				table.insert(tests, { name = k, func = v })
 			end
-		elseif type(v) == "table" and v.__index == Tests.Testsuite then
+		elseif type(v) == "table" and Class.instanceOf(v, Tests.Testsuite) then
 			if isSelected(findHolderForTestsuite(v, holder)) then
 				table.insert(testsuites, { name = k, suite = v })
 			end
