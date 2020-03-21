@@ -276,7 +276,7 @@ function Tests.Testsuite:ChangeStatus(newStatus)
 	local oldStatus = self.status
 	self.status = newStatus
 
-	self.onStatusChanged:fire(oldStatus, newStatus)
+	self.onStatusChanged:fire(self, oldStatus, newStatus)
 end
 
 --[[
