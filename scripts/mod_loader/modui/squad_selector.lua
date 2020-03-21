@@ -248,14 +248,13 @@ local function createUi()
 		end
 
 		local frame = sdlext.buildButtonDialog(
-			modApi:getText("TestingConsole_FrameTitle"),
+			modApi:getText("SquadSelect_FrameTitle"),
 			0.6 * ScreenSizeX(), 0.6 * ScreenSizeY(),
 			buildContent,
 			buildButtons
 		)
 
 		frame
-			:caption(modApi:getText("SquadSelect_FrameTitle"))
 			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
 			:addTo(ui)
 
