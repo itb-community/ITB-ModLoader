@@ -299,7 +299,7 @@ function Tests.Testsuite:EnumerateTests()
 	for k, v in pairs(self) do
 		if type(v) == "function" and modApi:stringStartsWith(k, "test_") then
 			table.insert(tests, { name = k, func = v })
-		elseif type(v) == "table" and v.__index == Tests.Testsuite then
+		elseif type(v) == "table" and Class.instanceOf(v, Tests.Testsuite) then
 			table.insert(testsuites, { name = k, suite = v })
 		end
 	end
