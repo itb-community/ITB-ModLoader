@@ -50,19 +50,19 @@ end
 
 function Tests.AssertEquals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected '%s', but was '%s'\n%s", tostring(expected), tostring(actual), debug.traceback())
+	msg = msg .. string.format("Expected '%s', but was '%s'\n%s", tostring(expected), tostring(actual), debug.traceback("", 2))
 	assert(expected == actual, msg)
 end
 
 function Tests.AssertNotEquals(notExpected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected '%s' to not be equal to '%s'\n%s", tostring(actual), tostring(notExpected), debug.traceback())
+	msg = msg .. string.format("Expected '%s' to not be equal to '%s'\n%s", tostring(actual), tostring(notExpected), debug.traceback("", 2))
 	assert(notExpected ~= actual, msg)
 end
 
 function Tests.AssertTypePoint(arg, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected Point, but was %s\n%s", tostring(type(arg)), debug.traceback())
+	msg = msg .. string.format("Expected Point, but was %s\n%s", tostring(type(arg)), debug.traceback("", 2))
 	assert(type(arg) == "userdata" and type(arg.x) == "number" and type(arg.y) == "number", msg)
 end
 
@@ -70,12 +70,12 @@ function Tests.AssertBoardStateEquals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
 
 	for index, expectedState in ipairs(expected.tiles) do
-		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback()
+		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback("", 2)
 		Tests.AssertTableEquals(expectedState, actual.tiles[index], msg)
 	end
 
 	for index, expectedState in ipairs(expected.pawns) do
-		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback()
+		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback("", 2)
 		Tests.AssertTableEquals(expectedState, actual.pawns[index], msg)
 	end
 end
@@ -95,12 +95,12 @@ function Tests.AssertTableEquals(expected, actual, msg)
 	end
 
 	if #differences > 0 then
-		error(msg .. "\n" .. debug.traceback())
+		error(msg .. "\n" .. debug.traceback("", 2))
 	end
 end
 
 function Tests.RequireBoard()
-	assert(Board ~= nil, "Error: this test requires a Board to be available" .. "\n" .. debug.traceback())
+	assert(Board ~= nil, "Error: this test requires a Board to be available" .. "\n" .. debug.traceback("", 2))
 end
 
 function Tests.WaitUntilBoardNotBusy(resultTable, fn)
@@ -115,7 +115,7 @@ function Tests.WaitUntilBoardNotBusy(resultTable, fn)
 			local ok, err = xpcall(
 				fn,
 				function(e)
-					return string.format("%s:\n%s", e, debug.traceback())
+					return string.format("%s:\n%s", e, debug.traceback("", 2))
 				end
 			)
 
@@ -134,7 +134,7 @@ function Tests.SafeRunLater(resultTable, fn)
 		local ok, err = xpcall(
 			fn,
 			function(e)
-				return string.format("%s:\n%s", e, debug.traceback())
+				return string.format("%s:\n%s", e, debug.traceback("", 2))
 			end
 		)
 
@@ -344,7 +344,7 @@ function Tests.Testsuite:EnumerateTests()
 	for k, v in pairs(self) do
 		if type(v) == "function" and modApi:stringStartsWith(k, "test_") then
 			table.insert(tests, { name = k, func = v })
-		elseif type(v) == "table" and v.__index == Tests.Testsuite then
+		elseif type(v) == "table" and Class.instanceOf(v, Tests.Testsuite) then
 			table.insert(testsuites, { name = k, suite = v })
 		end
 	end

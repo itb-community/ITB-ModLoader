@@ -340,7 +340,7 @@ local function enumerateSelectedTests(testsuite)
 			if isSelected(holder, v) then
 				table.insert(tests, { name = k, func = v })
 			end
-		elseif type(v) == "table" and v.__index == Tests.Testsuite then
+		elseif type(v) == "table" and Class.instanceOf(v, Tests.Testsuite) then
 			if isSelected(findHolderForTestsuite(v, holder)) then
 				table.insert(testsuites, { name = k, suite = v })
 			end
