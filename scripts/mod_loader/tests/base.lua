@@ -218,7 +218,6 @@ function Tests.BuildPawnTest(testFunctionsTable)
 
 						Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
 
-						LOG("SUCCESS")
 						resultTable.result = true
 					end)
 					:finally(globalCleanup)
@@ -405,6 +404,8 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 						self:ChangeStatus(Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH)
 						self.onTestStarted:fire(entry)
 
+						LOG("    Running test", entry.name)
+
 						local resultTable = {}
 						resultTable.done = false
 						resultTable.name = entry.name
@@ -426,8 +427,10 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 								self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_TEST)
 								if resultTable.ok and resultTable.result == true then
 									self.onTestSuccess:fire(entry, resultTable)
+									LOG("    Success:", entry.name)
 								else
 									self.onTestFailed:fire(entry, resultTable)
+									LOG("    FAILURE:", entry.name)
 								end
 								pendingTests = pendingTests - 1
 							end
