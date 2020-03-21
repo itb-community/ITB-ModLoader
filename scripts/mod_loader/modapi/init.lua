@@ -151,6 +151,10 @@ function modApi:setupModLoaderTexts()
 	self.texts["ModContent_ButtonTooltip_SquadSelect"] = "Select which squads will be available to pick."
 	self.texts["SquadSelect_FrameTitle"] = "Squad Selection"
 	self.texts["SquadSelect_Total"] = "Total selected"
+	self.texts["SquadSelect_Default_Text"] = "Default"
+	self.texts["SquadSelect_Default_Tooltip"] = "Select only vanilla squads."
+	self.texts["SquadSelect_Random_Text"] = "Random"
+	self.texts["SquadSelect_Random_Tooltip"] = "Select random squads."
 
 	self.texts["ModContent_Button_PilotArrange"] = "Arrange Pilots"
 	self.texts["ModContent_ButtonTooltip_PilotArrange"] = "Select which pilots will be available to pick."
