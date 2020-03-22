@@ -173,7 +173,23 @@ function Tests.GetBoardState()
 	return result
 end
 
--- Builder function for pawn tests, handling most of the common boilerplate
+--[[
+	Builder function for pawn tests, handling most of the common boilerplate
+
+	Input table can can contain several functions with the following names; the functions
+	are executed in the order listed:
+	- globalSetup   - Executed in non-sandboxed context. Should only be used to set up things that
+	                  *have* to be global, eg. adding a new pawn type for Board:AddPawn()
+	- prepare       - Executed in sandboxed context. Use to set up things used by the test, eg.
+	                  create pawns, change the Board, etc.
+	- execute       - Sandboxed. Execute the actions that the test is supposed to verify.
+	- check         - Sandboxed, executed once the Board is no longer busy. Verify that the
+	                  actions performed in 'execute' have had their intended outcome.
+	- cleanup       - Sandboxed. Cleanup the things that have been done in 'prepare', eg. remove
+	                  the created pawns, undo Board changes, etc.
+	- globalCleanup - Non-sandboxed. Should only be used to cleanup the things that have been
+	                  done in 'globalSetup'.
+--]]
 function Tests.BuildPawnTest(testFunctionsTable)
 	return function(resultTable)
 		Tests.RequireBoard()
