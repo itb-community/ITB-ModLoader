@@ -34,9 +34,14 @@ function Ui:new()
 	self.parent = nil
 end
 
-function Ui:add(child)
+function Ui:add(child, index)
 	child:setroot(self.root)
-	table.insert(self.children,child)
+	if index then
+		assert(type(index) == "number")
+		table.insert(self.children, index, child)
+	else
+		table.insert(self.children, child)
+	end
 	child.parent = self
 	
 	if self.nofitx == nil then
@@ -77,10 +82,10 @@ function Ui:detach()
 	return self
 end
 
-function Ui:addTo(parent)
+function Ui:addTo(parent, index)
 	if parent == nil then return self end
 	
-	parent:add(self)
+	parent:add(self, index)
 	
 	return self
 end
@@ -531,6 +536,37 @@ function Ui:startDrag(mx, my, button)
 	self:stopDrag(mx, my, button)
 end
 
+function Ui:swapSibling(destIndex)
+	if self.parent == nil then return self end
+	local list = self.parent.children
+	if destIndex < 1 or destIndex > #list then return self end
+	local sourceIndex = list_indexof(list, self)
+
+	local dest = list[destIndex]
+	list[destIndex] = self
+	list[sourceIndex] = dest
+
+	return self
+end
+
+function Ui:bringUp()
+	if self.parent == nil then return self end
+	local list = self.parent.children
+	local index = list_indexof(list, self)
+	if index == #list then return self end
+
+	return self:swapSibling(index + 1)
+end
+
+function Ui:bringDown()
+	if self.parent == nil then return self end
+	local list = self.parent.children
+	local index = list_indexof(list, self)
+	if index == 1 then return self end
+
+	return self:swapSibling(index - 1)
+end
+
 function Ui:bringToTop()
 	if self.parent == nil then return self end
 	local list = self.parent.children
@@ -543,5 +579,6 @@ function Ui:bringToTop()
 	end
 	
 	table.insert(list, 1, self)
+	return self
 end
 
