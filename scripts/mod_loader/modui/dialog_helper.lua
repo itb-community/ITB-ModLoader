@@ -142,7 +142,7 @@ function sdlext.buildSimpleDialog(title, w, h)
 			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:caption(title)
 
-	local scroll = UiScrollArea()
+	frame.scroll = UiScrollArea()
 			:width(1):height(1)
 			:padding(10)
 			:addTo(frame)
@@ -173,7 +173,7 @@ function sdlext.buildButtonDialog(title, w, h, contentBuilderFn, buttonsBuilderF
 	h = h or 400
 
 	local frame = sdlext.buildSimpleDialog(title, w, h)
-	local scroll = frame.children[1]
+	local scroll = frame.scroll
 
 	if contentBuilderFn then
 		contentBuilderFn(scroll)
@@ -184,12 +184,14 @@ function sdlext.buildButtonDialog(title, w, h, contentBuilderFn, buttonsBuilderF
 			:width(1):heightpx(frame.decorations[1].bordersize)
 			:decorate({ DecoSolid(frame.decorations[1].bordercolor) })
 			:addTo(frame)
+	frame.line = line
 
 	local buttonLayout = UiBoxLayout()
 			:hgap(50)
 			:padding(18)
 			:addTo(frame)
 	buttonLayout:heightpx(45 + buttonLayout.padt + buttonLayout.padb)
+	frame.buttonLayout = buttonLayout
 
 	if buttonsBuilderFn then
 		buttonsBuilderFn(buttonLayout)

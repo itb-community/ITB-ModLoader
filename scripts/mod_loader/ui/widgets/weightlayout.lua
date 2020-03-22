@@ -20,6 +20,21 @@ function UiWeightLayout:new()
 	self.horizontal = true
 end
 
+function UiWeightLayout:vgap(gap)
+	self.gapVertical = gap
+	return self
+end
+
+function UiWeightLayout:hgap(gap)
+	self.gapHorizontal = gap
+	return self
+end
+
+function UiWeightLayout:orientation(horizontal)
+	self.horizontal = horizontal
+	return self
+end
+
 function UiWeightLayout:relayout()
 	if self.wPercent or self.hPercent then
 		return
