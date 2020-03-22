@@ -220,9 +220,9 @@ local function createUi()
 
 			-- random button: selects random 8 squads
 			local btnRandom = sdlext.buildButton(
-				modApi:getText("SquadSelect_Random_Text"),
-				modApi:getText("SquadSelect_Random_Tooltip"),
-				function()
+					modApi:getText("SquadSelect_Random_Text"),
+					modApi:getText("SquadSelect_Random_Tooltip"),
+					function()
 					-- create a list of indexes that we can modify
 					local indexes = {}
 					for i = 1, #checkboxes do
