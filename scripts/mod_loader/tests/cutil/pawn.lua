@@ -211,4 +211,48 @@ testsuite.test_SetImpactMaterial_ShouldChangeImpactMaterial = buildPawnTest({
 	end
 })
 
+testsuite.test_GetColor_ShouldReturnSquadColor = buildPawnTest({
+	prepare = function()
+		pawns = {}
+		expectedColors = {}
+		actualColors = {}
+
+		for i = 0, 7 do
+			local squad = getStartingSquad(i)
+			local pawnType = squad[2]
+			pawns[i] = PAWN_FACTORY:CreatePawn(pawnType)
+			expectedColors[i] = _G[pawnType].ImageOffset
+		end
+	end,
+	execute = function()
+		for i = 0, 7 do
+			actualColors[i] = pawns[i]:GetColor()
+		end
+	end,
+	check = function()
+		for i = 0, 7 do
+			assertEquals(expectedColors[i], actualColors[i], "GetColor() returned incorrect color")
+		end
+	end
+})
+
+testsuite.test_SetColor_ShouldChangeColor = buildPawnTest({
+	prepare = function()
+		pawn = PAWN_FACTORY:CreatePawn("PunchMech")
+		pawnTable = _G[pawn:GetType()]
+
+		expectedSquadColor = pawnTable.ImageOffset
+		expectedPawnColor = expectedSquadColor + 1
+	end,
+	execute = function()
+		pawn:SetColor(expectedPawnColor)
+	end,
+	cleanup = function()
+		local actualPawnColor = pawn:GetColor()
+
+		assertEquals(expectedPawnColor, actualPawnColor, "SetColor() did not change pawn color")
+		assertEquals(expectedSquadColor, pawnTable.ImageOffset, "SetColor() changed ImageOffset on the pawn type table")
+	end
+})
+
 return testsuite
