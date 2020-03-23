@@ -255,4 +255,73 @@ testsuite.test_SetColor_ShouldChangeColor = buildPawnTest({
 	end
 })
 
+testsuite.test_GetMassive = buildPawnTest({
+	prepare = function()
+		pawnMech = PAWN_FACTORY:CreatePawn("PunchMech")
+		pawnTableMech = _G[pawnMech:GetType()]
+
+		pawnVek = PAWN_FACTORY:CreatePawn("Scorpion1")
+		pawnTableVek = _G[pawnVek:GetType()]
+
+		expectedMassiveMech = pawnTableMech.Massive
+		expectedMassiveVek = pawnTableVek.Massive
+	end,
+	execute = function()
+		actualMassiveMech = pawnMech:IsMassive()
+		actualMassiveVek = pawnVek:IsMassive()
+	end,
+	check = function()
+		assertEquals(expectedMassiveMech, actualMassiveMech, "IsMassive() returned incorrect value")
+		assertEquals(expectedMassiveVek, actualMassiveVek, "IsMassive() returned incorrect value")
+	end
+})
+
+testsuite.test_SetMassiveTrue_ShouldMakePawnImmuneToDrowning = buildPawnTest({
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
+		loc = pawn:GetSpace()
+
+		terrain = Board:GetTerrain(loc)
+
+		assertNotEquals(true, _G[pawn:GetType()].Massive, "Assumed pawn would not be Massive")
+	end,
+	execute = function()
+		pawn:SetMassive(true)
+
+		Board:SetTerrain(loc, TERRAIN_WATER)
+	end,
+	check = function()
+		assertEquals(true, pawn:IsMassive(), "SetMassive() did not change pawn Massive status")
+		assertEquals(false, pawn:IsDead(), "Pawn changed into Massive using SetMassive() died in water")
+	end,
+	cleanup = function()
+		Board:SetTerrain(loc, terrain)
+		Board:RemovePawn(pawn)
+	end
+})
+
+testsuite.test_SetMassiveFalse_ShouldMakePawnDrownInWater = buildPawnTest({
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+		loc = pawn:GetSpace()
+
+		terrain = Board:GetTerrain(loc)
+
+		assertEquals(true, _G[pawn:GetType()].Massive, "Assumed pawn would be Massive")
+	end,
+	execute = function()
+		pawn:SetMassive(false)
+
+		Board:SetTerrain(loc, TERRAIN_WATER)
+	end,
+	check = function()
+		assertEquals(false, pawn:IsMassive(), "SetMassive() did not change pawn Massive status")
+		assertEquals(true, pawn:IsDead(), "Pawn changed into non-Massive using SetMassive() did not die in water")
+	end,
+	cleanup = function()
+		Board:SetTerrain(loc, terrain)
+		Board:RemovePawn(pawn)
+	end
+})
+
 return testsuite
