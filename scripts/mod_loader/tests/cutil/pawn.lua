@@ -7,14 +7,10 @@ local buildPawnTest = Tests.BuildPawnTest
 testsuite.test_WhenIncreasingMaxHealth_CurrentHealthShouldRemainUnchanged = buildPawnTest({
 	-- The pawn should have its max health increased, but current health should remain at its old value.
 	prepare = function()
-		pawnId = Board:SpawnPawn("PunchMech")
-		pawn = Board:GetPawn(pawnId)
-		loc = pawn:GetSpace()
+		pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 
-		assertEquals(3, pawn:GetHealth(), "Pawn did not have the expected starting max health value")
-
-		expectedHealth = pawn:GetHealth()
-		expectedMaxHealth = 5
+		expectedHealth = PunchMech.Health
+		expectedMaxHealth = expectedHealth + 2
 	end,
 	execute = function()
 		pawn:SetMaxHealth(expectedMaxHealth)
@@ -23,23 +19,17 @@ testsuite.test_WhenIncreasingMaxHealth_CurrentHealthShouldRemainUnchanged = buil
 		assertNotEquals(expectedHealth, pawn:GetMaxHealth(), "Pawn's max health was not changed")
 		assertEquals(expectedMaxHealth, pawn:GetMaxHealth(), "Pawn's max health was not changed")
 		assertEquals(expectedHealth, pawn:GetHealth(), "Pawn's current health was changed")
-	end,
-	cleanup = function()
-		Board:RemovePawn(pawn)
 	end
 })
 
 testsuite.test_WhenIncreasingMaxHealth_ShouldSurviveHitForOldMaxHealth = buildPawnTest({
 	-- The pawn should have its max health increased, and survive a hit equal to its old health after being healed up
 	prepare = function()
-		pawnId = Board:SpawnPawn("PunchMech")
-		pawn = Board:GetPawn(pawnId)
-		loc = pawn:GetSpace()
-
-		assertEquals(3, pawn:GetHealth(), "Pawn did not have the expected starting max health value")
+		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
 
 		oldHealth = pawn:GetHealth()
-		newMaxHealth = 5
+		newMaxHealth = PunchMech.Health + 2
+
 		expectedHealth = newMaxHealth - oldHealth
 	end,
 	execute = function()
@@ -64,8 +54,7 @@ testsuite.test_WeaponCount_ShouldCountWeapons_WhenNoWeapons = buildPawnTest({
 		})
 	end,
 	prepare = function()
-		pawnId = Board:SpawnPawn("Testsuites_NoWeaponPawn")
-		pawn = Board:GetPawn(pawnId)
+		pawn = PAWN_FACTORY:CreatePawn("Testsuites_NoWeaponPawn")
 
 		expectedWeaponCount = 0
 	end,
@@ -75,9 +64,6 @@ testsuite.test_WeaponCount_ShouldCountWeapons_WhenNoWeapons = buildPawnTest({
 	check = function()
 		assertEquals(expectedWeaponCount, actualWeaponCount, "GetWeaponCount() reported incorrect number of weapons")
 	end,
-	cleanup = function()
-		Board:RemovePawn(pawn)
-	end,
 	globalCleanup = function()
 		Testsuites_NoWeaponPawn = nil
 	end
@@ -85,8 +71,7 @@ testsuite.test_WeaponCount_ShouldCountWeapons_WhenNoWeapons = buildPawnTest({
 
 testsuite.test_WeaponCount_ShouldCountWeapons_WhenOneWeapon = buildPawnTest({
 	prepare = function()
-		pawnId = Board:SpawnPawn("PunchMech")
-		pawn = Board:GetPawn(pawnId)
+		pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 
 		expectedWeaponCount = 1
 	end,
@@ -95,16 +80,12 @@ testsuite.test_WeaponCount_ShouldCountWeapons_WhenOneWeapon = buildPawnTest({
 	end,
 	check = function()
 		assertEquals(expectedWeaponCount, actualWeaponCount, "GetWeaponCount() reported incorrect number of weapons")
-	end,
-	cleanup = function()
-		Board:RemovePawn(pawn)
 	end
 })
 
 testsuite.test_WeaponCount_ShouldCountWeapons_WhenTwoWeapons = buildPawnTest({
 	prepare = function()
-		pawnId = Board:SpawnPawn("RocketMech")
-		pawn = Board:GetPawn(pawnId)
+		pawn = PAWN_FACTORY:CreatePawn("RocketMech")
 
 		expectedWeaponCount = 2
 	end,
@@ -113,16 +94,12 @@ testsuite.test_WeaponCount_ShouldCountWeapons_WhenTwoWeapons = buildPawnTest({
 	end,
 	check = function()
 		assertEquals(expectedWeaponCount, actualWeaponCount, "GetWeaponCount() reported incorrect number of weapons")
-	end,
-	cleanup = function()
-		Board:RemovePawn(pawn)
 	end
 })
 
 testsuite.test_GetWeaponType_ShouldReturnCorrectWeapons = buildPawnTest({
 	prepare = function()
-		pawnId = Board:SpawnPawn("RocketMech")
-		pawn = Board:GetPawn(pawnId)
+		pawn = PAWN_FACTORY:CreatePawn("RocketMech")
 
 		expectedWeapon1 = RocketMech.SkillList[1]
 		expectedWeapon2 = RocketMech.SkillList[2]
@@ -134,17 +111,13 @@ testsuite.test_GetWeaponType_ShouldReturnCorrectWeapons = buildPawnTest({
 	check = function()
 		assertEquals(expectedWeapon1, actualWeapon1, "GetWeaponType(1) returned incorrect weapons")
 		assertEquals(expectedWeapon2, actualWeapon2, "GetWeaponType(2) returned incorrect weapons")
-	end,
-	cleanup = function()
-		Board:RemovePawn(pawn)
 	end
 })
 
 testsuite.test_SpawnedMinions_ShouldHaveOwnerSetToPawnThatCreatedThem = buildPawnTest({
 	prepare = function()
-		caster = PAWN_FACTORY:CreatePawn("Spider1")
+		caster = Board:GetPawn(Board:AddPawn("Spider1"))
 		caster:SetTeam(TEAM_PLAYER)
-		Board:AddPawn(caster)
 		casterLoc = caster:GetSpace()
 		expectedOwnerId = caster:GetId()
 
@@ -179,18 +152,18 @@ testsuite.test_SpawnedMinions_ShouldHaveOwnerSetToPawnThatCreatedThem = buildPaw
 
 testsuite.test_SetOwner_ShouldChangeOwner = buildPawnTest({
 	prepare = function()
-		ownerId = Board:SpawnPawn("PunchMech")
-		owner = Board:GetPawn(ownerId)
+		-- Pawns have to exist on the board, otherwise the minion gets assigned -1 as owner.
+		owner = Board:GetPawn(Board:AddPawn("PunchMech"))
+		minion = Board:GetPawn(Board:AddPawn("PunchMech"))
 
-		minionId = Board:SpawnPawn("PunchMech")
-		minion = Board:GetPawn(minionId)
+		expectedPawnId = owner:GetId()
 	end,
 	execute = function()
-		minion:SetOwner(ownerId)
+		minion:SetOwner(expectedPawnId)
 	end,
 	check = function()
 		local actualOwnerId = minion:GetOwner()
-		assertEquals(ownerId, actualOwnerId, "SetOwner() did not change pawn owner")
+		assertEquals(expectedPawnId, actualOwnerId, "SetOwner() did not change pawn owner")
 	end,
 	cleanup = function()
 		Board:RemovePawn(owner)
@@ -200,11 +173,8 @@ testsuite.test_SetOwner_ShouldChangeOwner = buildPawnTest({
 
 testsuite.test_GetImpactMaterial_ShouldReturnCorrectImpactMaterial = buildPawnTest({
 	prepare = function()
-		mechPawnId = Board:AddPawn("PunchMech")
-		mechPawn = Board:GetPawn(mechPawnId)
-
-		vekPawnId = Board:AddPawn("Scorpion1")
-		vekPawn = Board:GetPawn(vekPawnId)
+		mechPawn = PAWN_FACTORY:CreatePawn("PunchMech")
+		vekPawn = PAWN_FACTORY:CreatePawn("Scorpion1")
 
 		expectedMechImpactMaterial = PunchMech.ImpactMaterial
 		expectedVekImpactMaterial = Scorpion1.ImpactMaterial
@@ -216,17 +186,12 @@ testsuite.test_GetImpactMaterial_ShouldReturnCorrectImpactMaterial = buildPawnTe
 	check = function()
 		assertEquals(expectedMechImpactMaterial, actualMechImpactMaterial, "GetImpactMaterial() returned incorrect impact material")
 		assertEquals(expectedVekImpactMaterial, actualVekImpactMaterial, "GetImpactMaterial() returned incorrect impact material")
-	end,
-	cleanup = function()
-		Board:RemovePawn(mechPawn)
-		Board:RemovePawn(vekPawn)
 	end
 })
 
 testsuite.test_SetImpactMaterial_ShouldChangeImpactMaterial = buildPawnTest({
 	prepare = function()
-		pawnId = Board:AddPawn("PunchMech")
-		pawn = Board:GetPawn(pawnId)
+		pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 
 		expectedImpactMaterial = IMPACT_INSECT
 		originalImpactMaterial = PunchMech.ImpactMaterial
