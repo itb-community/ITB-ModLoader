@@ -9,7 +9,7 @@ testsuite.test_WhenIncreasingMaxHealth_CurrentHealthShouldRemainUnchanged = buil
 	prepare = function()
 		pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 
-		expectedHealth = PunchMech.Health
+		expectedHealth = _G[pawn:GetType()].Health
 		expectedMaxHealth = expectedHealth + 2
 	end,
 	execute = function()
@@ -28,7 +28,7 @@ testsuite.test_WhenIncreasingMaxHealth_ShouldSurviveHitForOldMaxHealth = buildPa
 		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
 
 		oldHealth = pawn:GetHealth()
-		newMaxHealth = PunchMech.Health + 2
+		newMaxHealth = _G[pawn:GetType()].Health + 2
 
 		expectedHealth = newMaxHealth - oldHealth
 	end,
@@ -101,8 +101,9 @@ testsuite.test_GetWeaponType_ShouldReturnCorrectWeapons = buildPawnTest({
 	prepare = function()
 		pawn = PAWN_FACTORY:CreatePawn("RocketMech")
 
-		expectedWeapon1 = RocketMech.SkillList[1]
-		expectedWeapon2 = RocketMech.SkillList[2]
+		local ptable = _G[pawn:GetType()]
+		expectedWeapon1 = ptable.SkillList[1]
+		expectedWeapon2 = ptable.SkillList[2]
 	end,
 	execute = function()
 		actualWeapon1 = pawn:GetWeaponType(1)
@@ -176,8 +177,8 @@ testsuite.test_GetImpactMaterial_ShouldReturnCorrectImpactMaterial = buildPawnTe
 		mechPawn = PAWN_FACTORY:CreatePawn("PunchMech")
 		vekPawn = PAWN_FACTORY:CreatePawn("Scorpion1")
 
-		expectedMechImpactMaterial = PunchMech.ImpactMaterial
-		expectedVekImpactMaterial = Scorpion1.ImpactMaterial
+		expectedMechImpactMaterial = _G[mechPawn:GetType()].ImpactMaterial
+		expectedVekImpactMaterial = _G[vekPawn:GetType()].ImpactMaterial
 	end,
 	execute = function()
 		actualMechImpactMaterial = mechPawn:GetImpactMaterial()
@@ -194,7 +195,7 @@ testsuite.test_SetImpactMaterial_ShouldChangeImpactMaterial = buildPawnTest({
 		pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 
 		expectedImpactMaterial = IMPACT_INSECT
-		originalImpactMaterial = PunchMech.ImpactMaterial
+		originalImpactMaterial = _G[pawn:GetType()].ImpactMaterial
 	end,
 	execute = function()
 		pawn:SetImpactMaterial(expectedImpactMaterial)
