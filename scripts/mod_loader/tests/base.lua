@@ -48,21 +48,35 @@ function Tests.AssertSignature(signatures)
 	assert(signature_match_found, signature_match_found and "" or buildErrorMsg(signatures))
 end
 
+function Tests.ToString(v)
+	if type(v) == "userdata" or type(v) == "table" then
+		if type(v.GetLuaString) == "function" then
+			return v:GetLuaString()
+		elseif type(v.GetString) == "function" then
+			return v:GetString()
+		else
+			error("No GetLuaString() function defined on userdata or table\n" .. debug.traceback("", 2))
+		end
+	else
+		return tostring(v)
+	end
+end
+
 function Tests.AssertEquals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected '%s', but was '%s'\n%s", tostring(expected), tostring(actual), debug.traceback("", 2))
+	msg = msg .. string.format("Expected '%s', but was '%s'\n%s", Tests.ToString(expected), Tests.ToString(actual), debug.traceback("", 2))
 	assert(expected == actual, msg)
 end
 
 function Tests.AssertNotEquals(notExpected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected '%s' to not be equal to '%s'\n%s", tostring(actual), tostring(notExpected), debug.traceback("", 2))
+	msg = msg .. string.format("Expected '%s' to not be equal to '%s'\n%s", Tests.ToString(actual), Tests.ToString(notExpected), debug.traceback("", 2))
 	assert(notExpected ~= actual, msg)
 end
 
 function Tests.AssertTypePoint(arg, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected Point, but was %s\n%s", tostring(type(arg)), debug.traceback("", 2))
+	msg = msg .. string.format("Expected Point, but was %s\n%s", type(arg), debug.traceback("", 2))
 	assert(type(arg) == "userdata" and type(arg.x) == "number" and type(arg.y) == "number", msg)
 end
 
@@ -91,7 +105,7 @@ function Tests.AssertTableEquals(expected, actual, msg)
 	msg = msg and (msg .. "\n") or ""
 	msg = msg .. "Table state mismatch:\n"
 	for _, k in ipairs(differences) do
-		msg = msg .. string.format("- %s: expected %s, but was %s\n", k, tostring(expected[k]), tostring(actual[k]))
+		msg = msg .. string.format("- %s: expected %s, but was %s\n", k, Tests.ToString(expected[k]), Tests.ToString(actual[k]))
 	end
 
 	if #differences > 0 then
