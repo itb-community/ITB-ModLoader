@@ -452,7 +452,7 @@ function Region.GetHoveredMech()
 end
 
 sdlext.addFrameDrawnHook(function(screen)
-	if not Game then
+	if not Game or GameState.IsMission() then
 		return
 	end
 	
