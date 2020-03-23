@@ -247,7 +247,7 @@ testsuite.test_SetColor_ShouldChangeColor = buildPawnTest({
 	execute = function()
 		pawn:SetColor(expectedPawnColor)
 	end,
-	cleanup = function()
+	check = function()
 		local actualPawnColor = pawn:GetColor()
 
 		assertEquals(expectedPawnColor, actualPawnColor, "SetColor() did not change pawn color")
