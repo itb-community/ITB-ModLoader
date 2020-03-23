@@ -4,6 +4,15 @@ local assertEquals = Tests.AssertEquals
 local assertNotEquals = Tests.AssertNotEquals
 local buildPawnTest = Tests.BuildPawnTest
 
+local function getRandomTarget(skillTable, caster, casterLoc)
+	local oldPawn = Pawn
+	Pawn = caster
+	casterLoc = casterLoc or Pawn:GetSpace()
+	local plist = skillTable:GetTargetArea(casterLoc)
+	Pawn = oldPawn
+	return random_element(extract_table(plist))
+end
+
 testsuite.test_WhenIncreasingMaxHealth_CurrentHealthShouldRemainUnchanged = buildPawnTest({
 	-- The pawn should have its max health increased, but current health should remain at its old value.
 	prepare = function()
@@ -123,9 +132,7 @@ testsuite.test_SpawnedMinions_ShouldHaveOwnerSetToPawnThatCreatedThem = buildPaw
 		expectedOwnerId = caster:GetId()
 
 		local weaponType = caster:GetWeaponType(1)
-		local weaponTable = _G[weaponType]
-		local plist = weaponTable:GetTargetArea(caster:GetSpace())
-		targetLoc = random_element(extract_table(plist))
+		targetLoc = getRandomTarget(_G[weaponType], caster)
 
 		casterTerrain = Board:GetTerrain(casterLoc)
 		targetTerrain = Board:GetTerrain(targetLoc)
@@ -320,6 +327,55 @@ testsuite.test_SetMassiveFalse_ShouldMakePawnDrownInWater = buildPawnTest({
 	end,
 	cleanup = function()
 		Board:SetTerrain(loc, terrain)
+		Board:RemovePawn(pawn)
+	end
+})
+
+testsuite.test_IsMovementAvailable_ShouldReturnFalse_AfterMoving = buildPawnTest({
+	prepare = function()
+		-- Need to remove all pawns in order to not disturb the test pawn's movement.
+		-- Technically setting Pawn global to the pawn should properly emulate its movement,
+		-- but it bugs out occasionally for some reason.
+		movedPawns = {}
+		for _, pawnId in ipairs(extract_table(Board:GetPawns(TEAM_ANY))) do
+			local pawn = Board:GetPawn(pawnId)
+			movedPawns[pawnId] = pawn:GetSpace()
+			pawn:SetSpace(Point(-1, -1))
+		end
+
+		pawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
+
+		expectedLoc = getRandomTarget(Move, pawn)
+
+		assertEquals(true, pawn:IsMovementAvailable(), "Assumed pawn would be able to move after creation")
+	end,
+	execute = function()
+		pawn:FireWeapon(expectedLoc, 0)
+	end,
+	check = function()
+		assertEquals(expectedLoc, pawn:GetSpace(), "Pawn did not move to the expected location")
+		assertEquals(false, pawn:IsMovementAvailable(), "IsMovementAvailable() returned incorrect value")
+	end,
+	cleanup = function()
+		for pawnId, loc in pairs(movedPawns) do
+			Board:GetPawn(pawnId):SetSpace(loc)
+		end
+		Board:RemovePawn(pawn)
+	end
+})
+
+testsuite.test_SetMovementAvailableFalse_ShouldUseUpMovement = buildPawnTest({
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
+	end,
+	execute = function()
+		-- Can't test this functionally, since pawn:FireWeapon() ignores the movement token.
+		pawn:SetMovementAvailable(false)
+	end,
+	check = function()
+		assertEquals(false, pawn:IsMovementAvailable(), "IsMovementAvailable() returned incorrect value")
+	end,
+	cleanup = function()
 		Board:RemovePawn(pawn)
 	end
 })
