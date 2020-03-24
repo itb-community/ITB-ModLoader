@@ -259,6 +259,16 @@ function Tests.BuildPawnTest(testFunctionsTable)
 
 		local expectedBoardState = Tests.GetBoardState()
 
+		-- Need to remove all pawns in order to not disturb the test pawn's movement.
+		-- Technically setting Pawn global to the pawn should properly emulate its movement,
+		-- but it bugs out occasionally for some reason.
+		local movedPawns = {}
+		for _, pawnId in ipairs(extract_table(Board:GetPawns(TEAM_ANY))) do
+			local pawn = Board:GetPawn(pawnId)
+			movedPawns[pawnId] = pawn:GetSpace()
+			pawn:SetSpace(Point(-1, -1))
+		end
+
 		try(function()
 			globalSetup()
 
@@ -280,11 +290,19 @@ function Tests.BuildPawnTest(testFunctionsTable)
 						resultTable.result = true
 					end)
 					:finally(globalCleanup)
+
+					for pawnId, loc in pairs(movedPawns) do
+						Board:GetPawn(pawnId):SetSpace(loc)
+					end
 				end)
 			end)
 		else
 			try(cleanup)
 			:finally(globalCleanup)
+
+			for pawnId, loc in pairs(movedPawns) do
+				Board:GetPawn(pawnId):SetSpace(loc)
+			end
 		end
 	end
 end

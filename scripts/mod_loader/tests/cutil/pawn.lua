@@ -333,16 +333,6 @@ testsuite.test_SetMassiveFalse_ShouldMakePawnDrownInWater = buildPawnTest({
 
 testsuite.test_IsMovementAvailable_ShouldReturnFalse_AfterMoving = buildPawnTest({
 	prepare = function()
-		-- Need to remove all pawns in order to not disturb the test pawn's movement.
-		-- Technically setting Pawn global to the pawn should properly emulate its movement,
-		-- but it bugs out occasionally for some reason.
-		movedPawns = {}
-		for _, pawnId in ipairs(extract_table(Board:GetPawns(TEAM_ANY))) do
-			local pawn = Board:GetPawn(pawnId)
-			movedPawns[pawnId] = pawn:GetSpace()
-			pawn:SetSpace(Point(-1, -1))
-		end
-
 		pawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
 
 		expectedLoc = getRandomTarget(Move, pawn)
@@ -357,9 +347,6 @@ testsuite.test_IsMovementAvailable_ShouldReturnFalse_AfterMoving = buildPawnTest
 		assertEquals(false, pawn:IsMovementAvailable(), "IsMovementAvailable() returned incorrect value")
 	end,
 	cleanup = function()
-		for pawnId, loc in pairs(movedPawns) do
-			Board:GetPawn(pawnId):SetSpace(loc)
-		end
 		Board:RemovePawn(pawn)
 	end
 })
