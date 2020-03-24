@@ -351,16 +351,50 @@ testsuite.test_IsMovementAvailable_ShouldReturnFalse_AfterMoving = buildPawnTest
 	end
 })
 
-testsuite.test_SetMovementAvailableFalse_ShouldUseUpMovement = buildPawnTest({
+testsuite.test_SetMovementAvailableFalse_ShouldPreventMovement = buildPawnTest({
 	prepare = function()
 		pawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
+
+		expectedLoc = pawn:GetSpace()
+		targetLoc = getRandomTarget(Move, pawn)
+
+		assertEquals(true, pawn:IsMovementAvailable(), "Assumed pawn would be able to move after creation")
 	end,
 	execute = function()
-		-- Can't test this functionally, since pawn:FireWeapon() ignores the movement token.
 		pawn:SetMovementAvailable(false)
+
+		pawn:SetActive(true)
+		pawn:Move(targetLoc)
 	end,
 	check = function()
-		assertEquals(false, pawn:IsMovementAvailable(), "IsMovementAvailable() returned incorrect value")
+		assertEquals(expectedLoc, pawn:GetSpace(), "SetMovementAvailable(false) did not prevent pawn movement - pawn moved from its location")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+	end
+})
+
+testsuite.test_SetMovementAvailableTrue_ShouldAllowPawnToMoveAgain = buildPawnTest({
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
+
+		expectedLoc = pawn:GetSpace()
+		targetLoc = getRandomTarget(Move, pawn)
+
+		assertEquals(true, pawn:IsMovementAvailable(), "Assumed pawn would be able to move after creation")
+	end,
+	execute = function()
+		-- pawn:FireWeapon() uses up movement token, but doesn't respect it being false.
+		pawn:FireWeapon(targetLoc, 0)
+
+		pawn:SetMovementAvailable(true)
+
+		-- pawn:Move() respects movement token being false, but doesn't use it up.
+		pawn:SetActive(true)
+		pawn:Move(expectedLoc)
+	end,
+	check = function()
+		assertEquals(expectedLoc, pawn:GetSpace(), "SetMovementAvailable(true) did not restore pawn movement token - pawn did not return to its starting location")
 	end,
 	cleanup = function()
 		Board:RemovePawn(pawn)
