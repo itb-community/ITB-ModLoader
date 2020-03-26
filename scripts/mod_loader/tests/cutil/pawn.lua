@@ -283,7 +283,7 @@ testsuite.test_GetMassive = buildPawnTest({
 	end
 })
 
-testsuite.test_SetMassiveTrue_ShouldMakePawnImmuneToDrowning = buildPawnTest({
+testsuite.test_SetMassiveTrue_ShouldPreventDrowning = buildPawnTest({
 	prepare = function()
 		pawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
 		loc = pawn:GetSpace()
@@ -307,7 +307,7 @@ testsuite.test_SetMassiveTrue_ShouldMakePawnImmuneToDrowning = buildPawnTest({
 	end
 })
 
-testsuite.test_SetMassiveFalse_ShouldMakePawnDrownInWater = buildPawnTest({
+testsuite.test_SetMassiveFalse_ShouldDrown = buildPawnTest({
 	prepare = function()
 		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
 		loc = pawn:GetSpace()
@@ -397,6 +397,54 @@ testsuite.test_SetMovementAvailableTrue_ShouldAllowPawnToMoveAgain = buildPawnTe
 		assertEquals(expectedLoc, pawn:GetSpace(), "SetMovementAvailable(true) did not restore pawn movement token - pawn did not return to its starting location")
 	end,
 	cleanup = function()
+		Board:RemovePawn(pawn)
+	end
+})
+
+testsuite.test_SetFlyingTrue_ShouldPreventDrowning = buildPawnTest({
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
+
+		loc = pawn:GetSpace()
+		terrain = Board:GetTerrain(loc)
+
+		assertNotEquals(true, _G[pawn:GetType()].Flying, "Assumed pawn would not be Flying")
+	end,
+	execute = function()
+		pawn:SetFlying(true)
+
+		Board:SetTerrain(loc, TERRAIN_WATER)
+	end,
+	check = function()
+		assertEquals(true, pawn:IsFlying(), "SetFlying() did not change pawn Flying status")
+		assertEquals(false, pawn:IsDead(), "Pawn changed into Flying using SetFlying() died in water")
+	end,
+	cleanup = function()
+		Board:SetTerrain(loc, terrain)
+		Board:RemovePawn(pawn)
+	end
+})
+
+testsuite.test_SetFlyingFalse_ShouldDrown = buildPawnTest({
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("Hornet1"))
+
+		loc = pawn:GetSpace()
+		terrain = Board:GetTerrain(loc)
+
+		assertEquals(true, _G[pawn:GetType()].Flying, "Assumed pawn would be Flying")
+	end,
+	execute = function()
+		pawn:SetFlying(false)
+
+		Board:SetTerrain(loc, TERRAIN_WATER)
+	end,
+	check = function()
+		assertEquals(false, pawn:IsFlying(), "SetFlying() did not change pawn Flying status")
+		assertEquals(true, pawn:IsDead(), "Pawn changed into non-Flying using SetFlying() did not die in water")
+	end,
+	cleanup = function()
+		Board:SetTerrain(loc, terrain)
 		Board:RemovePawn(pawn)
 	end
 })
