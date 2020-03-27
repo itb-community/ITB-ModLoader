@@ -57,11 +57,7 @@ function modApi:splitStringEmpty(str, sep)
 	return ret
 end
 
-function modApi:overwriteTextTrue(id,str)
-	return self:overwriteText(id,str)
-end
-
-function modApi:overwriteText(id,str)
+function modApi:overwriteText(id, str)
 	assert(type(id) == "string")
 	assert(type(str) == "string")
 	self.textOverrides[id] = str

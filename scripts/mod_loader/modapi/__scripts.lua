@@ -16,7 +16,8 @@ local scripts = {
 	"skills",
 	"savedata",
 	"board",
-	"pawn"
+	"pawn",
+	"localization"
 }
 
 local rootpath = GetParentPath(...)

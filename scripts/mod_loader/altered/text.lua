@@ -47,23 +47,33 @@ function GetPopulationTexts(event, count)
 	return ret
 end
 
-local oldGetText = GetText
+oldGetText = GetText
 function GetText(id, r1, r2, r3)
-	if modApi.textOverrides and modApi.textOverrides[id] then
+	if not id then
+		error("Attempted to fetch text with id = nil:\n" .. debug.traceback())
+	end
+
+	local text = nil
+	if modApi.dictionary and modApi.dictionary[id] then
+		text = modApi.dictionary[id]
+	elseif modApi.textOverrides and modApi.textOverrides[id] then
+		text = modApi.textOverrides[id]
+	end
+
+	if text then
+		-- Expand variables
 		if r1 ~= nil and r1 ~= "" then
 			text = string.gsub(text,"$1", r1)
 		end
-
 		if r2 ~= nil and r2 ~= "" then
 			text = string.gsub(text,"$2", r2)
 		end
-
 		if r3 ~= nil and r3 ~= "" then
 			text = string.gsub(text,"$3", r3)
 		end
 
-		return modApi.textOverrides[id]
+		return text
+	else
+		return oldGetText(id, r1, r2, r3)
 	end
-
-	return oldGetText(id, r1, r2, r3)
 end

@@ -71,7 +71,7 @@ function GetDifficultyFaceName(level)
 
 	local suffix = GetDifficultyTipSuffix(level)
 
-	return modApi:getText("Difficulty_Name_"..suffix)
+	return GetText("Difficulty_Name_"..suffix)
 end
 
 local function copySpawner(src)
@@ -168,13 +168,13 @@ function SetDifficulty(level)
 		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(oldLevel))
 
 		if tempTipTitle then
-			Global_Texts["TipTitle_Hangar"..baseSuffix] = tempTipTitle
+			modApi.dictionary["TipTitle_Hangar"..baseSuffix] = tempTipTitle
 		end
 		if tempTipText then
-			Global_Texts["TipText_Hangar"..baseSuffix] = tempTipText
+			modApi.dictionary["TipText_Hangar"..baseSuffix] = tempTipText
 		end
 		if tempToggle then
-			Global_Texts["Toggle_"..baseSuffix] = tempToggle
+			modApi.dictionary["Toggle_"..baseSuffix] = tempToggle
 		end
 
 		tempTipTitle = nil
@@ -191,8 +191,8 @@ function SetDifficulty(level)
 		GAME.CustomDifficulty = level
 
 		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(level))
-		tempToggle = Global_Texts["Toggle_"..baseSuffix]
-		Global_Texts["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
+		tempToggle = modApi.dictionary["Toggle_"..baseSuffix]
+		modApi.dictionary["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
 	else
 		-- Hangar, before the game
 		modApi:writeModData("CustomDifficulty", level)
@@ -200,17 +200,17 @@ function SetDifficulty(level)
 		local tipSuffix = GetDifficultyTipSuffix(level)
 		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(level))
 
-		tempTipTitle = Global_Texts["TipTitle_Hangar"..baseSuffix]
-		tempTipText = Global_Texts["TipText_Hangar"..baseSuffix]
-		tempToggle = Global_Texts["Toggle_"..baseSuffix]
+		tempTipTitle = modApi.dictionary["TipTitle_Hangar"..baseSuffix]
+		tempTipText = modApi.dictionary["TipText_Hangar"..baseSuffix]
+		tempToggle = modApi.dictionary["Toggle_"..baseSuffix]
 
-		Global_Texts["TipTitle_Hangar"..baseSuffix] = modApi:getText("Difficulty_Title_"..tipSuffix)
-		Global_Texts["TipText_Hangar"..baseSuffix] = modApi:getText("Difficulty_Description_"..tipSuffix)
-		Global_Texts["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
+		modApi.dictionary["TipTitle_Hangar"..baseSuffix] = GetText("Difficulty_Title_"..tipSuffix)
+		modApi.dictionary["TipText_Hangar"..baseSuffix] = GetText("Difficulty_Description_"..tipSuffix)
+		modApi.dictionary["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
 
 		if not IsVanillaDifficultyLevel(level) then
-			Global_Texts["TipText_Hangar"..baseSuffix] =
-				Global_Texts["TipText_Hangar"..baseSuffix] .. "\n\n" .. modApi:getText("Difficulty_Custom_Note")
+			modApi.dictionary["TipText_Hangar"..baseSuffix] =
+				GetText("TipText_Hangar"..baseSuffix) .. "\n\n" .. GetText("Difficulty_Custom_Note")
 		end
 	end
 end

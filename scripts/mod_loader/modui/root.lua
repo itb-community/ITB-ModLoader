@@ -201,10 +201,13 @@ end)
 
 local optionsBox = Boxes.escape_options_box
 local profileBox = Boxes.profile_window
-if type(IsGamepad) == "function" then
-	-- game version 1.1.22
-	optionsBox = Rect2D(optionsBox)
-	optionsBox.w = optionsBox.w + 300
+local function adjustForGameVersion()
+	if modApi:isVersion("1.2.12", modApi:getGameVersion()) then
+		--
+	elseif modApi:isVersion("1.1.22", modApi:getGameVersion()) then
+		optionsBox = Rect2D(optionsBox)
+		optionsBox.w = optionsBox.w + 300
+	end
 end
 
 sdlext.addWindowVisibleHook(function(screen, x, y, w, h)
@@ -306,6 +309,8 @@ end
 
 local srfBotLeft, srfTopRight
 local function buildUiRoot(screen)
+	adjustForGameVersion()
+
 	uiRoot = UiRoot():widthpx(screen:w()):heightpx(screen:h())
 
 	uiRoot.wheel = function(self, mx, my, scroll)
