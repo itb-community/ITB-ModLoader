@@ -12,11 +12,11 @@ end
 
 local function showGamepadWarning()
 	sdlext.showButtonDialog(
-		modApi:getText("GamepadWarning_FrameTitle"),
-		modApi:getText("GamepadWarning_FrameText"),
+		GetText("GamepadWarning_FrameTitle"),
+		GetText("GamepadWarning_FrameText"),
 		responseFn, nil, nil,
-		{ modApi:getText("Button_Ok"), modApi:getText("Button_DisablePopup") },
-		{ "", modApi:getText("ButtonTooltip_DisablePopup") }
+		{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
+		{ "", GetText("ButtonTooltip_DisablePopup") }
 	)
 end
 

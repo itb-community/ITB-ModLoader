@@ -94,7 +94,7 @@ local function createUi()
 		ui.onDialogExit = onExit
 
 		local lblTotal = Ui()
-				:caption(modApi:getText("SquadSelect_Total"))
+				:caption(GetText("SquadSelect_Total"))
 				:decorate({ DecoCaption() })
 				:addTo(ui)
 
@@ -200,8 +200,8 @@ local function createUi()
 		local buildButtons = function(buttonLayout)
 			-- default button: selects all vanilla squads
 			local btnDefault = sdlext.buildButton(
-				modApi:getText("SquadSelect_Default_Text"),
-				modApi:getText("SquadSelect_Default_Tooltip"),
+				GetText("SquadSelect_Default_Text"),
+				GetText("SquadSelect_Default_Tooltip"),
 				function()
 					-- select first 8 vanilla squads
 					for i = 1, maxselected do
@@ -220,8 +220,8 @@ local function createUi()
 
 			-- random button: selects random 8 squads
 			local btnRandom = sdlext.buildButton(
-					modApi:getText("SquadSelect_Random_Text"),
-					modApi:getText("SquadSelect_Random_Tooltip"),
+					GetText("SquadSelect_Random_Text"),
+					GetText("SquadSelect_Random_Tooltip"),
 					function()
 					-- create a list of indexes that we can modify
 					local indexes = {}
@@ -248,7 +248,7 @@ local function createUi()
 		end
 
 		local frame = sdlext.buildButtonDialog(
-			modApi:getText("SquadSelect_FrameTitle"),
+			GetText("SquadSelect_FrameTitle"),
 			0.6 * ScreenSizeX(), 0.6 * ScreenSizeY(),
 			buildContent,
 			buildButtons

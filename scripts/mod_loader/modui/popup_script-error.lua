@@ -15,10 +15,10 @@ local function showErrorDialog(text)
 	local maxH = math.max(400, math.min(800, 0.8 * ScreenSizeY()))
 
 	sdlext.showButtonDialog(
-		modApi:getText("ScriptError_FrameTitle"), text,
+		GetText("ScriptError_FrameTitle"), text,
 		responseFn, maxW, maxH,
-		{ modApi:getText("Button_Ok"), modApi:getText("Button_DisablePopup") },
-		{ "", modApi:getText("ButtonTooltip_DisablePopup") }
+		{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
+		{ "", GetText("ButtonTooltip_DisablePopup") }
 	)
 end
 
@@ -37,7 +37,7 @@ sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 			modApi:scheduleHook(50, function()
 				-- could show all errors one after another, but let's not...
 				for dir, err in pairs(mod_loader.unmountedMods) do
-					showErrorDialog(string.format(modApi:getText("ScriptError_FrameText_Mount"), dir, err))
+					showErrorDialog(string.format(GetText("ScriptError_FrameText_Mount"), dir, err))
 					break
 				end
 				mod_loader.unmountedMods = {}

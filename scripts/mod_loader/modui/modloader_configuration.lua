@@ -99,7 +99,7 @@ local function createUi()
 		local frame = Ui()
 			:width(0.6):height(0.575)
 			:posCentered()
-			:caption(modApi:getText("ModLoaderConfig_FrameTitle"))
+			:caption(GetText("ModLoaderConfig_FrameTitle"))
 			:decorate({
 				DecoFrameHeader(),
 				DecoFrame()
@@ -125,9 +125,9 @@ local function createUi()
 					Logger.LOG_LEVEL_FILE
 				},
 				{
-					modApi:getText("ModLoaderConfig_DD_LogLevel_0"),
-					modApi:getText("ModLoaderConfig_DD_LogLevel_1"),
-					modApi:getText("ModLoaderConfig_DD_LogLevel_2")
+					GetText("ModLoaderConfig_DD_LogLevel_0"),
+					GetText("ModLoaderConfig_DD_LogLevel_1"),
+					GetText("ModLoaderConfig_DD_LogLevel_2")
 				},
 				mod_loader.logger:getLoggingLevel()
 			)
@@ -135,34 +135,34 @@ local function createUi()
 			:decorate({
 				DecoButton(),
 				DecoAlign(0, 2),
-				DecoText(modApi:getText("ModLoaderConfig_Text_LogLevel")),
+				DecoText(GetText("ModLoaderConfig_Text_LogLevel")),
 				DecoDropDownText(nil, nil, nil, 33),
 				DecoAlign(0, -2),
 				DecoDropDown()
 			})
-			:settooltip(modApi:getText("ModLoaderConfig_Tooltip_LogLevel"))
+			:settooltip(GetText("ModLoaderConfig_Tooltip_LogLevel"))
 			:addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Caller information
 		cboxCaller = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_Text_Caller"),
-			modApi:getText("ModLoaderConfig_Tooltip_Caller")
+			GetText("ModLoaderConfig_Text_Caller"),
+			GetText("ModLoaderConfig_Tooltip_Caller")
 		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Development Mode
 		cboxDevelopmentMode = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_Text_DevMode"),
-			modApi:getText("ModLoaderConfig_Tooltip_DevMode")
+			GetText("ModLoaderConfig_Text_DevMode"),
+			GetText("ModLoaderConfig_Tooltip_DevMode")
 		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Floaty tooltips
 		cboxFloatyTooltips = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_Text_FloatyTooltips"),
-			modApi:getText("ModLoaderConfig_Tooltip_FloatyTooltips_On"),
-			modApi:getText("ModLoaderConfig_Tooltip_FloatyTooltips_Off")
+			GetText("ModLoaderConfig_Text_FloatyTooltips"),
+			GetText("ModLoaderConfig_Tooltip_FloatyTooltips_On"),
+			GetText("ModLoaderConfig_Tooltip_FloatyTooltips_Off")
 		):addTo(layout)
 
 		cboxFloatyTooltips.clicked = function(self, button)
@@ -176,8 +176,8 @@ local function createUi()
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Profile-specific config
 		cboxProfileConfig = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_Text_ProfileConfig"),
-			modApi:getText("ModLoaderConfig_Tooltip_ProfileConfig")
+			GetText("ModLoaderConfig_Text_ProfileConfig"),
+			GetText("ModLoaderConfig_Tooltip_ProfileConfig")
 		):addTo(layout)
 
 		cboxProfileConfig.clicked = function(self, button)
@@ -195,33 +195,33 @@ local function createUi()
 		createSeparator(10):addTo(layout)
 
 		cboxErrorFrame = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_Text_ScriptError"),
-			modApi:getText("ModLoaderConfig_Tooltip_ScriptError")
+			GetText("ModLoaderConfig_Text_ScriptError"),
+			GetText("ModLoaderConfig_Tooltip_ScriptError")
 		):addTo(layout)
 
 		cboxVersionFrame = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_Text_OldVersion"),
-			modApi:getText("ModLoaderConfig_Tooltip_OldVersion")
+			GetText("ModLoaderConfig_Text_OldVersion"),
+			GetText("ModLoaderConfig_Tooltip_OldVersion")
 		):addTo(layout)
 
 		cboxResourceError = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_Text_ResourceError"),
-			modApi:getText("ModLoaderConfig_Tooltip_ResourceError")
+			GetText("ModLoaderConfig_Text_ResourceError"),
+			GetText("ModLoaderConfig_Tooltip_ResourceError")
 		):addTo(layout)
 
 		cboxGamepadWarning = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_Text_GamepadWarning"),
-			modApi:getText("ModLoaderConfig_Tooltip_GamepadWarning")
+			GetText("ModLoaderConfig_Text_GamepadWarning"),
+			GetText("ModLoaderConfig_Tooltip_GamepadWarning")
 		):addTo(layout)
 
 		cboxRestartReminder = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_Text_RestartReminder"),
-			modApi:getText("ModLoaderConfig_Tooltip_RestartReminder")
+			GetText("ModLoaderConfig_Text_RestartReminder"),
+			GetText("ModLoaderConfig_Tooltip_RestartReminder")
 		):addTo(layout)
 
 		cboxProfileFrame = createCheckboxOption(
-			modApi:getText("ModLoaderConfig_Text_ProfileFrame"),
-			modApi:getText("ModLoaderConfig_Tooltip_ProfileFrame")
+			GetText("ModLoaderConfig_Text_ProfileFrame"),
+			GetText("ModLoaderConfig_Tooltip_ProfileFrame")
 		):addTo(layout)
 
 		uiSetSettings(LoadModLoaderConfig())

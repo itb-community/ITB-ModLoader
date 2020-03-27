@@ -22,7 +22,7 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 	
 	buttonModContent = MainMenuButton("short")
 		:pospx(0, screen:h() - 186)
-		:caption(modApi:getText("MainMenu_Button_ModContent"))
+		:caption(GetText("MainMenu_Button_ModContent"))
 		:addTo(uiRoot)
 	buttonModContent.visible = false
 
@@ -36,7 +36,7 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 				local frame = Ui()
 					:width(0.4):height(0.8)
 					:posCentered()
-					:caption(modApi:getText("ModContent_FrameTitle"))
+					:caption(GetText("ModContent_FrameTitle"))
 					:decorate({ DecoFrameHeader(), DecoFrame() })
 					:addTo(ui)
 

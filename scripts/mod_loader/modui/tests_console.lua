@@ -92,11 +92,11 @@ local function buildTestUi(testEntry)
 			statusBox.decorations[1].bordercolor = deco.colors.buttonborder
 			statusBox.decorations[2].surface = deco.surfaces.markCross
 			statusBox.disabled = false
-			statusBox:settooltip(modApi:getText("TestingConsole_FailSummary_Tooltip"))
+			statusBox:settooltip(GetText("TestingConsole_FailSummary_Tooltip"))
 
 			sdlext.addButtonSoundHandlers(statusBox, function ()
 				sdlext.showTextDialog(
-						modApi:getText("TestingConsole_FailSummary_FrameTitle"),
+						GetText("TestingConsole_FailSummary_FrameTitle"),
 						resultTable.result,
 						1000, 1000
 				)
@@ -352,7 +352,7 @@ end
 
 local function buildTestingConsoleContent(scroll)
 	local entry = {
-		name = modApi:getText("TestingConsole_RootTestsuite"),
+		name = GetText("TestingConsole_RootTestsuite"),
 		suite = Testsuites
 	}
 
@@ -362,7 +362,7 @@ end
 
 local function buildTestingConsoleButtons(buttonLayout)
 	local btnRunAll = sdlext.buildButton(
-		modApi:getText("TestingConsole_RunAll"),
+		GetText("TestingConsole_RunAll"),
 		nil,
 		function()
 			resetEvent:fire()
@@ -373,7 +373,7 @@ local function buildTestingConsoleButtons(buttonLayout)
 	btnRunAll:addTo(buttonLayout)
 
 	local btnRunSelected = sdlext.buildButton(
-		modApi:getText("TestingConsole_RunSelected"),
+		GetText("TestingConsole_RunSelected"),
 		nil,
 		function()
 			resetEvent:fire()
@@ -403,7 +403,7 @@ local function showTestingConsole()
 		end
 
 		local frame = sdlext.buildButtonDialog(
-			modApi:getText("TestingConsole_FrameTitle"),
+			GetText("TestingConsole_FrameTitle"),
 			0.6 * ScreenSizeX(), 0.8 * ScreenSizeY(),
 			buildTestingConsoleContent,
 			buildTestingConsoleButtons
@@ -425,8 +425,8 @@ end
 
 local function createOpenTestingConsoleButton(root)
 	local button = sdlext.buildButton(
-		modApi:getText("TestingConsole_ToggleButton_Text"),
-		modApi:getText("TestingConsole_ToggleButton_Tooltip"),
+		GetText("TestingConsole_ToggleButton_Text"),
+		GetText("TestingConsole_ToggleButton_Tooltip"),
 		function()
 			showTestingConsole()
 		end

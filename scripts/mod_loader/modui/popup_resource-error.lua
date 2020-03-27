@@ -19,11 +19,11 @@ sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
 		modApi:scheduleHook(50, function()
 			if srf:w() == 0 then
 				sdlext.showButtonDialog(
-					modApi:getText("ResourceError_FrameTitle"),
-					modApi:getText("ResourceError_FrameText"),
+					GetText("ResourceError_FrameTitle"),
+					GetText("ResourceError_FrameText"),
 					responseFn, nil, nil,
-					{ modApi:getText("Button_Ok"), modApi:getText("Button_DisablePopup") },
-					{ "", modApi:getText("ButtonTooltip_DisablePopup") }
+					{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
+					{ "", GetText("ButtonTooltip_DisablePopup") }
 				)
 			end
 		end)

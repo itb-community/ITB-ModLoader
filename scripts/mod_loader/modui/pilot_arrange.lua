@@ -76,7 +76,7 @@ local function createUi()
 		local frametop = Ui()
 			:width(0.8):height(0.8)
 			:posCentered()
-			:caption(modApi:getText("PilotArrange_FrameTitle"))
+			:caption(GetText("PilotArrange_FrameTitle"))
 			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:addTo(ui)
 
@@ -306,6 +306,6 @@ end
 sdlext.addHangarEnteredHook(function(screen)
 	if not arrangePilotsButton.disabled then
 		arrangePilotsButton.disabled = true
-		arrangePilotsButton.tip = modApi:getText("PilotArrange_ButtonTooltip_Off")
+		arrangePilotsButton.tip = GetText("PilotArrange_ButtonTooltip_Off")
 	end
 end)

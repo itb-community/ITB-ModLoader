@@ -352,9 +352,9 @@ function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
 end
 
 function sdlext.showInfoDialog(title, text, fn, w, h)
-	sdlext.showAlertDialog(title, text, fn, w, h, modApi:getText("Button_Ok"))
+	sdlext.showAlertDialog(title, text, fn, w, h, GetText("Button_Ok"))
 end
 
 function sdlext.showConfirmDialog(title, text, fn, w, h)
-	sdlext.showAlertDialog(title, text, fn, w, h, modApi:getText("Button_Yes"), modApi:getText("Button_No"))
+	sdlext.showAlertDialog(title, text, fn, w, h, GetText("Button_Yes"), GetText("Button_No"))
 end
