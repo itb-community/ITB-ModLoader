@@ -17,6 +17,21 @@ function UiFlowLayout:new()
 	self.horizontal = true
 end
 
+function UiFlowLayout:vgap(gap)
+	self.gapVertical = gap
+	return self
+end
+
+function UiFlowLayout:hgap(gap)
+	self.gapHorizontal = gap
+	return self
+end
+
+function UiFlowLayout:orientation(horizontal)
+	self.horizontal = horizontal
+	return self
+end
+
 function UiFlowLayout:relayout()
 	assert(type(self.horizontal) == "boolean")
 
@@ -42,6 +57,7 @@ function UiFlowLayout:relayout()
 	-- positions of the next child
 	local nextX = 0
 	local nextY = 0
+	local lastChild = nil
 	for i = 1, #self.children do
 		local child = self.children[i]
 
@@ -86,7 +102,20 @@ function UiFlowLayout:relayout()
 			child.rect.y = child.screeny
 			child.rect.w = child.w
 			child.rect.h = child.h
+
+			lastChild = child
 		end
+	end
+
+	if lastChild then
+		if self.horizontal then
+			self.h = lastChild.y + self.padt + self.padb + lastChild.h
+		else
+			self.w = lastChild.x + self.padl + self.padr + lastChild.w
+		end
+	else
+		self.w = self.horizontal and 0 or self.w
+		self.h = self.horizontal and self.h or 0
 	end
 
 	if self.horizontal then
