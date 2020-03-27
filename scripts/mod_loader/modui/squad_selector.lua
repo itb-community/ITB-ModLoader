@@ -129,13 +129,11 @@ local function createUi()
 				local column = index % 2
 				local row = 1 + math.floor(index / 2)
 				if column == 0 then
-					LOG(column, row, "creating new")
 					return UiWeightLayout()
 						:width(1):heightpx(60)
 						:hgap(columnGap)
 						:addTo(contentLayout)
 				else
-					LOG(column, row, "fetching existing")
 					-- Fetch existing layout
 					return contentLayout.children[row]
 				end
