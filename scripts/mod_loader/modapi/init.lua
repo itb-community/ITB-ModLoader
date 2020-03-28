@@ -160,10 +160,6 @@ function modApi:resetModContent()
 	self.scheduledHooks = {}
 	self:ResetHooks()
 
-	local name, tbl = debug.getupvalue(oldGetPopulationTexts,1)
-	self.PopEvents = copy_table(tbl)
-	self.onGetPopEvent = {}
-	
 	self:conditionalHook(
 		function()
 			return Game ~= nil and modApi.delayedInit ~= nil
