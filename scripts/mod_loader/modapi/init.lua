@@ -58,7 +58,7 @@ function modApi:init()
 		"Detritus_B",
 	}
 
-	self:loadLanguageDictionary(self:getLanguageIndex())
+	self:loadLanguage(self:getLanguageIndex())
 
 	self.defaultMaps = require(parentDirectory .. "default_maps")
 	self:deleteModdedMaps()
@@ -84,7 +84,6 @@ function modApi:init()
 	end
 
 	-- Execute deferred statements
-
 	AddDifficultyLevel(
 		"DIFF_VERY_HARD",
 		#DifficultyLevels -- adds as a new highest difficulty
@@ -190,3 +189,13 @@ function modApi:getGameVersion()
 
 	return "1.0.22"
 end
+
+sdlext.addSettingsChangedHook(function(old, neu)
+	if old.language ~= neu.language then
+		if GAME then
+			mod_loader:loadModContent(GAME.modOptions, GAME.modLoadOrder)
+		else
+			mod_loader:loadModContent(mod_loader.mod_options, mod_loader:getModConfig())
+		end
+	end
+end)

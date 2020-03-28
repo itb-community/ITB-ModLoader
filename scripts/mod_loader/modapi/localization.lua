@@ -62,21 +62,24 @@ function modApi:setText(id, text)
 	self.dictionary[id] = text
 end
 
-local dictionariesPath = "scripts/mod_loader/localization"
-local function getLanguageDictionaryPath(languageIndex)
-	local languageId = modApi:getLanguageId(languageIndex)
-	return string.format("%s/dictionary_%s", dictionariesPath, languageId)
+function modApi:getModLoaderDictionariesPath()
+	return "scripts/mod_loader/localization"
 end
 
-function modApi:loadLanguageDictionary(languageIndex)
+function modApi:getModLoaderDictionary(languageIndex)
+	local languageId = modApi:getLanguageId(languageIndex)
+	return string.format("%s/dictionary_%s", self:getModLoaderDictionariesPath(), languageId)
+end
+
+function modApi:loadLanguage(languageIndex)
 	assert(type(languageIndex) == "number", "Language index must be a number")
 
-	local dictionaryFilePath = getLanguageDictionaryPath(languageIndex)
+	local dictionaryFilePath = self:getModLoaderDictionary(languageIndex)
 	if self:fileExists(dictionaryFilePath .. ".lua") then
 		self.modLoaderDictionary = require(dictionaryFilePath)
 	else
 		-- Fall back to loading English
-		self.modLoaderDictionary = require(getLanguageDictionaryPath(Languages.English))
+		self.modLoaderDictionary = require(self:getModLoaderDictionary(Languages.English))
 	end
 
 	self:setupVanillaTexts()

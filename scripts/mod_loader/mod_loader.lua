@@ -37,7 +37,7 @@ function mod_loader:init()
 	
 	modApi.modsInitializedHooks = {}
 
-	modApi:loadLanguageDictionary(modApi:getLanguageIndex())
+	modApi:loadLanguage(modApi:getLanguageIndex())
 	self:enumerateMods()
 
 	if MOD_API_DRAW_HOOK then
@@ -427,7 +427,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 	
 	--For helping with the standardized mod API--
 	modApi:resetModContent()
-	modApi:loadLanguageDictionary(modApi:getLanguageIndex())
+	modApi:loadLanguage(modApi:getLanguageIndex())
 	
 	local orderedMods = self:orderMods(mod_options, savedOrder)
 	
