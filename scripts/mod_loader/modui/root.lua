@@ -204,7 +204,8 @@ local profileBox = Boxes.profile_window
 local function adjustForGameVersion()
 	if modApi:isVersion("1.2.12", modApi:getGameVersion()) then
 		--
-	elseif modApi:isVersion("1.1.22", modApi:getGameVersion()) then
+	end
+	if modApi:isVersion("1.1.22", modApi:getGameVersion()) then
 		optionsBox = Rect2D(optionsBox)
 		optionsBox.w = optionsBox.w + 300
 	end
