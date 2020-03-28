@@ -57,12 +57,6 @@ function modApi:splitStringEmpty(str, sep)
 	return ret
 end
 
-function modApi:overwriteText(id, str)
-	assert(type(id) == "string")
-	assert(type(str) == "string")
-	self.textOverrides[id] = str
-end
-
 function modApi:addWeapon_Texts(tbl)
 	assert(type(tbl) == "table")
 	for k,v in pairs(tbl) do

@@ -131,7 +131,7 @@ function LoadGame()
 
 	if GAME.squadTitles then
 		for k, name in pairs(GAME.squadTitles) do
-			modApi:overwriteText(k,name)
+			modApi:setText(k, name)
 		end
 	end
 

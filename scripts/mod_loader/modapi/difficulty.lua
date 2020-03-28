@@ -168,13 +168,13 @@ function SetDifficulty(level)
 		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(oldLevel))
 
 		if tempTipTitle then
-			modApi.dictionary["TipTitle_Hangar"..baseSuffix] = tempTipTitle
+			modApi.modLoaderDictionary["TipTitle_Hangar"..baseSuffix] = tempTipTitle
 		end
 		if tempTipText then
-			modApi.dictionary["TipText_Hangar"..baseSuffix] = tempTipText
+			modApi.modLoaderDictionary["TipText_Hangar"..baseSuffix] = tempTipText
 		end
 		if tempToggle then
-			modApi.dictionary["Toggle_"..baseSuffix] = tempToggle
+			modApi.modLoaderDictionary["Toggle_"..baseSuffix] = tempToggle
 		end
 
 		tempTipTitle = nil
@@ -191,8 +191,8 @@ function SetDifficulty(level)
 		GAME.CustomDifficulty = level
 
 		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(level))
-		tempToggle = modApi.dictionary["Toggle_"..baseSuffix]
-		modApi.dictionary["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
+		tempToggle = GetText("Toggle_"..baseSuffix)
+		modApi.modLoaderDictionary["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
 	else
 		-- Hangar, before the game
 		modApi:writeModData("CustomDifficulty", level)
@@ -200,16 +200,16 @@ function SetDifficulty(level)
 		local tipSuffix = GetDifficultyTipSuffix(level)
 		local baseSuffix = GetDifficultyTipSuffix(GetBaselineDifficulty(level))
 
-		tempTipTitle = modApi.dictionary["TipTitle_Hangar"..baseSuffix]
-		tempTipText = modApi.dictionary["TipText_Hangar"..baseSuffix]
-		tempToggle = modApi.dictionary["Toggle_"..baseSuffix]
+		tempTipTitle = GetText("TipTitle_Hangar"..baseSuffix)
+		tempTipText = GetText("TipText_Hangar"..baseSuffix)
+		tempToggle = GetText("Toggle_"..baseSuffix)
 
-		modApi.dictionary["TipTitle_Hangar"..baseSuffix] = GetText("Difficulty_Title_"..tipSuffix)
-		modApi.dictionary["TipText_Hangar"..baseSuffix] = GetText("Difficulty_Description_"..tipSuffix)
-		modApi.dictionary["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
+		modApi.modLoaderDictionary["TipTitle_Hangar"..baseSuffix] = GetText("Difficulty_Title_"..tipSuffix)
+		modApi.modLoaderDictionary["TipText_Hangar"..baseSuffix] = GetText("Difficulty_Description_"..tipSuffix)
+		modApi.modLoaderDictionary["Toggle_"..baseSuffix] = GetDifficultyFaceName(level)
 
 		if not IsVanillaDifficultyLevel(level) then
-			modApi.dictionary["TipText_Hangar"..baseSuffix] =
+			modApi.modLoaderDictionary["TipText_Hangar"..baseSuffix] =
 				GetText("TipText_Hangar"..baseSuffix) .. "\n\n" .. GetText("Difficulty_Custom_Note")
 		end
 	end

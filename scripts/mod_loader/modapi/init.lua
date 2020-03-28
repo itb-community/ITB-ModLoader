@@ -58,7 +58,7 @@ function modApi:init()
 		"Detritus_B",
 	}
 
-	self:loadLocaleDictionary(self:getLanguage())
+	self:loadLanguageDictionary(self:getLanguageIndex())
 
 	self.defaultMaps = require(parentDirectory .. "default_maps")
 	self:deleteModdedMaps()
@@ -106,7 +106,6 @@ end
 -- Maintain sanity
 -- Update as new API functions are added
 function modApi:resetModContent()
-	self.textOverrides = {}
 	self.dictionary = {}
 
 	self.mod_squads = {

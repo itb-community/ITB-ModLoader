@@ -1,6 +1,6 @@
 
+GetVanillaText = GetText
 
-oldGetText = GetText
 function GetText(id, r1, r2, r3)
 	if not id then
 		error("Attempted to fetch text with id = nil:\n" .. debug.traceback())
@@ -9,8 +9,8 @@ function GetText(id, r1, r2, r3)
 	local text = nil
 	if modApi.dictionary and modApi.dictionary[id] then
 		text = modApi.dictionary[id]
-	elseif modApi.textOverrides and modApi.textOverrides[id] then
-		text = modApi.textOverrides[id]
+	elseif modApi.modLoaderDictionary and modApi.modLoaderDictionary[id] then
+		text = modApi.modLoaderDictionary[id]
 	end
 
 	if text then
@@ -27,6 +27,6 @@ function GetText(id, r1, r2, r3)
 
 		return text
 	else
-		return oldGetText(id, r1, r2, r3)
+		return GetVanillaText(id, r1, r2, r3)
 	end
 end
