@@ -37,7 +37,6 @@ function mod_loader:init()
 	
 	modApi.modsInitializedHooks = {}
 
-	modApi:loadLanguage(modApi:getLanguageIndex())
 	self:enumerateMods()
 
 	if MOD_API_DRAW_HOOK then
@@ -76,10 +75,13 @@ function mod_loader:init()
 	modApi.modsInitializedHooks = nil
 	
 	modApi:finalize()
-	
-	self:loadModContent(self:getModConfig(), self:getSavedModOrder())
+
 	self:loadPilotList()
 	modApi:affirmProfileData()
+
+	sdlext.addInitialLoadingFinishedHook(function()
+		self:loadModContent(self:getModConfig(), self:getSavedModOrder())
+	end)
 end
 
 function mod_loader:loadAdditionalSprites()

@@ -70,6 +70,10 @@ function modApi:init()
 	self.msDeltaTime = 0
 	self.msLastElapsed = 0
 
+	self.conditionalHooks = {}
+	self.scheduledHooks = {}
+	self:ResetHooks()
+
 	if MOD_API_DRAW_HOOK then
 		sdlext.addFrameDrawnHook(function(screen)
 			local t = modApi.timer:elapsed()

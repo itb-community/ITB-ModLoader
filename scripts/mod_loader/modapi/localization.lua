@@ -93,7 +93,7 @@ end
 function modApi:setupVanillaTexts()
 	local t = self.modLoaderDictionary
 
-	for i, v in ipairs(self.squadKeys) do
+	for _, v in ipairs(self.squadKeys) do
 		t["Squad_Name_" .. v] = GetVanillaText("TipTitle_" .. v)
 		t["Squad_Description_" .. v] = GetVanillaText("TipText_" .. v)
 	end

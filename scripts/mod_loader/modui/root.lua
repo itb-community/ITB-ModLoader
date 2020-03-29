@@ -36,6 +36,13 @@ end
 -- //////////////////////////////////////////////////////////////////////
 -- UI hooks
 
+local initialLoadingFinishedHookFired = false
+local initialLoadingFinishedHooks = {}
+function sdlext.addInitialLoadingFinishedHook(fn)
+	assert(type(fn) == "function")
+	table.insert(initialLoadingFinishedHooks, fn)
+end
+
 local uiRootCreatedHooks = {}
 function sdlext.addUiRootCreatedHook(fn)
 	assert(type(fn) == "function")
@@ -377,6 +384,14 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	isInHangar = bgHangar:wasDrawn()
 	isInGame = Game ~= nil
 	isTestMech = IsTestMechScenario()
+
+	if not initialLoadingFinishedHookFired and bgRobot:wasDrawn() then
+		initialLoadingFinishedHookFired = true
+		for _, hook in ipairs(initialLoadingFinishedHooks) do
+			hook()
+		end
+		initialLoadingFinishedHooks = nil
+	end
 
 	-- ////////////////////////////////////////////////////////
 	-- Hooks
