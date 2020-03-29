@@ -15,6 +15,9 @@ function modApi:overwriteText(id, str)
 	modApi:setText(id, str)
 end
 
+-- ///////////////////////////////////////////////////////////////////////////////////
+-- Override global text tables with metatables that automatically register texts
+-- so that the new version of the game recognizes them.
 local textsMetatable = {
 	__index = function(self, key)
 		return GetText(key)

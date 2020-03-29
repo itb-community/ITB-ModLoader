@@ -94,19 +94,19 @@ function modApi:setupVanillaTexts()
 	local t = self.modLoaderDictionary
 
 	for i, v in ipairs(self.squadKeys) do
-		t["Squad_Name_" .. v] = GetText("TipTitle_" .. v)
-		t["Squad_Description_" .. v] = GetText("TipText_" .. v)
+		t["Squad_Name_" .. v] = GetVanillaText("TipTitle_" .. v)
+		t["Squad_Description_" .. v] = GetVanillaText("TipText_" .. v)
 	end
 
-	t["Difficulty_Name_Easy"] = GetText("Toggle_Easy")
-	t["Difficulty_Title_Easy"] = GetText("TipTitle_HangarEasy")
-	t["Difficulty_Description_Easy"] = GetText("TipText_HangarEasy")
+	t["Difficulty_Name_Easy"] = GetVanillaText("Toggle_Easy")
+	t["Difficulty_Title_Easy"] = GetVanillaText("TipTitle_HangarEasy")
+	t["Difficulty_Description_Easy"] = GetVanillaText("TipText_HangarEasy")
 
-	t["Difficulty_Name_Normal"] = GetText("Toggle_Normal")
-	t["Difficulty_Title_Normal"] = GetText("TipTitle_HangarNormal")
-	t["Difficulty_Description_Normal"] = GetText("TipText_HangarNormal")
+	t["Difficulty_Name_Normal"] = GetVanillaText("Toggle_Normal")
+	t["Difficulty_Title_Normal"] = GetVanillaText("TipTitle_HangarNormal")
+	t["Difficulty_Description_Normal"] = GetVanillaText("TipText_HangarNormal")
 
-	t["Difficulty_Name_Hard"] = GetText("Toggle_Hard")
-	t["Difficulty_Title_Hard"] = GetText("TipTitle_HangarHard")
-	t["Difficulty_Description_Hard"] = GetText("TipText_HangarHard")
+	t["Difficulty_Name_Hard"] = GetVanillaText("Toggle_Hard")
+	t["Difficulty_Title_Hard"] = GetVanillaText("TipTitle_HangarHard")
+	t["Difficulty_Description_Hard"] = GetVanillaText("TipText_HangarHard")
 end
