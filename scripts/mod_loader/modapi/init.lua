@@ -58,7 +58,7 @@ function modApi:init()
 		"Detritus_B",
 	}
 
-	self:loadLanguage(self:getLanguageIndex())
+	modApi:loadLanguage(modApi:getLanguageIndex())
 
 	self.defaultMaps = require(parentDirectory .. "default_maps")
 	self:deleteModdedMaps()
@@ -112,39 +112,39 @@ function modApi:resetModContent()
 	self.dictionary = {}
 
 	self.mod_squads = {
-		{ GetText("Squad_Name_Archive_A"), "PunchMech", "TankMech", "ArtiMech" },
-		{ GetText("Squad_Name_Rust_A"), "JetMech", "RocketMech",  "PulseMech" },
-		{ GetText("Squad_Name_Pinnacle_A"), "LaserMech", "ChargeMech", "ScienceMech" },
-		{ GetText("Squad_Name_Detritus_A"), "ElectricMech", "WallMech", "RockartMech" },
-		{ GetText("Squad_Name_Archive_B"), "JudoMech", "DStrikeMech", "GravMech" },
-		{ GetText("Squad_Name_Rust_B"), "FlameMech", "IgniteMech", "TeleMech" },
-		{ GetText("Squad_Name_Pinnacle_B"), "GuardMech", "MirrorMech", "IceMech" },
-		{ GetText("Squad_Name_Detritus_B"), "LeapMech", "UnstableTank", "NanoMech" },
+		{ GetVanillaText("TipTitle_Archive_A"), "PunchMech", "TankMech", "ArtiMech" },
+		{ GetVanillaText("TipTitle_Rust_A"), "JetMech", "RocketMech",  "PulseMech" },
+		{ GetVanillaText("TipTitle_Pinnacle_A"), "LaserMech", "ChargeMech", "ScienceMech" },
+		{ GetVanillaText("TipTitle_Detritus_A"), "ElectricMech", "WallMech", "RockartMech" },
+		{ GetVanillaText("TipTitle_Archive_B"), "JudoMech", "DStrikeMech", "GravMech" },
+		{ GetVanillaText("TipTitle_Rust_B"), "FlameMech", "IgniteMech", "TeleMech" },
+		{ GetVanillaText("TipTitle_Pinnacle_B"), "GuardMech", "MirrorMech", "IceMech" },
+		{ GetVanillaText("TipTitle_Detritus_B"), "LeapMech", "UnstableTank", "NanoMech" },
 	}
 	self.squad_text = {
-		GetText("Squad_Name_Archive_A"),
-		GetText("Squad_Description_Archive_A"),
+		GetVanillaText("TipTitle_Archive_A"),
+		GetVanillaText("TipText_Archive_A"),
 
-		GetText("Squad_Name_Rust_A"),
-		GetText("Squad_Description_Rust_A"),
+		GetVanillaText("TipTitle_Rust_A"),
+		GetVanillaText("TipText_Rust_A"),
 
-		GetText("Squad_Name_Pinnacle_A"),
-		GetText("Squad_Description_Pinnacle_A"),
+		GetVanillaText("TipTitle_Pinnacle_A"),
+		GetVanillaText("TipText_Pinnacle_A"),
 
-		GetText("Squad_Name_Detritus_A"),
-		GetText("Squad_Description_Detritus_A"),
+		GetVanillaText("TipTitle_Detritus_A"),
+		GetVanillaText("TipText_Detritus_A"),
 
-		GetText("Squad_Name_Archive_B"),
-		GetText("Squad_Description_Archive_B"),
+		GetVanillaText("TipTitle_Archive_B"),
+		GetVanillaText("TipText_Archive_B"),
 
-		GetText("Squad_Name_Rust_B"),
-		GetText("Squad_Description_Rust_B"),
+		GetVanillaText("TipTitle_Rust_B"),
+		GetVanillaText("TipText_Rust_B"),
 
-		GetText("Squad_Name_Pinnacle_B"),
-		GetText("Squad_Description_Pinnacle_B"),
+		GetVanillaText("TipTitle_Pinnacle_B"),
+		GetVanillaText("TipText_Pinnacle_B"),
 
-		GetText("Squad_Name_Detritus_B"),
-		GetText("Squad_Description_Detritus_B"),
+		GetVanillaText("TipTitle_Detritus_B"),
+		GetVanillaText("TipText_Detritus_B"),
 	}
 	self.squad_icon = {
 		"img/units/player/mech_punch_ns.png",
