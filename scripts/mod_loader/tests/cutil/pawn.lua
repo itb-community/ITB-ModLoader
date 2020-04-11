@@ -20,6 +20,39 @@ local function OrderPawnToMoveTo(caster, targetLoc)
 	caster = oldPawn
 end
 
+testsuite.test_IsPlayerControlled_ShouldReturnTrueIfPlayerCanIssueOrders = buildPawnTest({
+	-- The mech unit should be controllable by default, but be uncontrollable after attacking.
+	-- The vek unit should be uncontrollable by default.
+	prepare = function()
+		mechPawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+		vekPawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
+
+		expectedMechControl = _G[mechPawn:GetType()].DefaultTeam == TEAM_PLAYER
+		expectedVekControl = _G[vekPawn:GetType()].DefaultTeam == TEAM_PLAYER
+		expectedInactiveMechControl = false
+		
+		targetLoc = getRandomTarget(Prime_Punchmech, mechPawn)
+	end,
+	execute = function()
+		modApi:runLater(function()
+			actualMechControl = mechPawn:IsPlayerControlled()
+			actualVekControl = vekPawn:IsPlayerControlled()
+			
+			-- Firing a weapon should remove player control from the mech when the SkillEffect has finished. Exception to this rule is when a pilot still allows further actions.
+			mechPawn:FireWeapon(targetLoc, 1)
+		end)
+	end,
+	check = function()
+		assertEquals(expectedMechControl, actualMechControl, "IsPlayerControlled() returned incorrect default control state for mech")
+		assertEquals(expectedVekControl, actualVekControl, "IsPlayerControlled() returned incorrect default control state for vek")
+		assertEquals(expectedInactiveMechControl, mechPawn:IsPlayerControlled(), "IsPlayerControlled() returned incorrect control state for inactive mech")
+	end,
+	cleanup = function()
+		Board:RemovePawn(mechPawn)
+		Board:RemovePawn(vekPawn)
+	end
+})
+
 testsuite.test_WhenIncreasingMaxHealth_CurrentHealthShouldRemainUnchanged = buildPawnTest({
 	-- The pawn should have its max health increased, but current health should remain at its old value.
 	prepare = function()
