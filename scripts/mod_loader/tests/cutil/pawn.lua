@@ -40,6 +40,38 @@ local function getPawnSaveData(pawnId)
 	return pawn_data
 end
 
+testsuite.test_SetMoveSkill_ShouldBeAbleToAttackWithMoveSkill = buildPawnTest({
+	-- Should be able to punch adjacent tiles if move skill is swapped out.
+	-- using Prime_ShieldBash for its property of not pushing or affecting tile outside of its target.
+	prepare = function()
+		mechPawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+		vekPawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
+		
+		targetLoc = getRandomTarget(Prime_ShieldBash, mechPawn)
+		targetTerrain = Board:GetTerrain(targetLoc)
+		
+		Board:SetTerrain(targetLoc, TERRAIN_ROAD)
+		
+		expectedInitialHealth = vekPawn:GetHealth()
+		expectedAlteredHealth = expectedInitialHealth - Prime_ShieldBash.Damage
+		
+		vekPawn:SetSpace(targetLoc)
+	end,
+	execute = function()
+		mechPawn:SetMoveSkill("Prime_ShieldBash")
+		mechPawn:FireWeapon(targetLoc, 0)
+	end,
+	check = function()
+		assertNotEquals(expectedInitialHealth, vekPawn:GetHealth(), "Vekpawn's initial health was unchanged.")
+		assertEquals(expectedAlteredHealth, vekPawn:GetHealth(), "Vekpawn's altered health was incorrect.")
+	end,
+	cleanup = function()
+		Board:RemovePawn(mechPawn)
+		Board:RemovePawn(vekPawn)
+		Board:SetTerrain(targetLoc, targetTerrain)
+	end
+})
+
 testsuite.test_SetUndoLoc_SaveGameShouldReflectChange = buildPawnTest({
 	-- The pawn's undo location in the save game should change after setting it.
 	prepare = function()
