@@ -53,6 +53,29 @@ testsuite.test_IsPlayerControlled_ShouldReturnTrueIfPlayerCanIssueOrders = build
 	end
 })
 
+testsuite.test_GetMaxHealth_ShouldBeEqualToFullyHealedPawn = buildPawnTest({
+	-- The pawn's max health should be the same as the pawn's current health at pawn creation, as well as after fully healed.
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+
+		expectedInitialMaxHealth = pawn:GetHealth()
+	end,
+	execute = function()
+		-- kill pawn and heal it back up to full.
+		pawn:ApplyDamage(SpaceDamage(expectedInitialMaxHealth))
+		pawn:ApplyDamage(SpaceDamage(-INT_MAX))
+		
+		expectedHealedMaxHealth = pawn:GetHealth()
+	end,
+	check = function()
+		assertEquals(expectedInitialMaxHealth, pawn:GetMaxHealth(), "Pawn's max health differed from initial health")
+		assertEquals(expectedHealedMaxHealth, pawn:GetMaxHealth(), "Pawn's max health differed after fully healed")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+	end
+})
+
 testsuite.test_WhenIncreasingMaxHealth_CurrentHealthShouldRemainUnchanged = buildPawnTest({
 	-- The pawn should have its max health increased, but current health should remain at its old value.
 	prepare = function()
