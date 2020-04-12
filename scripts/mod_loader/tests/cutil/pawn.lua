@@ -40,6 +40,54 @@ local function getPawnSaveData(pawnId)
 	return pawn_data
 end
 
+testsuite.test_SetFrozen_noAnimation_ShouldFreezePawn = buildPawnTest({
+	-- Using SetFrozen with the `no_animation` flag set to true should still freeze the pawn.
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+	end,
+	execute = function()
+		pawn:SetFrozen(true, true)
+	end,
+	check = function()
+		assertEquals(true, pawn:IsFrozen(), "Pawn was not frozen.")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+	end
+})
+
+testsuite.test_SetShield_noAnimation_ShouldShieldPawn = buildPawnTest({
+	-- Using SetShield with the `no_animation` flag set to true should still shield the pawn.
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+	end,
+	execute = function()
+		pawn:SetShield(true, true)
+	end,
+	check = function()
+		assertEquals(true, pawn:IsShield(), "Pawn was not shielded.")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+	end
+})
+
+testsuite.test_SetAcid_noAnimation_ShouldAffectPawnWithAcid = buildPawnTest({
+	-- Using SetAcid with the `no_animation` flag set to true should still affect the pawn with acid.
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+	end,
+	execute = function()
+		pawn:SetAcid(true, true)
+	end,
+	check = function()
+		assertEquals(true, pawn:IsAcid(), "Pawn was not affected with acid.")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+	end
+})
+
 testsuite.test_AddWeapon_ShouldAllowAttackingWithNewWeapon = buildPawnTest({
 	-- The pawn should be able to attack with newly added weapon.
 	-- using Prime_ShieldBash for its property of not pushing or affecting tiles outside of its target.
