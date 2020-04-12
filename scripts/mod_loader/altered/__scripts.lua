@@ -2,6 +2,7 @@ local scripts = {
 	"difficulty",
 	"misc",
 	"missions",
+	"globalize_enemy_tables",
 	"skills",
 	"spawn_point",
 	"squad",
