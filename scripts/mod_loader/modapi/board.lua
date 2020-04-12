@@ -517,7 +517,7 @@ end]]
 function InitializeBoardClass(board)
 	-- modify existing board functions here
 	
-	local oldSetLava = board.SetLava
+	BoardClass.SetLavaVanilla = board.SetLava
 	BoardClass.SetLava = function(self, loc, lava, sink)
 		Tests.AssertSignature{
 			ret = "void",
@@ -532,14 +532,14 @@ function InitializeBoardClass(board)
 			d.iTerrain = TERRAIN_LAVA
 			self:DamageSpace(d)
 		else
-			oldSetLava(self, loc, lava)
+			self:SetLavaVanilla(loc, lava)
 		end
 	end
 	
 	-- Note for future digging:
 	-- (glitchy vanilla behavior) setting building on water messes up the tile somehow,
 	-- making the water stick around even when attempting to change the terrain later.
-	local oldSetTerrain = board.SetTerrain
+	BoardClass.SetTerrainVanilla = board.SetTerrain
 	BoardClass.SetTerrain = function(self, loc, iTerrain)
 		Tests.AssertSignature{
 			ret = "void",
@@ -555,7 +555,7 @@ function InitializeBoardClass(board)
 			self:SetIce(loc, 1)
 			
 		else
-			oldSetTerrain(self, loc, iTerrain)
+			self:SetTerrainVanilla(loc, iTerrain)
 			
 			if iTerrain == TERRAIN_FOREST and board:IsFire(loc) then
 				-- update tile after placing forest on fire, to avoid graphical glitch.
@@ -570,7 +570,7 @@ function InitializeBoardClass(board)
 		end
 	end
 	
-	local oldIsTerrain = board.IsTerrain
+	BoardClass.IsTerrainVanilla = board.IsTerrain
 	BoardClass.IsTerrain = function(self, loc, iTerrain)
 		Tests.AssertSignature{
 			ret = "bool",
@@ -595,11 +595,11 @@ function InitializeBoardClass(board)
 			return self:IsForestFire(loc)
 		end
 		
-		return oldIsTerrain(self, loc, iTerrain)
+		return self:IsTerrainVanilla(loc, iTerrain)
 	end
 	
 	-- added no_animation parameter similar to what vanilla function SetSmoke has.
-	local oldSetFrozen = board.SetFrozen
+	BoardClass.SetFrozenVanilla = board.SetFrozen
 	BoardClass.SetFrozen = function(self, loc, frozen, no_animation)
 		Tests.AssertSignature{
 			ret = "void",
@@ -635,16 +635,16 @@ function InitializeBoardClass(board)
 		elseif no_animation and isFreezeableTerrain then
 			CUtils.SetTileFrozen(self, loc, frozen)
 		else
-			oldSetFrozen(self, loc, frozen)
+			self:SetFrozenVanilla(loc, frozen)
 		end
 	end
 	
 	-- the PointList returned by vanilla GetBuildings is inconsistent.
 	-- destroyed buildings will linger as valid points until SetTerrain is used.
-	local oldGetBuildings = board.GetBuildings
+	BoardClass.GetBuildingsVanilla = board.GetBuildings
 	BoardClass.GetBuildings = function(self)
 		
-		local buildings = oldGetBuildings(self)
+		local buildings = self:GetBuildingsVanilla()
 		
 		for i = buildings:size(), 1, -1 do
 			local isBuilding = self:IsTerrain(buildings:index(i), TERRAIN_BUILDING) 
@@ -659,9 +659,9 @@ function InitializeBoardClass(board)
 
 	-- if a damaged tile is changed into a forest, the original IsDamaged function
 	-- will return incorrectly 'true'
-	local oldIsDamaged = board.IsDamaged
+	BoardClass.IsDamagedVanilla = board.IsDamaged
 	BoardClass.IsDamaged = function(self, loc)
-		local isDamaged = oldIsDamaged(self, loc)
+		local isDamaged = self:IsDamagedVanilla(loc)
 		-- this will return false for forest fires - this is fine, since
 		-- in that case the tile is actually damaged.
 		local isForest = self:IsTerrain(loc, TERRAIN_FOREST)
