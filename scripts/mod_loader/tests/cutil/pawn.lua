@@ -40,6 +40,42 @@ local function getPawnSaveData(pawnId)
 	return pawn_data
 end
 
+testsuite.test_AddWeapon_ShouldAllowAttackingWithNewWeapon = buildPawnTest({
+	-- The pawn should be able to attack with newly added weapon.
+	-- using Prime_ShieldBash for its property of not pushing or affecting tiles outside of its target.
+	prepare = function()
+		oldSkillList = PunchMech.SkillList
+		PunchMech.SkillList = {}
+		
+		mechPawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+		vekPawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
+		
+		targetLoc = getRandomTarget(Prime_ShieldBash, mechPawn)
+		targetTerrain = Board:GetTerrain(targetLoc)
+		
+		Board:SetTerrain(targetLoc, TERRAIN_ROAD)
+		
+		expectedInitialHealth = vekPawn:GetHealth()
+		expectedAlteredHealth = expectedInitialHealth - Prime_ShieldBash.Damage
+		
+		vekPawn:SetSpace(targetLoc)
+	end,
+	execute = function()
+		mechPawn:AddWeapon("Prime_ShieldBash")
+		mechPawn:FireWeapon(targetLoc, 1)
+	end,
+	check = function()
+		assertNotEquals(expectedInitialHealth, vekPawn:GetHealth(), "Vekpawn's initial health was unchanged.")
+		assertEquals(expectedAlteredHealth, vekPawn:GetHealth(), "Vekpawn's altered health was incorrect.")
+	end,
+	cleanup = function()
+		PunchMech.SkillList = oldSkillList
+		Board:RemovePawn(mechPawn)
+		Board:RemovePawn(vekPawn)
+		Board:SetTerrain(targetLoc, targetTerrain)
+	end
+})
+
 testsuite.test_RemoveWeapon_ShouldPreventPawnFromAttacking = buildPawnTest({
 	-- The pawn should be unable to attack after having its weapon removed.
 	-- Using Aegis Mech for Prime_ShieldBash's property of not pushing or affecting tiles outside of its target.
