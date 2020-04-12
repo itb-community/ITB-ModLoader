@@ -71,6 +71,29 @@ testsuite.test_SetUndoLoc_SaveGameShouldReflectChange = buildPawnTest({
 	end
 })
 
+testsuite.test_GetUndoLoc_ShouldUpdateAfterSettingUndoLoc = buildPawnTest({
+	-- The pawn's undo location should change after setting it.
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+		
+		expectedInitialUndoLoc = Point(-1,-1)
+		expectedAlteredUndoLoc = getRandomTarget(Move, pawn)
+	end,
+	execute = function()
+		actualInitialUndoLoc = pawn:GetUndoLoc()
+		
+		pawn:SetUndoLoc(expectedAlteredUndoLoc)
+		actualAlteredUndoLoc = pawn:GetUndoLoc()
+	end,
+	check = function()
+		assertEquals(expectedInitialUndoLoc, actualInitialUndoLoc, "Pawn's initial undo location was incorrect")
+		assertEquals(expectedAlteredUndoLoc, actualAlteredUndoLoc, "Pawn's altered undo location was incorrect")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+	end
+})
+
 testsuite.test_IsPlayerControlled_ShouldReturnTrueIfPlayerCanIssueOrders = buildPawnTest({
 	-- The mech unit should be controllable by default, but be uncontrollable after attacking.
 	-- The vek unit should be uncontrollable by default.
