@@ -20,6 +20,57 @@ local function OrderPawnToMoveTo(caster, targetLoc)
 	caster = oldPawn
 end
 
+local function getPawnSaveData(pawnId)
+	local region = GetCurrentRegion()
+	local pawn_data
+	local pawn_index = 1
+	
+	if region and region.player and region.player.map_data then
+		
+		repeat
+			pawn_data = region.player.map_data["pawn".. pawn_index]
+			pawn_index = pawn_index + 1
+			
+			if pawn_data and pawn_data.id == pawnId then
+				break
+			end
+		until pawn_data == nil
+	end
+	
+	return pawn_data
+end
+
+testsuite.test_SetUndoLoc_SaveGameShouldReflectChange = buildPawnTest({
+	-- The pawn's undo location in the save game should change after setting it.
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+		pawnId = pawn:GetId()
+		
+		expectedUndoLoc = getRandomTarget(Move, pawn)
+		
+		msTimeout = 1000
+		endTime = modApi:elapsedTime() + msTimeout
+	end,
+	execute = function()
+		pawn:SetUndoLoc(expectedUndoLoc)
+		
+		-- wait one frame before saving.
+		modApi:runLater(function()
+			DoSaveGame()
+		end)
+	end,
+	checkAwait = function()
+		-- wait until we can find the pawn in the save data.
+		return getPawnSaveData(pawnId) ~= nil or modApi:elapsedTime() > endTime
+    end,
+	check = function()
+		assertEquals(expectedUndoLoc, (getPawnSaveData(pawnId) or {}).undo_point, "Pawn's undo location was incorrect")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+	end
+})
+
 testsuite.test_IsPlayerControlled_ShouldReturnTrueIfPlayerCanIssueOrders = buildPawnTest({
 	-- The mech unit should be controllable by default, but be uncontrollable after attacking.
 	-- The vek unit should be uncontrollable by default.
