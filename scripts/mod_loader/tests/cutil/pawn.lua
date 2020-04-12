@@ -42,7 +42,7 @@ end
 
 testsuite.test_SetMoveSkill_ShouldBeAbleToAttackWithMoveSkill = buildPawnTest({
 	-- Should be able to punch adjacent tiles if move skill is swapped out.
-	-- using Prime_ShieldBash for its property of not pushing or affecting tile outside of its target.
+	-- using Prime_ShieldBash for its property of not pushing or affecting tiles outside of its target.
 	prepare = function()
 		mechPawn = Board:GetPawn(Board:AddPawn("PunchMech"))
 		vekPawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
