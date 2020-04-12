@@ -13,7 +13,7 @@ local function getRandomTarget(skillTable, caster, casterLoc)
 	return random_element(extract_table(plist))
 end
 
-local function OrderPawnToMoveTo(caster, targetLoc)
+local function orderPawnToMoveTo(caster, targetLoc)
 	local oldPawn = Pawn
 	Pawn = caster
 	caster:FireWeapon(targetLoc, 0)
@@ -623,7 +623,7 @@ testsuite.test_IsMovementAvailable_ShouldReturnFalse_AfterMoving = buildPawnTest
 		assertEquals(true, pawn:IsMovementAvailable(), "Assumed pawn would be able to move after creation")
 	end,
 	execute = function()
-		OrderPawnToMoveTo(pawn, expectedLoc)
+		orderPawnToMoveTo(pawn, expectedLoc)
 	end,
 	check = function()
 		assertEquals(expectedLoc, pawn:GetSpace(), "Pawn did not move to the expected location")
@@ -668,7 +668,7 @@ testsuite.test_SetMovementAvailableTrue_ShouldAllowPawnToMoveAgain = buildPawnTe
 	end,
 	execute = function()
 		-- pawn:FireWeapon() uses up movement token, but doesn't respect it being false.
-		OrderPawnToMoveTo(pawn, expectedLoc)
+		orderPawnToMoveTo(pawn, expectedLoc)
 
 		pawn:SetMovementAvailable(true)
 

@@ -643,7 +643,6 @@ function InitializeBoardClass(board)
 	-- destroyed buildings will linger as valid points until SetTerrain is used.
 	BoardClass.GetBuildingsVanilla = board.GetBuildings
 	BoardClass.GetBuildings = function(self)
-		
 		local buildings = self:GetBuildingsVanilla()
 		
 		for i = buildings:size(), 1, -1 do

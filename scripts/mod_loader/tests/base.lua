@@ -311,6 +311,10 @@ function Tests.BuildPawnTest(testFunctionsTable)
 							resultTable.result = true
 						end)
 						:finally(globalCleanup)
+
+						for pawnId, loc in pairs(movedPawns) do
+							Board:GetPawn(pawnId):SetSpace(loc)
+						end
 					end,
 					checkAwait
 				)
