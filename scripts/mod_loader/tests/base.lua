@@ -58,17 +58,16 @@ function Tests.RequireBoard()
 	assert(Board ~= nil, "Error: this test requires a Board to be available" .. "\n" .. debug.traceback("", 2))
 end
 
-function Tests.WaitUntilBoardNotBusy(resultTable, fn)
+function Tests.ExecuteWhenCondition(resultTable, executeFn, conditionFn)
 	Tests.AssertEquals("table", type(resultTable), "Argument #1")
-	Tests.AssertEquals("function", type(fn), "Argument #2")
+	Tests.AssertEquals("function", type(executeFn), "Argument #2")
+	Tests.AssertEquals("function", type(conditionFn), "Argument #3")
 
 	modApi:conditionalHook(
-		function()
-			return Board and not Board:IsBusy()
-		end,
+		conditionFn,
 		function()
 			local ok, err = xpcall(
-				fn,
+				executeFn,
 				function(e)
 					return string.format("%s:\n%s", e, debug.traceback("", 2))
 				end
@@ -185,6 +184,8 @@ end
 	- execute       - Sandboxed. Execute the actions that the test is supposed to verify.
 	- check         - Sandboxed, executed once the Board is no longer busy. Verify that the
 	                  actions performed in 'execute' have had their intended outcome.
+	- checkAwait    - Sandboxed. When this function returns true, the cleanup step is executed.
+	                  Waits until the board is not busy by default.
 	- cleanup       - Sandboxed. Cleanup the things that have been done in 'prepare', eg. remove
 	                  the created pawns, undo Board changes, etc.
 	- globalCleanup - Non-sandboxed. Should only be used to cleanup the things that have been
@@ -204,6 +205,7 @@ function Tests.BuildPawnTest(testFunctionsTable)
 		local globalSetup = testFunctionsTable.globalSetup or noop
 		local prepare = testFunctionsTable.prepare or noop
 		local execute = testFunctionsTable.execute or noop
+		local checkAwait = testFunctionsTable.checkAwait or function() return Board and not Board:IsBusy() end
 		local check = testFunctionsTable.check or noop
 		local cleanup = testFunctionsTable.cleanup or noop
 		local globalCleanup = testFunctionsTable.globalCleanup or noop
@@ -211,6 +213,7 @@ function Tests.BuildPawnTest(testFunctionsTable)
 		local fenv = setmetatable({}, { __index = _G })
 		setfenv(prepare, fenv)
 		setfenv(execute, fenv)
+		setfenv(checkAwait, fenv)
 		setfenv(check, fenv)
 		setfenv(cleanup, fenv)
 
@@ -227,17 +230,21 @@ function Tests.BuildPawnTest(testFunctionsTable)
 
 		if resultTable.ok == nil and resultTable.result == nil then
 			modApi:runLater(function()
-				Tests.WaitUntilBoardNotBusy(resultTable, function()
-					try(function()
-						try(check)
-						:finally(cleanup)
+				Tests.ExecuteWhenCondition(
+					resultTable,
+					function()
+						try(function()
+							try(check)
+							:finally(cleanup)
 
-						Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
+							Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
 
-						resultTable.result = true
-					end)
-					:finally(globalCleanup)
-				end)
+							resultTable.result = true
+						end)
+						:finally(globalCleanup)
+					end,
+					checkAwait
+				)
 			end)
 		else
 			try(cleanup)
