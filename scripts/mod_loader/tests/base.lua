@@ -25,12 +25,12 @@ function Tests.AssertBoardStateEquals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
 
 	for index, expectedState in ipairs(expected.tiles) do
-		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback("", 2)
+		local msg = msg .. expectedState.loc:GetLuaString()
 		Tests.AssertTableEquals(expectedState, actual.tiles[index], msg)
 	end
 
 	for index, expectedState in ipairs(expected.pawns) do
-		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback("", 2)
+		local msg = msg .. expectedState.loc:GetLuaString()
 		Tests.AssertTableEquals(expectedState, actual.pawns[index], msg)
 	end
 end
