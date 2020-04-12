@@ -84,12 +84,12 @@ function Tests.AssertBoardStateEquals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
 
 	for index, expectedState in ipairs(expected.tiles) do
-		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback("", 2)
+		local msg = msg .. expectedState.loc:GetLuaString()
 		Tests.AssertTableEquals(expectedState, actual.tiles[index], msg)
 	end
 
 	for index, expectedState in ipairs(expected.pawns) do
-		local msg = msg .. expectedState.loc:GetLuaString() .. "\n" .. debug.traceback("", 2)
+		local msg = msg .. expectedState.loc:GetLuaString()
 		Tests.AssertTableEquals(expectedState, actual.pawns[index], msg)
 	end
 end
@@ -117,17 +117,16 @@ function Tests.RequireBoard()
 	assert(Board ~= nil, "Error: this test requires a Board to be available" .. "\n" .. debug.traceback("", 2))
 end
 
-function Tests.WaitUntilBoardNotBusy(resultTable, fn)
+function Tests.ExecuteWhenCondition(resultTable, executeFn, conditionFn)
 	Tests.AssertEquals("table", type(resultTable), "Argument #1")
-	Tests.AssertEquals("function", type(fn), "Argument #2")
+	Tests.AssertEquals("function", type(executeFn), "Argument #2")
+	Tests.AssertEquals("function", type(conditionFn), "Argument #3")
 
 	modApi:conditionalHook(
-		function()
-			return Board and not Board:IsBusy()
-		end,
+		conditionFn,
 		function()
 			local ok, err = xpcall(
-				fn,
+				executeFn,
 				function(e)
 					return string.format("%s:\n%s", e, debug.traceback("", 2))
 				end
@@ -232,7 +231,25 @@ function Tests.GetBoardState()
 	return result
 end
 
--- Builder function for pawn tests, handling most of the common boilerplate
+--[[
+	Builder function for pawn tests, handling most of the common boilerplate
+
+	Input table can can contain several functions with the following names; the functions
+	are executed in the order listed:
+	- globalSetup   - Executed in non-sandboxed context. Should only be used to set up things that
+	                  *have* to be global, eg. adding a new pawn type for Board:AddPawn()
+	- prepare       - Executed in sandboxed context. Use to set up things used by the test, eg.
+	                  create pawns, change the Board, etc.
+	- execute       - Sandboxed. Execute the actions that the test is supposed to verify.
+	- check         - Sandboxed, executed once the Board is no longer busy. Verify that the
+	                  actions performed in 'execute' have had their intended outcome.
+	- checkAwait    - Sandboxed. When this function returns true, the cleanup step is executed.
+	                  Waits until the board is not busy by default.
+	- cleanup       - Sandboxed. Cleanup the things that have been done in 'prepare', eg. remove
+	                  the created pawns, undo Board changes, etc.
+	- globalCleanup - Non-sandboxed. Should only be used to cleanup the things that have been
+	                  done in 'globalSetup'.
+--]]
 function Tests.BuildPawnTest(testFunctionsTable)
 	return function(resultTable)
 		Tests.RequireBoard()
@@ -247,6 +264,7 @@ function Tests.BuildPawnTest(testFunctionsTable)
 		local globalSetup = testFunctionsTable.globalSetup or noop
 		local prepare = testFunctionsTable.prepare or noop
 		local execute = testFunctionsTable.execute or noop
+		local checkAwait = testFunctionsTable.checkAwait or function() return Board and not Board:IsBusy() end
 		local check = testFunctionsTable.check or noop
 		local cleanup = testFunctionsTable.cleanup or noop
 		local globalCleanup = testFunctionsTable.globalCleanup or noop
@@ -254,6 +272,7 @@ function Tests.BuildPawnTest(testFunctionsTable)
 		local fenv = setmetatable({}, { __index = _G })
 		setfenv(prepare, fenv)
 		setfenv(execute, fenv)
+		setfenv(checkAwait, fenv)
 		setfenv(check, fenv)
 		setfenv(cleanup, fenv)
 
@@ -280,21 +299,21 @@ function Tests.BuildPawnTest(testFunctionsTable)
 
 		if resultTable.ok == nil and resultTable.result == nil then
 			modApi:runLater(function()
-				Tests.WaitUntilBoardNotBusy(resultTable, function()
-					try(function()
-						try(check)
-						:finally(cleanup)
+				Tests.ExecuteWhenCondition(
+					resultTable,
+					function()
+						try(function()
+							try(check)
+							:finally(cleanup)
 
-						Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
+							Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
 
-						resultTable.result = true
-					end)
-					:finally(globalCleanup)
-
-					for pawnId, loc in pairs(movedPawns) do
-						Board:GetPawn(pawnId):SetSpace(loc)
-					end
-				end)
+							resultTable.result = true
+						end)
+						:finally(globalCleanup)
+					end,
+					checkAwait
+				)
 			end)
 		else
 			try(cleanup)
