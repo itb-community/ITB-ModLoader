@@ -40,6 +40,36 @@ local function getPawnSaveData(pawnId)
 	return pawn_data
 end
 
+testsuite.test_RemoveWeapon_ShouldPreventPawnFromAttacking = buildPawnTest({
+	-- The pawn should be unable to attack after having its weapon removed.
+	-- Using Aegis Mech for Prime_ShieldBash's property of not pushing or affecting tiles outside of its target.
+	prepare = function()
+		mechPawn = Board:GetPawn(Board:AddPawn("GuardMech"))
+		vekPawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
+		
+		targetLoc = getRandomTarget(Prime_ShieldBash, mechPawn)
+		targetTerrain = Board:GetTerrain(targetLoc)
+		
+		Board:SetTerrain(targetLoc, TERRAIN_ROAD)
+		
+		expectedHealth = vekPawn:GetHealth()
+		
+		vekPawn:SetSpace(targetLoc)
+	end,
+	execute = function()
+		mechPawn:RemoveWeapon(1)
+		mechPawn:FireWeapon(targetLoc, 1)
+	end,
+	check = function()
+		assertEquals(expectedHealth, vekPawn:GetHealth(), "Vekpawn's health was changed.")
+	end,
+	cleanup = function()
+		Board:RemovePawn(mechPawn)
+		Board:RemovePawn(vekPawn)
+		Board:SetTerrain(targetLoc, targetTerrain)
+	end
+})
+
 testsuite.test_SetMoveSkill_ShouldBeAbleToAttackWithMoveSkill = buildPawnTest({
 	-- Should be able to punch adjacent tiles if move skill is swapped out.
 	-- using Prime_ShieldBash for its property of not pushing or affecting tiles outside of its target.
