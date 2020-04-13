@@ -409,4 +409,78 @@ testsuite.test_SetIce_SavegameShouldReflectChange = buildPawnTest({
 	end
 })
 
+testsuite.test_SetRubble_SavegameShouldReflectChange = buildPawnTest({
+	-- The mountain should become rubble and have its health set to 0.
+	-- The building should become rubble and have its health set to 0.
+	-- The rubble should become a building or mountain with its health set to the tile's max health.
+	prepare = function()
+		local locations = getBoardLocations()
+		mountainLoc = getRandomLocation(locations)
+		buildingLoc = getRandomLocation(locations)
+		rubbleLoc = getRandomLocation(locations)
+		
+		defaultMountainTerrain = Board:GetTerrain(mountainLoc)
+		defaultBuildingTerrain = Board:GetTerrain(buildingLoc)
+		defaultRubbleTerrain = Board:GetTerrain(rubbleLoc)
+		
+		expectedMountainTerrain = TERRAIN_RUBBLE
+		expectedBuildingTerrain = TERRAIN_RUBBLE
+		
+		expectedMountainHealth = 0
+		expectedBuildingHealth = 0
+		
+		Board:SetTerrainVanilla(mountainLoc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(buildingLoc, TERRAIN_BUILDING)
+		Board:SetTerrainVanilla(rubbleLoc, TERRAIN_RUBBLE)
+		
+		msTimeout = MS_WAIT_FOR_SAVING_GAME
+		endTime = modApi:elapsedTime() + msTimeout
+	end,
+	execute = function()
+		Board:SetRubble(mountainLoc, true)
+		Board:SetRubble(buildingLoc, true)
+		Board:SetRubble(rubbleLoc, false)
+		
+		-- wait one frame before saving.
+		modApi:runLater(function()
+			DoSaveGame()
+		end)
+	end,
+	checkAwait = function()
+		-- wait for a while until we can be pretty sure the save game has been updated.
+		return modApi:elapsedTime() > endTime
+    end,
+	check = function()
+		mountain_tile_data = getTileSaveData(mountainLoc) or {}
+		actualMountainTerrain = mountain_tile_data.terrain
+		actualMountainHealth = mountain_tile_data.health_min or mountain_tile_data.health_max or 2
+		
+		building_tile_data = getTileSaveData(buildingLoc) or {}
+		actualBuildingTerrain = building_tile_data.terrain
+		actualBuildingHealth = building_tile_data.health_min or building_tile_data.health_max or 2
+		
+		rubble_tile_data = getTileSaveData(rubbleLoc) or {}
+		actualRubbleHealth = rubble_tile_data.health_min or rubble_tile_data.health_max or 2
+		actualRubbleMaxHealth = rubble_tile_data.health_max or 2
+		
+		assertEquals(expectedMountainTerrain, actualMountainTerrain, "Mountain terrain did not turn to rubble")
+		assertEquals(expectedMountainHealth, actualMountainHealth, "Mountain health did not change to 0")
+		
+		assertEquals(expectedBuildingTerrain, expectedBuildingTerrain, "Building terrain did not turn to rubble")
+		assertEquals(expectedBuildingHealth, actualBuildingHealth, "Building health did not change to 0")
+		
+		assertEquals(actualRubbleHealth, actualRubbleMaxHealth, "Rubble health did not match max health")
+	end,
+	cleanup = function()
+		-- change terrain to mountain first to clear the tile's damaged state.
+		Board:SetTerrainVanilla(mountainLoc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(buildingLoc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(rubbleLoc, TERRAIN_MOUNTAIN)
+		
+		Board:SetTerrainVanilla(mountainLoc, defaultMountainTerrain)
+		Board:SetTerrainVanilla(buildingLoc, defaultBuildingTerrain)
+		Board:SetTerrainVanilla(rubbleLoc, defaultRubbleTerrain)
+	end
+})
+
 return testsuite
