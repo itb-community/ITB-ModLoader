@@ -4,6 +4,8 @@ local assertEquals = Tests.AssertEquals
 local assertNotEquals = Tests.AssertNotEquals
 local buildPawnTest = Tests.BuildPawnTest
 
+local MS_WAIT_TIMEOUT = 1000
+
 local function getRandomTarget(skillTable, caster, casterLoc)
 	local oldPawn = Pawn
 	Pawn = caster
@@ -194,7 +196,7 @@ testsuite.test_SetUndoLoc_SaveGameShouldReflectChange = buildPawnTest({
 		
 		expectedUndoLoc = getRandomTarget(Move, pawn)
 		
-		msTimeout = 1000
+		msTimeout = MS_WAIT_TIMEOUT
 		endTime = modApi:elapsedTime() + msTimeout
 	end,
 	execute = function()
