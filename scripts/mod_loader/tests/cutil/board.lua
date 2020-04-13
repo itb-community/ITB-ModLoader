@@ -39,6 +39,8 @@ local function getRandomLocation(locations, is_valid_tile)
 end
 
 testsuite.test_SetFrozen_ShouldFreezePawnsAndMountains = buildPawnTest({
+	-- The mountain and pawn should be frozen, while the road should not.
+	-- The mountain and pawn should then be unfrozen.
 	prepare = function()
 		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
 		pawnLoc = pawn:GetSpace()
@@ -53,18 +55,34 @@ testsuite.test_SetFrozen_ShouldFreezePawnsAndMountains = buildPawnTest({
 		Board:SetTerrain(roadLoc, TERRAIN_ROAD)
 	end,
 	execute = function()
-		Board:SetFrozen(pawnLoc)
-		Board:SetFrozen(mountainLoc)
-		Board:SetFrozen(roadLoc)
+		-- Board:SetFrozen(location, frozen, no_animation)
+		Board:SetFrozen(pawnLoc, true, true)
+		Board:SetFrozen(mountainLoc, true, true)
+		Board:SetFrozen(roadLoc, true, true)
+		
+		actualPawnFrozenState = pawn:IsFrozen()
+		actualMountainFrozenState = Board:IsFrozen(mountainLoc)
+		actualRoadFrozenState = Board:IsFrozen(roadLoc)
+		
+		Board:SetFrozen(pawnLoc, false, true)
+		Board:SetFrozen(mountainLoc, false, true)
+		Board:SetFrozen(roadLoc, false, true)
+		
+		actualPawnUnfrozenState = pawn:IsFrozen()
+		actualMountainUnfrozenState = Board:IsFrozen(mountainLoc)
+		actualRoadUnfrozenState = Board:IsFrozen(roadLoc)
 	end,
 	check = function()
-		assertEquals(true, Board:IsFrozen(pawnLoc), "Pawn was incorrectly not frozen")
-		assertEquals(true, Board:IsFrozen(mountainLoc), "Mountain was incorrectly not frozen")
-		assertEquals(false, Board:IsFrozen(roadLoc), "Road was incorrectly frozen")
+		assertEquals(true, actualPawnFrozenState, "Pawn was incorrectly not frozen")
+		assertEquals(true, actualMountainFrozenState, "Mountain was incorrectly not frozen")
+		assertEquals(false, actualRoadFrozenState, "Road was incorrectly frozen")
+		
+		assertEquals(false, actualPawnUnfrozenState, "Pawn was incorrectly not unfrozen")
+		assertEquals(false, actualMountainUnfrozenState, "Mountain was incorrectly not unfrozen")
+		assertEquals(false, actualRoadUnfrozenState, "Road was incorrectly frozen")
 	end,
 	cleanup = function()
 		Board:RemovePawn(pawn)
-		Board:SetFrozen(mountainLoc, false)
 		Board:SetTerrain(mountainLoc, defaultMountainTerrain)
 		Board:SetTerrain(roadLoc, defaultRoadTerrain)
 	end
