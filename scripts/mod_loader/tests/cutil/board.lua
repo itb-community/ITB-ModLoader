@@ -185,9 +185,8 @@ testsuite.test_SetFire_ShouldSetFireToTerrainAndPawns = buildPawnTest({
 	end
 })
 
-testsuite.test_SetShield_ShouldShieldMountainAndPawnButNotRoad = buildPawnTest({
+testsuite.test_SetShield_SaveGameShouldReflectShieldedMountainAndPawnButNotRoad = buildPawnTest({
 	-- The mountain and pawn should be shielded, but the road should not.
-	-- The mountain and pawn should then be unshielded.
 	prepare = function()
 		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
 		pawnLoc = pawn:GetSpace()
@@ -200,6 +199,9 @@ testsuite.test_SetShield_ShouldShieldMountainAndPawnButNotRoad = buildPawnTest({
 		defaultRoadTerrain = Board:GetTerrain(roadLoc)
 		Board:SetTerrainVanilla(mountainLoc, TERRAIN_MOUNTAIN)
 		Board:SetTerrainVanilla(roadLoc, TERRAIN_ROAD)
+		
+		msTimeout = MS_WAIT_FOR_SAVING_GAME
+		endTime = modApi:elapsedTime() + msTimeout
 	end,
 	execute = function()
 		--Board:SetShield(location, shield, no_animation)
@@ -207,30 +209,35 @@ testsuite.test_SetShield_ShouldShieldMountainAndPawnButNotRoad = buildPawnTest({
 		Board:SetShield(mountainLoc, true, true)
 		Board:SetShield(roadLoc, true, true)
 		
-		actualPawnShieldedState = pawn:IsShield()
-		actualMountainShieldedState = Board:IsShield(mountainLoc)
-		actualRoadShieldedState = Board:IsShield(roadLoc)
-		
-		Board:SetShield(pawnLoc, false, true)
-		Board:SetShield(mountainLoc, false, true)
-		Board:SetShield(roadLoc, false, true)
-		
-		actualPawnUnshieldedState = pawn:IsShield()
-		actualMountainUnshieldedState = Board:IsShield(mountainLoc)
-		actualRoadUnshieldedState = Board:IsShield(roadLoc)
+		-- wait one frame before saving.
+		modApi:runLater(function()
+			DoSaveGame()
+		end)
 	end,
+	checkAwait = function()
+		-- wait for a while until we can be pretty sure the save game has been updated.
+		return modApi:elapsedTime() > endTime
+    end,
 	check = function()
-		assertEquals(true, actualPawnShieldedState, "Pawn was incorrectly not shielded")
-		assertEquals(true, actualMountainShieldedState, "Mountain was incorrectly not shielded")
-		assertEquals(false, actualRoadShieldedState, "Road was incorrectly shielded")
+		actualPawnShielded = pawn:IsShield()
 		
-		assertEquals(false, actualPawnUnshieldedState, "Pawn was incorrectly not unshielded")
-		assertEquals(false, actualMountainUnshieldedState, "Mountain was incorrectly not unshielded")
-		assertEquals(false, actualRoadUnshieldedState, "Road was incorrectly shielded")
+		mountain_tile_data = getTileSaveData(mountainLoc) or {}
+		actualMountainShielded = mountain_tile_data.shield
+		
+		road_tile_data = getTileSaveData(roadLoc) or {}
+		actualRoadShielded = road_tile_data.shield or false
+		
+		assertEquals(true, actualPawnShielded, "Pawn was incorrectly not shielded")
+		assertEquals(true, actualMountainShielded, "Mountain was incorrectly not shielded")
+		assertEquals(false, actualRoadShielded, "Road was incorrectly shielded")
 	end,
 	cleanup = function()
 		Board:RemovePawn(pawn)
-		Board:SetFrozen(mountainLoc, false)
+		
+		local shield = SpaceDamage(); shield.iShield = -1
+		shield.loc = mountainLoc; Board:DamageSpace(shield)
+		shield.loc = roadLoc; Board:DamageSpace(shield)
+		
 		Board:SetTerrainVanilla(mountainLoc, defaultMountainTerrain)
 		Board:SetTerrainVanilla(roadLoc, defaultRoadTerrain)
 	end
