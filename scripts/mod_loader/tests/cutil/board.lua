@@ -63,6 +63,34 @@ local function getTileSaveData(loc)
 	return tile_data
 end
 
+testsuite.test_IsShield_ShouldShieldAndUnShieldMountain = buildPawnTest({
+	-- The mountain should be shielded and then unshielded.
+	prepare = function()
+		loc = getRandomLocation(locations)
+		
+		defaultTerrain = Board:GetTerrain(loc)
+		
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
+	end,
+	execute = function()
+		local shield = SpaceDamage(loc)
+		
+		shield.iShield = 1; Board:DamageSpace(shield)
+		actualShieldedState = Board:IsShield(loc)
+		
+		shield.iShield = -1; Board:DamageSpace(shield)
+		actualUnshieldedState = Board:IsShield(loc)
+	end,
+	check = function()
+		assertEquals(true, actualShieldedState, "Mountain was incorrectly not shielded")
+		
+		assertEquals(false, actualUnshieldedState, "Mountain was incorrectly not unshielded")
+	end,
+	cleanup = function()
+		Board:SetTerrainVanilla(loc, defaultTerrain)
+	end
+})
+
 testsuite.test_SetFrozen_ShouldFreezePawnsAndMountains = buildPawnTest({
 	-- The mountain and pawn should be frozen, while the road should not.
 	-- The mountain and pawn should then be unfrozen.
