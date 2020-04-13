@@ -642,7 +642,7 @@ testsuite.test_GetUniqueBuilding_ShouldBeBar = buildPawnTest({
 		
 		-- remove all buildings.
 		for _, p in ipairs(extract_table(buildings)) do
-			Board:SetTerrain(p, TERRAIN_ROAD)
+			Board:SetTerrainVanilla(p, TERRAIN_ROAD)
 		end
 		
 		expectedUniqueBuilding = "str_bar1"
@@ -678,7 +678,7 @@ testsuite.test_RemoveUniqueBuilding_SaveGameShouldReflectUniqueBuildingTurnedInt
 		
 		-- remove all buildings.
 		for _, p in ipairs(extract_table(buildings)) do
-			Board:SetTerrain(p, TERRAIN_ROAD)
+			Board:SetTerrainVanilla(p, TERRAIN_ROAD)
 		end
 		
 		expectedTerrain = TERRAIN_BUILDING
@@ -775,7 +775,7 @@ testsuite.test_GetItemName_SaveGameShouldMatchItemName = buildPawnTest({
 		loc = getRandomLocation()
 		defaultTerrain = Board:GetTerrain(loc)
 		
-		Board:SetTerrain(loc, TERRAIN_ROAD)
+		Board:SetTerrainVanilla(loc, TERRAIN_ROAD)
 		Board:SetItem(loc, "Item_Mine")
 		
 		endTime = modApi:elapsedTime() + MS_WAIT_FOR_SAVING_GAME
@@ -800,7 +800,7 @@ testsuite.test_GetItemName_SaveGameShouldMatchItemName = buildPawnTest({
 	end,
 	cleanup = function()
 		Board:DamageSpace(SpaceDamage(loc, 1))
-		Board:SetTerrain(loc, defaultTerrain)
+		Board:SetTerrainVanilla(loc, defaultTerrain)
 	end
 })
 
