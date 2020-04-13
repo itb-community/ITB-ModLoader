@@ -366,4 +366,47 @@ testsuite.test_SetMountain_SavegameShouldReflectChange = buildPawnTest({
 	end
 })
 
+testsuite.test_SetIce_SavegameShouldReflectChange = buildPawnTest({
+	-- The terrain should become ice, have its health set to 1 and its max health set to 2.
+	prepare = function()
+		loc = getRandomLocation(locations)
+		
+		defaultTerrain = Board:GetTerrain(loc)
+		
+		expectedTerrain = TERRAIN_ICE
+		expectedHealth = 1
+		expectedMaxHealth = 2
+		
+		msTimeout = MS_WAIT_FOR_SAVING_GAME
+		endTime = modApi:elapsedTime() + msTimeout
+	end,
+	execute = function()
+		Board:SetIce(loc, expectedHealth, expectedMaxHealth)
+		
+		-- wait one frame before saving.
+		modApi:runLater(function()
+			DoSaveGame()
+		end)
+	end,
+	checkAwait = function()
+		-- wait for a while until we can be pretty sure the save game has been updated.
+		return modApi:elapsedTime() > endTime
+    end,
+	check = function()
+		tile_data = getTileSaveData(loc) or {}
+		actualTerrain = tile_data.terrain
+		actualTileHealth = tile_data.health_min or tile_data.health_max or 2
+		actualTileMaxHealth = tile_data.health_max or 2
+		
+		assertEquals(expectedTerrain, actualTerrain, "Terrain was incorrect")
+		assertEquals(expectedHealth, actualTileHealth, "Ice health was incorrect")
+		assertEquals(expectedMaxHealth, actualTileMaxHealth, "Ice max health was incorrect")
+	end,
+	cleanup = function()
+		-- change terrain to mountain first to clear the tile's damaged state.
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, defaultTerrain)
+	end
+})
+
 return testsuite
