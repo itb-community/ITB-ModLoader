@@ -630,4 +630,26 @@ testsuite.test_IsGameBoard_ShouldReturnTrue = buildPawnTest({
 	end,
 })
 
+testsuite.test_SetSnow_ShouldChangeTileToSnow = buildPawnTest({
+	prepare = function()
+		loc = getRandomLocation(nil, function(p)
+			return isValidTile(p) and Board:GetCustomTile(p) == ""
+		end)
+		
+		expectedIsSnow = "snow.png"
+		expectedIsNotSnow = ""
+	end,
+	execute = function()
+		Board:SetSnow(loc, true)
+		actualIsSnow = Board:GetCustomTile(loc)
+		
+		Board:SetSnow(loc, false)
+		actualIsNotSnow = Board:GetCustomTile(loc)
+	end,
+	check = function()
+		assertEquals(expectedIsSnow, actualIsSnow, "Tile did not change to snow")
+		assertEquals(expectedIsNotSnow, actualIsNotSnow, "Tile did not change from snow")
+	end,
+})
+
 return testsuite
