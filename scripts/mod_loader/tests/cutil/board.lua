@@ -483,4 +483,49 @@ testsuite.test_SetRubble_SavegameShouldReflectChange = buildPawnTest({
 	end
 })
 
+testsuite.test_SetUniqueBuilding_SavegameShouldReflectChange = buildPawnTest({
+	-- The building should become a bar, and it's health and max health should be 1.
+	prepare = function()
+		loc = getRandomLocation()
+		
+		defaulTerrain = Board:GetTerrain(loc)
+		
+		expectedUniqueBuilding = "str_bar1"
+		expectedHealth = 1
+		expectedMaxHealth = 1
+		
+		Board:SetTerrainVanilla(loc, TERRAIN_BUILDING)
+		
+		msTimeout = MS_WAIT_FOR_SAVING_GAME
+		endTime = modApi:elapsedTime() + msTimeout
+	end,
+	execute = function()
+		Board:SetUniqueBuilding(loc, expectedUniqueBuilding)
+		
+		-- wait one frame before saving.
+		modApi:runLater(function()
+			DoSaveGame()
+		end)
+	end,
+	checkAwait = function()
+		-- wait for a while until we can be pretty sure the save game has been updated.
+		return modApi:elapsedTime() > endTime
+    end,
+	check = function()
+		tile_data = getTileSaveData(loc) or {}
+		actualUniqueBuilding = tile_data.unique
+		actualHealth = tile_data.health_min or tile_data.health_max or 2
+		actualMaxHealth = tile_data.health_max or 2
+		
+		assertEquals(expectedUniqueBuilding, actualUniqueBuilding, "Unique building was incorrect")
+		assertEquals(expectedHealth, actualHealth, "Health did not change to 1")
+		assertEquals(expectedMaxHealth, actualMaxHealth, "Max health did not change to 1")
+	end,
+	cleanup = function()
+		-- change terrain to mountain first to clear the tile's damaged state.
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, defaulTerrain)
+	end
+})
+
 return testsuite
