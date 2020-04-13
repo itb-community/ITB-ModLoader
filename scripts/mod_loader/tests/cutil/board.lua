@@ -4,7 +4,7 @@ local assertEquals = Tests.AssertEquals
 local assertNotEquals = Tests.AssertNotEquals
 local buildPawnTest = Tests.BuildPawnTest
 
-local MS_WAIT_FOR_SAVING_GAME = 100
+local MS_WAIT_FOR_SAVING_GAME = 200
 
 local function isValidTile(loc)
 	return not Board:IsBlocked(loc, PATH_PROJECTILE)
