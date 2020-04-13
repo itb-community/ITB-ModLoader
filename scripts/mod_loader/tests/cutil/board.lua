@@ -6,6 +6,9 @@ local buildPawnTest = Tests.BuildPawnTest
 
 local MS_WAIT_FOR_SAVING_GAME = 200
 
+-- the amount of health a tile has when it is not specified in the save game.
+local TILE_DEFAULT_HEALTH_MAX = 2
+
 local function isValidTile(loc)
 	return not Board:IsBlocked(loc, PATH_PROJECTILE)
 end
@@ -232,7 +235,7 @@ testsuite.test_SetHealth_SavegameShouldReflectChange = buildPawnTest({
     end,
 	check = function()
 		tile_data = getTileSaveData(loc) or {}
-		actualTileHealth = tile_data.health_min or tile_data.health_max or 2
+		actualTileHealth = tile_data.health_min or tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		
 		assertEquals(expectedHealth, actualTileHealth, "Tile health was incorrect")
 	end,
@@ -265,7 +268,7 @@ testsuite.test_GetHealth_SavegameShouldReflectTileHealth = buildPawnTest({
     end,
 	check = function()
 		tile_data = getTileSaveData(loc) or {}
-		actualTileHealth = tile_data.health_min or tile_data.health_max or 2
+		actualTileHealth = tile_data.health_min or tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		
 		assertEquals(expectedHealth, actualTileHealth, "Tile health in the save game was not a match")
 	end,
@@ -301,7 +304,7 @@ testsuite.test_SetMaxHealth_SavegameShouldReflectChange = buildPawnTest({
     end,
 	check = function()
 		tile_data = getTileSaveData(loc) or {}
-		actualTileMaxHealth = tile_data.health_max or 2
+		actualTileMaxHealth = tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		
 		assertEquals(expectedMaxHealth, actualTileMaxHealth, "Tile max health was incorrect")
 	end,
@@ -335,7 +338,7 @@ testsuite.test_GetMaxHealth_SavegameShouldReflectTileMaxHealth = buildPawnTest({
     end,
 	check = function()
 		tile_data = getTileSaveData(loc) or {}
-		actualTileMaxHealth = tile_data.health_max or 2
+		actualTileMaxHealth = tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		
 		assertEquals(expectedMaxHealth, actualTileMaxHealth, "Tile max health in the save game was not a match")
 	end,
@@ -368,8 +371,8 @@ testsuite.test_GetLostHealth_SavegameShouldReflectTileLostHealth = buildPawnTest
     end,
 	check = function()
 		tile_data = getTileSaveData(loc) or {}
-		tileHealth = tile_data.health_min or tile_data.health_max or 2
-		tileMaxHealth = tile_data.health_max or 2
+		tileHealth = tile_data.health_min or tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
+		tileMaxHealth = tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		actualTileLostHealth = tileMaxHealth - tileHealth
 		
 		assertEquals(expectedLostHealth, actualTileLostHealth, "Tile lost health in the save game was not a match")
@@ -410,8 +413,8 @@ testsuite.test_SetBuilding_SavegameShouldReflectChange = buildPawnTest({
 	check = function()
 		tile_data = getTileSaveData(loc) or {}
 		actualTerrain = tile_data.terrain
-		actualTileHealth = tile_data.health_min or tile_data.health_max or 2
-		actualTileMaxHealth = tile_data.health_max or 2
+		actualTileHealth = tile_data.health_min or tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
+		actualTileMaxHealth = tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		
 		assertEquals(expectedTerrain, actualTerrain, "Terrain was incorrect")
 		assertEquals(expectedHealth, actualTileHealth, "Building health was incorrect")
@@ -453,8 +456,8 @@ testsuite.test_SetMountain_SavegameShouldReflectChange = buildPawnTest({
 	check = function()
 		tile_data = getTileSaveData(loc) or {}
 		actualTerrain = tile_data.terrain
-		actualTileHealth = tile_data.health_min or tile_data.health_max or 2
-		actualTileMaxHealth = tile_data.health_max or 2
+		actualTileHealth = tile_data.health_min or tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
+		actualTileMaxHealth = tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		
 		assertEquals(expectedTerrain, actualTerrain, "Terrain was incorrect")
 		assertEquals(expectedHealth, actualTileHealth, "Mountain health was incorrect")
@@ -496,8 +499,8 @@ testsuite.test_SetIce_SavegameShouldReflectChange = buildPawnTest({
 	check = function()
 		tile_data = getTileSaveData(loc) or {}
 		actualTerrain = tile_data.terrain
-		actualTileHealth = tile_data.health_min or tile_data.health_max or 2
-		actualTileMaxHealth = tile_data.health_max or 2
+		actualTileHealth = tile_data.health_min or tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
+		actualTileMaxHealth = tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		
 		assertEquals(expectedTerrain, actualTerrain, "Terrain was incorrect")
 		assertEquals(expectedHealth, actualTileHealth, "Ice health was incorrect")
@@ -554,15 +557,15 @@ testsuite.test_SetRubble_SavegameShouldReflectChange = buildPawnTest({
 	check = function()
 		mountain_tile_data = getTileSaveData(mountainLoc) or {}
 		actualMountainTerrain = mountain_tile_data.terrain
-		actualMountainHealth = mountain_tile_data.health_min or mountain_tile_data.health_max or 2
+		actualMountainHealth = mountain_tile_data.health_min or mountain_tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		
 		building_tile_data = getTileSaveData(buildingLoc) or {}
 		actualBuildingTerrain = building_tile_data.terrain
-		actualBuildingHealth = building_tile_data.health_min or building_tile_data.health_max or 2
+		actualBuildingHealth = building_tile_data.health_min or building_tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		
 		rubble_tile_data = getTileSaveData(rubbleLoc) or {}
-		actualRubbleHealth = rubble_tile_data.health_min or rubble_tile_data.health_max or 2
-		actualRubbleMaxHealth = rubble_tile_data.health_max or 2
+		actualRubbleHealth = rubble_tile_data.health_min or rubble_tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
+		actualRubbleMaxHealth = rubble_tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		
 		assertEquals(expectedMountainTerrain, actualMountainTerrain, "Mountain terrain did not turn to rubble")
 		assertEquals(expectedMountainHealth, actualMountainHealth, "Mountain health did not change to 0")
@@ -615,8 +618,8 @@ testsuite.test_SetUniqueBuilding_SavegameShouldReflectChange = buildPawnTest({
 	check = function()
 		tile_data = getTileSaveData(loc) or {}
 		actualUniqueBuilding = tile_data.unique
-		actualHealth = tile_data.health_min or tile_data.health_max or 2
-		actualMaxHealth = tile_data.health_max or 2
+		actualHealth = tile_data.health_min or tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
+		actualMaxHealth = tile_data.health_max or TILE_DEFAULT_HEALTH_MAX
 		
 		assertEquals(expectedUniqueBuilding, actualUniqueBuilding, "Unique building was incorrect")
 		assertEquals(expectedHealth, actualHealth, "Health did not change to 1")
