@@ -564,4 +564,58 @@ testsuite.test_GetUniqueBuilding_ShouldBeBar = buildPawnTest({
 	end
 })
 
+testsuite.test_RemoveUniqueBuilding_SaveGameShouldReflectUniqueBuildingTurnedIntoRegularBuilding = buildPawnTest({
+	-- The bar should become a normal building.
+	prepare = function()
+		loc = getRandomLocation()
+		defaultTerrain = Board:GetTerrain(loc)
+		
+		buildings = Board:GetBuildingsVanilla()
+		
+		-- remove all buildings.
+		for _, p in ipairs(extract_table(buildings)) do
+			Board:SetTerrain(p, TERRAIN_ROAD)
+		end
+		
+		expectedTerrain = TERRAIN_BUILDING
+		expectedUniqueBuilding = nil
+		
+		-- add a single building that we turn into a bar.
+		Board:SetTerrainVanilla(loc, TERRAIN_BUILDING)
+		Board:AddUniqueBuilding("str_bar1")
+		
+		msTimeout = MS_WAIT_FOR_SAVING_GAME
+		endTime = modApi:elapsedTime() + msTimeout
+	end,
+	execute = function()
+		Board:RemoveUniqueBuilding(loc)
+		
+		-- wait one frame before saving.
+		modApi:runLater(function()
+			DoSaveGame()
+		end)
+	end,
+	checkAwait = function()
+		-- wait for a while until we can be pretty sure the save game has been updated.
+		return modApi:elapsedTime() > endTime
+    end,
+	check = function()
+		tile_data = getTileSaveData(loc) or {}
+		actualTerrain = tile_data.terrain
+		actualUniqueBuilding = tile_data.unique
+		
+		assertEquals(expectedTerrain, actualTerrain, "Terrain was incorrect")
+		assertEquals(expectedUniqueBuilding, actualUniqueBuilding, "Unique building was incorrect")
+	end,
+	cleanup = function()
+		-- change terrain to mountain first to clear the tile's damaged state.
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, defaultTerrain)
+		
+		for _, p in ipairs(extract_table(buildings)) do
+			Board:SetTerrainVanilla(p, TERRAIN_BUILDING)
+		end
+	end
+})
+
 return testsuite
