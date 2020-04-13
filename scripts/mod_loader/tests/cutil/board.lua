@@ -287,6 +287,7 @@ testsuite.test_SetBuilding_SavegameShouldReflectChange = buildPawnTest({
 		
 		defaultTerrain = Board:GetTerrain(loc)
 		
+		expectedTerrain = TERRAIN_BUILDING
 		expectedHealth = 1
 		expectedMaxHealth = 3
 		
@@ -307,9 +308,11 @@ testsuite.test_SetBuilding_SavegameShouldReflectChange = buildPawnTest({
     end,
 	check = function()
 		tile_data = getTileSaveData(loc) or {}
+		actualTerrain = tile_data.terrain
 		actualTileHealth = tile_data.health_min or tile_data.health_max or 2
 		actualTileMaxHealth = tile_data.health_max or 2
 		
+		assertEquals(expectedTerrain, actualTerrain, "Terrain was incorrect")
 		assertEquals(expectedHealth, actualTileHealth, "Building health was incorrect")
 		assertEquals(expectedMaxHealth, actualTileMaxHealth, "Building max health was incorrect")
 	end,
