@@ -618,4 +618,16 @@ testsuite.test_RemoveUniqueBuilding_SaveGameShouldReflectUniqueBuildingTurnedInt
 	end
 })
 
+testsuite.test_IsGameBoard_ShouldReturnTrue = buildPawnTest({
+	prepare = function()
+		expectedResult = true
+	end,
+	execute = function()
+		actualResult = Board:IsGameBoard()
+	end,
+	check = function()
+		assertEquals(expectedResult, actualResult, "GameBoard state was incorrect")
+	end,
+})
+
 return testsuite
