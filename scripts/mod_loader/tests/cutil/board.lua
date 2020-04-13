@@ -114,4 +114,55 @@ testsuite.test_SetFire_ShouldSetFireToTerrainAndPawns = buildPawnTest({
 	end
 })
 
+testsuite.test_SetShield_ShouldShieldMountainAndPawnButNotRoad = buildPawnTest({
+	-- The mountain and pawn should be shielded, but the road should not.
+	-- The mountain and pawn should then be unshielded.
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+		pawnLoc = pawn:GetSpace()
+		
+		local locations = getBoardLocations()
+		mountainLoc = getRandomLocation(locations)
+		roadLoc = getRandomLocation(locations)
+		
+		defaultMountainTerrain = Board:GetTerrain(mountainLoc)
+		defaultRoadTerrain = Board:GetTerrain(roadLoc)
+		Board:SetTerrain(mountainLoc, TERRAIN_MOUNTAIN)
+		Board:SetTerrain(roadLoc, TERRAIN_ROAD)
+	end,
+	execute = function()
+		--Board:SetShield(location, shield, no_animation)
+		Board:SetShield(pawnLoc, true, true)
+		Board:SetShield(mountainLoc, true, true)
+		Board:SetShield(roadLoc, true, true)
+		
+		actualPawnShieldedState = pawn:IsShield()
+		actualMountainShieldedState = Board:IsShield(mountainLoc)
+		actualRoadShieldedState = Board:IsShield(roadLoc)
+		
+		Board:SetShield(pawnLoc, false, true)
+		Board:SetShield(mountainLoc, false, true)
+		Board:SetShield(roadLoc, false, true)
+		
+		actualPawnUnshieldedState = pawn:IsShield()
+		actualMountainUnshieldedState = Board:IsShield(mountainLoc)
+		actualRoadUnshieldedState = Board:IsShield(roadLoc)
+	end,
+	check = function()
+		assertEquals(true, actualPawnShieldedState, "Pawn was incorrectly not shielded")
+		assertEquals(true, actualMountainShieldedState, "Mountain was incorrectly not shielded")
+		assertEquals(false, actualRoadShieldedState, "Road was incorrectly shielded")
+		
+		assertEquals(false, actualPawnUnshieldedState, "Pawn was incorrectly not unshielded")
+		assertEquals(false, actualMountainUnshieldedState, "Mountain was incorrectly not unshielded")
+		assertEquals(false, actualRoadUnshieldedState, "Road was incorrectly shielded")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+		Board:SetFrozen(mountainLoc, false)
+		Board:SetTerrain(mountainLoc, defaultMountainTerrain)
+		Board:SetTerrain(roadLoc, defaultRoadTerrain)
+	end
+})
+
 return testsuite
