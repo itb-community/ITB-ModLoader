@@ -71,8 +71,8 @@ testsuite.test_SetFrozen_ShouldFreezePawnsAndMountains = buildPawnTest({
 		
 		defaultMountainTerrain = Board:GetTerrain(mountainLoc)
 		defaultRoadTerrain = Board:GetTerrain(roadLoc)
-		Board:SetTerrain(mountainLoc, TERRAIN_MOUNTAIN)
-		Board:SetTerrain(roadLoc, TERRAIN_ROAD)
+		Board:SetTerrainVanilla(mountainLoc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(roadLoc, TERRAIN_ROAD)
 	end,
 	execute = function()
 		-- Board:SetFrozen(location, frozen, no_animation)
@@ -103,8 +103,8 @@ testsuite.test_SetFrozen_ShouldFreezePawnsAndMountains = buildPawnTest({
 	end,
 	cleanup = function()
 		Board:RemovePawn(pawn)
-		Board:SetTerrain(mountainLoc, defaultMountainTerrain)
-		Board:SetTerrain(roadLoc, defaultRoadTerrain)
+		Board:SetTerrainVanilla(mountainLoc, defaultMountainTerrain)
+		Board:SetTerrainVanilla(roadLoc, defaultRoadTerrain)
 	end
 })
 
@@ -117,7 +117,7 @@ testsuite.test_SetFire_ShouldSetFireToTerrainAndPawns = buildPawnTest({
 		tileLoc = getRandomLocation()
 		
 		defaultTerrain = Board:GetTerrain(tileLoc)
-		Board:SetTerrain(tileLoc, TERRAIN_ROAD)
+		Board:SetTerrainVanilla(tileLoc, TERRAIN_ROAD)
 		
 		local fx = SkillEffect()
 		fx.iFire = EFFECT_REMOVE
@@ -148,7 +148,7 @@ testsuite.test_SetFire_ShouldSetFireToTerrainAndPawns = buildPawnTest({
 	end,
 	cleanup = function()
 		Board:RemovePawn(pawn)
-		Board:SetTerrain(tileLoc, defaultTerrain)
+		Board:SetTerrainVanilla(tileLoc, defaultTerrain)
 	end
 })
 
@@ -165,8 +165,8 @@ testsuite.test_SetShield_ShouldShieldMountainAndPawnButNotRoad = buildPawnTest({
 		
 		defaultMountainTerrain = Board:GetTerrain(mountainLoc)
 		defaultRoadTerrain = Board:GetTerrain(roadLoc)
-		Board:SetTerrain(mountainLoc, TERRAIN_MOUNTAIN)
-		Board:SetTerrain(roadLoc, TERRAIN_ROAD)
+		Board:SetTerrainVanilla(mountainLoc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(roadLoc, TERRAIN_ROAD)
 	end,
 	execute = function()
 		--Board:SetShield(location, shield, no_animation)
@@ -198,8 +198,8 @@ testsuite.test_SetShield_ShouldShieldMountainAndPawnButNotRoad = buildPawnTest({
 	cleanup = function()
 		Board:RemovePawn(pawn)
 		Board:SetFrozen(mountainLoc, false)
-		Board:SetTerrain(mountainLoc, defaultMountainTerrain)
-		Board:SetTerrain(roadLoc, defaultRoadTerrain)
+		Board:SetTerrainVanilla(mountainLoc, defaultMountainTerrain)
+		Board:SetTerrainVanilla(roadLoc, defaultRoadTerrain)
 	end
 })
 
@@ -209,7 +209,7 @@ testsuite.test_SetHealth_SavegameShouldReflectChange = buildPawnTest({
 		loc = getRandomLocation(locations)
 		
 		defaultTerrain = Board:GetTerrain(loc)
-		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
 		
 		expectedHealth = 0
 		
@@ -235,8 +235,8 @@ testsuite.test_SetHealth_SavegameShouldReflectChange = buildPawnTest({
 		assertEquals(expectedHealth, actualTileHealth, "Tile health was incorrect")
 	end,
 	cleanup = function()
-		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
-		Board:SetTerrain(loc, defaultTerrain)
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, defaultTerrain)
 	end
 })
 

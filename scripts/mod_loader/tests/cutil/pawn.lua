@@ -101,7 +101,7 @@ testsuite.test_AddWeapon_ShouldAllowAttackingWithNewWeapon = buildPawnTest({
 		targetLoc = getRandomTarget(Prime_ShieldBash, mechPawn)
 		targetTerrain = Board:GetTerrain(targetLoc)
 		
-		Board:SetTerrain(targetLoc, TERRAIN_ROAD)
+		Board:SetTerrainVanilla(targetLoc, TERRAIN_ROAD)
 		
 		expectedInitialHealth = vekPawn:GetHealth()
 		expectedAlteredHealth = expectedInitialHealth - Prime_ShieldBash.Damage
@@ -120,7 +120,7 @@ testsuite.test_AddWeapon_ShouldAllowAttackingWithNewWeapon = buildPawnTest({
 		PunchMech.SkillList = oldSkillList
 		Board:RemovePawn(mechPawn)
 		Board:RemovePawn(vekPawn)
-		Board:SetTerrain(targetLoc, targetTerrain)
+		Board:SetTerrainVanilla(targetLoc, targetTerrain)
 	end
 })
 
@@ -134,7 +134,7 @@ testsuite.test_RemoveWeapon_ShouldPreventPawnFromAttacking = buildPawnTest({
 		targetLoc = getRandomTarget(Prime_ShieldBash, mechPawn)
 		targetTerrain = Board:GetTerrain(targetLoc)
 		
-		Board:SetTerrain(targetLoc, TERRAIN_ROAD)
+		Board:SetTerrainVanilla(targetLoc, TERRAIN_ROAD)
 		
 		expectedHealth = vekPawn:GetHealth()
 		
@@ -150,7 +150,7 @@ testsuite.test_RemoveWeapon_ShouldPreventPawnFromAttacking = buildPawnTest({
 	cleanup = function()
 		Board:RemovePawn(mechPawn)
 		Board:RemovePawn(vekPawn)
-		Board:SetTerrain(targetLoc, targetTerrain)
+		Board:SetTerrainVanilla(targetLoc, targetTerrain)
 	end
 })
 
@@ -164,7 +164,7 @@ testsuite.test_SetMoveSkill_ShouldBeAbleToAttackWithMoveSkill = buildPawnTest({
 		targetLoc = getRandomTarget(Prime_ShieldBash, mechPawn)
 		targetTerrain = Board:GetTerrain(targetLoc)
 		
-		Board:SetTerrain(targetLoc, TERRAIN_ROAD)
+		Board:SetTerrainVanilla(targetLoc, TERRAIN_ROAD)
 		
 		expectedInitialHealth = vekPawn:GetHealth()
 		expectedAlteredHealth = expectedInitialHealth - Prime_ShieldBash.Damage
@@ -182,7 +182,7 @@ testsuite.test_SetMoveSkill_ShouldBeAbleToAttackWithMoveSkill = buildPawnTest({
 	cleanup = function()
 		Board:RemovePawn(mechPawn)
 		Board:RemovePawn(vekPawn)
-		Board:SetTerrain(targetLoc, targetTerrain)
+		Board:SetTerrainVanilla(targetLoc, targetTerrain)
 	end
 })
 
@@ -419,8 +419,8 @@ testsuite.test_SpawnedMinions_ShouldHaveOwnerSetToPawnThatCreatedThem = buildPaw
 
 		casterTerrain = Board:GetTerrain(casterLoc)
 		targetTerrain = Board:GetTerrain(targetLoc)
-		Board:SetTerrain(casterLoc, TERRAIN_ROAD)
-		Board:SetTerrain(targetLoc, TERRAIN_ROAD)
+		Board:SetTerrainVanilla(casterLoc, TERRAIN_ROAD)
+		Board:SetTerrainVanilla(targetLoc, TERRAIN_ROAD)
 	end,
 	execute = function()
 		caster:FireWeapon(targetLoc, 1)
@@ -433,11 +433,11 @@ testsuite.test_SpawnedMinions_ShouldHaveOwnerSetToPawnThatCreatedThem = buildPaw
 	end,
 	cleanup = function()
 		Board:RemovePawn(caster)
-		Board:SetTerrain(casterLoc, casterTerrain)
+		Board:SetTerrainVanilla(casterLoc, casterTerrain)
 		if target then
 			Board:RemovePawn(target)
 		end
-		Board:SetTerrain(targetLoc, targetTerrain)
+		Board:SetTerrainVanilla(targetLoc, targetTerrain)
 	end
 })
 
@@ -578,14 +578,14 @@ testsuite.test_SetMassiveTrue_ShouldPreventDrowning = buildPawnTest({
 	execute = function()
 		pawn:SetMassive(true)
 
-		Board:SetTerrain(loc, TERRAIN_WATER)
+		Board:SetTerrainVanilla(loc, TERRAIN_WATER)
 	end,
 	check = function()
 		assertEquals(true, pawn:IsMassive(), "SetMassive() did not change pawn Massive status")
 		assertEquals(false, pawn:IsDead(), "Pawn changed into Massive using SetMassive() died in water")
 	end,
 	cleanup = function()
-		Board:SetTerrain(loc, terrain)
+		Board:SetTerrainVanilla(loc, terrain)
 		Board:RemovePawn(pawn)
 	end
 })
@@ -602,14 +602,14 @@ testsuite.test_SetMassiveFalse_ShouldDrown = buildPawnTest({
 	execute = function()
 		pawn:SetMassive(false)
 
-		Board:SetTerrain(loc, TERRAIN_WATER)
+		Board:SetTerrainVanilla(loc, TERRAIN_WATER)
 	end,
 	check = function()
 		assertEquals(false, pawn:IsMassive(), "SetMassive() did not change pawn Massive status")
 		assertEquals(true, pawn:IsDead(), "Pawn changed into non-Massive using SetMassive() did not die in water")
 	end,
 	cleanup = function()
-		Board:SetTerrain(loc, terrain)
+		Board:SetTerrainVanilla(loc, terrain)
 		Board:RemovePawn(pawn)
 	end
 })
@@ -696,14 +696,14 @@ testsuite.test_SetFlyingTrue_ShouldPreventDrowning = buildPawnTest({
 	execute = function()
 		pawn:SetFlying(true)
 
-		Board:SetTerrain(loc, TERRAIN_WATER)
+		Board:SetTerrainVanilla(loc, TERRAIN_WATER)
 	end,
 	check = function()
 		assertEquals(true, pawn:IsFlying(), "SetFlying() did not change pawn Flying status")
 		assertEquals(false, pawn:IsDead(), "Pawn changed into Flying using SetFlying() died in water")
 	end,
 	cleanup = function()
-		Board:SetTerrain(loc, terrain)
+		Board:SetTerrainVanilla(loc, terrain)
 		Board:RemovePawn(pawn)
 	end
 })
@@ -720,14 +720,14 @@ testsuite.test_SetFlyingFalse_ShouldDrown = buildPawnTest({
 	execute = function()
 		pawn:SetFlying(false)
 
-		Board:SetTerrain(loc, TERRAIN_WATER)
+		Board:SetTerrainVanilla(loc, TERRAIN_WATER)
 	end,
 	check = function()
 		assertEquals(false, pawn:IsFlying(), "SetFlying() did not change pawn Flying status")
 		assertEquals(true, pawn:IsDead(), "Pawn changed into non-Flying using SetFlying() did not die in water")
 	end,
 	cleanup = function()
-		Board:SetTerrain(loc, terrain)
+		Board:SetTerrainVanilla(loc, terrain)
 		Board:RemovePawn(pawn)
 	end
 })
