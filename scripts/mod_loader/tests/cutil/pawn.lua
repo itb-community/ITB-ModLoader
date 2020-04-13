@@ -252,6 +252,8 @@ testsuite.test_IsPlayerControlled_ShouldReturnTrueIfPlayerCanIssueOrders = build
 		expectedInactiveMechControl = false
 		
 		targetLoc = getRandomTarget(Prime_Punchmech, mechPawn)
+		targetTerrain = Board:GetTerrain(targetLoc)
+		Board:SetTerrainVanilla(targetLoc, TERRAIN_ROAD)
 	end,
 	execute = function()
 		modApi:runLater(function()
@@ -270,6 +272,8 @@ testsuite.test_IsPlayerControlled_ShouldReturnTrueIfPlayerCanIssueOrders = build
 	cleanup = function()
 		Board:RemovePawn(mechPawn)
 		Board:RemovePawn(vekPawn)
+		
+		Board:SetTerrainVanilla(targetLoc, targetTerrain)
 	end
 })
 
