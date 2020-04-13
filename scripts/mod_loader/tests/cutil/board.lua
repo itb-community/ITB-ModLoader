@@ -208,7 +208,7 @@ testsuite.test_SetShield_ShouldShieldMountainAndPawnButNotRoad = buildPawnTest({
 testsuite.test_SetHealth_SavegameShouldReflectChange = buildPawnTest({
 	-- The mountain should have its health set to 0.
 	prepare = function()
-		loc = getRandomLocation(locations)
+		loc = getRandomLocation()
 		
 		defaultTerrain = Board:GetTerrain(loc)
 		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
@@ -245,7 +245,7 @@ testsuite.test_SetHealth_SavegameShouldReflectChange = buildPawnTest({
 testsuite.test_SetMaxHealth_SavegameShouldReflectChange = buildPawnTest({
 	-- The building should have its max health set to 3.
 	prepare = function()
-		loc = getRandomLocation(locations)
+		loc = getRandomLocation()
 		
 		defaultTerrain = Board:GetTerrain(loc)
 		Board:SetTerrainVanilla(loc, TERRAIN_BUILDING)
@@ -283,7 +283,7 @@ testsuite.test_SetMaxHealth_SavegameShouldReflectChange = buildPawnTest({
 testsuite.test_SetBuilding_SavegameShouldReflectChange = buildPawnTest({
 	-- The building should have its health set to 1 and its max health set to 3.
 	prepare = function()
-		loc = getRandomLocation(locations)
+		loc = getRandomLocation()
 		
 		defaultTerrain = Board:GetTerrain(loc)
 		
@@ -326,7 +326,7 @@ testsuite.test_SetBuilding_SavegameShouldReflectChange = buildPawnTest({
 testsuite.test_SetMountain_SavegameShouldReflectChange = buildPawnTest({
 	-- The mountain should have its health set to 1 and its max health set to 2.
 	prepare = function()
-		loc = getRandomLocation(locations)
+		loc = getRandomLocation()
 		
 		defaultTerrain = Board:GetTerrain(loc)
 		
@@ -369,7 +369,7 @@ testsuite.test_SetMountain_SavegameShouldReflectChange = buildPawnTest({
 testsuite.test_SetIce_SavegameShouldReflectChange = buildPawnTest({
 	-- The terrain should become ice, have its health set to 1 and its max health set to 2.
 	prepare = function()
-		loc = getRandomLocation(locations)
+		loc = getRandomLocation()
 		
 		defaultTerrain = Board:GetTerrain(loc)
 		
