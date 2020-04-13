@@ -557,9 +557,9 @@ function InitializeBoardClass(board)
 		else
 			self:SetTerrainVanilla(loc, iTerrain)
 			
-			if iTerrain == TERRAIN_FOREST and board:IsFire(loc) then
+			if iTerrain == TERRAIN_FOREST and self:IsFire(loc) then
 				-- update tile after placing forest on fire, to avoid graphical glitch.
-				board:SetFire(loc)
+				self:SetFire(loc)
 			end
 			
 			if iTerrain == TERRAIN_BUILDING and self:GetHealth(loc) == 0 then
