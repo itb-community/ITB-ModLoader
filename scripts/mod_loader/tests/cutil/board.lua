@@ -666,4 +666,38 @@ testsuite.test_RemoveItem_ShouldRemoveMine = buildPawnTest({
 	end,
 })
 
+testsuite.test_GetItemName_SaveGameShouldMatchItemName = buildPawnTest({
+	prepare = function()
+		loc = getRandomLocation()
+		defaultTerrain = Board:GetTerrain(loc)
+		
+		Board:SetTerrain(loc, TERRAIN_ROAD)
+		Board:SetItem(loc, "Item_Mine")
+		
+		endTime = modApi:elapsedTime() + MS_WAIT_FOR_SAVING_GAME
+	end,
+	execute = function()
+		expectedItemName = Board:GetItemName(loc)
+		
+		-- wait one frame before saving.
+		modApi:runLater(function()
+			DoSaveGame()
+		end)
+	end,
+	checkAwait = function()
+		-- wait for a while until we can be pretty sure the save game has been updated.
+		return modApi:elapsedTime() > endTime
+    end,
+	check = function()
+		tile_data = getTileSaveData(loc) or {}
+		actualItemName = tile_data.item
+		
+		assertEquals(expectedItemName, actualItemName, "Item name did not match")
+	end,
+	cleanup = function()
+		Board:DamageSpace(SpaceDamage(loc, 1))
+		Board:SetTerrain(loc, defaultTerrain)
+	end
+})
+
 return testsuite
