@@ -652,4 +652,18 @@ testsuite.test_SetSnow_ShouldChangeTileToSnow = buildPawnTest({
 	end,
 })
 
+testsuite.test_RemoveItem_ShouldRemoveMine = buildPawnTest({
+	prepare = function()
+		loc = getRandomLocation()
+		
+		Board:SetItem(loc, "Item_Mine")
+	end,
+	execute = function()
+		Board:RemoveItem(loc)
+	end,
+	check = function()
+		assertEquals(false, Board:IsItem(loc), "Mine was not removed")
+	end,
+})
+
 return testsuite
