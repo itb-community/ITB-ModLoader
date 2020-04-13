@@ -528,4 +528,40 @@ testsuite.test_SetUniqueBuilding_SavegameShouldReflectChange = buildPawnTest({
 	end
 })
 
+testsuite.test_GetUniqueBuilding_ShouldBeBar = buildPawnTest({
+	-- The building should become a bar.
+	prepare = function()
+		loc = getRandomLocation()
+		defaultTerrain = Board:GetTerrain(loc)
+		
+		buildings = Board:GetBuildingsVanilla()
+		
+		-- remove all buildings.
+		for _, p in ipairs(extract_table(buildings)) do
+			Board:SetTerrain(p, TERRAIN_ROAD)
+		end
+		
+		expectedUniqueBuilding = "str_bar1"
+		
+		-- add a single building that we turn into a bar.
+		Board:SetTerrainVanilla(loc, TERRAIN_BUILDING)
+		Board:AddUniqueBuilding(expectedUniqueBuilding)
+	end,
+	execute = function()
+		actualUniqueBuilding = Board:GetUniqueBuilding(loc)
+	end,
+	check = function()
+		assertEquals(expectedUniqueBuilding, actualUniqueBuilding, "Unique building was incorrect")
+	end,
+	cleanup = function()
+		-- change terrain to mountain first to clear the tile's damaged state.
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, defaultTerrain)
+		
+		for _, p in ipairs(extract_table(buildings)) do
+			Board:SetTerrainVanilla(p, TERRAIN_BUILDING)
+		end
+	end
+})
+
 return testsuite
