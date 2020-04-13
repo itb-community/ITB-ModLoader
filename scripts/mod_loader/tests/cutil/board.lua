@@ -240,4 +240,42 @@ testsuite.test_SetHealth_SavegameShouldReflectChange = buildPawnTest({
 	end
 })
 
+testsuite.test_SetMaxHealth_SavegameShouldReflectChange = buildPawnTest({
+	-- The building should have its max health set to 3.
+	prepare = function()
+		loc = getRandomLocation(locations)
+		
+		defaultTerrain = Board:GetTerrain(loc)
+		Board:SetTerrainVanilla(loc, TERRAIN_BUILDING)
+		
+		expectedMaxHealth = 3
+		
+		msTimeout = 100
+		endTime = modApi:elapsedTime() + msTimeout
+	end,
+	execute = function()
+		Board:SetMaxHealth(loc, expectedMaxHealth)
+		
+		-- wait one frame before saving.
+		modApi:runLater(function()
+			DoSaveGame()
+		end)
+	end,
+	checkAwait = function()
+		-- wait for a while until we can be pretty sure the save game has been updated.
+		return modApi:elapsedTime() > endTime
+    end,
+	check = function()
+		tile_data = getTileSaveData(loc) or {}
+		actualTileMaxHealth = tile_data.health_max or 2
+		
+		assertEquals(expectedMaxHealth, actualTileMaxHealth, "Tile max health was incorrect")
+	end,
+	cleanup = function()
+		-- change terrain to mountain first to clear the tile's potential damaged state.
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, defaultTerrain)
+	end
+})
+
 return testsuite
