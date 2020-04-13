@@ -4,6 +4,8 @@ local assertEquals = Tests.AssertEquals
 local assertNotEquals = Tests.AssertNotEquals
 local buildPawnTest = Tests.BuildPawnTest
 
+local MS_WAIT_FOR_SAVING_GAME = 100
+
 local function isValidTile(loc)
 	return not Board:IsBlocked(loc, PATH_PROJECTILE)
 end
@@ -213,7 +215,7 @@ testsuite.test_SetHealth_SavegameShouldReflectChange = buildPawnTest({
 		
 		expectedHealth = 0
 		
-		msTimeout = 100
+		msTimeout = MS_WAIT_FOR_SAVING_GAME
 		endTime = modApi:elapsedTime() + msTimeout
 	end,
 	execute = function()
@@ -250,7 +252,7 @@ testsuite.test_SetMaxHealth_SavegameShouldReflectChange = buildPawnTest({
 		
 		expectedMaxHealth = 3
 		
-		msTimeout = 100
+		msTimeout = MS_WAIT_FOR_SAVING_GAME
 		endTime = modApi:elapsedTime() + msTimeout
 	end,
 	execute = function()
@@ -288,7 +290,7 @@ testsuite.test_SetBuilding_SavegameShouldReflectChange = buildPawnTest({
 		expectedHealth = 1
 		expectedMaxHealth = 3
 		
-		msTimeout = 100
+		msTimeout = MS_WAIT_FOR_SAVING_GAME
 		endTime = modApi:elapsedTime() + msTimeout
 	end,
 	execute = function()
