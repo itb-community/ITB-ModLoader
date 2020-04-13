@@ -38,6 +38,26 @@ local function getRandomLocation(locations, is_valid_tile)
 	return random_removal(locations)
 end
 
+local function getTileSaveData(loc)
+	local region = GetCurrentRegion()
+	local tile_data
+	local tile_index = 1
+	
+	if region and region.player and region.player.map_data and region.player.map_data.map then
+		
+		repeat
+			tile_data = region.player.map_data.map[tile_index]
+			tile_index = tile_index + 1
+			
+			if tile_data and tile_data.loc == loc then
+				break
+			end
+		until tile_data == nil
+	end
+	
+	return tile_data
+end
+
 testsuite.test_SetFrozen_ShouldFreezePawnsAndMountains = buildPawnTest({
 	-- The mountain and pawn should be frozen, while the road should not.
 	-- The mountain and pawn should then be unfrozen.
@@ -180,6 +200,43 @@ testsuite.test_SetShield_ShouldShieldMountainAndPawnButNotRoad = buildPawnTest({
 		Board:SetFrozen(mountainLoc, false)
 		Board:SetTerrain(mountainLoc, defaultMountainTerrain)
 		Board:SetTerrain(roadLoc, defaultRoadTerrain)
+	end
+})
+
+testsuite.test_SetHealth_SavegameShouldReflectChange = buildPawnTest({
+	-- The mountain should have its health set to 0.
+	prepare = function()
+		loc = getRandomLocation(locations)
+		
+		defaultTerrain = Board:GetTerrain(loc)
+		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
+		
+		expectedHealth = 0
+		
+		msTimeout = 100
+		endTime = modApi:elapsedTime() + msTimeout
+	end,
+	execute = function()
+		Board:SetHealth(loc, expectedHealth)
+		
+		-- wait one frame before saving.
+		modApi:runLater(function()
+			DoSaveGame()
+		end)
+	end,
+	checkAwait = function()
+		-- wait for a while until we can be pretty sure the save game has been updated.
+		return modApi:elapsedTime() > endTime
+    end,
+	check = function()
+		tile_data = getTileSaveData(loc) or {}
+		actualTileHealth = tile_data.health_min or tile_data.health_max or 2
+		
+		assertEquals(expectedHealth, actualTileHealth, "Tile health was incorrect")
+	end,
+	cleanup = function()
+		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrain(loc, defaultTerrain)
 	end
 })
 
