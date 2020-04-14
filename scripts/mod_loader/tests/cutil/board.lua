@@ -513,19 +513,19 @@ testsuite.test_IsTerrain_ShouldDetectNewTerrainConstants = buildPawnTest({
 		local damage = SpaceDamage(loc, 1)
 		local fire = SpaceDamage(loc); fire.iFire = EFFECT_CREATE
 		
-		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
 		Board:DamageSpace(damage)
 		
 		actualDamagedMountainIsMountain = Board:IsTerrain(loc, TERRAIN_MOUNTAIN)
 		actualDamagedMountainIsCrackedMountain = Board:IsTerrain(loc, TERRAIN_MOUNTAIN_CRACKED)
 		
-		Board:SetTerrain(loc, TERRAIN_ICE)
+		Board:SetTerrainVanilla(loc, TERRAIN_ICE)
 		Board:DamageSpace(damage)
 		
 		actualDamagedIceIsIce = Board:IsTerrain(loc, TERRAIN_ICE)
 		actualDamagedIceIsCrackedIce = Board:IsTerrain(loc, TERRAIN_ICE_CRACKED)
 		
-		Board:SetTerrain(loc, TERRAIN_FOREST)
+		Board:SetTerrainVanilla(loc, TERRAIN_FOREST)
 		Board:DamageSpace(fire)
 		
 		actualBurningForestIsForest = Board:IsTerrain(loc, TERRAIN_FOREST)
@@ -563,7 +563,7 @@ testsuite.test_IsForest_ShouldReturnTrueForForestsAndForestFires = buildPawnTest
 	execute = function()
 		local fire = SpaceDamage(loc); fire.iFire = EFFECT_CREATE
 		
-		Board:SetTerrain(loc, TERRAIN_FOREST)
+		Board:SetTerrainVanilla(loc, TERRAIN_FOREST)
 		actualForestIsForest = Board:IsForest(loc)
 		
 		Board:DamageSpace(fire)
@@ -595,7 +595,7 @@ testsuite.test_IsForestFire_ShouldReturnTrueForForestFiresButFalseForForest = bu
 	execute = function()
 		local fire = SpaceDamage(loc); fire.iFire = EFFECT_CREATE
 		
-		Board:SetTerrain(loc, TERRAIN_FOREST)
+		Board:SetTerrainVanilla(loc, TERRAIN_FOREST)
 		actualForestIsForestFire = Board:IsForestFire(loc)
 		
 		Board:DamageSpace(fire)
@@ -829,19 +829,19 @@ testsuite.test_SetWater_ShouldChangeTerrainToWaterAndWaterToRoad = buildPawnTest
 		expectedMountainToRoadTerrain = TERRAIN_MOUNTAIN
 	end,
 	execute = function()
-		Board:SetTerrain(loc, TERRAIN_ROAD)
+		Board:SetTerrainVanilla(loc, TERRAIN_ROAD)
 		Board:SetWater(loc, true, true)
 		actualRoadToWaterTerrain = Board:GetTerrain(loc)
 		
-		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
 		Board:SetWater(loc, true, true)
 		actualMountainToWaterTerrain = Board:GetTerrain(loc)
 		
-		Board:SetTerrain(loc, TERRAIN_WATER)
+		Board:SetTerrainVanilla(loc, TERRAIN_WATER)
 		Board:SetWater(loc, false, true)
 		actualWaterToRoadTerrain = Board:GetTerrain(loc)
 		
-		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
 		Board:SetWater(loc, false, true)
 		actualMountainToRoadTerrain = Board:GetTerrain(loc)
 	end,
