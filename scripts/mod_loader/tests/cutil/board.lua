@@ -856,6 +856,70 @@ testsuite.test_SetWater_ShouldChangeTerrainToWaterAndWaterToRoad = buildPawnTest
 	end
 })
 
+testsuite.test_SetAcidWater_ShouldChangeTerrainToAcidWaterAndAcidWaterToWater = buildPawnTest({
+	-- Function should be able to change any terrain to acid water, but only acid water to road.
+	prepare = function()
+		loc = getRandomLocation()
+		defaultTerrain = Board:GetTerrain(loc)
+		defaultIsAcid = Board:IsAcid(loc)
+		
+		expectedRoadToAcidWaterTerrain = TERRAIN_WATER
+		expectedRoadToAcidWaterAcidState = true
+		expectedMountainToAcidWaterTerrain = TERRAIN_WATER
+		expectedMountainToAcidWaterAcidState = true
+		expectedAcidWaterToRoadTerrain = TERRAIN_ROAD
+		expectedAcidWaterToRoadAcidState = false
+		expectedAcidMountainToRoadTerrain = TERRAIN_MOUNTAIN
+		expectedAcidMountainToRoadAcidState = true
+	end,
+	execute = function()
+		-- signature:
+		--Board:SetAcidWater(location, set_acid, animate_sinking)
+		
+		-- Attempting to change road to acid water should change the tile to water with acid.
+		Board:SetTerrainVanilla(loc, TERRAIN_ROAD)
+		Board:SetAcid(loc, false)
+		Board:SetAcidWater(loc, true, true)
+		actualRoadToAcidWaterTerrain = Board:GetTerrain(loc)
+		actualRoadToAcidWaterAcidState = Board:IsAcid(loc)
+		
+		-- Attempting to change mountain to acid water should change the tile to water with acid.
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
+		Board:SetAcid(loc, false)
+		Board:SetAcidWater(loc, true, true)
+		actualMountainToAcidWaterTerrain = Board:GetTerrain(loc)
+		actualMountainToAcidWaterAcidState = Board:IsAcid(loc)
+		
+		-- Attempting to remove acid water from water with acid should change the tile to road without acid.
+		Board:SetTerrainVanilla(loc, TERRAIN_WATER)
+		Board:SetAcid(loc, true)
+		Board:SetAcidWater(loc, false, true)
+		actualAcidWaterToRoadTerrain = Board:GetTerrain(loc)
+		actualAcidWaterToRoadAcidState = Board:IsAcid(loc)
+		
+		-- Attempting to remove acid water from mountain should do nothing.
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
+		Board:SetAcid(loc, true)
+		Board:SetAcidWater(loc, false, true)
+		actualAcidMountainToRoadTerrain = Board:GetTerrain(loc)
+		actualAcidMountainToRoadAcidState = Board:IsAcid(loc)
+	end,
+	check = function()
+		assertEquals(expectedRoadToAcidWaterTerrain, actualRoadToAcidWaterTerrain, "Road incorrectly did not change to water")
+		assertEquals(expectedRoadToAcidWaterAcidState, actualRoadToAcidWaterAcidState, "Road incorrectly did not get affected with acid")
+		assertEquals(expectedMountainToAcidWaterTerrain, actualMountainToAcidWaterTerrain, "Mountain incorrectly did not change to water")
+		assertEquals(expectedMountainToAcidWaterAcidState, actualMountainToAcidWaterAcidState, "Mountain incorrectly did not get affected with acid")
+		assertEquals(expectedAcidWaterToRoadTerrain, actualAcidWaterToRoadTerrain, "Acid water incorrectly did not change to road")
+		assertEquals(expectedAcidWaterToRoadAcidState, actualAcidWaterToRoadAcidState, "Acid water incorrectly did not have its acid removed")
+		assertEquals(expectedAcidMountainToRoadTerrain, actualAcidMountainToRoadTerrain, "Mountain with acid incorrectly change from mountain")
+		assertEquals(expectedAcidMountainToRoadAcidState, actualAcidMountainToRoadAcidState, "Mountain with acid incorrectly had its acid removed")
+	end,
+	cleanup = function()
+		Board:SetAcid(loc, defaultIsAcid)
+		Board:SetTerrainVanilla(loc, defaultTerrain)
+	end
+})
+
 testsuite.test_SetUniqueBuilding_SavegameShouldReflectChange = buildPawnTest({
 	-- The building should become a bar, and it's health and max health should be 1.
 	prepare = function()
