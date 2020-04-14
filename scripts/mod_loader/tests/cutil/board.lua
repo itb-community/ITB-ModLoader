@@ -419,6 +419,78 @@ testsuite.test_GetLostHealth_SavegameShouldReflectTileLostHealth = buildPawnTest
 	end
 })
 
+testsuite.test_SetTerrain_ShouldAlterTerrainProperly = buildPawnTest({
+	-- Changing a destroyed mountain to a building should keep it as rubble.
+	-- Changing a frozen mountain to road should unfreeze the tile.
+	-- TERRAIN_MOUNTAIN_CRACKED and TERRAIN_ICE_CRACKED should create damaged mountain and ice, respectively.
+	prepare = function()
+		loc = getRandomLocation()
+		
+		defaultTerrain = Board:GetTerrain(loc)
+		
+		expectedDestroyedMountainTerrain = TERRAIN_RUBBLE
+		expectedDestroyedBuildingTerrain = TERRAIN_RUBBLE
+		
+		expectedFrozenMountainFrozenState = true
+		expectedFrozenRoadFrozenState = false
+		
+		expectedCrackedMountainTerrain = TERRAIN_MOUNTAIN
+		expectedCrackedMountainDamagedState = true
+		
+		expectedCrackedIceTerrain = TERRAIN_ICE
+		expectedCrackedIceDamagedState = true
+	end,
+	execute = function()
+		local freeze = SpaceDamage(loc); freeze.iFrozen = 1
+		local damage = SpaceDamage(loc, 1)
+		
+		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
+		Board:DamageSpace(damage)
+		Board:DamageSpace(damage)
+		
+		actualDestroyedMountainTerrain = Board:GetTerrain(loc)
+		
+		Board:SetTerrain(loc, TERRAIN_BUILDING)
+		
+		actualDestroyedBuildingTerrain = Board:GetTerrain(loc)
+		
+		-- setting a tile to mountain will fully heal it.
+		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
+		Board:DamageSpace(freeze)
+		
+		actualFrozenMountainFrozenState = Board:IsFrozen(loc)
+		
+		Board:SetTerrain(loc, TERRAIN_ROAD)
+		
+		actualFrozenRoadFrozenState = Board:IsFrozen(loc)
+		
+		Board:SetTerrain(loc, TERRAIN_MOUNTAIN_CRACKED)
+		
+		actualCrackedMountainTerrain = Board:GetTerrain(loc)
+		actualCrackedMountainDamagedState = Board:IsDamaged(loc)
+		
+		Board:SetTerrain(loc, TERRAIN_ICE_CRACKED)
+		
+		actualCrackedIceTerrain = Board:GetTerrain(loc)
+		actualCrackedIceDamagedState = Board:IsDamaged(loc)
+	end,
+	check = function()
+		assertEquals(expectedDestroyedMountainTerrain, actualDestroyedMountainTerrain, "Destroyed mountain terrain was incorrect")
+		assertEquals(expectedDestroyedBuildingTerrain, actualDestroyedBuildingTerrain, "Destroyed building terrain was incorrect")
+		assertEquals(expectedFrozenMountainFrozenState, actualFrozenMountainFrozenState, "Frozen mountain frozen state was incorrect")
+		assertEquals(expectedFrozenRoadFrozenState, actualFrozenRoadFrozenState, "Frozen road frozen state was incorrect")
+		assertEquals(expectedCrackedMountainTerrain, actualCrackedMountainTerrain, "Cracked mountain terrain was incorrect")
+		assertEquals(expectedCrackedMountainDamagedState, actualCrackedMountainDamagedState, "Cracked mountain damaged state was incorrect")
+		assertEquals(expectedCrackedIceTerrain, actualCrackedIceTerrain, "Cracked ice terrain was incorrect")
+		assertEquals(expectedCrackedIceDamagedState, actualCrackedIceDamagedState, "Cracked ice damaged state was incorrect")
+	end,
+	cleanup = function()
+		-- change terrain to mountain first to clear the tile's damaged state.
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, defaultTerrain)
+	end
+})
+
 testsuite.test_SetBuilding_SavegameShouldReflectChange = buildPawnTest({
 	-- The building should have its health set to 1 and its max health set to 3.
 	prepare = function()
