@@ -671,22 +671,6 @@ function InitializeBoardClass(board)
 		
 		return buildings
 	end
-
-	-- if a damaged tile is changed into a forest, the original IsDamaged function
-	-- will return incorrectly 'true'
-	BoardClass.IsDamagedVanilla = board.IsDamaged
-	BoardClass.IsDamaged = function(self, loc)
-		local isDamaged = self:IsDamagedVanilla(loc)
-		-- this will return false for forest fires - this is fine, since
-		-- in that case the tile is actually damaged.
-		local isForest = self:IsTerrain(loc, TERRAIN_FOREST)
-
-		if isDamaged then
-			return not isForest
-		else
-			return false
-		end
-	end
 	
 	-- TODO: add function SetAcid(board, bool, bool) with instant acid application/removal
 end
