@@ -496,10 +496,6 @@ BoardPawn.GetMoveSkill = function(self)
 	return CUtils.PawnGetMoveSkill(self)
 end
 
---[[BoardPawn.GetRepairSkill = function(self)
-	return CUtils.PawnGetRepairSkill(self)
-end]]
-
 
 BoardPawn.RemoveWeapon = function(self, index)
 	return CUtils.PawnRemoveWeapon(self, index)
