@@ -635,6 +635,40 @@ testsuite.test_SetMassiveFalse_ShouldDrown = buildPawnTest({
 	end
 })
 
+testsuite.test_SetMech_ShouldDisableCurrentMechsAndEnableNewMech = buildPawnTest({
+	-- In order to test this function, we must use it both in preparation as well as cleanup.
+	prepare = function()
+		pawn = Board:GetPawn(Board:AddPawn("PunchMech"))
+		
+		-- Only 3 mechs are allowed at the same time, so we must strip old mechs of their status.
+		mechs = {}
+		for _, pawnId in ipairs(extract_table(Board:GetPawns(TEAM_ANY))) do
+			local mech = Board:GetPawn(pawnId)
+			if mech:IsMech() then
+				mechs[#mechs+1] = mech
+			end
+			mech:SetMech(false)
+		end
+		
+		expectedIsMech = true
+	end,
+	execute = function()
+		pawn:SetMech(true)
+		
+		actualIsMech = pawn:IsMech()
+	end,
+	check = function()
+		assertEquals(expectedIsMech, actualIsMech, "Pawn incorrectly did not become a mech")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+		
+		for _, mech in ipairs(mechs) do
+			mech:SetMech(true)
+		end
+	end
+})
+
 testsuite.test_IsMovementAvailable_ShouldReturnFalse_AfterMoving = buildPawnTest({
 	prepare = function()
 		pawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
