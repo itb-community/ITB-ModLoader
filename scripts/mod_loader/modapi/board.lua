@@ -553,6 +553,10 @@ function InitializeBoardClass(board)
 			
 		elseif iTerrain == TERRAIN_ICE_CRACKED then
 			self:SetIce(loc, 1)
+		
+		elseif iTerrain == TERRAIN_FOREST_FIRE then
+			self:SetTerrain(loc, TERRAIN_FOREST)
+			self:SetFire(loc)
 			
 		else
 			-- unfreeze terrain if new terrain can not be frozen.
