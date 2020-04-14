@@ -582,6 +582,38 @@ testsuite.test_IsForest_ShouldReturnTrueForForestsAndForestFires = buildPawnTest
 	end
 })
 
+testsuite.test_IsForestFire_ShouldReturnTrueForForestFiresButFalseForForest = buildPawnTest({
+	prepare = function()
+		loc = getRandomLocation()
+		
+		defaultTerrain = Board:GetTerrain(loc)
+		defaultIsFire = Board:IsFire(loc)
+		
+		expectedForestIsForestFire = false
+		expectedForestFireIsForestFire = true
+	end,
+	execute = function()
+		local fire = SpaceDamage(loc); fire.iFire = EFFECT_CREATE
+		
+		Board:SetTerrain(loc, TERRAIN_FOREST)
+		actualForestIsForestFire = Board:IsForestFire(loc)
+		
+		Board:DamageSpace(fire)
+		actualForestFireIsForestFire = Board:IsForestFire(loc)
+	end,
+	check = function()
+		assertEquals(expectedForestIsForestFire, actualForestIsForestFire, "Forest incorrectly was forest fire")
+		assertEquals(expectedForestFireIsForestFire, actualForestFireIsForestFire, "Forest fire incorrectly was not forest fire")
+	end,
+	cleanup = function()
+		local fire = SpaceDamage(loc)
+		fire.iFire = defaultIsFire and EFFECT_CREATE or EFFECT_REMOVE
+		
+		Board:DamageSpace(fire)
+		Board:SetTerrainVanilla(loc, defaultTerrain)
+	end
+})
+
 testsuite.test_SetBuilding_SavegameShouldReflectChange = buildPawnTest({
 	-- The building should have its health set to 1 and its max health set to 3.
 	prepare = function()
