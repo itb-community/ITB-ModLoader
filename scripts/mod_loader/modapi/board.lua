@@ -1,7 +1,5 @@
 local DequeList = require("scripts/mod_loader/deque_list")
 
--- TODO: test and find out what is saved in savegame, and what is not.
-
 TERRAIN_ICE_CRACKED = -1
 TERRAIN_MOUNTAIN_CRACKED = -2
 TERRAIN_FOREST_FIRE = -3
@@ -671,8 +669,6 @@ function InitializeBoardClass(board)
 		
 		return buildings
 	end
-	
-	-- TODO: add function SetAcid(board, bool, bool) with instant acid application/removal
 end
 
 local board_metatable
