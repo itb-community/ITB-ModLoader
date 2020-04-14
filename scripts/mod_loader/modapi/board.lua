@@ -555,6 +555,17 @@ function InitializeBoardClass(board)
 			self:SetIce(loc, 1)
 			
 		else
+			-- unfreeze terrain if new terrain can not be frozen.
+			local isFreezeableTerrain = iTerrain == TERRAIN_BUILDING or iTerrain == TERRAIN_MOUNTAIN
+			
+			-- terrain with 0 health cannot be frozen.
+			local terrainHealth = self:GetHealth(loc)
+			isFreezeableTerrain = isFreezeableTerrain and terrainHealth > 0
+			
+			if Board:IsFrozen(loc) and not isFreezeableTerrain then
+				Board:SetFrozen(loc, false, true)
+			end
+			
 			self:SetTerrainVanilla(loc, iTerrain)
 			
 			if iTerrain == TERRAIN_FOREST and self:IsFire(loc) then
@@ -562,9 +573,10 @@ function InitializeBoardClass(board)
 				self:SetFire(loc)
 			end
 			
-			if iTerrain == TERRAIN_BUILDING and self:GetHealth(loc) == 0 then
+			if iTerrain == TERRAIN_BUILDING and terrainHealth == 0 then
 				-- update tile after placing building on rubble,
 				-- so visual and functional rubble always returns TERRAIN_RUBBLE
+				CUtils.SetTileRubbleState(self, loc, RUBBLE_BUILDING)
 				CUtils.SetTileTerrain(self, loc, TERRAIN_RUBBLE)
 			end
 		end
