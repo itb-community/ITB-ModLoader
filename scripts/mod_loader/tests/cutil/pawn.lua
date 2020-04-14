@@ -279,6 +279,21 @@ testsuite.test_IsPlayerControlled_ShouldReturnTrueIfPlayerCanIssueOrders = build
 	end
 })
 
+testsuite.test_SetHealth_ShouldUpdatePawnHealth = buildPawnTest({
+	prepare = function()
+		pawn = PAWN_FACTORY:CreatePawn("PunchMech")
+
+		expectedPawnHealth = 1
+	end,
+	execute = function()
+		pawn:SetHealth(expectedPawnHealth)
+		actualPawnHealth = pawn:GetHealth()
+	end,
+	check = function()
+		assertEquals(expectedPawnHealth, actualPawnHealth, "Pawn health was not updated")
+	end
+})
+
 testsuite.test_GetMaxHealth_ShouldBeEqualToFullyHealedPawn = buildPawnTest({
 	-- The pawn's max health should be the same as the pawn's current health at pawn creation, as well as after fully healed.
 	prepare = function()
