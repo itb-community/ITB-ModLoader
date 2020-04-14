@@ -494,22 +494,6 @@ BoardClass.IsTipImage = function(self)
 	return not CUtils.IsGameboard(self)
 end
 
--- GetCurrentMission is not accurate enough.
---[[BoardClass.GetMission = function(self)
-	Tests.AssertSignature{
-		ret = "table",
-		func = "GetMission",
-		params = { self },
-		{ "userdata|GameBoard&" }
-	}
-	
-	if self:IsTipImage() then
-		return nil
-	end
-	
-	return GetCurrentMission()
-end]]
-
 
 
 function InitializeBoardClass(board)
