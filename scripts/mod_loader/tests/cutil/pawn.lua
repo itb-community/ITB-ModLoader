@@ -294,6 +294,27 @@ testsuite.test_SetHealth_ShouldUpdatePawnHealth = buildPawnTest({
 	end
 })
 
+testsuite.test_GetBaseMaxHealth_ShouldNotIncreaseWithSoldierPsionOnBoard = buildPawnTest({
+	prepare = function()
+		vekPawn = Board:GetPawn(Board:AddPawn("Scorpion1"))
+		expectedBaseMaxHealth = vekPawn:GetHealth()
+	end,
+	execute = function()
+		actualBaseMaxHealth = vekPawn:GetBaseMaxHealth()
+		
+		-- Create a soldier psion to increase health and max health by 1.
+		psionPawn = Board:GetPawn(Board:AddPawn("Jelly_Health1"))
+	end,
+	check = function()
+		assertEquals(expectedBaseMaxHealth, actualBaseMaxHealth, "Vek pawn's old max health was incorrectly different from base max health")
+		assertNotEquals(vekPawn:GetHealth(), actualBaseMaxHealth, "Vek pawn's new max health was incorrectly not different from base max health")
+	end,
+	cleanup = function()
+		Board:RemovePawn(vekPawn)
+		Board:RemovePawn(psionPawn)
+	end
+})
+
 testsuite.test_GetMaxHealth_ShouldBeEqualToFullyHealedPawn = buildPawnTest({
 	-- The pawn's max health should be the same as the pawn's current health at pawn creation, as well as after fully healed.
 	prepare = function()
