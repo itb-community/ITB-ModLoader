@@ -210,8 +210,6 @@ BoardPawn.SetOwner = function(self, iOwner)
 		return
 	end
 	
-	-- TODO: find out how this interacts with enemy pawns, etc.
-	
 	return CUtils.SetPawnOwner(self, iOwner)
 end
 
@@ -563,7 +561,6 @@ local function initializeBoardPawn()
 	
 	local function getMechCount()
 		if not Board then
-			-- TODO: return mechs in 'Game' object?
 			return 0
 		end
 		
