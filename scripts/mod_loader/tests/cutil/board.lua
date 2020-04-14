@@ -491,6 +491,65 @@ testsuite.test_SetTerrain_ShouldAlterTerrainProperly = buildPawnTest({
 	end
 })
 
+testsuite.test_IsTerrain_ShouldDetectNewTerrainConstants = buildPawnTest({
+	-- Should detect damaged mountain and ice, as well as forest on fire.
+	prepare = function()
+		loc = getRandomLocation()
+		
+		defaultTerrain = Board:GetTerrain(loc)
+		defaultIsFire = Board:IsFire(loc)
+		
+		expectedDamagedMountainIsMountain = true
+		expectedDamagedMountainIsCrackedMountain = true
+		
+		expectedDamagedIceIsIce = true
+		expectedDamagedIceIsCrackedIce = true
+		
+		-- vanilla function returns false for burning forests, so the altered function does too.
+		expectedBurningForestIsForest = false
+		expectedBurningForestIsForestFire = true
+	end,
+	execute = function()
+		local damage = SpaceDamage(loc, 1)
+		local fire = SpaceDamage(loc); fire.iFire = EFFECT_CREATE
+		
+		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
+		Board:DamageSpace(damage)
+		
+		actualDamagedMountainIsMountain = Board:IsTerrain(loc, TERRAIN_MOUNTAIN)
+		actualDamagedMountainIsCrackedMountain = Board:IsTerrain(loc, TERRAIN_MOUNTAIN_CRACKED)
+		
+		Board:SetTerrain(loc, TERRAIN_ICE)
+		Board:DamageSpace(damage)
+		
+		actualDamagedIceIsIce = Board:IsTerrain(loc, TERRAIN_ICE)
+		actualDamagedIceIsCrackedIce = Board:IsTerrain(loc, TERRAIN_ICE_CRACKED)
+		
+		Board:SetTerrain(loc, TERRAIN_FOREST)
+		Board:DamageSpace(fire)
+		
+		actualBurningForestIsForest = Board:IsTerrain(loc, TERRAIN_FOREST)
+		actualBurningForestIsForestFire = Board:IsTerrain(loc, TERRAIN_FOREST_FIRE)
+	end,
+	check = function()
+		assertEquals(expectedDamagedMountainIsMountain, actualDamagedMountainIsMountain, "Damaged mountain was incorrectly not mountain")
+		assertEquals(expectedDamagedMountainIsCrackedMountain, actualDamagedMountainIsCrackedMountain, "Damaged mountain was incorrectly not cracked mountain")
+		assertEquals(expectedDamagedIceIsIce, actualDamagedIceIsIce, "Damaged ice was incorrectly not ice")
+		assertEquals(expectedDamagedIceIsCrackedIce, actualDamagedIceIsCrackedIce, "Damaged ice was incorrectly not cracked ice")
+		assertEquals(expectedBurningForestIsForest, actualBurningForestIsForest, "Burning forest was incorrectly forest")
+		assertEquals(expectedBurningForestIsForestFire, actualBurningForestIsForestFire, "Burning forest was incorrectly not forest fire")
+	end,
+	cleanup = function()
+		local fire = SpaceDamage(loc)
+		fire.iFire = defaultIsFire and EFFECT_CREATE or EFFECT_REMOVE
+		Board:DamageSpace(fire)
+		
+		-- change terrain to mountain first to clear the tile's damaged state.
+		Board:SetTerrainVanilla(loc, TERRAIN_MOUNTAIN)
+		Board:SetTerrainVanilla(loc, defaultTerrain)
+	end
+})
+
 testsuite.test_SetBuilding_SavegameShouldReflectChange = buildPawnTest({
 	-- The building should have its health set to 1 and its max health set to 3.
 	prepare = function()
