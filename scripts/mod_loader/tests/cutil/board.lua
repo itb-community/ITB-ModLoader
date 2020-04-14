@@ -467,12 +467,12 @@ testsuite.test_SetTerrain_ShouldAlterTerrainProperly = buildPawnTest({
 		Board:SetTerrain(loc, TERRAIN_MOUNTAIN_CRACKED)
 		
 		actualCrackedMountainTerrain = Board:GetTerrain(loc)
-		actualCrackedMountainDamagedState = Board:IsDamaged(loc)
+		actualCrackedMountainDamagedState = Board:IsDamagedVanilla(loc)
 		
 		Board:SetTerrain(loc, TERRAIN_ICE_CRACKED)
 		
 		actualCrackedIceTerrain = Board:GetTerrain(loc)
-		actualCrackedIceDamagedState = Board:IsDamaged(loc)
+		actualCrackedIceDamagedState = Board:IsDamagedVanilla(loc)
 	end,
 	check = function()
 		assertEquals(expectedDestroyedMountainTerrain, actualDestroyedMountainTerrain, "Destroyed mountain terrain was incorrect")
