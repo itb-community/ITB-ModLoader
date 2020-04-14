@@ -817,6 +817,45 @@ testsuite.test_SetRubble_SavegameShouldReflectChange = buildPawnTest({
 	end
 })
 
+testsuite.test_SetWater_ShouldChangeTerrainToWaterAndWaterToRoad = buildPawnTest({
+	-- Function should be able to change any terrain to water, but only water back to road.
+	prepare = function()
+		loc = getRandomLocation()
+		defaultTerrain = Board:GetTerrain(loc)
+		
+		expectedRoadToWaterTerrain = TERRAIN_WATER
+		expectedMountainToWaterTerrain = TERRAIN_WATER
+		expectedWaterToRoadTerrain = TERRAIN_ROAD
+		expectedMountainToRoadTerrain = TERRAIN_MOUNTAIN
+	end,
+	execute = function()
+		Board:SetTerrain(loc, TERRAIN_ROAD)
+		Board:SetWater(loc, true, true)
+		actualRoadToWaterTerrain = Board:GetTerrain(loc)
+		
+		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
+		Board:SetWater(loc, true, true)
+		actualMountainToWaterTerrain = Board:GetTerrain(loc)
+		
+		Board:SetTerrain(loc, TERRAIN_WATER)
+		Board:SetWater(loc, false, true)
+		actualWaterToRoadTerrain = Board:GetTerrain(loc)
+		
+		Board:SetTerrain(loc, TERRAIN_MOUNTAIN)
+		Board:SetWater(loc, false, true)
+		actualMountainToRoadTerrain = Board:GetTerrain(loc)
+	end,
+	check = function()
+		assertEquals(expectedRoadToWaterTerrain, actualRoadToWaterTerrain, "Road incorrectly was not changed to water")
+		assertEquals(expectedMountainToWaterTerrain, actualMountainToWaterTerrain, "Mountain incorrectly was not changed to water")
+		assertEquals(expectedWaterToRoadTerrain, actualWaterToRoadTerrain, "Water incorrectly was not changed to road")
+		assertEquals(expectedMountainToRoadTerrain, actualMountainToRoadTerrain, "Mountain incorrectly was changed to road")
+	end,
+	cleanup = function()
+		Board:SetTerrainVanilla(loc, defaultTerrain)
+	end
+})
+
 testsuite.test_SetUniqueBuilding_SavegameShouldReflectChange = buildPawnTest({
 	-- The building should become a bar, and it's health and max health should be 1.
 	prepare = function()
