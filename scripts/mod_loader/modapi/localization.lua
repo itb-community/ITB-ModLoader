@@ -27,16 +27,17 @@ languageDisplayNames[Languages.Spanish] = Language_Spanish
 languageDisplayNames[Languages.Japanese] = Language_Japanese
 
 --[[
-	Returns the index representing the language.
+	Returns the index representing currently selected language.
 --]]
 function modApi:getLanguageIndex()
 	return Settings.language
 end
 
 --[[
-	Returns language identifier given a language index.
+	Returns language identifier for the specified language index.
 --]]
 function modApi:getLanguageId(languageIndex)
+	languageIndex = languageIndex or self:getLanguageIndex()
 	assert(type(languageIndex) == "number", "Language index must be a number")
 
 	for k, v in pairs(Languages) do
@@ -49,10 +50,13 @@ function modApi:getLanguageId(languageIndex)
 end
 
 --[[
-	Returns a table mapping language indices to language display names.
+	Returns display name for the specified language index.
 --]]
-function modApi:getLanguageDisplayName()
-	return languageDisplayNames[self:getLanguageIndex()]
+function modApi:getLanguageDisplayName(languageIndex)
+	languageIndex = languageIndex or self:getLanguageIndex()
+	assert(type(languageIndex) == "number", "Language index must be a number")
+
+	return languageDisplayNames[languageIndex]
 end
 
 function modApi:setText(id, text)
