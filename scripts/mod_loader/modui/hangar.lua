@@ -556,6 +556,87 @@ local function updateUiState()
 	end
 end
 
+-- Associated entries in Buttons global are not updated to reflect changing dimensions,
+-- need to hardcode them.
+local languageRectsMap
+local function getLanguageRectsMap()
+	if not languageRectsMap then
+		languageRectsMap = {
+			["btnBack"] = {
+				[Languages.English] = { x = 520, w = 103 },
+				[Languages.Chinese_Simplified] = { x = 520, w = 89 },
+				[Languages.French] = { x = 307, w = 141 },
+				[Languages.German] = { x = 429, w = 141 },
+				[Languages.Italian] = { x = 471, w = 161 },
+				[Languages.Polish] = { x = 280, w = 141 },
+				[Languages.Portuguese_Brazil] = { x = 481, w = 129 },
+				[Languages.Russian] = { x = 479, w  = 125 },
+				[Languages.Spanish] = { x = 459, w = 121 },
+				[Languages.Japanese] = { x = 517, w = 106 },
+			},
+			["btnStart"] = {
+				[Languages.English] = { x = 803, w = 117 },
+				[Languages.Chinese_Simplified] = { x = 830, w = 89 },
+				[Languages.French] = { x = 623, w = 297 },
+				[Languages.German] = { x = 763, w = 157 },
+				[Languages.Italian] = { x = 807, w = 113 },
+				[Languages.Polish] = { x = 645, w = 274 },
+				[Languages.Portuguese_Brazil] = { x = 785, w = 135 },
+				[Languages.Russian] = { x = 779, w = 141 },
+				[Languages.Spanish] = { x = 755, w = 165 },
+				[Languages.Japanese] = { x = 798, w = 122 },
+			},
+			["difficulty"] = {
+				[Languages.English] = 10,
+				[Languages.Chinese_Simplified] = 31,
+				[Languages.French] = 7,
+				[Languages.German] = 16,
+				[Languages.Italian] = 7,
+				[Languages.Polish] = 32,
+				[Languages.Portuguese_Brazil] = 7,
+				[Languages.Russian] = 7,
+				[Languages.Spanish] = 7,
+				[Languages.Japanese] = 7,
+			}
+		}
+	end
+
+	return languageRectsMap
+end
+
+function GetBackButtonRect(languageIndex)
+	languageIndex = languageIndex or modApi:getLanguageIndex()
+	return getLanguageRectsMap().btnBack[languageIndex]
+end
+
+function GetStartButtonRect(languageIndex)
+	languageIndex = languageIndex or modApi:getLanguageIndex()
+	return getLanguageRectsMap().btnStart[languageIndex]
+end
+
+function GetDifficultyRect(languageIndex)
+	languageIndex = languageIndex or modApi:getLanguageIndex()
+	return getLanguageRectsMap().difficulty[languageIndex]
+end
+
+local function setupButtonBack(btnBack)
+	local origin = GetHangarOrigin()
+	local rect = GetBackButtonRect()
+
+	btnBack
+			:pospx(origin.x + rect.x, origin.y + 10)
+			:widthpx(rect.w):heightpx(65)
+end
+
+local function setupButtonStart(btnStart)
+	local origin = GetHangarOrigin()
+	local rect = GetStartButtonRect()
+
+	btnStart
+			:pospx(origin.x + rect.x, origin.y + 10)
+			:widthpx(rect.w):heightpx(65)
+end
+
 -- //////////////////////////////////////////////////////////////////////
 -- translucent UI for click detection, tie it all together
 
@@ -635,9 +716,9 @@ local function createUi(root)
 		return result
 	end
 
-	local btnBack = Ui()
-		:widthpx(103):heightpx(65)
-		:addTo(holder)
+	local btnBack = Ui():addTo(holder)
+	setupButtonBack(btnBack)
+
 	btnBack.translucent = true
 	btnBack.mousedown = function(self, x, y, button)
 		if
@@ -653,9 +734,9 @@ local function createUi(root)
 		return Ui.mousedown(self, x, y, button)
 	end
 
-	local btnStart = Ui()
-		:widthpx(117):heightpx(65)
-		:addTo(holder)
+	local btnStart = Ui():addTo(holder)
+	setupButtonStart(btnStart)
+
 	btnStart.translucent = true
 	btnStart.mousedown = function(self, x, y, button)
 		if
@@ -674,10 +755,6 @@ local function createUi(root)
 	end
 
 	holder.draw = function(self, screen)
-		local origin = GetHangarOrigin()
-		btnBack:pospx(origin.x + 520, origin.y + 10)
-		btnStart:pospx(origin.x + 803, origin.y + 10)
-
 		self.visible = sdlext.isHangar()
 		-- The game doesn't register clicks if the button isn't "primed", ie.
 		-- if it wasn't highlighted prior to being clicked.
@@ -737,6 +814,13 @@ local function createUi(root)
 
 	sdlext.addGameWindowResizedHook(function(screen)
 		holder:width(1):height(1)
+		setupButtonBack(btnBack)
+		setupButtonStart(btnStart)
+	end)
+
+	sdlext.addSettingsChangedHook(function()
+		setupButtonBack(btnBack)
+		setupButtonStart(btnStart)
 	end)
 end
 

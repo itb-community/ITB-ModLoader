@@ -140,13 +140,15 @@ local function createUi(root)
 
 		if self.visible then
 			local origin = GetHangarOrigin()
-			origin.x = origin.x + 635
-			origin.y = origin.y + 30
+			local rect = GetBackButtonRect()
+			local diffArrowLeft = GetDifficultyRect()
 
-			arrLeft:pospx (origin.x - 2           , origin.y + 4 )
-			arrRight:pospx(origin.x + 28 + 90 + 10, origin.y + 4 )
-			diffText:pospx(origin.x               , origin.y + 13)
-			mask:pospx    (origin.x               , origin.y + 11)
+			origin.x = origin.x + rect.x + rect.w
+			origin.y = origin.y + 30
+			arrLeft:pospx(origin.x + diffArrowLeft, origin.y + 4)
+			arrRight:pospx(origin.x + diffArrowLeft + 130, origin.y + 4)
+			diffText:pospx(origin.x + diffArrowLeft, origin.y + 13)
+			mask:pospx(origin.x + diffArrowLeft, origin.y + 11)
 
 			local hideDifficultyUi = IsHangarWindowState() or
 				(leaving and not mask.animations.fadeIn:isStarted())
