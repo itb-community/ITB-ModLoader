@@ -209,7 +209,7 @@ end)
 local optionsBox = Boxes.escape_options_box
 local profileBox = Boxes.profile_window
 local function adjustForGameVersion()
-	if modApi:isVersion("1.2.12", modApi:getGameVersion()) then
+	if modApi:isVersion("1.2.20", modApi:getGameVersion()) then
 		--
 	end
 	if modApi:isVersion("1.1.22", modApi:getGameVersion()) then

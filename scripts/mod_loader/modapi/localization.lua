@@ -15,16 +15,16 @@ Languages = {
 }
 
 local languageDisplayNames = {}
-languageDisplayNames[Languages.English] = Language_English
-languageDisplayNames[Languages.Chinese_Simplified] = Language_Chinese_Simplified
-languageDisplayNames[Languages.French] = Language_French
-languageDisplayNames[Languages.German] = Language_German
-languageDisplayNames[Languages.Italian] = Language_Italian
-languageDisplayNames[Languages.Polish] = Language_Polish
-languageDisplayNames[Languages.Portuguese_Brazil] = Language_Portuguese_Brazil
-languageDisplayNames[Languages.Russian] = Language_Russian
-languageDisplayNames[Languages.Spanish] = Language_Spanish
-languageDisplayNames[Languages.Japanese] = Language_Japanese
+languageDisplayNames[Languages.English] = Global_Texts.Language_English
+languageDisplayNames[Languages.Chinese_Simplified] = Global_Texts.Language_Chinese_Simplified
+languageDisplayNames[Languages.French] = Global_Texts.Language_French
+languageDisplayNames[Languages.German] = Global_Texts.Language_German
+languageDisplayNames[Languages.Italian] = Global_Texts.Language_Italian
+languageDisplayNames[Languages.Polish] = Global_Texts.Language_Polish
+languageDisplayNames[Languages.Portuguese_Brazil] = Global_Texts.Language_Portuguese_Brazil
+languageDisplayNames[Languages.Russian] = Global_Texts.Language_Russian
+languageDisplayNames[Languages.Spanish] = Global_Texts.Language_Spanish
+languageDisplayNames[Languages.Japanese] = Global_Texts.Language_Japanese
 
 --[[
 	Returns the index representing currently selected language.
