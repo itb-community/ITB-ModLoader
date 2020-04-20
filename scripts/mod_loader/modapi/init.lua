@@ -186,7 +186,7 @@ end
 
 function modApi:getGameVersion()
 	if type(IsLocalizedText) == "function" then
-		return "1.2.12"
+		return "1.2.20"
 	elseif type(IsGamepad) == "function" then
 		return "1.1.22"
 	end
