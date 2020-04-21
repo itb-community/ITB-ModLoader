@@ -90,6 +90,13 @@ return {
 	                               "The mod loader does not support input via a gamepad. Since many of the mod loader's features rely on detecting " ..
 	                               "mouse and keyboard inputs, it is recommended to uninstall the mod loader if you plan to play with a gamepad.",
 
+	["OpenGL_FrameTitle"] = "Restart Required",
+	["OpenGL_FrameText"] = "Mod loader has updated game settings, please restart the game for the changes to take effect.\n\n" ..
+	                       "Most mods are likely be broken until then.\n\n" ..
+	                       "These changes are likely to be overwritten by the game unless you restart immediately.",
+	["OpenGL_Button_Quit"] = "OK, QUIT",
+	["OpenGL_Button_Stay"] = "GOT IT, I'LL RESTART LATER",
+
 	["ProfileSettings_FrameTitle"] = "Profile Settings Changed",
 	["ProfileSettings_FrameText"] = "Active profile has been changed, and profile-specific configuration is enabled.\n\n"..
 	                                "You need to restart the game in order to apply the changes made by the profile's configuration.",

@@ -16,6 +16,9 @@ local scripts = {
 	"altered/__scripts",
 	"mod_loader",
 
+	-- Needs to be loaded out-of-order
+	"modui/popup_opengl",
+
 	"tests/__scripts",
 }
 

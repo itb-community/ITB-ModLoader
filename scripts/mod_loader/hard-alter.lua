@@ -1,5 +1,5 @@
 --[[
-	Contains hard alterations: permament changes to game files.
+	Contains hard alterations: permanent changes to game files.
 	This file is loaded first, so it must not use any of the mod loader's functions.
 --]]
 
@@ -43,3 +43,5 @@ globalizeLocalVariable("scripts/text_population.lua", "PopEvent")
 
 -- Fix spawner backend's guard sometimes failing, leading to a crash
 replaceFileContent("scripts/spawner_backend.lua", "if Board == NULL then", "if Board == NULL or not Board then")
+
+ReplaceFileContent = replaceFileContent
