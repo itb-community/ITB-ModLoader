@@ -3,8 +3,11 @@
 A mod loader for the game [Into the Breach](https://www.subsetgames.com/itb.html), written in Lua, and with extension DLLs for some additional features. Originally created by Cyberboy2000, who has unfortunately been absent and unreachable for extended periods of time.
 
 - The mod loader's thread on Subset forums: [link](https://www.subsetgames.com/forum/viewtopic.php?f=26&t=33119)
-- Original Lua mod loader created by *Cyberboy2000*: [link](https://www.subsetgames.com/forum/viewtopic.php?f=26&t=32833)
-- Original Lua proxy DLLs created by *AUTOMATIC*: [link](https://github.com/AUTOMATIC1111/IntoTheBreachLua)
+- Lua proxy DLLs, updated to work with post-1.2.20 version of the game: [link](https://github.com/kartoFlane/IntoTheBreachLua) 
+
+Original tools created by:
+- Lua mod loader created by *Cyberboy2000*: [link](https://www.subsetgames.com/forum/viewtopic.php?f=26&t=32833)
+- Lua proxy DLLs created by *AUTOMATIC*: [link](https://github.com/AUTOMATIC1111/IntoTheBreachLua)
 
 The mod loader **only works with Windows version of the game**. Gamepad input is not supported either.
 
