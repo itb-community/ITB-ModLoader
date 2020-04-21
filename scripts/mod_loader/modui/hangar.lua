@@ -604,19 +604,22 @@ local function getLanguageRectsMap()
 	return languageRectsMap
 end
 
-function GetBackButtonRect(languageIndex)
+local function GetLanguageButton(name, languageIndex)
 	languageIndex = languageIndex or modApi:getLanguageIndex()
-	return getLanguageRectsMap().btnBack[languageIndex]
+	local buttons = getLanguageRectsMap()[name]
+	return buttons[languageIndex] or buttons[Languages.English]
+end
+
+function GetBackButtonRect(languageIndex)
+	return GetLanguageButton("btnBack", languageIndex)
 end
 
 function GetStartButtonRect(languageIndex)
-	languageIndex = languageIndex or modApi:getLanguageIndex()
-	return getLanguageRectsMap().btnStart[languageIndex]
+	return GetLanguageButton("btnStart", languageIndex)
 end
 
 function GetDifficultyRect(languageIndex)
-	languageIndex = languageIndex or modApi:getLanguageIndex()
-	return getLanguageRectsMap().difficulty[languageIndex]
+	return GetLanguageButton("difficulty", languageIndex)
 end
 
 local function setupButtonBack(btnBack)

@@ -13,6 +13,10 @@ Languages = {
 	Spanish = 9,
 	Japanese = 10
 }
+local languageNames = {}
+for name, index in pairs(Languages) do
+	languageNames[index] = name
+end
 
 local languageDisplayNames = {}
 languageDisplayNames[Languages.English] = Global_Texts.Language_English
@@ -30,7 +34,11 @@ languageDisplayNames[Languages.Japanese] = Global_Texts.Language_Japanese
 	Returns the index representing currently selected language.
 --]]
 function modApi:getLanguageIndex()
-	return Settings.language
+	local index = Settings and Settings.language or nil
+	if index == nil or languageNames[index] == nil then
+		return Languages.English
+	end
+	return index
 end
 
 --[[
@@ -40,13 +48,7 @@ function modApi:getLanguageId(languageIndex)
 	languageIndex = languageIndex or self:getLanguageIndex()
 	assert(type(languageIndex) == "number", "Language index must be a number")
 
-	for k, v in pairs(Languages) do
-		if v == languageIndex then
-			return k
-		end
-	end
-
-	return nil
+	return languageNames[index] or "English"
 end
 
 --[[
