@@ -12,34 +12,21 @@ function modApi:init()
 
 	if not self:fileExists("resources/resource.dat.bak") then
 		LOG("Backing up resource.dat")
-
-		local from = io.open("resources/resource.dat","rb")
-		local to = io.open("resources/resource.dat.bak","w+b")
-
-		to:write(from:read("*all"))
-
-		from:close()
-		to:close()
+		modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
 	else
 		LOG("Reading resource.dat to check mod loader signature...")
 		local file = io.open("resources/resource.dat","rb")
 		file:seek("end", -20)
-		local inp = file:read()
+		local content = file:read()
 
 		file:close()
 
-		if inp ~= "ModLoaderSignatureOK" then
+		if content ~= "ModLoaderSignatureOK" then
 			LOG("resource.dat has been updated since last launch, re-acquiring backup")
-
-			-- Copy via OS command rather than lua open/write, since it's much faster.
-			os.execute("COPY /V /Y resources/resource.dat resources/resource.dat.bak")
+			modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
 		else
 			LOG("Restoring resource.dat")
-
-			-- Copy via OS command rather than lua open/write, since it's much faster.
-			os.execute("COPY /V /Y resources/resource.dat.bak resources/resource.dat")
-
-			LOG("Done!")
+			modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
 		end
 	end
 

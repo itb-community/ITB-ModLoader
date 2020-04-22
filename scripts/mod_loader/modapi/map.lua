@@ -40,6 +40,18 @@ function modApi:copyFile(src, dst)
 	output:close()
 end
 
+function modApi:copyFileOS(src, dst)
+	assert(type(src) == "string")
+	assert(type(dst) == "string")
+
+	-- Need Windows-style paths with \ as separator
+	src = string.gsub(src, "/", "\\")
+	dst = string.gsub(dst, "/", "\\")
+
+	-- Copy via OS command rather than lua open/write, since it's much faster.
+	os.execute("COPY /V /Y " .. src .. " " .. dst)
+end
+
 function modApi:pruneExtension(filename)
 	-- gsub() returns multiple values, store the first
 	-- value in a variable so that we correctly ignore
