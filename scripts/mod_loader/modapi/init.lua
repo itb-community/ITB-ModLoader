@@ -25,11 +25,10 @@ function modApi:init()
 		local file = io.open("resources/resource.dat","rb")
 		file:seek("end", -20)
 		local inp = file:read()
-		LOG("READ:", inp)
 
 		file:close()
 
-		if inp == "ModLoaderSignatureOK" then
+		if inp ~= "ModLoaderSignatureOK" then
 			LOG("resource.dat has been updated since last launch, re-acquiring backup")
 
 			-- Copy via OS command rather than lua open/write, since it's much faster.
