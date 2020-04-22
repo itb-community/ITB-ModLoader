@@ -21,31 +21,32 @@ function modApi:init()
 		from:close()
 		to:close()
 	else
+		LOG("Reading resource.dat to check mod loader signature...")
 		local file = io.open("resources/resource.dat","rb")
-		local inp = file:read("*all")
-		file:close()
-		local instance = FtlDat.FtlDat:from_string(inp)
+		file:seek("end", -20)
+		local inp = file:read()
+		LOG("READ:", inp)
 
-		if not instance.signature then
+		file:close()
+
+		if inp == "ModLoaderSignatureOK" then
 			LOG("resource.dat has been updated since last launch, re-acquiring backup")
-			
-			local to = io.open("resources/resource.dat.bak","w+b")
-			to:write(inp)
-			to:close()
+
+			-- Copy via OS command rather than lua open/write, since it's much faster.
+			os.execute("COPY /V /Y resources/resource.dat resources/resource.dat.bak")
 		else
 			LOG("Restoring resource.dat")
 
-			local from = io.open("resources/resource.dat.bak","rb")
-			local to = io.open("resources/resource.dat","wb")
+			-- Copy via OS command rather than lua open/write, since it's much faster.
+			os.execute("COPY /V /Y resources/resource.dat.bak resources/resource.dat")
 
-			to:write(from:read("*all"))
-
-			from:close()
-			to:close()
+			LOG("Done!")
 		end
 	end
-	
+
+	LOG("Building FTLDat...")
 	self.resource = FtlDat.FtlDat:from_file("resources/resource.dat")
+	LOG("Done!")
 
 	self.squadKeys = {
 		"Archive_A",
