@@ -27,6 +27,30 @@ function GetText(id, r1, r2, r3)
 
 		return text
 	else
-		return GetVanillaText(id, r1, r2, r3)
+		text = GetVanillaText(id, r1, r2, r3)
+		
+		if text == id then
+			if id:match("Upgrade%d$") then
+				local skill = _G[id:sub(1,-10)]
+				local upgrade = tonumber(id:sub(-1,-1))
+				
+				if type(skill) == 'table' and type(skill.UpgradeList) == 'table' then
+					text = skill.UpgradeList[upgrade] or text
+				end
+			end
+		end
+		
+		return text
 	end
+end
+
+local vanillaGetPilotDialog = GetPilotDialog
+function GetPilotDialog(...)
+    local result = vanillaGetPilotDialog(...)
+    
+    if result == "" then
+        result = GetPilotDialog_Deprecated(...)
+    end
+    
+    return result
 end
