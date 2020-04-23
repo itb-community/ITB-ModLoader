@@ -43,3 +43,10 @@ function GetText(id, r1, r2, r3)
 		return text
 	end
 end
+
+local vanillaGetPilotDialog = GetPilotDialog
+function GetPilotDialog(personality, event)
+	local result = vanillaGetPilotDialog(personality, event)
+	
+	return GetPilotDialog_Deprecated(personality, event)
+end
