@@ -119,13 +119,16 @@ end
 BoardPawn.IsArmor = function(self)
 	Tests.AssertEquals("userdata", type(self), "Argument #0")
 
-	local pilot = self:IsAbility("Armored")
-	local mech = _G[self:GetType()]:GetArmor()
-	local mutation = self:IsMutation(LEADER_ARMOR)
+	local pawnType = _G[self:GetType()]
+	local isArmoredPilotAbility = self:IsAbility("Armored")
+	local isArmoredPawn = pawnType:GetArmor()
+	local isArmoredMutation = self:IsMutation(LEADER_ARMOR)
+	local isEffectSource = pawnType:GetLeader() == LEADER_ARMOR
+
 	-- TODO: Bug: killing an armor psion then respawning it via Board:AddPawn() causes this function to return false
 	-- Need to update the savefile after a new pawn appears on the board
 	
-	return pilot or mech or mutation
+	return isArmoredPilotAbility or isArmoredPawn or (isArmoredMutation and not isEffectSource)
 end
 
 BoardPawn.IsIgnoreWeb = function(self)
