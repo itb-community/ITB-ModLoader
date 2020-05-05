@@ -15,6 +15,18 @@ function Tests.AssertNotEquals(notExpected, actual, msg)
 	assert(notExpected ~= actual, msg)
 end
 
+function Tests.AssertTrue(condition, msg)
+	msg = (msg and msg .. ": ") or ""
+	msg = msg .. string.format("Expected 'true', but was '%s'\n%s", tostring(condition), debug.traceback("", 2))
+	assert(condition == true, msg)
+end
+
+function Tests.AssertFalse(condition, msg)
+	msg = (msg and msg .. ": ") or ""
+	msg = msg .. string.format("Expected 'false', but was '%s'\n%s", tostring(condition), debug.traceback("", 2))
+	assert(condition == false, msg)
+end
+
 function Tests.AssertTypePoint(arg, msg)
 	msg = (msg and msg .. ": ") or ""
 	msg = msg .. string.format("Expected Point, but was %s\n%s", tostring(type(arg)), debug.traceback("", 2))
