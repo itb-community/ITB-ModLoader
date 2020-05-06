@@ -450,7 +450,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 				end,
 				function(e)
 					return string.format(
-						"Loading mod [%s] with id [%s] failed:\n%s\n\n%s",
+						"Failed to load mod [%s] with id [%s]:\n%s\n\n%s",
 						mod.name, id, e, debug.traceback("", 2)
 					)
 				end
