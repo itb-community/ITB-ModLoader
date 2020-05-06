@@ -31,12 +31,31 @@ function testsuite.test_EventUnsubscribe()
 		fired = true
 	end)
 
-	sub:unsubscribe()
+	local unsubResult = sub:unsubscribe()
 	event:fire()
 
-	assertFalse(fired, "Subscriber got notified after it unsubscribed from the event.")
+	assertTrue(unsubResult, "Event:unsubscribe() returned false for valid subscriber")
 	assertTrue(sub:isClosed(), "Subscriber was not marked as closed after it unsubscribed.")
 	assertFalse(event:isSubscribed(sub), "Event:isSubscribed() did not return false for its subscriber after it unsubscribed.")
+	assertFalse(fired, "Subscriber got notified after it unsubscribed from the event.")
+
+	return true
+end
+
+function testsuite.test_EventUnsubscribeWithFunction()
+	local event = Event()
+
+	local fired = false
+	local fn = function()
+		fired = true
+	end
+	event:subscribe(fn)
+
+	local unsubResult = event:unsubscribe(fn)
+	event:fire()
+
+	assertTrue(unsubResult, "Event:unsubscribe() returned false for valid subscriber")
+	assertFalse(fired, "Subscriber got notified after it unsubscribed from the event.")
 
 	return true
 end
@@ -81,6 +100,17 @@ function testsuite.test_EventIsSubscribed()
 
 	assertTrue(eventA:isSubscribed(subA), "Event:isSubscribed() did not return true for its own subscriber.")
 	assertFalse(eventB:isSubscribed(subA), "Event:isSubscribed() did not return false for foreign subscriber.")
+
+	return true
+end
+
+function testsuite.test_EventIsSubscribedWithFunction()
+	local event = Event()
+
+	local fn = function() end
+	event:subscribe(fn)
+
+	assertTrue(event:isSubscribed(fn), "Event:isSubscribed() did not return true for its own subscriber.")
 
 	return true
 end

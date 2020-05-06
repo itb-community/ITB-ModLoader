@@ -81,31 +81,53 @@ end
 	Returns true if the specified object is subscribed to this Event. False otherwise.
 --]]
 function Event:isSubscribed(subscription)
-	if type(subscription) ~= "table" then
-		return false
-	end
-	if not Class.instanceOf(subscription, Subscription) then
-		return false
-	end
-	if subscription:isClosed() then
-		return false
+	if type(subscription) == "table" and Class.instanceOf(subscription, Subscription) then
+		if subscription:isClosed() then
+			return false
+		end
+
+		return list_contains(self.subscribers, subscription)
+	elseif type(subscription) == "function" then
+		for _, sub in ipairs(self.subscribers) do
+			if sub.fn == subscription then
+				return true
+			end
+		end
 	end
 
-	return list_contains(self.subscribers, subscription)
+	return false
 end
 
 --[[
 	Cancels the specified subscription, making it invalid and no longer notified
 	of the event being fired.
+	Returns true if successfully unsubscribed, false otherwise.
 --]]
 function Event:unsubscribe(subscription)
-	assert(type(subscription) == "table", "Event.unsubscribe: first argument must be a table\n"..debug.traceback())
+	local argType = type(subscription)
+	assert(argType == "table" or argType == "function", "Event.unsubscribe: first argument must be a table or a function\n"..debug.traceback())
+
+	if not self:isSubscribed(subscription) then
+		return false
+	end
+
+	if argType == "function" then
+		for _, sub in ipairs(self.subscribers) do
+			if sub.fn == subscription then
+				subscription = sub
+				break
+			end
+		end
+
+		-- No subscriber found for the function
+		if type(subscription) == "function" then
+			return false
+		end
+	end
+
 	assert(Class.instanceOf(subscription, Subscription), "Event.unsubscribe: first argument must be a Subscription\n"..debug.traceback())
 
 	if subscription:isClosed() then
-		return false
-	end
-	if not self:isSubscribed(subscription) then
 		return false
 	end
 
