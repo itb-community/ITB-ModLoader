@@ -7,7 +7,7 @@ local BufferedLogger
 -- ///////////////////////////////////////////////////////////////////////
 -- BufferedLogger implementation
 
-BufferedLogger = Class.inherit(BasicLogger)
+BufferedLogger = BasicLogger:extend()
 
 local bufferSize = 200
 local pageSize = 20
@@ -16,8 +16,18 @@ function BufferedLogger:new()
 	self.buffer = DequeList()
 end
 
-function BufferedLogger:log(...)
-	local message, caller = self:preprocessInput(...)
+local delimiter = "\n"
+function BufferedLogger:log(caller, ...)
+	local message = self:preprocessInput(...)
+
+	if self:getPrintCallerInfo() then
+		self:pushMessage(caller)
+	end
+
+	for match in (message..delimiter):gmatch("(.-)"..delimiter) do
+		self:pushMessage(match)
+	end
+
 	self.bufferOffset = self.buffer:size() - pageSize
 	self:output()
 end
@@ -28,19 +38,6 @@ function BufferedLogger:pushMessage(message)
 	end
 
 	self.buffer:pushRight(message)
-end
-
-local delimiter = "\n"
-function BufferedLogger:preprocessInput(...)
-	local message, caller = self.__super.preprocessInput(self, ...)
-
-    for match in (message..delimiter):gmatch("(.-)"..delimiter) do
-        self:pushMessage(match)
-	end
-
-	if self:getPrintCallerInfo() then
-		self:pushMessage(caller)
-	end
 end
 
 function BufferedLogger:scroll(scrollAmount)

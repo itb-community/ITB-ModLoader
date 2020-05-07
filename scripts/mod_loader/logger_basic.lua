@@ -1,5 +1,3 @@
-local LoggerInterface = require("scripts/mod_loader/logger")
-
 -- Forward declaration
 local BasicLoggerImpl
 
@@ -13,6 +11,21 @@ function BasicLoggerImpl:new()
 	self.logFileName = "modloader.log"
 	self.logFileHandle = nil
 	self.printCallerInfo = false
+end
+
+local function getCurrentDate()
+	return os.date("%Y-%m-%d %H:%M:%S")
+end
+
+function BasicLoggerImpl.buildCallerMessage(callerOffset)
+	callerOffset = callerOffset or 0
+	assert(type(callerOffset) == "number")
+
+	local timestamp = getCurrentDate()
+	local info = debug.getinfo(3 + callerOffset, "Sl")
+	local caller = string.format("%s %s:%d", timestamp, info.short_src, info.currentline)
+
+	return caller
 end
 
 function BasicLoggerImpl:getLoggingLevel()
@@ -55,10 +68,6 @@ function BasicLoggerImpl:setPrintCallerInfo(printCallerInfo)
 	self.printCallerInfo = printCallerInfo
 end
 
-local function getCurrentDate()
-	return os.date("%Y-%m-%d %H:%M:%S")
-end
-
 local function openLogFile(fileName)
 	local fileHandle = io.open(fileName, "a+")
 
@@ -73,8 +82,8 @@ local function openLogFile(fileName)
 	return fileHandle
 end
 
-function BasicLoggerImpl:log(...)
-	local message, caller = self:preprocessInput(...)
+function BasicLoggerImpl:log(caller, ...)
+	local message = self:preprocessInput(...)
 	self:output(message, caller)
 end
 
@@ -94,11 +103,8 @@ function BasicLoggerImpl:preprocessInput(...)
 	end
 
 	local message = table.concat(arg, " ")
-	local timestamp = getCurrentDate()
-	local info = debug.getinfo(2, "Sl")
-	local caller = string.format("%s %s:%d", timestamp, info.short_src, info.currentline)
 
-	return message, caller
+	return message
 end
 
 local delimiter = "\n"

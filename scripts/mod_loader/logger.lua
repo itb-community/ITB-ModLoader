@@ -10,9 +10,9 @@ Logger.LOG_LEVEL_NONE = 0
 Logger.LOG_LEVEL_CONSOLE = 1
 Logger.LOG_LEVEL_FILE = 2
 
-function Logger:new(loggerImplClass)
-	assert(loggerImplClass, "Argument #1 must not be nil")
-	self:__init(loggerImplClass())
+function Logger:new(loggerImpl)
+	assert(type(loggerImpl) == "table", "Argument #1 must be a table")
+	self:__init(loggerImpl)
 end
 
 function Logger:__init(loggerImpl)
@@ -42,6 +42,10 @@ function Logger:__init(loggerImpl)
 
 	self.log = function(self, ...)
 		loggerImpl:log(...)
+	end
+
+	self.buildCallerMessage = function(...)
+		return loggerImpl.buildCallerMessage(...)
 	end
 end
 

@@ -6,11 +6,11 @@ local ScrollableLogger
 -- ///////////////////////////////////////////////////////////////////////
 -- ScrollableLogger interface
 
-ScrollableLogger = Class.inherit(Logger)
+ScrollableLogger = Logger:extend()
 
-function ScrollableLogger:new(loggerImplClass)
-	assert(loggerImplClass, "Argument #1 must not be nil")
-	self:__init(loggerImplClass())
+function ScrollableLogger:new(loggerImpl)
+	assert(type(loggerImpl) == "table", "Argument #1 must be a table")
+	self:__init(loggerImpl)
 end
 
 function ScrollableLogger:__init(loggerImpl)

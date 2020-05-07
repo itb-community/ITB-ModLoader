@@ -1,23 +1,23 @@
 mod_loader = {}
 
 Logger = require("scripts/mod_loader/logger")
-
-local BasicLogger = require("scripts/mod_loader/logger_basic")
 local ScrollableLogger = require("scripts/mod_loader/logger_scrollable")
-local BufferedLogger = require("scripts/mod_loader/logger_buffered")
 
-local useBufferedLogger = false
-if useBufferedLogger then
-	mod_loader.logger = ScrollableLogger(BufferedLogger)
+local BasicLoggerImpl = require("scripts/mod_loader/logger_basic")
+local BufferedLoggerImpl = require("scripts/mod_loader/logger_buffered")
+
+local useScrollableLogger = true
+if useScrollableLogger then
+	mod_loader.logger = ScrollableLogger(BufferedLoggerImpl())
 else
-	mod_loader.logger = Logger(BasicLogger)
+	mod_loader.logger = Logger(BasicLoggerImpl())
 end
-
 
 local oldLog = LOG
 function LOG(...)
 	if mod_loader.logger then
-		mod_loader.logger:log(...)
+		local caller = mod_loader.logger.buildCallerMessage(1)
+		mod_loader.logger:log(caller, ...)
 	else
 		oldLog(...)
 	end
