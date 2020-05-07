@@ -311,4 +311,16 @@ t.KBDILLUMUP = 0x40000118
 t.EJECT = 0x40000119
 t.SLEEP = 0x4000011A
 
+t.isPrintableKeyCode = function(keycode)
+	return (keycode >= t.SPACE and keycode <= t.AT) or
+	       (keycode >= t.LEFTBRACKET and keycode <= t.z) or
+	       (keycode >= t.KP_1 and keycode <= t.KP_0) or
+	       (keycode >= t.KP_DIVIDE and keycode <= t.KP_PLUS) or
+	       (keycode == t.KP_PERIOD)
+end
+
+t.isArrowKeyCode = function(keycode)
+	return (keycode >= t.ARROW_RIGHT and keycode <= t.ARROW_UP)
+end
+
 SDLKeycodes = t
