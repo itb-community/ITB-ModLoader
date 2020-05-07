@@ -64,6 +64,17 @@ t['.'] = t.PERIOD
 t.SLASH = 0x2F
 t['/'] = t.SLASH
 
+t['0'] = 0x30
+t['1'] = 0x31
+t['2'] = 0x32
+t['3'] = 0x33
+t['4'] = 0x34
+t['5'] = 0x35
+t['6'] = 0x36
+t['7'] = 0x37
+t['8'] = 0x38
+t['9'] = 0x39
+
 t.COLON = 0x3A
 t[':'] = t.COLON
 
@@ -103,22 +114,6 @@ t['_'] = t.UNDERSCORE
 t.BACKQUOTE = 0x60
 t['`'] = t.BACKQUOTE
 
-t.DELETE = 0x7F
-t['\177'] = t.DELETE
-
-t.CAPSLOCK = 0x40000039
-
-t['0'] = 0x30
-t['1'] = 0x31
-t['2'] = 0x32
-t['3'] = 0x33
-t['4'] = 0x34
-t['5'] = 0x35
-t['6'] = 0x36
-t['7'] = 0x37
-t['8'] = 0x38
-t['9'] = 0x39
-
 t.a = 0x61
 t.b = 0x62
 t.c = 0x63
@@ -145,6 +140,11 @@ t.w = 0x77
 t.x = 0x78
 t.y = 0x79
 t.z = 0x7A
+
+t.DELETE = 0x7F
+t['\177'] = t.DELETE
+
+t.CAPSLOCK = 0x40000039
 
 t.F1 = 0x4000003A
 t.F2 = 0x4000003B
