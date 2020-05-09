@@ -23,7 +23,7 @@ return {
 
 	["ModContent_Button_PilotArrange"] = "Arrange Pilots",
 	["ModContent_ButtonTooltip_PilotArrange"] = "Select which pilots will be available to pick.",
-	["PilotArrange_ButtonTooltip_Off"] = "Pilots can only be arranged before the New Game button is pressed.\n\nRestart the game to be able to arrange pilots.",
+	["PilotArrange_ButtonTooltip_Off"] = "New Game was pressed, so the pilots in the hangar can no longer be updated.\n\nYou must restart the game for changes to take effect.",
 	["PilotArrange_FrameTitle"] = "Arrange Pilots",
 
 	["ModContent_Button_ModLoaderConfig"] = "Configure Mod Loader",
