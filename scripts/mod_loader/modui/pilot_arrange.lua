@@ -7,6 +7,7 @@
 local MAX_PILOTS = 13
 local hangarBackdrop = sdlext.getSurface({ path = "resources/mods/ui/pilot-arrange-hangar.png" })
 local pilotSurfaces = {}
+local updateImmediately = true
 -- copy of the list before we make any changes to it
 local PilotListDefault = shallow_copy(PilotList)
 
@@ -30,11 +31,11 @@ function loadPilotsOrder()
 	end)
 end
 
-function savePilotsOrder()
+function savePilotsOrder(pilots)
 	local modcontent = modApi:getCurrentModcontentPath()
 
 	sdlext.config(modcontent, function(obj)
-		obj.pilotOrder = PilotList
+		obj.pilotOrder = pilots
 	end)
 end
 
@@ -55,13 +56,16 @@ local function createUi()
 	local pilotButtons = {}
 
 	local onExit = function(self)
-		PilotList = {}
-
+		-- update a local variable into config
+		local pilots = {}
 		for i = 1, MAX_PILOTS do
-			PilotList[i] = pilotButtons[i].pilotId
+			pilots[i] = pilotButtons[i].pilotId
 		end
-
-		savePilotsOrder()
+		savePilotsOrder(pilots)
+		-- update the global if we have not entered the hangar
+		if updateImmediately then
+			PilotList = pilots
+		end
 	end
 
 	sdlext.showDialog(function(ui, quit)
@@ -304,8 +308,8 @@ function ArrangePilots()
 end
 
 sdlext.addHangarEnteredHook(function(screen)
-	if not arrangePilotsButton.disabled then
-		arrangePilotsButton.disabled = true
+	if updateImmediately then
+		updateImmediately = false
 		arrangePilotsButton.tip = GetText("PilotArrange_ButtonTooltip_Off")
 	end
 end)
