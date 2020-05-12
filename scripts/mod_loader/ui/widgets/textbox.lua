@@ -1,14 +1,25 @@
-UiTextbox = Class.inherit(Ui)
+UiTextbox = Class.inherit(UiWrappedText)
 
-function UiTextbox:new()
-	Ui.new(self)
-	self.textBuffer = EditableTextBuffer()
-	self.caretPosition = 0
-	self.selectionMarker = nil
+function UiTextbox:new(text, font, textset)
+	UiWrappedText.new(self, text, font, textset)
+
+	self.textBuffer = EditableTextBuffer(text)
 
 	self.onTextChanged = self.textBuffer.onTextChanged
 	self.onCaretPositionChanged = self.textBuffer.onCaretPositionChanged
 	self.onSelectionChanged = self.textBuffer.onSelectionChanged
+
+	self.onTextChanged:subscribe(function(oldText, newText)
+		self.__index.setText(self, newText)
+	end)
+end
+
+function UiTextbox:relayout()
+	local h = self.h
+
+	UiWrappedText.relayout(self)
+
+	self.h = h
 end
 
 function UiTextbox:keydown(keycode)
@@ -29,9 +40,11 @@ function UiTextbox:keydown(keycode)
 	elseif SDLKeycodes.DELETE then
 		self:handleDelete()
 		return true
-	end
-
-	if handled then
+	elseif SDLKeycodes.HOME then
+		self:handleHome()
+		return true
+	elseif SDLKeycodes.END then
+		self:handleEnd()
 		return true
 	end
 
@@ -44,6 +57,10 @@ function UiTextbox:keyup(keycode)
 	end
 
 	return Ui.keyup(self, keycode)
+end
+
+function UiTextbox:hasSelection()
+	return self.textBuffer:hasSelection()
 end
 
 function UiTextbox:handleArrows(keycode)
@@ -100,4 +117,12 @@ function UiTextbox:handleDelete()
 	end
 
 	self.textBuffer:deleteNextCharacter()
+end
+
+function UiTextbox:handleHome()
+	-- TODO
+end
+
+function UiTextbox:handleEnd()
+	-- TODO
 end

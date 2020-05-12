@@ -12,6 +12,7 @@ local scripts = {
 	"decorations/deco_checkbox",
 	"decorations/deco_dropdown",
 	"decorations/deco_animsheet",
+	"decorations/deco_textbox",
 
 	"widgets/base",
 	"widgets/draggable",
@@ -25,6 +26,8 @@ local scripts = {
 	"widgets/checkbox",
 	"widgets/dropdown",
 	"widgets/mainmenubutton",
+	"widgets/textbuffer",
+	"widgets/textbox",
 }
 
 local rootpath = GetParentPath(...)
