@@ -73,6 +73,18 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 						return false
 					end
 				end
+
+				-- TOOD REMOVE ME
+				textbox = UiTextbox("TEST")
+					:width(1)
+					:heightpx(40)
+					:decorate({
+						DecoFrame(),
+						DecoAlign(2, 2),
+						DecoText(),
+						DecoTextbox()
+					})
+					:addTo(holder)
 			end)
 
 			return true
