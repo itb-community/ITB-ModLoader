@@ -14,7 +14,7 @@ function EditableTextBuffer:insertCharacter(keycode)
 	local oldText = self.text
 	local oldPos = self.caretPosition
 
-	self.text = string.insert(self.text, self.caretPosition, keycode)
+	self.text = self.text:sub(0, self.caretPosition) .. keycode .. self.text:sub(self.caretPosition + 1)
 	self.caretPosition = self.caretPosition + 1
 
 	self.onTextChanged:fire(oldText, self.text)
