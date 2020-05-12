@@ -69,7 +69,11 @@ function UiTextbox:handleArrows(keycode)
 end
 
 function UiTextbox:handlePrintableCharacter(keycode)
-	self.textBuffer:insertCharacter(keycode)
+	keycode = SDLKeycodes.normalizePrintableKeyCode(keycode)
+
+	local character = string.char(keycode)
+	self.textBuffer:insertCharacter(character)
+	return true
 end
 
 function UiTextbox:handleDeleteSelection()

@@ -323,4 +323,24 @@ t.isArrowKeyCode = function(keycode)
 	return (keycode >= t.ARROW_RIGHT and keycode <= t.ARROW_UP)
 end
 
+t.normalizePrintableKeyCode = function(keycode)
+	if keycode >= t.KP_1 and keycode <= t.KP_9 then
+		return keycode - t.KP_1 + t['1']
+	elseif keycode == t.KP_0 then
+		return t['0']
+	elseif keycode == t.KP_DIVIDE then
+		return t.SLASH
+	elseif keycode == t.KP_MULTIPLY then
+		return t.ASTERISK
+	elseif keycode == t.KP_MINUS then
+		return t.MINUS
+	elseif keycode == t.KP_PLUS then
+		return t.PLUS
+	elseif keycode == t.KP_PERIOD then
+		return t.PERIOD
+	end
+
+	return keycode
+end
+
 SDLKeycodes = t
