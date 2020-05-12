@@ -11,6 +11,7 @@ local scripts = {
 	"data",
 	"text",
 	"squad",
+	"drops",
 	"difficulty",
 	"map",
 	"skills",

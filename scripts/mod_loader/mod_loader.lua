@@ -27,6 +27,16 @@ function LOGF(...)
 	LOG(string.format(...))
 end
 
+-- fires a list of hooks, catching and logging errors
+local function fireHooksSafely(hooks, errorMsg)
+	for i, hook in ipairs(hooks) do
+		local ok, err = pcall(function() hook() end)
+		if not ok then
+			LOG(errorMsg, err)
+		end
+	end
+end
+
 function mod_loader:init()
 	self.mod_dirs = {}
 	self.mods = {}
@@ -65,13 +75,7 @@ function mod_loader:init()
 		self:initMod(id)
 	end
 
-	for i, hook in ipairs(modApi.modsInitializedHooks) do
-		local ok, err = pcall(function() hook() end)
-
-		if not ok then
-			LOG("A modsInitializedHook failed: ", err)
-		end
-	end
+	fireHooksSafely(modApi.modsInitializedHooks, "A modsInitializedHook failed: ")
 	modApi.modsInitializedHooks = nil
 	
 	modApi:finalize()
@@ -81,6 +85,7 @@ function mod_loader:init()
 
 	sdlext.addInitialLoadingFinishedHook(function()
 		self:loadModContent(self:getModConfig(), self:getSavedModOrder())
+		fireHooksSafely(modApi.modsFirstLoadedHooks, "A modsFirstLoaded hook failed: ")
 	end)
 end
 
@@ -479,13 +484,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 		end
 	end
 
-	for i, hook in ipairs(modApi.modsLoadedHooks) do
-		local ok, err = pcall(function() hook() end)
-
-		if not ok then
-			LOG("A modsLoadedHook failed: ", err)
-		end
-	end
+	fireHooksSafely(modApi.modsLoadedHooks, "A modsLoadedHook failed: ")
 end
 
 function mod_loader:loadPilotList()
