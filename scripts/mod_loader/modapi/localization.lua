@@ -48,7 +48,7 @@ function modApi:getLanguageId(languageIndex)
 	languageIndex = languageIndex or self:getLanguageIndex()
 	assert(type(languageIndex) == "number", "Language index must be a number")
 
-	return languageNames[index] or "English"
+	return languageNames[languageIndex] or "English"
 end
 
 --[[
