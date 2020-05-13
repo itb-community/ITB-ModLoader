@@ -226,7 +226,7 @@ local function createUi()
 		local frametop = Ui()
 			:width(0.8):height(0.8)
 			:posCentered()
-			:caption(GetText("ModContent_Button_PilotArrange"))
+			:caption(GetText("ModContent_Button_ConfigureWeaponDeck"))
 			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:addTo(ui)
 		-- scrollable content
