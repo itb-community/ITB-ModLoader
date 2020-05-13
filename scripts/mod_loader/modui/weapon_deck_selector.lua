@@ -69,9 +69,11 @@ for i = 1, 26 do ALL_PRESETS[i] = string.char(64+i) end
 function loadWeaponDeck()
 	-- load weapon enable values from the config
 	sdlext.config(modApi:getCurrentModcontentPath(), function(config)
-		for id, enabled in pairs(config.shopWeaponsEnabled) do
-			if modApi.weaponDeck[id] ~= nil then
-				modApi.weaponDeck[id] = enabled
+		if config.shopWeaponsEnabled ~= nil then
+			for id, enabled in pairs(config.shopWeaponsEnabled) do
+				if modApi.weaponDeck[id] ~= nil then
+					modApi.weaponDeck[id] = enabled
+				end
 			end
 		end
 	end)
