@@ -25,6 +25,7 @@ return {
 	["ModContent_ButtonTooltip_PilotArrange"] = "Select which pilots will be available to pick.",
 	["PilotArrange_ButtonTooltip_Off"] = "New Game was pressed, so the pilots in the hangar can no longer be updated.\n\nYou must restart the game for changes to take effect.",
 	["PilotArrange_FrameTitle"] = "Arrange Pilots",
+	["PilotArrange_RestartWarning_Text"] = "The hangar was already loaded, so you must restart the game for your changes to take effect.",
 
 	["ModContent_Button_ModLoaderConfig"] = "Configure Mod Loader",
 	["ModContent_ButtonTooltip_ModLoaderConfig"] = "Configure some features of the mod loader.",

@@ -6,10 +6,21 @@
 
 local MAX_PILOTS = 13
 local hangarBackdrop = sdlext.getSurface({ path = "resources/mods/ui/pilot-arrange-hangar.png" })
+local pilotLock = sdlext.getSurface({ path = "img/main_menus/lock.png" })
 local pilotSurfaces = {}
+local lockedSurfaces = {}
 local updateImmediately = true
 -- copy of the list before we make any changes to it
 local PilotListDefault = shallow_copy(PilotList)
+local BLACK_MASK = sdl.rgb(0, 0, 0)
+
+--[[--
+	Checks if the advanced AI pilot was unlocked
+	@return True if the advanced AI was unlocked, false otherwise
+]]
+local function isPilotUnlocked(id)
+	return type(Profile) == "table" and type(Profile.pilots) == "table" and list_contains(Profile.pilots, id)
+end
 
 function loadPilotsOrder()
 	local order = {}
@@ -39,7 +50,8 @@ function savePilotsOrder(pilots)
 	end)
 end
 
-local function getOrCreatePilotSurface(pilotId)
+-- gets and caches a pilot surface
+local function getSurfaceInternal(pilotId)
 	local surface = pilotSurfaces[pilotId]
 	if not surface then
 		surface = sdlext.getSurface({
@@ -48,8 +60,30 @@ local function getOrCreatePilotSurface(pilotId)
 		})
 		pilotSurfaces[pilotId] = surface
 	end
-
 	return surface
+end
+
+-- gets a pilot surface, or if not unlocked a black surface
+local function getOrCreatePilotSurface(pilotId)
+	-- unlocked calls directly
+	local unlocked = isPilotUnlocked(pilotId)
+	if unlocked then
+		return getSurfaceInternal(pilotId)
+	end
+	-- not unlocked may need to color
+	local surface = lockedSurfaces[pilotId]
+	if not surface then
+		surface = sdl.multiply(getSurfaceInternal(pilotId), BLACK_MASK)
+		lockedSurfaces[pilotId] = surface
+	end
+	return surface
+end
+
+--- function called to confirm when the UI is opened after the hangar
+local function responseFn(btnIndex)
+	if btnIndex == 1 then
+		os.exit()
+	end
 end
 
 local function createUi()
@@ -65,6 +99,16 @@ local function createUi()
 		-- update the global if we have not entered the hangar
 		if updateImmediately then
 			PilotList = pilots
+		else
+			-- alert the user to restart the game
+			modApi:scheduleHook(50, function()
+				sdlext.showButtonDialog(
+					GetText("OpenGL_FrameTitle"),
+					GetText("PilotArrange_RestartWarning_Text"),
+					responseFn, nil, nil,
+					{ GetText("OpenGL_Button_Quit"), GetText("OpenGL_Button_Stay") }
+				)
+			end)
 		end
 	end
 
@@ -232,17 +276,32 @@ local function createUi()
 			local col = (i - 1) % portraitsPerRow
 			local row = math.floor((i - 1) / portraitsPerRow)
 
+			local unlocked = isPilotUnlocked(pilotId)
 			local surface = getOrCreatePilotSurface(pilotId)
+			local decorations = {
+				DecoButton(),
+				DecoAlign(-4),
+				DecoSurface(surface)
+			}
+			-- locked pilots add a lock icon
+			if not unlocked then
+				table.insert(decorations, DecoAlign(-(pilotLock:w()+surface:w())/2))
+				table.insert(decorations, DecoSurface(pilotLock))
+			end
 			local button = Ui()
 				:widthpx(portraitW):heightpx(portraitH)
 				:pospx(cellW * col, cellH * row)
-				:settooltip(GetText(pilot.Name))
-				:decorate({
-					DecoButton(),
-					DecoAlign(-4),
-					DecoSurface(surface)
-				})
+				:decorate(decorations)
 				:addTo(scrollarea)
+			-- only show tooltip text if the pilot is unlocked
+			if unlocked then
+				-- if the pilot lacks a skill, state "No Special Ability"
+				local desc = GetSkillInfo(pilot.Skill).desc
+				if not desc or desc == "" then
+					desc = "Hangar_NoAbility"
+				end
+				button:settooltip(string.format("%s\n\n%s", GetText(pilot.Name), GetText(desc)))
+			end
 
 			button:registerDragMove()
 			button.pilotId = pilotId
