@@ -64,8 +64,11 @@ return {
 	["ModLoaderConfig_Text_GamepadWarning"] = "Show Gamepad Warning Popup",
 	["ModLoaderConfig_Tooltip_GamepadWarning"] = "Show a warning popup when Gamepad Mode is enabled.",
 
-	["ModLoaderConfig_Text_RestartReminder"] = "Show Restart Reminder Popup",
+	["ModLoaderConfig_Text_RestartReminder"] = "Show Mod Restart Reminder Popup",
 	["ModLoaderConfig_Tooltip_RestartReminder"] = "Show a popup reminding to restart the game when enabling mods.",
+
+	["ModLoaderConfig_Text_PilotRestartReminder"] = "Show Pilot Restart Reminder Popup",
+	["ModLoaderConfig_Tooltip_PilotRestartReminder"] = "Show a popup reminding to restart the game when changing pilot order after viewing the hangar.",
 
 	["ModLoaderConfig_Text_ProfileFrame"] = "Show Profile Settings Change Popup",
 	["ModLoaderConfig_Tooltip_ProfileFrame"] = "Show a popup reminding to restart the game when switching profiles with Profile-Specific Configuration enabled.",

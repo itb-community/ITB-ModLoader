@@ -82,7 +82,7 @@ end
 --- function called to confirm when the UI is opened after the hangar
 local function responseFn(btnIndex)
 	if btnIndex == 2 then
-		modApi.showRestartReminder = false
+		modApi.showPilotRestartReminder = false
 		SaveModLoaderConfig(CurrentModLoaderConfig())
 	end
 end
@@ -100,7 +100,7 @@ local function createUi()
 		-- update the global if we have not entered the hangar
 		if updateImmediately then
 			PilotList = pilots
-		else
+		elseif modApi.showPilotRestartReminder then
 			-- alert the user to restart the game
 			modApi:scheduleHook(50, function()
 				sdlext.showButtonDialog(

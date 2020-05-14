@@ -14,6 +14,7 @@ function CurrentModLoaderConfig()
 	data.showResourceWarning = modApi.showResourceWarning
 	data.showGamepadWarning  = modApi.showGamepadWarning
 	data.showRestartReminder = modApi.showRestartReminder
+	data.showPilotRestartReminder = modApi.showPilotRestartReminder
 	data.showProfileSettingsFrame = modApi.showProfileSettingsFrame
 
 	return data
@@ -59,6 +60,7 @@ function DefaultModLoaderConfig()
 		showResourceWarning = true,
 		showGamepadWarning  = true,
 		showRestartReminder = true,
+		showPilotRestartReminder = true,
 		showProfileSettingsFrame = true
 	}
 end
@@ -104,6 +106,7 @@ function ApplyModLoaderConfig(config)
 	modApi.showResourceWarning    = config.showResourceWarning
 	modApi.showGamepadWarning     = config.showGamepadWarning
 	modApi.showRestartReminder    = config.showRestartReminder
+	modApi.showPilotRestartReminder = config.showPilotRestartReminder
 	modApi.showProfileSettingsFrame = config.showProfileSettingsFrame
 end
 
