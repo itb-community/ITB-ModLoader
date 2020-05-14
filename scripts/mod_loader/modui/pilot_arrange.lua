@@ -81,8 +81,9 @@ end
 
 --- function called to confirm when the UI is opened after the hangar
 local function responseFn(btnIndex)
-	if btnIndex == 1 then
-		os.exit()
+	if btnIndex == 2 then
+		modApi.showRestartReminder = false
+		SaveModLoaderConfig(CurrentModLoaderConfig())
 	end
 end
 
@@ -106,7 +107,8 @@ local function createUi()
 					GetText("OpenGL_FrameTitle"),
 					GetText("PilotArrange_RestartWarning_Text"),
 					responseFn, nil, nil,
-					{ GetText("OpenGL_Button_Quit"), GetText("OpenGL_Button_Stay") }
+					{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
+					{ "", GetText("ButtonTooltip_DisablePopup") }
 				)
 			end)
 		end
