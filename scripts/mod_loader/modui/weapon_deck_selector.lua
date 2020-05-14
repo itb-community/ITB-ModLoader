@@ -6,7 +6,6 @@ local WEAPON_HEIGHT = 80 + 8 + TEXT_PADDING
 -- button spacing
 local WEAPON_GAP = 16
 local CELL_WIDTH = WEAPON_WIDTH + WEAPON_GAP
-local CELL_HEIGHT = WEAPON_HEIGHT + WEAPON_GAP
 local PADDING = 12
 local BUTTON_HEIGHT = 40
 
@@ -35,6 +34,48 @@ local function getWeaponKey(id, key)
 		return GetLocalizedText(textId)
 	end
 	return _G[id] and _G[id][key] or id
+end
+
+--[[--
+  Gets a sorted list of weapon classes, each containing a sorted list of weapons
+]]
+local function getClassList(oldConfig)
+	local classes = {}
+	for id, enabled in pairs(modApi.weaponDeck) do
+		local weapon = _G[id]
+		if type(weapon) == "table" and (not weapon.GetUnlocked or weapon:GetUnlocked()) then
+			-- first, determine the weapon class
+			local class
+			if oldConfig[id] == nil and not modApi:isDefaultWeapon(id) then
+				class = "new"
+			elseif weapon.Passive ~= "" then
+				class = "Passive"
+			else
+				class = weapon:GetClass()
+				if class == "" then class = "Any" end
+			end
+			-- if this is the first we have seen the class, make a class group
+			if classes[class] == nil then
+				-- new sorts first, and uses a special text
+				if class == "new" then
+					classes[class] = {weapons = {}, name = GetLocalizedText("Upgrade_New"), sortName = "1"}
+				else
+					local key = "Skill_Class" .. class
+					classes[class] = {weapons = {}, name = IsLocalizedText(key) and GetLocalizedText(key) or class}
+				end
+			end
+			table.insert(classes[class].weapons, {id = id, name = getWeaponKey(id, "Name"), enabled = enabled})
+		end
+	end
+	--- convert the map into a list and sort, plus sort the weapons
+	local sortName = function(a, b) return (a.sortName or a.name) < (b.sortName or b.name) end
+	local classList = {}
+	for id, data in pairs(classes) do
+		table.sort(data.weapons, sortName)
+		table.insert(classList, data)
+	end
+	table.sort(classList, sortName)
+	return classList
 end
 
 --[[--
@@ -233,6 +274,11 @@ local function createUi()
 		local scrollArea = UiScrollArea()
 			:width(1):height(1)
 			:addTo(frametop)
+		-- subelement to ensure classes automatically are aligned to the right heights
+		local allClassArea = UiBoxLayout()
+			:width(1)
+			:vgap(PADDING)
+			:addTo(scrollArea)
 		-- define the window size to fit as many weapons as possible, comes out to about 5
 		local weaponsPerRow = math.floor(ui.w * frametop.wPercent / CELL_WIDTH)
 		frametop
@@ -240,225 +286,192 @@ local function createUi()
 			:posCentered()
 		ui:relayout()
 
-		-- add button area on the bottom
+		-- line separating button area
 		local line = Ui()
       :width(1):heightpx(frametop.decorations[1].bordersize)
       :decorate({ DecoSolid(frametop.decorations[1].bordercolor) })
       :addTo(frametop)
+		-- vertical layout for left and right aligned buttons
 		local buttonLayout = UiBoxLayout()
-      :hgap(20)
-      :padding(24)
-      :width(1)
-      :addTo(frametop)
-		buttonLayout:heightpx(BUTTON_HEIGHT + buttonLayout.padt + buttonLayout.padb)
-		ui:relayout()
-		scrollArea:heightpx(scrollArea.h - (buttonLayout.h + line.h))
+			:vgap(-BUTTON_HEIGHT) -- negative padding will make both elements go at the same height
+			:padding(24)
+			:width(1)
+			:addTo(frametop)
+		scrollArea:heightpx(scrollArea.h - (BUTTON_HEIGHT + buttonLayout.padt + buttonLayout.padb + line.h))
 		line:pospx(0, scrollArea.y + scrollArea.h)
 		buttonLayout:pospx(0, line.y + line.h)
 
-		-------------
-		-- Buttons --
-		-------------
+		--- function defined in addPresetButtons that enables the save and load buttons
 		local enableSaveLoad
-
-		--- Button to enable all weapons
 		local size = weaponsPerRow > 6 and 1.5 or 1
-		local enableAllButton = Ui()
-			:widthpx(WEAPON_WIDTH * size):heightpx(BUTTON_HEIGHT)
-			:settooltip(GetText("ConfigureWeaponDeck_EnableAll_Tooltip"))
-			:decorate({
-				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText(GetText("ConfigureWeaponDeck_EnableAll_Title")),
-			})
-			:addTo(buttonLayout)
-		function enableAllButton.onclicked()
-			for _, button in ipairs(buttons) do
-				button.checked = true
-			end
-			enableSaveLoad(true)
-			return true
-		end
-		--- Button to disable all weapons
-		local disableAllButton = Ui()
-			:widthpx(WEAPON_WIDTH * size):heightpx(BUTTON_HEIGHT)
-			:settooltip(GetText("ConfigureWeaponDeck_DisableAll_Tooltip"))
-			:decorate({
-				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText(GetText("ConfigureWeaponDeck_DisableAll_Title")),
-			})
-			:addTo(buttonLayout)
-		function disableAllButton.onclicked()
-			for _, button in ipairs(buttons) do
-				button.checked = false
-			end
-			enableSaveLoad(true)
-			return true
-		end
 
-		-- add spacer before preset buttons
-		-- width is crafted to right align the preset buttons
-		Ui()
-			:widthpx(frametop.w													-- button area width
-				- buttonLayout.padl - buttonLayout.padr		-- padding on sides
-				- WEAPON_WIDTH * (PRESET_WIDTH + size * 3) -- all buttons, 2 are half sized, one fixed
-				- buttonLayout.gapHorizontal * 5)					-- gap between buttons
-			:heightpx(BUTTON_HEIGHT):addTo(buttonLayout)
-		-- preset dropdown
-		local presetDropdown = UiDropDown(presets)
-			:widthpx(WEAPON_WIDTH * PRESET_WIDTH):heightpx(BUTTON_HEIGHT)
-			:settooltip(GetText("ConfigureWeaponDeck_Preset_Tooltip"))
-			:decorate({
-				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText(GetText("ConfigureWeaponDeck_Preset_Title")),
-				DecoDropDownText(nil, nil, nil, 33),
-				DecoAlign(0, -2),
-				DecoDropDown(),
-			})
-			:addTo(buttonLayout)
-		function presetDropdown:destroyDropDown()
-			UiDropDown.destroyDropDown(self)
-			enableSaveLoad(true)
-		end
-		--- localized earlier before savePreset
-		function setPreset(id)
-			presetDropdown.value = id
-		end
-		--- loads the current preset
-		size = size / 2
-		local loadPresetButton = Ui()
-			:widthpx(WEAPON_WIDTH * size):heightpx(BUTTON_HEIGHT)
-			:settooltip(GetText("ConfigureWeaponDeck_PresetLoad_Tooltip"))
-			:decorate({
-				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText(GetText("ConfigureWeaponDeck_PresetLoad_Title")),
-			})
-			:addTo(buttonLayout)
-		function loadPresetButton.onclicked()
-			loadPreset(presetDropdown.value)
-			enableSaveLoad(false)
-			return true
-		end
-		--- Saves the current preset
-		local savePresetButton = Ui()
-			:widthpx(WEAPON_WIDTH * size):heightpx(BUTTON_HEIGHT)
-			:settooltip(GetText("ConfigureWeaponDeck_PresetSave_Tooltip"))
-			:decorate({
-				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText(GetText("ConfigureWeaponDeck_PresetSave_Title")),
-			})
-			:addTo(buttonLayout)
-		savePresetButton.disabled = true
-		function savePresetButton.onclicked()
-			local value = presetDropdown.value
-			if value ~= PRESET_DEFAULT then
-				savePreset(value)
+		-- adds buttons for enabling and disabling
+		local function addEnableDisableButtons()
+			-- Button to enable all weapons
+			local buttonLayoutLeft = UiBoxLayout()
+				:hgap(20)
+				:heightpx(BUTTON_HEIGHT)
+				:addTo(buttonLayout)
+			buttonLayoutLeft.alignH = "left"
+			local enableAllButton = Ui()
+				:widthpx(WEAPON_WIDTH * size):heightpx(BUTTON_HEIGHT)
+				:settooltip(GetText("ConfigureWeaponDeck_EnableAll_Tooltip"))
+				:decorate({
+					DecoButton(),
+					DecoAlign(0, 2),
+					DecoText(GetText("ConfigureWeaponDeck_EnableAll_Title")),
+				})
+				:addTo(buttonLayoutLeft)
+			function enableAllButton.onclicked()
+				for _, button in ipairs(buttons) do
+					button.checked = true
+				end
+				enableSaveLoad(true)
+				return true
 			end
-			enableSaveLoad(false)
-			return true
-		end
-		--- Define function to enable/disable the buttons, localized earlier
-		function enableSaveLoad(enable)
-			local value = presetDropdown.value
-			if enable then
-				-- vanilla and random cannot save, new cannot load
-				savePresetButton.disabled = value == PRESET_DEFAULT or value == PRESET_RANDOM
-				loadPresetButton.disabled = value == PRESET_NEW
-			else
-				-- random can always load
-				savePresetButton.disabled = true
-				loadPresetButton.disabled = value ~= PRESET_RANDOM
+			--- Button to disable all weapons
+			local disableAllButton = Ui()
+				:widthpx(WEAPON_WIDTH * size):heightpx(BUTTON_HEIGHT)
+				:settooltip(GetText("ConfigureWeaponDeck_DisableAll_Tooltip"))
+				:decorate({
+					DecoButton(),
+					DecoAlign(0, 2),
+					DecoText(GetText("ConfigureWeaponDeck_DisableAll_Title")),
+				})
+				:addTo(buttonLayoutLeft)
+			function disableAllButton.onclicked()
+				for _, button in ipairs(buttons) do
+					button.checked = false
+				end
+				enableSaveLoad(true)
+				return true
 			end
 		end
 
-		-------------
-		-- Weapons --
-		-------------
-
-		--- sort the buttons by class
-		local classes = {}
-		for id, enabled in pairs(modApi.weaponDeck) do
-			local weapon = _G[id]
-			if type(weapon) == "table" and (not weapon.GetUnlocked or weapon:GetUnlocked()) then
-				-- first, determine the weapon class
-				local class
-				if oldConfig[id] == nil and not modApi:isDefaultWeapon(id) then
-					class = "new"
-				elseif weapon.Passive ~= "" then
-					class = "Passive"
+		--- adds buttons to control presets
+		local function addPresetButtons()
+			-- dropdown to choose a preset
+			local buttonLayoutRight = UiBoxLayout()
+				:hgap(20)
+				:heightpx(BUTTON_HEIGHT)
+				:addTo(buttonLayout)
+			buttonLayoutRight.alignH = "right"
+			local presetDropdown = UiDropDown(presets)
+				:widthpx(WEAPON_WIDTH * PRESET_WIDTH):heightpx(BUTTON_HEIGHT)
+				:settooltip(GetText("ConfigureWeaponDeck_Preset_Tooltip"))
+				:decorate({
+					DecoButton(),
+					DecoAlign(0, 2),
+					DecoText(GetText("ConfigureWeaponDeck_Preset_Title")),
+					DecoDropDownText(nil, nil, nil, 33),
+					DecoAlign(0, -2),
+					DecoDropDown(),
+				})
+				:addTo(buttonLayoutRight)
+			function presetDropdown:destroyDropDown()
+				UiDropDown.destroyDropDown(self)
+				enableSaveLoad(true)
+			end
+			--- localized earlier before savePreset
+			function setPreset(id)
+				presetDropdown.value = id
+			end
+			--- loads the current preset
+			size = size / 2
+			local loadPresetButton = Ui()
+				:widthpx(WEAPON_WIDTH * size):heightpx(BUTTON_HEIGHT)
+				:settooltip(GetText("ConfigureWeaponDeck_PresetLoad_Tooltip"))
+				:decorate({
+					DecoButton(),
+					DecoAlign(0, 2),
+					DecoText(GetText("ConfigureWeaponDeck_PresetLoad_Title")),
+				})
+				:addTo(buttonLayoutRight)
+			function loadPresetButton.onclicked()
+				loadPreset(presetDropdown.value)
+				enableSaveLoad(false)
+				return true
+			end
+			--- Saves the current preset
+			local savePresetButton = Ui()
+				:widthpx(WEAPON_WIDTH * size):heightpx(BUTTON_HEIGHT)
+				:settooltip(GetText("ConfigureWeaponDeck_PresetSave_Tooltip"))
+				:decorate({
+					DecoButton(),
+					DecoAlign(0, 2),
+					DecoText(GetText("ConfigureWeaponDeck_PresetSave_Title")),
+				})
+				:addTo(buttonLayoutRight)
+			savePresetButton.disabled = true
+			function savePresetButton.onclicked()
+				local value = presetDropdown.value
+				if value ~= PRESET_DEFAULT then
+					savePreset(value)
+				end
+				enableSaveLoad(false)
+				return true
+			end
+			--- Define function to enable/disable the buttons, localized earlier
+			function enableSaveLoad(enable)
+				local value = presetDropdown.value
+				if enable then
+					-- vanilla and random cannot save, new cannot load
+					savePresetButton.disabled = value == PRESET_DEFAULT or value == PRESET_RANDOM
+					loadPresetButton.disabled = value == PRESET_NEW
 				else
-					class = weapon:GetClass()
-					if class == "" then class = "Any" end
+					-- random can always load
+					savePresetButton.disabled = true
+					loadPresetButton.disabled = value ~= PRESET_RANDOM
 				end
-				-- if this is the first we have seen the class, make a group
-				if classes[class] == nil then
-					if class == "new" then
-						-- sort first
-						classes[class] = {weapons = {}, name = GetLocalizedText("Upgrade_New"), sortName = "1"}
-					else
-						local key = "Skill_Class" .. class
-						classes[class] = {weapons = {}, name = IsLocalizedText(key) and GetLocalizedText(key) or class}
-					end
-				end
-				table.insert(classes[class].weapons, {id = id, name = getWeaponKey(id, "Name"), enabled = enabled})
 			end
 		end
-		--- conver the map into a list and sort, plus sort the weapons
-		local sortName = function(a, b) return (a.sortName or a.name) < (b.sortName or b.name) end
-		local classList = {}
-		for id, data in pairs(classes) do
-			table.sort(data.weapons, sortName)
-			table.insert(classList, data)
+
+		-- adds a single weapon button to the class area
+		local function addWeaponButton(classArea, weapon)
+			local id = weapon.id
+			local decoName = DecoText(weapon.name, WEAPON_FONT)
+			local button = UiCheckbox()
+				:widthpx(WEAPON_WIDTH):heightpx(WEAPON_HEIGHT)
+				:settooltip(getWeaponKey(id, "Description"))
+				:decorate({
+					DecoButton(nil, not modApi:isDefaultWeapon(id) and MOD_COLOR),
+					DecoAlign(-4, (TEXT_PADDING / 2)),
+					DecoSurface(getOrCreateWeaponSurface(weapon.id)),
+					DecoFixedCAlign(CHECKBOX, WEAPON_HEIGHT / 2),
+					DecoCheckbox(),
+					DecoFixedCAlign(decoName.surface:w(), (decoName.surface:h() - WEAPON_HEIGHT) / 2 + 4),
+					decoName,
+				})
+				:addTo(classArea)
+			button.id = id
+			button.checked = weapon.enabled
+			--- enable the save and load buttons when we make a change
+			function button:onclicked()
+				enableSaveLoad(true)
+				return true
+			end
+			table.insert(buttons, button)
 		end
-		table.sort(classList, sortName)
-		-- create a frame for each class
-		local offset = 0
-		for _, class in ipairs(classList) do
-			-- 2 of the paddings is for the height, plus a little extra pading
-			local height = math.ceil(#class.weapons / weaponsPerRow) * CELL_HEIGHT + 4 * PADDING
-			local classArea = Ui()
+
+		-- add in buttons from each class
+		addEnableDisableButtons()
+		addPresetButtons()
+		for _, class in ipairs(getClassList(oldConfig)) do
+			-- local frame for each class, will automatically assign rows and columns
+			local classArea = UiFlowLayout()
 				:width(1)
-				:heightpx(height)
+				:vgap(WEAPON_GAP):hgap(WEAPON_GAP)
 				:padding(PADDING)
-				:pospx(0, offset)
 				:caption(class.name)
 				:decorate({ classHeader, DecoFrame() })
-				:addTo(scrollArea)
-			offset = offset + height
+				:addTo(allClassArea)
+			classArea.padb = classArea.padb + PADDING
 			--- Create a button for each weapon
-			for index, weapon in pairs(class.weapons) do
-				local id = weapon.id
-				local col = (index-1) % weaponsPerRow
-				local row = math.floor((index-1) / weaponsPerRow)
-				local decoName = DecoText(weapon.name, WEAPON_FONT)
-				local button = UiCheckbox()
-					:widthpx(WEAPON_WIDTH):heightpx(WEAPON_HEIGHT)
-					:pospx(CELL_WIDTH * col, CELL_HEIGHT * row)
-					:settooltip(getWeaponKey(id, "Description"))
-					:decorate({
-						DecoButton(nil, not modApi:isDefaultWeapon(id) and MOD_COLOR),
-						DecoAlign(-4, (TEXT_PADDING / 2)),
-						DecoSurface(getOrCreateWeaponSurface(weapon.id)),
-						DecoFixedCAlign(CHECKBOX, WEAPON_HEIGHT / 2),
-						DecoCheckbox(),
-						DecoFixedCAlign(decoName.surface:w(), (decoName.surface:h() - WEAPON_HEIGHT) / 2 + 4),
-						decoName,
-					})
-					:addTo(classArea)
-				button.id = id
-				button.checked = weapon.enabled
-				--- enable the save and load buttons when we make a change
-				function button:onclicked()
-					enableSaveLoad(true)
-					return true
-				end
-				table.insert(buttons, button)
+			for _, weapon in pairs(class.weapons) do
+				addWeaponButton(classArea, weapon)
 			end
 		end
+		-- final relayout
 		ui:relayout()
 	end)
 end
