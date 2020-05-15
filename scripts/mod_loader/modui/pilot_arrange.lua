@@ -7,8 +7,6 @@
 local MAX_PILOTS = 13
 local hangarBackdrop = sdlext.getSurface({ path = "resources/mods/ui/pilot-arrange-hangar.png" })
 local pilotLock = sdlext.getSurface({ path = "img/main_menus/lock.png" })
-local pilotSurfaces = {}
-local lockedSurfaces = {}
 local updateImmediately = true
 -- copy of the list before we make any changes to it
 local PilotListDefault = shallow_copy(PilotList)
@@ -50,33 +48,22 @@ function savePilotsOrder(pilots)
 	end)
 end
 
--- gets and caches a pilot surface
-local function getSurfaceInternal(pilotId)
-	local surface = pilotSurfaces[pilotId]
-	if not surface then
-		surface = sdlext.getSurface({
-			path = "img/portraits/pilots/"..pilotId..".png",
-			scale = 2
-		})
-		pilotSurfaces[pilotId] = surface
-	end
-	return surface
-end
-
 -- gets a pilot surface, or if not unlocked a black surface
 local function getOrCreatePilotSurface(pilotId)
 	-- unlocked calls directly
 	local unlocked = isPilotUnlocked(pilotId)
 	if unlocked then
-		return getSurfaceInternal(pilotId)
+		return sdlext.getSurface({
+			path = "img/portraits/pilots/"..pilotId..".png",
+			scale = 2
+		})
+	else
+		return sdlext.getSurface({
+			path = "img/portraits/pilots/"..pilotId..".png",
+			scale = 2,
+			multiply = BLACK_MASK
+		})
 	end
-	-- not unlocked may need to color
-	local surface = lockedSurfaces[pilotId]
-	if not surface then
-		surface = sdl.multiply(getSurfaceInternal(pilotId), BLACK_MASK)
-		lockedSurfaces[pilotId] = surface
-	end
-	return surface
 end
 
 --- function called to confirm when the UI is opened after the hangar
