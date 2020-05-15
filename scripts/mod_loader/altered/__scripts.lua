@@ -1,6 +1,7 @@
 local scripts = {
 	"difficulty",
 	"misc",
+	"drops",
 	"missions",
 	"globalize_enemy_tables",
 	"skills",

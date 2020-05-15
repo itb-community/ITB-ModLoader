@@ -32,3 +32,14 @@ function DecoAlign:draw(screen, widget)
 	widget.decorationx = widget.decorationx + self.lSpace
 	widget.decorationy = widget.decorationy + self.tSpace
 end
+
+DecoFixedCAlign = Class.inherit(UiDeco)
+function DecoFixedCAlign:new(hSize, tOffset)
+  UiDeco.new(self)
+  self.cOffset = -hSize / 2
+  self.tOffset = tOffset or 0
+end
+function DecoFixedCAlign:draw(screen, widget)
+  widget.decorationx = widget.rect.w/2 + self.cOffset
+  widget.decorationy = self.tOffset
+end

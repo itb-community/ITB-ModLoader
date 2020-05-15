@@ -20,6 +20,7 @@ local scripts = {
 	"mod_configuration",
 	"pilot_arrange",
 	"squad_selector",
+	"weapon_deck_selector",
 	"modloader_configuration",
 
 	"modcontent_entries",

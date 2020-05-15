@@ -185,33 +185,6 @@ function CreateEffect(data)
 	return effect
 end
 
--- initializeDecks is called before the game entered hook, so we still need this override
-local oldInitializeDecks = initializeDecks
-function initializeDecks()
-	local oldPilotList = PilotList
-	PilotList = PilotListExtended
-	oldInitializeDecks()
-	PilotList = oldPilotList
-end
-
--- a pilot must be in PilotList to be unlocked, however we cannot have more than 13 pilots in the list for the UI
--- fix that by using PilotListExtended in game, and the smaller pilot list in the hangar
-local hangarPilotList = nil
-sdlext.addGameEnteredHook(function()
-	-- prevent overwriting the list twice accidently
-	if hangarPilotList == nil then
-		hangarPilotList = PilotList
-		PilotList = PilotListExtended
-	end
-end)
-sdlext.addGameExitedHook(function()
-	-- only update if we have an old list
-	if hangarPilotList ~= nil then
-		PilotList = hangarPilotList
-		hangarPilotList = nil
-	end
-end)
-
 Effect.GetLuaString = function(self)
 	return string.format("CreateEffect(%s)", save_table(self.data))
 end
