@@ -7,7 +7,7 @@
 	
 	tbl
 	---
-	a table of surface info.
+	a table of surface info. Transformations are applied in the order listed here.
 	
 		arg        type         description
 		-----------------------------------------------------------------
@@ -15,6 +15,8 @@
 		scale      number       scale of image (default: nil)
 		outline    table        see below (default: nil)
 		colormap   table        see below (default: nil)
+		multiply   color        color tint of the image
+		grayscale  boolean      if true, the image will be turned to grayscale
 		-----------------------------------------------------------------
 		
 	outline
@@ -46,7 +48,9 @@ local keys = {
 	"path",
 	"scale",
 	"outline",
-	"colormap"
+	"colormap",
+	"multiply",
+	"grayscale"
 }
 
 local stringize = {
@@ -57,16 +61,20 @@ local stringize = {
 	outline = function(outline)
 		local border = outline.border or 1
 		local c = outline.color or deco.colors.white
-		return border ..",".. c.r ..",".. c.g ..",".. c.b ..",".. c.a ..","
+		return string.format("%s,%s,%s,%s,%s,", border, c.r, c.g, c.b, c.a)
 	end,
 	
 	colormap = function(colormap)
 		local ret = ""
 		for _, c in ipairs(colormap) do
-			ret = ret .. c.r ..",".. c.g ..",".. c.b ..",".. c.a ..","
+			ret = ret .. string.format("%s,%s,%s,%s,", c.r, c.g, c.b, c.a)
 		end
 		
 		return ret
+	end,
+
+	color = function(c)
+		return string.format("%s,%s,%s,%s,", c.r, c.g, c.b, c.a)
 	end
 }
 
@@ -132,13 +140,31 @@ function sdlext.getSurface(tbl)
 			function() return sdl.outlined(surface, tbl.outline.border or 1, tbl.outline.color or deco.colors.white) end
 		)
 	end
-	
+
 	if tbl.colormap then
 		assert(type(tbl.colormap) == 'table')
 		key.colormap = stringize.colormap(tbl.colormap)
 		surface = getSurface(
 			getHash(key),
 			function() return sdl.colormapped(surface, tbl.colormap) end
+		)
+	end
+
+	if tbl.multiply then
+		assert(type(tbl.multiply) == 'userdata')
+		key.multiply = stringize.color(tbl.multiply)
+		surface = getSurface(
+			getHash(key),
+			function() return sdl.multiply(surface, tbl.multiply) end
+		)
+	end
+
+	if tbl.grayscale then
+		assert(type(tbl.grayscale) == 'boolean')
+		key.grayscale = "true,"
+		surface = getSurface(
+			getHash(key),
+			function() return sdl.grayscale(surface) end
 		)
 	end
 	
