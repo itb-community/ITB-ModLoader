@@ -16,11 +16,6 @@ local surfaces = {}
 local WEAPON_FONT = sdlext.font("fonts/NunitoSans_Regular.ttf", 10)
 local MOD_COLOR = sdl.rgb(50, 125, 75)
 
---- Header with a smaller font size
-local classHeader = DecoFrameHeader()
-classHeader.font = deco.uifont.default.font
-classHeader.height = 20
-
 --[[--
 	Gets the name for a weapon
 	@param id	Weapon ID
@@ -98,7 +93,7 @@ local function getOrCreateWeaponSurface(id)
 	return surface
 end
 
---- Speccial values for the preset dropdown
+--- Special values for the preset dropdown
 local PRESET_DEFAULT = "Default"
 local PRESET_RANDOM = "Random"
 local PRESET_NEW = "New"
@@ -288,9 +283,9 @@ local function createUi()
 
 		-- line separating button area
 		local line = Ui()
-      :width(1):heightpx(frametop.decorations[1].bordersize)
-      :decorate({ DecoSolid(frametop.decorations[1].bordercolor) })
-      :addTo(frametop)
+			:width(1):heightpx(frametop.decorations[1].bordersize)
+			:decorate({ DecoSolid(frametop.decorations[1].bordercolor) })
+			:addTo(frametop)
 		-- vertical layout for left and right aligned buttons
 		local buttonLayout = UiBoxLayout()
 			:vgap(-BUTTON_HEIGHT) -- negative padding will make both elements go at the same height
@@ -457,6 +452,11 @@ local function createUi()
 		addEnableDisableButtons()
 		addPresetButtons()
 		for _, class in ipairs(getClassList(oldConfig)) do
+			-- Header with a smaller font size
+			local classHeader = DecoFrameHeader()
+			classHeader.font = deco.uifont.default.font
+			classHeader.height = 20
+
 			-- local frame for each class, will automatically assign rows and columns
 			local classArea = UiFlowLayout()
 				:width(1)
