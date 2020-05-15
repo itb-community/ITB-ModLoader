@@ -14,6 +14,7 @@ local function createUi()
 	local cboxResourceError = nil
 	local cboxGamepadWarning = nil
 	local cboxRestartReminder = nil
+	local cboxPilotRestartReminder = nil
 	local cboxProfileFrame = nil
 
 	local onExit = function(self)
@@ -29,6 +30,7 @@ local function createUi()
 			showResourceWarning = cboxResourceError.checked,
 			showGamepadWarning  = cboxGamepadWarning.checked,
 			showRestartReminder = cboxRestartReminder.checked,
+			showPilotRestartReminder = cboxPilotRestartReminder.checked,
 			showProfileSettingsFrame = cboxProfileFrame.checked
 		}
 
@@ -49,6 +51,7 @@ local function createUi()
 		cboxResourceError.checked   = config.showResourceWarning
 		cboxGamepadWarning.checked  = config.showGamepadWarning
 		cboxRestartReminder.checked = config.showRestartReminder
+		cboxPilotRestartReminder.checked = config.showPilotRestartReminder
 		cboxProfileFrame.checked    = config.showProfileSettingsFrame
 
 		local t = cboxFloatyTooltips.root.tooltip
@@ -217,6 +220,11 @@ local function createUi()
 		cboxRestartReminder = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_RestartReminder"),
 			GetText("ModLoaderConfig_Tooltip_RestartReminder")
+		):addTo(layout)
+
+		cboxPilotRestartReminder = createCheckboxOption(
+			GetText("ModLoaderConfig_Text_PilotRestartReminder"),
+			GetText("ModLoaderConfig_Tooltip_PilotRestartReminder")
 		):addTo(layout)
 
 		cboxProfileFrame = createCheckboxOption(
