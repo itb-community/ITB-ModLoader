@@ -3,6 +3,14 @@
 	some features of the mod loader itself.
 --]]
 
+local subscriptions = {}
+local function cleanup()
+	for _, sub in ipairs(subscriptions) do
+		sub:unsubscribe()
+	end
+	subscriptions = {}
+end
+
 local function createUi()
 	local ddLogLevel = nil
 	local cboxCaller = nil
@@ -36,6 +44,8 @@ local function createUi()
 
 		ApplyModLoaderConfig(data)
 		SaveModLoaderConfig(data)
+
+		cleanup()
 	end
 
 	local uiSetSettings = function(config)
@@ -96,6 +106,73 @@ local function createUi()
 			:width(1):heightpx(h)
 	end
 
+	local createCollapseGroup = function(text, tooltip)
+		local entryBoxHolder = UiBoxLayout()
+			:vgap(5)
+			:width(1)
+
+		-- Use UiWeightLayout so that we don't have to manually decide each element's size,
+		-- just tell it to take up the remainder of horizontal space.
+		local entryHeaderHolder = UiWeightLayout()
+			:width(1):heightpx(41)
+			:addTo(entryBoxHolder)
+
+		local entryContentHolder = UiBoxLayout()
+			:vgap(5)
+			:width(1)
+			:addTo(entryBoxHolder)
+		entryContentHolder.padl = 46
+
+		local toggleGroup = function(self, button)
+			if button == 1 then
+				entryContentHolder.visible = not self.checked
+				entryBoxHolder:relayout()
+			end
+
+			return true
+		end
+
+		local collapse = UiCheckbox()
+			:widthpx(41):heightpx(41)
+			:decorate({
+				DecoButton(),
+				DecoCheckbox(
+					deco.surfaces.dropdownOpenRight,
+					deco.surfaces.dropdownClosed,
+					deco.surfaces.dropdownOpenRightHovered,
+					deco.surfaces.dropdownClosedHovered
+				)
+			})
+			:settooltip(tooltip)
+			:addTo(entryHeaderHolder)
+		collapse.onclicked = toggleGroup
+
+		local header = UiCheckbox()
+			:width(1):heightpx(41)
+			:decorate({
+				DecoButton(),
+				DecoAlign(4, 2),
+				DecoText(text)
+			})
+			:settooltip(tooltip)
+			:addTo(entryHeaderHolder)
+		header.onclicked = toggleGroup
+
+		table.insert(subscriptions, collapse.onToggled:subscribe(function(toggled)
+			header.checked = toggled
+		end))
+		table.insert(subscriptions, header.onToggled:subscribe(function(toggled)
+			collapse.checked = toggled
+		end))
+
+		entryBoxHolder.header = entryHeaderHolder
+		entryBoxHolder.content = entryContentHolder
+		entryBoxHolder.collapse = collapse
+		entryBoxHolder.header = header
+
+		return entryBoxHolder
+	end
+
 	sdlext.showDialog(function(ui, quit)
 		ui.onDialogExit = onExit
 
@@ -122,29 +199,29 @@ local function createUi()
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Logging level
 		ddLogLevel = UiDropDown(
-				{
-					Logger.LOG_LEVEL_NONE,
-					Logger.LOG_LEVEL_CONSOLE,
-					Logger.LOG_LEVEL_FILE
-				},
-				{
-					GetText("ModLoaderConfig_DD_LogLevel_0"),
-					GetText("ModLoaderConfig_DD_LogLevel_1"),
-					GetText("ModLoaderConfig_DD_LogLevel_2")
-				},
-				mod_loader.logger:getLoggingLevel()
-			)
-			:width(1):heightpx(41)
-			:decorate({
-				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText(GetText("ModLoaderConfig_Text_LogLevel")),
-				DecoDropDownText(nil, nil, nil, 33),
-				DecoAlign(0, -2),
-				DecoDropDown()
-			})
-			:settooltip(GetText("ModLoaderConfig_Tooltip_LogLevel"))
-			:addTo(layout)
+			{
+				Logger.LOG_LEVEL_NONE,
+				Logger.LOG_LEVEL_CONSOLE,
+				Logger.LOG_LEVEL_FILE
+			},
+			{
+				GetText("ModLoaderConfig_DD_LogLevel_0"),
+				GetText("ModLoaderConfig_DD_LogLevel_1"),
+				GetText("ModLoaderConfig_DD_LogLevel_2")
+			},
+			mod_loader.logger:getLoggingLevel()
+		)
+		:width(1):heightpx(41)
+		:decorate({
+			DecoButton(),
+			DecoAlign(0, 2),
+			DecoText(GetText("ModLoaderConfig_Text_LogLevel")),
+			DecoDropDownText(nil, nil, nil, 33),
+			DecoAlign(0, -2),
+			DecoDropDown()
+		})
+		:settooltip(GetText("ModLoaderConfig_Tooltip_LogLevel"))
+		:addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Caller information
@@ -197,40 +274,45 @@ local function createUi()
 		-- Warning dialogs
 		createSeparator(10):addTo(layout)
 
+		local popupsGroup = createCollapseGroup(
+				GetText("ModLoaderConfig_Text_PopupsGroup"),
+				GetText("ModLoaderConfig_Tooltips_PopupsGroup")
+		):addTo(layout)
+
 		cboxErrorFrame = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_ScriptError"),
 			GetText("ModLoaderConfig_Tooltip_ScriptError")
-		):addTo(layout)
+		):addTo(popupsGroup.content)
 
 		cboxVersionFrame = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_OldVersion"),
 			GetText("ModLoaderConfig_Tooltip_OldVersion")
-		):addTo(layout)
+		):addTo(popupsGroup.content)
 
 		cboxResourceError = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_ResourceError"),
 			GetText("ModLoaderConfig_Tooltip_ResourceError")
-		):addTo(layout)
+		):addTo(popupsGroup.content)
 
 		cboxGamepadWarning = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_GamepadWarning"),
 			GetText("ModLoaderConfig_Tooltip_GamepadWarning")
-		):addTo(layout)
+		):addTo(popupsGroup.content)
 
 		cboxRestartReminder = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_RestartReminder"),
 			GetText("ModLoaderConfig_Tooltip_RestartReminder")
-		):addTo(layout)
+		):addTo(popupsGroup.content)
 
 		cboxPilotRestartReminder = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_PilotRestartReminder"),
 			GetText("ModLoaderConfig_Tooltip_PilotRestartReminder")
-		):addTo(layout)
+		):addTo(popupsGroup.content)
 
 		cboxProfileFrame = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_ProfileFrame"),
 			GetText("ModLoaderConfig_Tooltip_ProfileFrame")
-		):addTo(layout)
+		):addTo(popupsGroup.content)
 
 		uiSetSettings(LoadModLoaderConfig())
 	end)

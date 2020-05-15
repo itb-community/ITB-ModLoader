@@ -52,6 +52,9 @@ return {
 	["ModLoaderConfig_Tooltip_ProfileConfig"] = "Configuration for the mod loader and individual mods will be remembered per profile, instead of globally.\n\n"..
 	                                            "Note: with this option enabled, switching profiles will require you to restart the game to apply the different mod configurations.",
 
+	["ModLoaderConfig_Text_PopupsGroup"] = "Popups Options",
+	["ModLoaderConfig_Tooltips_PopupsGroup"] = "Manage which popups are enabled.",
+
 	["ModLoaderConfig_Text_ScriptError"] = "Show Script Error Popup",
 	["ModLoaderConfig_Tooltip_ScriptError"] = "Show an error popup at startup if a mod fails to mount, init, or load.",
 
