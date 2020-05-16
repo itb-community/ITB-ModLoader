@@ -112,11 +112,30 @@ local function createUi()
 			:vgap(5)
 			:width(1)
 
-		-- Use UiWeightLayout so that we don't have to manually decide each element's size,
-		-- just tell it to take up the remainder of horizontal space.
-		local entryHeaderHolder = UiWeightLayout()
+		local collapse = UiCheckbox()
 			:width(1):heightpx(41)
+			:decorate({
+				DecoButton(),
+				DecoCheckbox(
+					deco.surfaces.dropdownOpenRight,
+					deco.surfaces.dropdownClosed,
+					deco.surfaces.dropdownOpenRightHovered,
+					deco.surfaces.dropdownClosedHovered
+				),
+				DecoAlign(4, 2),
+				DecoText(text)
+			})
+			:settooltip(tooltip)
 			:addTo(entryBoxHolder)
+		collapse.onclicked = function(self, button)
+			if button == 1 then
+				entryBoxHolder.content.visible = not self.checked
+				entryBoxHolder:relayout()
+			end
+
+			return true
+		end
+		collapse.checked = defaultCollapsed
 
 		local entryContentHolder = UiBoxLayout()
 			:vgap(5)
@@ -125,54 +144,8 @@ local function createUi()
 		entryContentHolder.padl = 46
 		entryContentHolder.visible = not defaultCollapsed
 
-		local toggleGroup = function(self, button)
-			if button == 1 then
-				entryContentHolder.visible = not self.checked
-				entryBoxHolder:relayout()
-			end
-
-			return true
-		end
-
-		local collapse = UiCheckbox()
-			:widthpx(41):heightpx(41)
-			:decorate({
-				DecoButton(),
-				DecoCheckbox(
-					deco.surfaces.dropdownOpenRight,
-					deco.surfaces.dropdownClosed,
-					deco.surfaces.dropdownOpenRightHovered,
-					deco.surfaces.dropdownClosedHovered
-				)
-			})
-			:settooltip(tooltip)
-			:addTo(entryHeaderHolder)
-		collapse.onclicked = toggleGroup
-		collapse.checked = defaultCollapsed
-
-		local header = UiCheckbox()
-			:width(1):heightpx(41)
-			:decorate({
-				DecoButton(),
-				DecoAlign(4, 2),
-				DecoText(text)
-			})
-			:settooltip(tooltip)
-			:addTo(entryHeaderHolder)
-		header.onclicked = toggleGroup
-		header.checked = defaultCollapsed
-
-		table.insert(subscriptions, collapse.onToggled:subscribe(function(toggled)
-			header.checked = toggled
-		end))
-		table.insert(subscriptions, header.onToggled:subscribe(function(toggled)
-			collapse.checked = toggled
-		end))
-
-		entryBoxHolder.header = entryHeaderHolder
 		entryBoxHolder.content = entryContentHolder
 		entryBoxHolder.collapse = collapse
-		entryBoxHolder.header = header
 
 		return entryBoxHolder
 	end
