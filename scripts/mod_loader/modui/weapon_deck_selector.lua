@@ -116,7 +116,7 @@ function loadWeaponDeck()
 end
 
 --[[--
-	Logic to create the actual weapn UI
+	Logic to create the actual weapon UI
 ]]
 local function createUi()
 	-- load old config and available presets, used for the new item display

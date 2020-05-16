@@ -129,7 +129,8 @@ function sdlext.config(filename, func)
 	persistence.store(path..filename, obj)
 end
 
-function drawborder(screen, color, rect, borderwidth, temprect)
+local temprect = nil
+function drawborder(screen, color, rect, borderwidth)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
 	-- left side
@@ -155,7 +156,7 @@ function drawborder(screen, color, rect, borderwidth, temprect)
 	screen:drawrect(color, temprect)
 end
 
-function drawtri_tl(screen, color, rect, temprect)
+function drawtri_tl(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
 	for y = 0, rect.h do
@@ -168,7 +169,7 @@ function drawtri_tl(screen, color, rect, temprect)
 	end
 end
 
-function drawtri_tr(screen, color, rect, temprect)
+function drawtri_tr(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
 	for y = 0, rect.h do
@@ -181,7 +182,7 @@ function drawtri_tr(screen, color, rect, temprect)
 	end
 end
 
-function drawtri_bl(screen, color, rect, temprect)
+function drawtri_bl(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
 	for y = 0, rect.h do
@@ -194,7 +195,7 @@ function drawtri_bl(screen, color, rect, temprect)
 	end
 end
 
-function drawtri_br(screen, color, rect, temprect)
+function drawtri_br(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
 	for y = 0, rect.h do
