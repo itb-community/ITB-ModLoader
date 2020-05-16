@@ -60,8 +60,10 @@ local function getOrCreatePilotSurface(pilotId)
 	else
 		return sdlext.getSurface({
 			path = "img/portraits/pilots/"..pilotId..".png",
-			scale = 2,
-			multiply = BLACK_MASK
+			transformations = {
+				{ scale = 2 },
+				{ multiply = BLACK_MASK }
+			}
 		})
 	end
 end
