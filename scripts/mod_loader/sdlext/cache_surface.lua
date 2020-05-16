@@ -13,10 +13,10 @@
 		-----------------------------------------------------------------
 		path       string       path of image in resource.dat (required)
 		scale      number       scale of image (default: nil)
-		outline    table        see below (default: nil)
 		colormap   table        see below (default: nil)
-		multiply   color        color tint of the image
 		grayscale  boolean      if true, the image will be turned to grayscale
+		multiply   color        color tint of the image
+		outline    table        see below (default: nil)
 		-----------------------------------------------------------------
 		
 	outline
@@ -47,10 +47,10 @@ local indices = {}
 local keys = {
 	"path",
 	"scale",
-	"outline",
 	"colormap",
+	"grayscale",
 	"multiply",
-	"grayscale"
+	"outline",
 }
 
 local stringize = {
@@ -95,7 +95,7 @@ local function getSurface(key, fn)
 		
 		-- create a new surface
 		surface = fn()
-		cache:pushLeft{ key = key, surface = surface }
+		cache:pushLeft({ key = key, surface = surface })
 		indices[key] = cache.first
 	end
 	
@@ -131,15 +131,6 @@ function sdlext.getSurface(tbl)
 			function() return sdl.scaled(tbl.scale, surface) end
 		)
 	end
-	
-	if tbl.outline then
-		assert(type(tbl.outline) == 'table')
-		key.outline = stringize.outline(tbl.outline)
-		surface = getSurface(
-			getHash(key),
-			function() return sdl.outlined(surface, tbl.outline.border or 1, tbl.outline.color or deco.colors.white) end
-		)
-	end
 
 	if tbl.colormap then
 		assert(type(tbl.colormap) == 'table')
@@ -147,6 +138,15 @@ function sdlext.getSurface(tbl)
 		surface = getSurface(
 			getHash(key),
 			function() return sdl.colormapped(surface, tbl.colormap) end
+		)
+	end
+
+	if tbl.grayscale then
+		assert(type(tbl.grayscale) == 'boolean')
+		key.grayscale = "true,"
+		surface = getSurface(
+			getHash(key),
+			function() return sdl.grayscale(surface) end
 		)
 	end
 
@@ -159,12 +159,12 @@ function sdlext.getSurface(tbl)
 		)
 	end
 
-	if tbl.grayscale then
-		assert(type(tbl.grayscale) == 'boolean')
-		key.grayscale = "true,"
+	if tbl.outline then
+		assert(type(tbl.outline) == 'table')
+		key.outline = stringize.outline(tbl.outline)
 		surface = getSurface(
 			getHash(key),
-			function() return sdl.grayscale(surface) end
+			function() return sdl.outlined(surface, tbl.outline.border or 1, tbl.outline.color or deco.colors.white) end
 		)
 	end
 	
