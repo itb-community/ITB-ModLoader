@@ -7,7 +7,7 @@ function modApi:init()
 	Settings = self:loadSettings()
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
-	self.version = "2.5.2"
+	self.version = "2.5.3"
 	LOG("MOD-API VERSION "..self.version)
 
 	if not self:fileExists("resources/resource.dat.bak") then
