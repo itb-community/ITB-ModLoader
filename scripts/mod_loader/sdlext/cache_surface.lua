@@ -58,7 +58,7 @@
 
 local DequeList = require("scripts/mod_loader/deque_list")
 
-sdlext.surface_cache_max = 100
+sdlext.surface_cache_max = 256
 local cache = DequeList()
 local indices = {}
 
