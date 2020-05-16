@@ -106,7 +106,8 @@ local function createUi()
 			:width(1):heightpx(h)
 	end
 
-	local createCollapseGroup = function(text, tooltip)
+	local createCollapseGroup = function(text, tooltip, defaultCollapsed)
+		defaultCollapsed = defaultCollapsed or false
 		local entryBoxHolder = UiBoxLayout()
 			:vgap(5)
 			:width(1)
@@ -122,6 +123,7 @@ local function createUi()
 			:width(1)
 			:addTo(entryBoxHolder)
 		entryContentHolder.padl = 46
+		entryContentHolder.visible = not defaultCollapsed
 
 		local toggleGroup = function(self, button)
 			if button == 1 then
@@ -146,6 +148,7 @@ local function createUi()
 			:settooltip(tooltip)
 			:addTo(entryHeaderHolder)
 		collapse.onclicked = toggleGroup
+		collapse.checked = defaultCollapsed
 
 		local header = UiCheckbox()
 			:width(1):heightpx(41)
@@ -157,6 +160,7 @@ local function createUi()
 			:settooltip(tooltip)
 			:addTo(entryHeaderHolder)
 		header.onclicked = toggleGroup
+		header.checked = defaultCollapsed
 
 		table.insert(subscriptions, collapse.onToggled:subscribe(function(toggled)
 			header.checked = toggled
@@ -276,7 +280,8 @@ local function createUi()
 
 		local popupsGroup = createCollapseGroup(
 				GetText("ModLoaderConfig_Text_PopupsGroup"),
-				GetText("ModLoaderConfig_Tooltips_PopupsGroup")
+				GetText("ModLoaderConfig_Tooltips_PopupsGroup"),
+				true
 		):addTo(layout)
 
 		cboxErrorFrame = createCheckboxOption(
