@@ -7,18 +7,36 @@
 	
 	tbl
 	---
-	a table of surface info. Transformations are applied in the order listed here.
+	a table of surface info.
 	
+		arg               type         description
+		-----------------------------------------------------------------
+		path              string       path of image in resource.dat (required)
+		transformations   table        list of transformations to apply - see below
+		-----------------------------------------------------------------
+
+	transformations
+	---------------
+	a list of transformations to apply to the surface. Transformations are applied in the order listed,
+	and can repeat. Example:
+
+		transformations = {
+			{ scale = 2 },
+			{ grayscale = true },
+			{ multiply = sdl.rgb(255, 0, 0) }
+		}
+
+	In case a single transformation entry contains multiple keys, only one transformation is performed,
+	in the order listed in the table below.
+
 		arg        type         description
 		-----------------------------------------------------------------
-		path       string       path of image in resource.dat (required)
 		scale      number       scale of image (default: nil)
 		colormap   table        see below (default: nil)
 		grayscale  boolean      if true, the image will be turned to grayscale
 		multiply   color        color tint of the image
 		outline    table        see below (default: nil)
-		-----------------------------------------------------------------
-		
+
 	outline
 	-------
 	a table of outline info.
@@ -112,6 +130,58 @@ local function getHash(tbl)
 	return save_table(tbl)
 end
 
+local function processTransformation(index, tbl, key, surface)
+	if tbl.scale then
+		assert(type(tbl.scale) == 'number')
+		key[index] = stringize.scale(tbl.scale)
+		surface = getSurface(
+			getHash(key),
+			function() return sdl.scaled(tbl.scale, surface) end
+		)
+	elseif tbl.colormap then
+		assert(type(tbl.colormap) == 'table')
+		key[index] = stringize.colormap(tbl.colormap)
+		surface = getSurface(
+			getHash(key),
+			function() return sdl.colormapped(surface, tbl.colormap) end
+		)
+	elseif tbl.grayscale then
+		assert(type(tbl.grayscale) == 'boolean')
+		key[index] = "true,"
+		surface = getSurface(
+			getHash(key),
+			function() return sdl.grayscale(surface) end
+		)
+	elseif tbl.multiply then
+		assert(type(tbl.multiply) == 'userdata')
+		key[index] = stringize.color(tbl.multiply)
+		surface = getSurface(
+			getHash(key),
+			function() return sdl.multiply(surface, tbl.multiply) end
+		)
+	elseif tbl.outline then
+		assert(type(tbl.outline) == 'table')
+		key[index] = stringize.outline(tbl.outline)
+		surface = getSurface(
+			getHash(key),
+			function() return sdl.outlined(surface, tbl.outline.border or 1, tbl.outline.color or deco.colors.white) end
+		)
+	end
+
+	return key, surface
+end
+
+local function processTransformations(transformations, key, surface)
+	assert(type(key) == "table")
+	assert(type(surface) == "userdata")
+
+	for i, v in ipairs(transformations) do
+		key, surface = processTransformation(i, v, key, surface)
+	end
+
+	return key, surface
+end
+
 -- creates and caches new surfaces and returns cached surface.
 function sdlext.getSurface(tbl)
 	assert(type(tbl) == 'table')
@@ -122,51 +192,18 @@ function sdlext.getSurface(tbl)
 		getHash(key),
 		function() return sdlext.surface(tbl.path) end
 	)
-	
-	if tbl.scale then
-		assert(type(tbl.scale) == 'number')
-		key.scale = stringize.scale(tbl.scale)
-		surface = getSurface(
-			getHash(key),
-			function() return sdl.scaled(tbl.scale, surface) end
-		)
+
+	-- Compatibility with old version of this function
+	if type(tbl.transformations) ~= "table" then
+		tbl.transformations = {}
+		for _, k in ipairs(keys) do
+			if k ~= "path" then
+				table.insert(tbl.transformations, { [k] = tbl[k] })
+			end
+		end
 	end
 
-	if tbl.colormap then
-		assert(type(tbl.colormap) == 'table')
-		key.colormap = stringize.colormap(tbl.colormap)
-		surface = getSurface(
-			getHash(key),
-			function() return sdl.colormapped(surface, tbl.colormap) end
-		)
-	end
+	key, surface = processTransformations(tbl.transformations, key, surface)
 
-	if tbl.grayscale then
-		assert(type(tbl.grayscale) == 'boolean')
-		key.grayscale = "true,"
-		surface = getSurface(
-			getHash(key),
-			function() return sdl.grayscale(surface) end
-		)
-	end
-
-	if tbl.multiply then
-		assert(type(tbl.multiply) == 'userdata')
-		key.multiply = stringize.color(tbl.multiply)
-		surface = getSurface(
-			getHash(key),
-			function() return sdl.multiply(surface, tbl.multiply) end
-		)
-	end
-
-	if tbl.outline then
-		assert(type(tbl.outline) == 'table')
-		key.outline = stringize.outline(tbl.outline)
-		surface = getSurface(
-			getHash(key),
-			function() return sdl.outlined(surface, tbl.outline.border or 1, tbl.outline.color or deco.colors.white) end
-		)
-	end
-	
 	return surface
 end
