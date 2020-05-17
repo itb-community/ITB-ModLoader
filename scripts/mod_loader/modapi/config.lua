@@ -2,6 +2,7 @@
 function CurrentModLoaderConfig()
 	local data = {}
 
+	data.scrollableLogger    = mod_loader.scrollableLogger
 	data.logLevel            = mod_loader.logger:getLoggingLevel()
 	data.printCallerInfo     = mod_loader.logger:getPrintCallerInfo()
 	data.developmentMode     = modApi.developmentMode
@@ -48,6 +49,7 @@ end
 
 function DefaultModLoaderConfig()
 	return {
+		scrollableLogger    = false,
 		logLevel            = 1, -- log to console by default
 		printCallerInfo     = true,
 		developmentMode     = false,
@@ -93,7 +95,26 @@ function LoadModLoaderConfig(overrideLoadProfileConfig)
 	return data
 end
 
+local function updateLogger(config)
+	if mod_loader.scrollableLogger ~= config.scrollableLogger then
+		Logger = Logger or require("scripts/mod_loader/logger")
+		local ScrollableLogger = require("scripts/mod_loader/logger_scrollable")
+
+		local BasicLoggerImpl = require("scripts/mod_loader/logger_basic")
+		local BufferedLoggerImpl = require("scripts/mod_loader/logger_buffered")
+
+		mod_loader.scrollableLogger = config.scrollableLogger
+		if mod_loader.scrollableLogger then
+			mod_loader.logger = ScrollableLogger(BufferedLoggerImpl())
+		else
+			mod_loader.logger = Logger(BasicLoggerImpl())
+		end
+	end
+end
+
 function ApplyModLoaderConfig(config)
+	updateLogger(config)
+
 	mod_loader.logger:setLoggingLevel(config.logLevel)
 	mod_loader.logger:setPrintCallerInfo(config.printCallerInfo)
 	modApi.developmentMode        = config.developmentMode

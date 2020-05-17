@@ -12,6 +12,7 @@ local function cleanup()
 end
 
 local function createUi()
+	local cboxScrollableLogger = nil
 	local ddLogLevel = nil
 	local cboxCaller = nil
 	local cboxDevelopmentMode = nil
@@ -27,6 +28,7 @@ local function createUi()
 
 	local onExit = function(self)
 		local data = {
+			scrollableLogger    = cboxScrollableLogger.checked,
 			logLevel            = ddLogLevel.value,
 			printCallerInfo     = cboxCaller.checked,
 			developmentMode     = cboxDevelopmentMode.checked,
@@ -49,20 +51,21 @@ local function createUi()
 	end
 
 	local uiSetSettings = function(config)
-		ddLogLevel.value            = config.logLevel
-		ddLogLevel.choice           = ddLogLevel.value + 1
-		cboxDevelopmentMode.checked = config.developmentMode
-		cboxCaller.checked          = config.printCallerInfo
-		cboxFloatyTooltips.checked  = config.floatyTooltips
-		cboxProfileConfig.checked   = config.profileConfig
+		cboxScrollableLogger.checked     = config.scrollableLogger
+		ddLogLevel.value                 = config.logLevel
+		ddLogLevel.choice                = ddLogLevel.value + 1
+		cboxCaller.checked               = config.printCallerInfo
+		cboxDevelopmentMode.checked      = config.developmentMode
+		cboxFloatyTooltips.checked       = config.floatyTooltips
+		cboxProfileConfig.checked        = config.profileConfig
 
-		cboxErrorFrame.checked      = config.showErrorFrame
-		cboxVersionFrame.checked    = config.showVersionFrame
-		cboxResourceError.checked   = config.showResourceWarning
-		cboxGamepadWarning.checked  = config.showGamepadWarning
-		cboxRestartReminder.checked = config.showRestartReminder
+		cboxErrorFrame.checked           = config.showErrorFrame
+		cboxVersionFrame.checked         = config.showVersionFrame
+		cboxResourceError.checked        = config.showResourceWarning
+		cboxGamepadWarning.checked       = config.showGamepadWarning
+		cboxRestartReminder.checked      = config.showRestartReminder
 		cboxPilotRestartReminder.checked = config.showPilotRestartReminder
-		cboxProfileFrame.checked    = config.showProfileSettingsFrame
+		cboxProfileFrame.checked         = config.showProfileSettingsFrame
 
 		local t = cboxFloatyTooltips.root.tooltip
 		modApi.floatyTooltips = config.floatyTooltips
@@ -172,6 +175,13 @@ local function createUi()
 			:vgap(5)
 			:width(1)
 			:addTo(scrollarea)
+
+		-- ////////////////////////////////////////////////////////////////////////
+		-- Scrollable logger
+		cboxScrollableLogger = createCheckboxOption(
+				GetText("ModLoaderConfig_Text_ScrollableLogger"),
+				GetText("ModLoaderConfig_Tooltip_ScrollableLogger")
+		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Logging level

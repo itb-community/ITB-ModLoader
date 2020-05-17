@@ -45,6 +45,13 @@ return {
 	["ModContent_ButtonTooltip_ModLoaderConfig"] = "Configure some features of the mod loader.",
 	["ModLoaderConfig_FrameTitle"] = "Mod Loader Configuration",
 
+	["ModLoaderConfig_Text_ScrollableLogger"] = "Enable Scrolling Messages in Console",
+	["ModLoaderConfig_Tooltip_ScrollableLogger"] = "Allow scrolling through LOG messages in console. Can scroll back up to 200 messages. Also has the "..
+	                                               "benefit of making multi-line messages more readable.\n\n"..
+	                                               "This method only stores messages printed through the LOG function, so error messages printed in "..
+	                                               "red by the game will be lost when scrolling.\n\n"..
+	                                               "Navigate using mouse scroll, or page up/down keys. Hold down shift to jump by more.",
+
 	["ModLoaderConfig_Text_LogLevel"] = "Logging level",
 	["ModLoaderConfig_Tooltip_LogLevel"] = "Controls where the game's logging messages are printed.",
 	["ModLoaderConfig_DD_LogLevel_0"] = "None",

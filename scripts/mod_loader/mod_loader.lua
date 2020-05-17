@@ -6,8 +6,8 @@ local ScrollableLogger = require("scripts/mod_loader/logger_scrollable")
 local BasicLoggerImpl = require("scripts/mod_loader/logger_basic")
 local BufferedLoggerImpl = require("scripts/mod_loader/logger_buffered")
 
-local useScrollableLogger = false
-if useScrollableLogger then
+mod_loader.scrollableLogger = false
+if mod_loader.scrollableLogger then
 	mod_loader.logger = ScrollableLogger(BufferedLoggerImpl())
 else
 	mod_loader.logger = Logger(BasicLoggerImpl())
