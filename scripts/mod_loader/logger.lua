@@ -44,8 +44,8 @@ function Logger:__init(loggerImpl)
 		loggerImpl:log(...)
 	end
 
-	self.buildCallerMessage = function(...)
-		return loggerImpl.buildCallerMessage(...)
+	self.buildCallerMessage = function(self, ...)
+		return loggerImpl:buildCallerMessage(...)
 	end
 end
 

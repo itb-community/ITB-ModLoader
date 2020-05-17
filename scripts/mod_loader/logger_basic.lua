@@ -17,7 +17,7 @@ local function getCurrentDate()
 	return os.date("%Y-%m-%d %H:%M:%S")
 end
 
-function BasicLoggerImpl.buildCallerMessage(callerOffset)
+function BasicLoggerImpl:buildCallerMessage(callerOffset)
 	callerOffset = callerOffset or 0
 	assert(type(callerOffset) == "number")
 
