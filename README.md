@@ -18,7 +18,9 @@ The mod loader can be downloaded from the [Releases](https://github.com/kartoFla
 
 Since people unfamiliar with GitHub are often confused where to click:
 
-<img src="https://i.imgur.com/NpaEhyE.png"/><img src="https://i.imgur.com/EOULQhJ.png"/>
+<img src="https://i.imgur.com/YeoO1lr.png"/>
+
+<img src="https://i.imgur.com/EOULQhJ.png"/>
 
 
 ## Installation
