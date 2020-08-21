@@ -25,7 +25,7 @@ local scripts = {
 -- In files loaded via require(), (...) in top-level scope returns
 -- the path of the file being loaded
 function GetParentPath(path)
-	return path:sub(0, path:find("/[^/]*$"))
+	return path:sub(0, path:find("/[^/]*/?$"))
 end
 
 -- This particular file is loaded by the game itself, so we have
