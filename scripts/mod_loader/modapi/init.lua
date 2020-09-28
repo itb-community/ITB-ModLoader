@@ -25,7 +25,7 @@ function modApi:init()
 			modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
 		else
 			LOG("Restoring resource.dat")
-			modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
+			modApi:copyFileOS("resources/resource.dat.bak", "resources/resource.dat")
 		end
 	end
 
