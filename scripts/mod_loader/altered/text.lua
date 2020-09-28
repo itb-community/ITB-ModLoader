@@ -44,6 +44,18 @@ function GetText(id, r1, r2, r3)
 	end
 end
 
+IsVanillaText = IsText
+
+function IsText(id)
+	if modApi.dictionary and modApi.dictionary[id] then
+		return true
+	elseif modApi.modLoaderDictionary and modApi.modLoaderDictionary[id] then
+		return true
+	else
+		return IsVanillaText(id)
+	end
+end
+
 local vanillaGetPilotDialog = GetPilotDialog
 function GetPilotDialog(...)
     local result = vanillaGetPilotDialog(...)
