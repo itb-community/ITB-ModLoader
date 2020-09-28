@@ -16,12 +16,11 @@ function modApi:init()
 	else
 		LOG("Reading resource.dat to check mod loader signature...")
 		local file = io.open("resources/resource.dat","rb")
-		file:seek("end", -20)
-		local content = file:read()
-
+		local content = file:read("*all")
 		file:close()
+		local instance = FtlDat.FtlDat:from_string(content)
 
-		if content ~= "ModLoaderSignatureOK" then
+		if not instance.signature then
 			LOG("resource.dat has been updated since last launch, re-acquiring backup")
 			modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
 		else
