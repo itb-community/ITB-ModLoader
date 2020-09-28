@@ -50,13 +50,18 @@ function mod_loader:init()
 	self:enumerateMods()
 
 	if MOD_API_DRAW_HOOK then
-		-- Replace the game's cursor with a transparent image.
-		-- Helps visually, as some modded UI may want to completely intercept
-		-- mousemotion events, in which case the game's own cursor would 'hitch',
-		-- and stop moving once the mouse entered the modded UI's bounds.
-		-- We re-draw the cursor ourselves on top of modded UI to retain smooth
-		-- mouse pointer movement.
-		modApi:appendAsset("img/mouse/pointer.png","resources/mods/ui/pointer-dummy.png")
+		-- We used to have to replace the game's cursor with a dummy one drawn
+		-- by the mod loader, but since 1.2.x, this is no longer needed, as game
+		-- appears to be drawing its own cursor even over the mod loader's overlay.
+		--
+		-- Unfortunately, it's possible for the backup resource.dat to contain the
+		-- replaced blank cursor image. This would result in people not seeing the
+		-- default cursor in-game, unless they redownload unmodified resource.dat,
+		-- once we removed the following line.
+		--
+		-- To make it easier for everyone, let's keep replacing the cursor; though
+		-- this time with the real image.
+		modApi:appendAsset("img/mouse/pointer.png","resources/mods/ui/pointer.png")
 	end
 
 	self:loadAdditionalSprites()

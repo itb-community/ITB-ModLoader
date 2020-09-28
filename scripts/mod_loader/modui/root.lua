@@ -5,7 +5,6 @@
 local bgRobot = sdlext.getSurface({ path = "img/main_menus/bg3.png" })
 local bgHangar = sdlext.getSurface({ path = "img/strategy/hangar_main.png" })
 local loading = sdlext.getSurface({ path = "img/main_menus/Loading_main.png" })
-local cursor = sdlext.getSurface({ path = "resources/mods/ui/pointer-large.png" })
 
 -- //////////////////////////////////////////////////////////////////////
 
@@ -470,10 +469,6 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 
 	for i, hook in ipairs(frameDrawnHooks) do
 		hook(screen)
-	end
-
-	if not loading:wasDrawn() then
-		screen:blit(cursor, nil, sdl.mouse.x(), sdl.mouse.y())
 	end
 end)
 
