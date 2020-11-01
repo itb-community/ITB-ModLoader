@@ -116,37 +116,37 @@ local function overrideProjectileOrArtillery(funcName, oldFunc)
 
     assert(metadataType == "projectile" or metadataType == "artillery", "This function only works for projectile or artillery weapons")
 
-    SkillEffect[funcName] = function(self, ...)
-		local origin, damageInstance, projectileArt, delay = ...
+    SkillEffect[funcName] = function(self, source, damageInstance, projectileArt, delay)
 		
-		if not isUserdataPoint(origin) then
+		if not isUserdataPoint(source) then
 			delay = projectileArt
 			projectileArt = damageInstance
-			damageInstance = origin
-			origin = nil
+			damageInstance = source
+			
+			-- adding backwards compatibility for mods made before ITB 1.2
+			-- it only works if piOrigin was set before AddProjectile/AddArtillery was called
+			source = self.piOrigin ~= Point(-INT_MAX, -INT_MAX) and self.piOrigin or nil
 		end
 		
 		if type(damageInstance) ~= 'userdata' then
 			damageInstance = {}
 		end
 		
-        if not delay and damageInstance.loc then
-            delay = PROJ_DELAY
-        end
-
         local metadataTable = {}
         metadataTable.type = metadataType
         metadataTable.projectileArt = projectileArt
-        metadataTable.source = Pawn and Pawn:GetSpace() or nil
+        metadataTable.source = source or (Pawn and Pawn:GetSpace()) or nil
         metadataTable.target = damageInstance.loc
         addDamageListMetadata(self[damageList], metadataTable)
 		
-		-- adding backwards compatibility for mods made before ITB 1.2
-		-- it only works if piOrigin was set before AddProjectile/AddArtillery was called
-		if origin == nil and self.piOrigin ~= Point(-INT_MAX,-INT_MAX) then
-			oldFunc(self, self.piOrigin, ...)
+		if source ~= nil then
+			oldFunc(self, source, damageInstance, projectileArt, delay or PROJ_DELAY)
 		else
-			oldFunc(self, ...)
+			if delay ~= nil then
+				oldFunc(self, damageInstance, projectileArt, delay)
+			else
+				oldFunc(self, damageInstance, projectileArt)
+			end
 		end
     end
 end
