@@ -40,6 +40,7 @@ end
 function mod_loader:init()
 	self.mod_dirs = {}
 	self.mods = {}
+	self.mod_list = {}
 	self.mod_options = {}
 
 	self.unmountedMods = {} -- mods which had malformed init.lua
@@ -47,7 +48,7 @@ function mod_loader:init()
 	
 	modApi.modsInitializedHooks = {}
 
-	self:enumerateMods()
+	self:enumerateMods("mods/")
 
 	if MOD_API_DRAW_HOOK then
 		-- We used to have to replace the game's cursor with a dummy one drawn
@@ -69,9 +70,15 @@ function mod_loader:init()
 	-- Process all mods for metadata first.
 	-- orderMods only returns a list with enabled mods, so we iterate over the
 	-- list of all mods here.
-	for id, _ in pairs(self.mods) do
+	-- By using a while loop, it will be possible for mods to add addtional mods
+	-- during metadata initialization, and have those mods have their metadata
+	-- inited as well.
+	local i = 1
+	while i <= #self.mod_list do
+		local id = self.mod_list[i].id
 		modApi:setCurrentMod(id)
 		self:initMetadata(id)
+		i = i + 1
 	end
 
 	local orderedMods = self:orderMods(self:getModConfig(), self:getSavedModOrder())
@@ -113,12 +120,12 @@ function mod_loader:loadAdditionalSprites()
 	ANIMS.placeholder_enemy = ANIMS.SingleImage:new{Image = "units/placeholder_enemy.png"}
 end
 
-function mod_loader:enumerateMods()
-	self.mod_dirs = self:enumerateDirectoriesIn("mods")
+function mod_loader:enumerateMods(dirPathRelativeToGameDir)
+	self.mod_dirs = self:enumerateDirectoriesIn(dirPathRelativeToGameDir)
 
 	for i, dir in pairs(self.mod_dirs) do
 		local err = ""
-		local path = string.format("mods/%s/scripts/init.lua",dir)
+		local path = string.format(dirPathRelativeToGameDir .."%s/scripts/init.lua",dir)
 		local function fn()
 			return dofile(path)
 		end
@@ -181,13 +188,14 @@ function mod_loader:enumerateMods()
 		if ok then
 			data.dir = dir
 			data.path = path
-			data.scriptPath = string.format("mods/%s/scripts/",dir)
-			data.resourcePath = string.format("mods/%s/",dir)
+			data.scriptPath = string.format(dirPathRelativeToGameDir .."%s/scripts/",dir)
+			data.resourcePath = string.format(dirPathRelativeToGameDir .."%s/",dir)
 			
 			data.initialized = false
 			data.installed = false
 			
 			self.mods[data.id] = data
+			self.mod_list[#self.mod_list + 1] = data
 			
 			self.mod_options[data.id] = {
 				options = {},--For configurable mods
