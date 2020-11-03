@@ -140,6 +140,25 @@ local function createUi()
 			end
 			return false
 		end
+		
+		local line = Ui()
+				:width(1):heightpx(frametop.decorations[1].bordersize)
+				:decorate({ DecoSolid(frametop.decorations[1].bordercolor) })
+				:addTo(frametop)
+
+		local buttonHeight = 40
+		local buttonLayout = UiBoxLayout()
+				:hgap(20)
+				:padding(24)
+				:width(1)
+				:addTo(frametop)
+		buttonLayout:heightpx(buttonHeight + buttonLayout.padt + buttonLayout.padb)
+
+		ui:relayout()
+		scrollarea:heightpx(scrollarea.h - (buttonLayout.h + line.h))
+
+		line:pospx(0, scrollarea.y + scrollarea.h)
+		buttonLayout:pospx(0, line.y + line.h)
 
 		local getDisplayName = function(mod)
 			local r = mod.name
@@ -149,6 +168,50 @@ local function createUi()
 			return r
 		end
 		
+		local sortDropDownOptions = {
+			GetText("ModConfig_Button_Sort_Choice_1"),
+			GetText("ModConfig_Button_Sort_Choice_2"),
+			GetText("ModConfig_Button_Sort_Choice_3")
+		}
+		
+		--- adds buttons to control sorting
+		local function addSortButtons()
+			-- dropdown to choose a sorting
+			local buttonLayoutRight = UiBoxLayout()
+				:hgap(20)
+				:heightpx(40)
+				:addTo(buttonLayout)
+			buttonLayoutRight.alignH = "right"
+			local presetDropdown = UiDropDown(sortDropDownOptions)
+				:widthpx(260):heightpx(40)
+				:settooltip(GetText("ModConfig_Button_Sort_Tooltip"))
+				:decorate({
+					DecoButton(),
+					DecoAlign(0, 2),
+					DecoText(GetText("ModConfig_Button_Sort_Title")),
+					DecoDropDownText(nil, nil, nil, 33),
+					DecoAlign(0, -2),
+					DecoDropDown(),
+				})
+				:addTo(buttonLayoutRight)
+			function presetDropdown:destroyDropDown()
+				UiDropDown.destroyDropDown(self)
+				if self.value == "Load Order" then
+					local orderedMods = mod_loader:orderMods(mod_loader:getModConfig(), mod_loader:getSavedModOrder())
+					local loadOrder = {}
+					
+					for i,v in ipairs(orderedMods) do
+						loadOrder[v] = i
+					end
+					
+					table.sort(entryHolder.children, function(a,b) return mod_loader.mods[a.modId].id < mod_loader.mods[b.modId].id end)
+					table.sort(entryHolder.children, function(a,b) return (loadOrder[a.modId] or INT_MAX) < (loadOrder[b.modId] or INT_MAX) end)
+				elseif self.value == "Name" or self.value == "Id" then
+					table.sort(entryHolder.children, function(a,b) return mod_loader.mods[a.modId][self.value:lower()] < mod_loader.mods[b.modId][self.value:lower()] end)
+				end
+			end
+		end
+			
 		for id, option in pairs(mod_options) do
 			if mod_loader:hasMod(id) then
 				local mod = mod_loader.mods[id]
@@ -158,6 +221,7 @@ local function createUi()
 						:vgap(0)
 						:width(1)
 						:addTo(entryHolder)
+					entryBox.modId = id
 
 					local entryHeader = UiBoxLayout()
 						:hgap(5)
@@ -270,6 +334,8 @@ local function createUi()
 				end
 			end
 		end
+		
+		addSortButtons()
 	end)
 end
 

@@ -11,6 +11,11 @@ return {
 	["ModContent_Button_ModConfig"] = "Configure Mods",
 	["ModContent_ButtonTooltip_ModConfig"] = "Turn on and off individual mods, and configure any settings they might have.",
 	["ModConfig_FrameTitle"] = "Mod Configuration",
+	["ModConfig_Button_Sort_Title"] = "Sort by:",
+	["ModConfig_Button_Sort_Tooltip"] = "Sort mods alphabetically by name, id or sort them in the order they were loaded.",
+	["ModConfig_Button_Sort_Choice_1"] = "Name",
+	["ModConfig_Button_Sort_Choice_2"] = "Id",
+	["ModConfig_Button_Sort_Choice_3"] = "Load Order",
 
 	["ModContent_Button_SquadSelect"] = "Edit Squads",
 	["ModContent_ButtonTooltip_SquadSelect"] = "Select which squads will be available to pick.",
