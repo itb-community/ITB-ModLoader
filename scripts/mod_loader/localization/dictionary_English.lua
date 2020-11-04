@@ -15,7 +15,11 @@ return {
 	["ModConfig_Button_Sort_Tooltip"] = "Sort mods alphabetically by name, id or sort them in the order they were loaded.",
 	["ModConfig_Button_Sort_Choice_1"] = "Name",
 	["ModConfig_Button_Sort_Choice_2"] = "Id",
-	["ModConfig_Button_Sort_Choice_3"] = "Load Order",
+	["ModConfig_Button_Sort_Enabled_Mods_Title"] = "Enabled Mods:",
+	["ModConfig_Button_Sort_Enabled_Mods_Tooltip"] = "Sort enabled mods before or after disabled mods",
+	["ModConfig_Button_Sort_Enabled_Mods_Choice_1"] = "First",
+	["ModConfig_Button_Sort_Enabled_Mods_Choice_2"] = "Last",
+	["ModConfig_Button_Sort_Enabled_Mods_Choice_3"] = "Unsorted",
 
 	["ModContent_Button_SquadSelect"] = "Edit Squads",
 	["ModContent_ButtonTooltip_SquadSelect"] = "Select which squads will be available to pick.",
