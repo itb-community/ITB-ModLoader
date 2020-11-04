@@ -140,6 +140,25 @@ local function createUi()
 			end
 			return false
 		end
+		
+		local line = Ui()
+				:width(1):heightpx(frametop.decorations[1].bordersize)
+				:decorate({ DecoSolid(frametop.decorations[1].bordercolor) })
+				:addTo(frametop)
+
+		local buttonHeight = 40
+		local buttonLayout = UiBoxLayout()
+				:hgap(20)
+				:padding(24)
+				:width(1)
+				:addTo(frametop)
+		buttonLayout:heightpx(buttonHeight + buttonLayout.padt + buttonLayout.padb)
+
+		ui:relayout()
+		scrollarea:heightpx(scrollarea.h - (buttonLayout.h + line.h))
+
+		line:pospx(0, scrollarea.y + scrollarea.h)
+		buttonLayout:pospx(0, line.y + line.h)
 
 		local getDisplayName = function(mod)
 			local r = mod.name
@@ -148,6 +167,47 @@ local function createUi()
 			end
 			return r
 		end
+		
+		local sortDropDownOptions = {
+			GetText("ModConfig_Button_Sort_Choice_1"),
+			GetText("ModConfig_Button_Sort_Choice_2")
+		}
+		local sortEnabledModsDropDownOptions = {
+			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_1"),
+			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_2"),
+			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_3")
+		}
+		
+		-- dropdown button to choose a sorting
+		local buttonLayoutRight = UiBoxLayout()
+			:hgap(20)
+			:heightpx(40)
+			:addTo(buttonLayout)
+		buttonLayoutRight.alignH = "right"
+		local sortDropdown = UiDropDown({1,2}, sortDropDownOptions, sortEnabledModsDropDownOptions[3])
+			:widthpx(260):heightpx(40)
+			:settooltip(GetText("ModConfig_Button_Sort_Tooltip"))
+			:decorate({
+				DecoButton(),
+				DecoAlign(0, 2),
+				DecoText(GetText("ModConfig_Button_Sort_Title")),
+				DecoDropDownText(nil, nil, nil, 33),
+				DecoAlign(0, -2),
+				DecoDropDown(),
+			})
+			:addTo(buttonLayoutRight)
+		local sortEnabledModsDropdown = UiDropDown({1,2,3}, sortEnabledModsDropDownOptions, sortEnabledModsDropDownOptions[3])
+			:widthpx(260):heightpx(40)
+			:settooltip(GetText("ModConfig_Button_Sort_Enabled_Mods_Tooltip"))
+			:decorate({
+				DecoButton(),
+				DecoAlign(0, 2),
+				DecoText(GetText("ModConfig_Button_Sort_Enabled_Mods_Title")),
+				DecoDropDownText(nil, nil, nil, 33),
+				DecoAlign(0, -2),
+				DecoDropDown(),
+			})
+			:addTo(buttonLayoutRight)
 		
 		for id, option in pairs(mod_options) do
 			if mod_loader:hasMod(id) then
@@ -158,6 +218,7 @@ local function createUi()
 						:vgap(0)
 						:width(1)
 						:addTo(entryHolder)
+					entryBox.modId = id
 
 					local entryHeader = UiBoxLayout()
 						:hgap(5)
@@ -183,6 +244,7 @@ local function createUi()
 						})
 						:addTo(entryHeader)
 					
+					entryBox.checkbox = checkbox
 					checkbox.modId = id
 					checkbox.checked = modSelection[id].enabled
 					table.insert(checkboxes, checkbox)
@@ -194,6 +256,10 @@ local function createUi()
 							DecoSurface(sdlext.getSurface({ path = "resources/mods/ui/config-unchecked.png" }))
 						})
 						:addTo(entryHeader)
+					function checkbox:clicked(button)
+						sortEnabledModsDropdown.choice = 3
+						return UiCheckbox.clicked(self, button)
+					end
 					
 					configbox.configi = #checkboxes
 					configbox.onclicked = clickConfiguration
@@ -263,13 +329,44 @@ local function createUi()
 							DecoText(getDisplayName(mod))
 						})
 						:addTo(entryHolder)
+					function checkbox:clicked(button)
+						sortEnabledModsDropdown.choice = 3
+						return UiCheckbox.clicked(self, button)
+					end
 					
+					checkbox.checkbox = checkbox
 					checkbox.checked = modSelection[id].enabled
 					checkbox.modId = id
 					table.insert(checkboxes, checkbox)
 				end
 			end
 		end
+		
+		local function sortMods()
+			if sortDropdown.value == 1 then
+				table.sort(entryHolder.children, function(a,b) return mod_loader.mods[a.modId].name < mod_loader.mods[b.modId].name end)
+			elseif sortDropdown.value == 2 then
+				table.sort(entryHolder.children, function(a,b) return mod_loader.mods[a.modId].id < mod_loader.mods[b.modId].id end)
+			end
+			
+			if sortEnabledModsDropdown.value == 1 then
+				table.sort(entryHolder.children, function(a,b) return a.checkbox.checked and not b.checkbox.checked end)
+			elseif sortEnabledModsDropdown.value == 2 then
+				table.sort(entryHolder.children, function(a,b) return not a.checkbox.checked and b.checkbox.checked end)
+			end
+		end
+		
+		function sortDropdown:destroyDropDown()
+			UiDropDown.destroyDropDown(self)
+			sortMods()
+		end
+		
+		function sortEnabledModsDropdown:destroyDropDown()
+			UiDropDown.destroyDropDown(self)
+			sortMods()
+		end
+		
+		sortMods()
 	end)
 end
 
