@@ -130,17 +130,19 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir)
 
 	for i, dir in pairs(self.mod_dirs) do
 		local err = ""
-		local path = string.format("%s/%s/scripts/init.lua", dirPathRelativeToGameDir, dir)
+		local modDirPath = dirPathRelativeToGameDir..dir.."/"
+		local initFilePath = modDirPath .. "scripts/init.lua"
 
-		if not modApi:fileExists(path) then
-			local directories = self:enumerateDirectoriesIn(dirPathRelativeToGameDir.."/"..dir)
+		if not modApi:fileExists(initFilePath) then
+			local directories = self:enumerateDirectoriesIn(modDirPath)
 			if #directories == 1 then
-				path = string.format("%s/%s/%s/scripts/init.lua", dirPathRelativeToGameDir, dir, directories[1])
+				modDirPath = modDirPath..directories[1].."/"
+				initFilePath = modDirPath .. "scripts/init.lua"
 			end
 		end
 
 		local function fn()
-			return dofile(path)
+			return dofile(initFilePath)
 		end
 		
 		local ok, data = xpcall(fn,function(e) err = e end)
@@ -200,9 +202,9 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir)
 
 		if ok then
 			data.dir = dir
-			data.path = path
-			data.scriptPath = string.format(dirPathRelativeToGameDir .."%s/scripts/",dir)
-			data.resourcePath = string.format(dirPathRelativeToGameDir .."%s/",dir)
+			data.path = initFilePath
+			data.scriptPath = modDirPath .. "scripts/"
+			data.resourcePath = modDirPath
 			
 			data.initialized = false
 			data.installed = false
