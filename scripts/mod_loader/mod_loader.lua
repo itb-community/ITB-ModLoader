@@ -133,7 +133,7 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir)
 		local path = string.format("%s/%s/scripts/init.lua", dirPathRelativeToGameDir, dir)
 
 		if not modApi:fileExists(path) then
-			local files = self:enumerateFilesAndDirectoriesIn(dirPathRelativeToGameDir)
+			local files = self:enumerateFilesAndDirectoriesIn(dirPathRelativeToGameDir.."/"..dir)
 			if #files == 1 then
 				path = string.format("%s/%s/%s/scripts/init.lua", dirPathRelativeToGameDir, dir, files[1])
 			end
