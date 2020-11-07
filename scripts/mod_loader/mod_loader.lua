@@ -134,9 +134,20 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir)
 		local initFilePath = modDirPath .. "scripts/init.lua"
 
 		if not modApi:fileExists(initFilePath) then
-			local directories = self:enumerateDirectoriesIn(modDirPath)
-			if #directories == 1 then
-				modDirPath = modDirPath..directories[1].."/"
+			local allDirectories = self:enumerateDirectoriesIn(modDirPath)
+
+			-- filter out directories whose names start with '.' - by convention, these
+			-- typically contain configuration or other files that programs generally
+			-- shouldn't try to list / index.
+			local visibleDirectories = {}
+			for _, entry in ipairs(allDirectories) do
+				if not modApi:stringStartsWith(entry, ".") then
+					table.insert(visibleDirectories, entry)
+				end
+			end
+
+			if #visibleDirectories == 1 then
+				modDirPath = modDirPath..visibleDirectories[1].."/"
 				initFilePath = modDirPath .. "scripts/init.lua"
 			end
 		end
