@@ -130,7 +130,15 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir)
 
 	for i, dir in pairs(self.mod_dirs) do
 		local err = ""
-		local path = string.format(dirPathRelativeToGameDir .."%s/scripts/init.lua",dir)
+		local path = string.format("%s/%s/scripts/init.lua", dirPathRelativeToGameDir, dir)
+
+		if not modApi:fileExists(path) then
+			local files = self:enumerateFilesAndDirectoriesIn(dirPathRelativeToGameDir)
+			if #files == 1 then
+				path = string.format("%s/%s/%s/scripts/init.lua", dirPathRelativeToGameDir, dir, files[1])
+			end
+		end
+
 		local function fn()
 			return dofile(path)
 		end
@@ -240,16 +248,30 @@ function mod_loader:enumerateDirectoriesIn(dirPathRelativeToGameDir)
 	if os and os.listdirs then
 		return os.listdirs(dirPathRelativeToGameDir)
 	else
-		local result = {}
-		local directory = io.popen(string.format([[dir ".\%s\" /B /AD]], dirPathRelativeToGameDir))
-		for dir in directory:lines() do
-			table.insert(result, dir)
+		local directories = {}
+		local cmdResult = io.popen(string.format([[dir ".\%s\" /B /AD]], dirPathRelativeToGameDir))
+		for dir in cmdResult:lines() do
+			table.insert(directories, dir)
 		end
 
-		directory:close()
+		cmdResult:close()
 
-		return result
+		return directories
 	end
+end
+
+function mod_loader:enumerateFilesAndDirectoriesIn(dirPathRelativeToGameDir)
+	dirPathRelativeToGameDir = dirPathRelativeToGameDir:gsub("/", "\\")
+
+	local files = {}
+	local cmdResult = io.popen(string.format([[dir ".\%s\" /B]], dirPathRelativeToGameDir))
+	for dir in cmdResult:lines() do
+		table.insert(files, dir)
+	end
+
+	cmdResult:close()
+
+	return files
 end
 
 function mod_loader:initMod(id)
