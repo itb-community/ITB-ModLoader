@@ -1,6 +1,48 @@
 
+-- modified vanilla save_table with optional 'depth' parameter
+function save_table(target, depth)
+	local ret = "{"
+	for i, v in pairs(target) do
+		local value = ""
+	    if type(v) == "table" then
+	        if v ~= target.__index then
+				if not depth or depth > 0 then
+					depth = depth and depth - 1 or nil
+					value = save_table(v, depth)
+				else
+					value = "table"
+				end
+			end
+		elseif type(v) == "userdata" and v["GetLuaString"] ~= nil then
+			value = v:GetLuaString()
+        elseif type(v) ~= "userdata" and type(v) ~= "function" then
+            if type(v) == "string" then
+	    	    value = "\""..v.."\""
+	    	elseif type(v) == "boolean" then
+	    	    value = v and "true" or "false"
+	        else
+                value = v
+            end
+	    end
+		
+		if type(i) == "string" then
+			ret = ret.." \n[\""..i.."\"] = "..value..","
+		else
+			ret = ret.." \n["..i.."] = "..value..","
+		end
+	end
+	
+	if string.len(ret) > 1 then
+		ret = string.sub(ret,1,string.len(ret)-1)
+	end
+	
+	ret = ret.." \n}"
+	
+	return ret
+end
+
 local oldSaveTable = save_table
-function save_table(target)
+function save_table(target, ...)
 	local sStart = target.OnSerializationStart
 	local sEnd = target.OnSerializationEnd
 	local temp = {}
@@ -12,7 +54,7 @@ function save_table(target)
 	target.OnSerializationStart = nil
 	target.OnSerializationEnd = nil
 
-	local result = oldSaveTable(target)
+	local result = oldSaveTable(target, ...)
 
 	if sEnd then
 		sEnd(target, temp)
