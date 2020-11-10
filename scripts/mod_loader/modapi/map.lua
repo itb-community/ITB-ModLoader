@@ -15,6 +15,19 @@ function modApi:fileExists(name)
 	end
 end
 
+function modApi:directoryExists(path)
+	if type(path) ~= "string" then return false end
+
+	local response = os.execute("cd " .. path)
+
+	if response == 0 then
+		return true
+	end
+
+	return false
+end
+
+
 function modApi:writeFile(path, content)
 	assert(type(path) == "string")
 	assert(type(content) == "string")
