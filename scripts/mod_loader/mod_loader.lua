@@ -215,6 +215,20 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir)
 	end
 end
 
+function mod_loader:enumerateFilesIn(dirPathRelativeToGameDir)
+	dirPathRelativeToGameDir = dirPathRelativeToGameDir:gsub("/", "\\")
+
+	local result = {}
+	local directory = io.popen(string.format([[dir ".\%s\" /B /A-D]], dirPathRelativeToGameDir))
+	for dir in directory:lines() do
+		table.insert(result, dir)
+	end
+
+	directory:close()
+
+	return result
+end
+
 function mod_loader:enumerateDirectoriesIn(dirPathRelativeToGameDir)
 	dirPathRelativeToGameDir = dirPathRelativeToGameDir:gsub("/", "\\")
 
