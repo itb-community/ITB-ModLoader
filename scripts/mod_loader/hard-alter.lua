@@ -44,4 +44,8 @@ globalizeLocalVariable("scripts/text_population.lua", "PopEvent")
 -- Fix spawner backend's guard sometimes failing, leading to a crash
 replaceFileContent("scripts/spawner_backend.lua", "if Board == NULL then", "if Board == NULL or not Board then")
 
+-- Modify RandomMap in maps/maphelper.lua to always return a mapname
+replaceFileContent("maps/maphelper.lua", "if v == sector or v == \"any_sector\" then", "if sector == nil or v == sector or v == \"any_sector\" then")
+replaceFileContent("maps/maphelper.lua", "%s*-- LOG%(\"COULD NOT FIND MAP WITH TAGS \"..tag..\" and \"..sector%)%s+return \"\"", "\n\t\tif sector ~= nil then\n\t\t\treturn RandomMap%(tag, nil%)\n\t\tend\n\n\t\treturn \"null\"")
+
 ReplaceFileContent = replaceFileContent
