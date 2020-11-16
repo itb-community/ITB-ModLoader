@@ -27,7 +27,7 @@ BoardPawn.GetPawnTable = function(self)
 end
 
 BoardPawn.ClearUndoMove = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 
 	if not Board or GetCurrentMission() == nil then
 		return
@@ -61,7 +61,7 @@ BoardPawn.ClearUndoMove = function(self)
 end
 
 BoardPawn.IsNeutral = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 
 	if not Board or GetCurrentMission() == nil then
 		return
@@ -81,7 +81,7 @@ BoardPawn.IsNeutral = function(self)
 end
 
 BoardPawn.IsPowered = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 
 	if not Board or GetCurrentMission() == nil then
 		return
@@ -98,7 +98,7 @@ BoardPawn.IsPowered = function(self)
 end
 	
 BoardPawn.GetMutation = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 
 	if not Board or GetCurrentMission() == nil then
 		return
@@ -110,14 +110,14 @@ BoardPawn.GetMutation = function(self)
 end
 
 BoardPawn.IsMutation = function(self, mutation)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
-	Tests.AssertEquals("number", type(mutation), "Argument #1")
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(mutation), "Argument #1")
 
 	return self:GetMutation() == mutation
 end
 
 BoardPawn.IsArmor = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 
 	local pawnType = _G[self:GetType()]
 	local isArmoredPilotAbility = self:IsAbility("Armored")
@@ -132,13 +132,13 @@ BoardPawn.IsArmor = function(self)
 end
 
 BoardPawn.IsIgnoreWeb = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 	
 	return self:IsAbility("Disable_Immunity")
 end
 
 BoardPawn.IsIgnoreSmoke = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 	
 	local pilot = self:IsAbility("Disable_Immunity")
 	local unit = _G[self:GetType()].IgnoreSmoke
@@ -147,7 +147,7 @@ BoardPawn.IsIgnoreSmoke = function(self)
 end
 
 BoardPawn.IsIgnoreFire = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 	
 	local passive = self:IsMech() and IsPassiveSkill("Flame_Immune")
 	local pilot = self:IsAbility("Rock_Skill")
@@ -157,7 +157,7 @@ BoardPawn.IsIgnoreFire = function(self)
 end
 
 BoardPawn.GetQueued = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 
 	if not Board or GetCurrentMission() == nil then
 		return
@@ -178,7 +178,7 @@ BoardPawn.GetQueued = function(self)
 end
 
 BoardPawn.IsQueued = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 
 	local queued = self:GetQueued()
 	
@@ -190,8 +190,8 @@ BoardPawn.IsQueued = function(self)
 end
 
 BoardPawn.ApplyDamage = function(self, spaceDamage)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
-	Tests.AssertEquals("userdata", type(spaceDamage), "Argument #1")
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(spaceDamage), "Argument #1")
 	
 	if not Board or GetCurrentMission() == nil then
 		return
@@ -208,8 +208,8 @@ BoardPawn.ApplyDamage = function(self, spaceDamage)
 end
 
 BoardPawn.SetFire = function(self, fire)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
-	Tests.AssertEquals("boolean", type(fire), "Argument #1")
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("boolean", type(fire), "Argument #1")
 
 	if not Board or GetCurrentMission() == nil then
 		return
@@ -226,7 +226,7 @@ BoardPawn.SetFire = function(self, fire)
 end
 
 BoardPawn.IsHighlighted = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 
 	if not Board or GetCurrentMission() == nil then
 		return
@@ -242,7 +242,7 @@ BoardPawn.IsHighlighted = function(self)
 end
 
 BoardPawn.GetLuaString = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 	return string.format("BoardPawn [id = %s, space = %s, name = %s]", self:GetId(), self:GetSpace():GetLuaString(), self:GetMechName())
 end
 BoardPawn.GetString = BoardPawn.GetLuaString
@@ -256,8 +256,8 @@ local function initializeBoardPawn()
 	
 	local oldSetNeutral = pawn.SetNeutral
 	BoardPawn.SetNeutral = function(self, neutral)
-		Tests.AssertEquals("userdata", type(self), "Argument #0")
-		Tests.AssertEquals("boolean", type(neutral), "Argument #1")
+		Assert.Equals("userdata", type(self), "Argument #0")
+		Assert.Equals("boolean", type(neutral), "Argument #1")
 
 		oldSetNeutral(self, neutral)
 
@@ -270,8 +270,8 @@ local function initializeBoardPawn()
 
 	local oldSetPowered = pawn.SetPowered
 	BoardPawn.SetPowered = function(self, powered)
-		Tests.AssertEquals("userdata", type(self), "Argument #0")
-		Tests.AssertEquals("boolean", type(powered), "Argument #1")
+		Assert.Equals("userdata", type(self), "Argument #0")
+		Assert.Equals("boolean", type(powered), "Argument #1")
 
 		oldSetPowered(self, powered)
 

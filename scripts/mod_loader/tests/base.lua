@@ -3,77 +3,14 @@
 -- Useful things for tests
 Tests = {}
 
-function Tests.AssertEquals(expected, actual, msg)
-	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected '%s', but was '%s'\n%s", tostring(expected), tostring(actual), debug.traceback("", 2))
-	assert(expected == actual, msg)
-end
-
-function Tests.AssertNotEquals(notExpected, actual, msg)
-	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected '%s' to not be equal to '%s'\n%s", tostring(actual), tostring(notExpected), debug.traceback("", 2))
-	assert(notExpected ~= actual, msg)
-end
-
-function Tests.AssertTrue(condition, msg)
-	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected 'true', but was '%s'\n%s", tostring(condition), debug.traceback("", 2))
-	assert(condition == true, msg)
-end
-
-function Tests.AssertFalse(condition, msg)
-	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected 'false', but was '%s'\n%s", tostring(condition), debug.traceback("", 2))
-	assert(condition == false, msg)
-end
-
-function Tests.AssertTypePoint(arg, msg)
-	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected Point, but was %s\n%s", tostring(type(arg)), debug.traceback("", 2))
-	assert(type(arg) == "userdata" and type(arg.x) == "number" and type(arg.y) == "number", msg)
-end
-
-function Tests.AssertBoardStateEquals(expected, actual, msg)
-	msg = (msg and msg .. ": ") or ""
-
-	for index, expectedState in ipairs(expected.tiles) do
-		local msg = msg .. expectedState.loc:GetLuaString()
-		Tests.AssertTableEquals(expectedState, actual.tiles[index], msg)
-	end
-
-	for index, expectedState in ipairs(expected.pawns) do
-		local msg = msg .. expectedState.loc:GetLuaString()
-		Tests.AssertTableEquals(expectedState, actual.pawns[index], msg)
-	end
-end
-
-function Tests.AssertTableEquals(expected, actual, msg)
-	local differences = {}
-	for k, v in pairs(expected) do
-		if v ~= actual[k] then
-			table.insert(differences, k)
-		end
-	end
-
-	msg = msg and (msg .. "\n") or ""
-	msg = msg .. "Table state mismatch:\n"
-	for _, k in ipairs(differences) do
-		msg = msg .. string.format("- %s: expected %s, but was %s\n", k, tostring(expected[k]), tostring(actual[k]))
-	end
-
-	if #differences > 0 then
-		error(msg .. "\n" .. debug.traceback("", 2))
-	end
-end
-
 function Tests.RequireBoard()
 	assert(Board ~= nil, "Error: this test requires a Board to be available" .. "\n" .. debug.traceback("", 2))
 end
 
 function Tests.ExecuteWhenCondition(resultTable, executeFn, conditionFn)
-	Tests.AssertEquals("table", type(resultTable), "Argument #1")
-	Tests.AssertEquals("function", type(executeFn), "Argument #2")
-	Tests.AssertEquals("function", type(conditionFn), "Argument #3")
+	Assert.Equals("table", type(resultTable), "Argument #1")
+	Assert.Equals("function", type(executeFn), "Argument #2")
+	Assert.Equals("function", type(conditionFn), "Argument #3")
 
 	modApi:conditionalHook(
 		conditionFn,
@@ -93,8 +30,8 @@ function Tests.ExecuteWhenCondition(resultTable, executeFn, conditionFn)
 end
 
 function Tests.SafeRunLater(resultTable, fn)
-	Tests.AssertEquals("table", type(resultTable), "Argument #1")
-	Tests.AssertEquals("function", type(fn), "Argument #2")
+	Assert.Equals("table", type(resultTable), "Argument #1")
+	Assert.Equals("function", type(fn), "Argument #2")
 
 	modApi:runLater(function()
 		local ok, err = xpcall(
@@ -111,7 +48,7 @@ function Tests.SafeRunLater(resultTable, fn)
 end
 
 function Tests.GetTileState(loc)
-	Tests.AssertEquals("userdata", type(loc), "Argument #1")
+	Assert.Equals("userdata", type(loc), "Argument #1")
 
 	local state = {}
 
@@ -249,7 +186,7 @@ function Tests.BuildPawnTest(testFunctionsTable)
 							try(check)
 							:finally(cleanup)
 
-							Tests.AssertBoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
+							Assert.BoardStateEquals(expectedBoardState, Tests.GetBoardState(), "Tested operation had side effects")
 
 							resultTable.result = true
 						end)
@@ -382,9 +319,9 @@ function Tests.Testsuite:RunAllTests(testsuiteName, testEnumeratorFn, isSecondar
 	testsuiteName = testsuiteName or findTestsuiteName(self)
 	testEnumeratorFn = testEnumeratorFn or self.EnumerateTests
 	isSecondaryCall = isSecondaryCall or false
-	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
-	Tests.AssertEquals("function", type(testEnumeratorFn), "Argument #2")
-	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #3")
+	Assert.Equals("string", type(testsuiteName), "Argument #1")
+	Assert.Equals("function", type(testEnumeratorFn), "Argument #2")
+	Assert.Equals("boolean", type(isSecondaryCall), "Argument #3")
 
 	local tests, testsuites = testEnumeratorFn(self)
 	self.onTestsuiteStarting:fire(self, tests, testsuites)
@@ -418,8 +355,8 @@ function Tests.Testsuite:RunAllTests(testsuiteName, testEnumeratorFn, isSecondar
 end
 
 function Tests.Testsuite:RunTests(tests, resultsHolder)
-	Tests.AssertEquals("table", type(tests), "Argument #1")
-	Tests.AssertEquals("table", type(resultsHolder), "Argument #2")
+	Assert.Equals("table", type(tests), "Argument #1")
+	Assert.Equals("table", type(resultsHolder), "Argument #2")
 
 	modApi:conditionalHook(
 		function()
@@ -487,8 +424,8 @@ function Tests.Testsuite:RunTests(tests, resultsHolder)
 end
 
 function Tests.Testsuite:ProcessResults(testsuiteName, results)
-	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
-	Tests.AssertEquals("table", type(results), "Argument #2")
+	Assert.Equals("string", type(testsuiteName), "Argument #1")
+	Assert.Equals("table", type(results), "Argument #2")
 
 	modApi:conditionalHook(
 		function()
@@ -517,10 +454,10 @@ function Tests.Testsuite:ProcessResults(testsuiteName, results)
 end
 
 function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, testEnumeratorFn, isSecondaryCall)
-	Tests.AssertEquals("string", type(testsuiteName), "Argument #1")
-	Tests.AssertEquals("table", type(testsuites), "Argument #2")
-	Tests.AssertEquals("function", type(testEnumeratorFn), "Argument #3")
-	Tests.AssertEquals("boolean", type(isSecondaryCall), "Argument #4")
+	Assert.Equals("string", type(testsuiteName), "Argument #1")
+	Assert.Equals("table", type(testsuites), "Argument #2")
+	Assert.Equals("function", type(testEnumeratorFn), "Argument #3")
+	Assert.Equals("boolean", type(isSecondaryCall), "Argument #4")
 
 	modApi:conditionalHook(
 		function()

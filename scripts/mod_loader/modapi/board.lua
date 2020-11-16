@@ -3,8 +3,8 @@ local DequeList = require("scripts/mod_loader/deque_list")
 BoardClass = Board
 
 BoardClass.MovePawnsFromTile = function(self, loc)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
-	Tests.AssertTypePoint(loc, "Argument #1")
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.TypePoint(loc, "Argument #1")
 
 	-- In case there are multiple pawns on the same tile
 	local pawnStack = DequeList()
@@ -20,9 +20,9 @@ BoardClass.MovePawnsFromTile = function(self, loc)
 end
 
 BoardClass.RestorePawnsToTile = function(self, loc, pawnStack)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
-	Tests.AssertTypePoint(loc, "Argument #1")
-	Tests.AssertEquals("table", type(pawnStack), "Argument #2")
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.TypePoint(loc, "Argument #1")
+	Assert.Equals("table", type(pawnStack), "Argument #2")
 
 	while not pawnStack:isEmpty() do
 		local pawn = pawnStack:popLeft()
@@ -31,9 +31,9 @@ BoardClass.RestorePawnsToTile = function(self, loc, pawnStack)
 end
 
 BoardClass.SetFire = function(self, loc, fire)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
-	Tests.AssertTypePoint(loc, "Argument #1")
-	Tests.AssertEquals("boolean", type(fire), "Argument #2")
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.TypePoint(loc, "Argument #1")
+	Assert.Equals("boolean", type(fire), "Argument #2")
 
 	local pawnStack = self:MovePawnsFromTile(loc)
 
@@ -45,9 +45,9 @@ BoardClass.SetFire = function(self, loc, fire)
 end
 
 BoardClass.SetShield = function(self, loc, shield)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
-	Tests.AssertTypePoint(loc, "Argument #1")
-	Tests.AssertEquals("boolean", type(shield), "Argument #2")
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.TypePoint(loc, "Argument #1")
+	Assert.Equals("boolean", type(shield), "Argument #2")
 
 	local dmg = SpaceDamage(loc)
 	dmg.iShield = shield and EFFECT_CREATE or EFFECT_REMOVE
@@ -55,7 +55,7 @@ BoardClass.SetShield = function(self, loc, shield)
 end
 
 BoardClass.GetLuaString = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 	
 	local size = self:GetSize()
 	return string.format("Board [width = %s, height = %s]", size.x, size.y)
@@ -63,19 +63,19 @@ end
 BoardClass.GetString = BoardClass.GetLuaString
 
 BoardClass.IsMissionBoard = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 	
 	return self.isMission == true
 end
 
 BoardClass.IsTipImage = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 	
 	return self.isMission == nil
 end
 
 BoardClass.GetHighlighted = function(self)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
+	Assert.Equals("userdata", type(self), "Argument #0")
 	
 	if GetCurrentMission() == nil then
 		return
@@ -85,8 +85,8 @@ BoardClass.GetHighlighted = function(self)
 end
 
 BoardClass.IsHighlighted = function(self, loc)
-	Tests.AssertEquals("userdata", type(self), "Argument #0")
-	Tests.AssertTypePoint(loc, "Argument #1")
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.TypePoint(loc, "Argument #1")
 	
 	if GetCurrentMission() == nil then
 		return

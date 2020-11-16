@@ -1,9 +1,9 @@
 local testsuite = Tests.Testsuite()
 
-local assertTrue = Tests.AssertTrue
-local assertFalse = Tests.AssertFalse
-local assertEquals = Tests.AssertEquals
-local assertNotEquals = Tests.AssertNotEquals
+local assertTrue = Assert.True
+local assertFalse = Assert.False
+local assertEquals = Assert.Equals
+local assertNotEquals = Assert.NotEquals
 
 function testsuite.test_EventFire()
 	local event = Event()

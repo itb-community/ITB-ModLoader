@@ -1,7 +1,7 @@
 local testsuite = Tests.Testsuite()
 
-local assertTrue = Tests.AssertTrue
-local assertFalse = Tests.AssertFalse
+local assertTrue = Assert.True
+local assertFalse = Assert.False
 
 function testsuite.test_ClassHierarchy()
 	local rootClass = Class.new()

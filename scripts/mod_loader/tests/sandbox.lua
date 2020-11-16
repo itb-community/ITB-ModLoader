@@ -1,6 +1,6 @@
 local testsuite = Tests.Testsuite()
 
-local assertEquals = Tests.AssertEquals
+local assertEquals = Assert.Equals
 
 function testsuite.test_GlobalTablesChanges_ShouldNotLeak()
 	-- Changes to fields of global tables should not leak out to the real environment
