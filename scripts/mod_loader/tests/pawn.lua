@@ -1,6 +1,6 @@
 local testsuite = Tests.Testsuite()
 
-local assertEquals = Tests.AssertEquals
+local assertEquals = Assert.Equals
 local buildPawnTest = Tests.BuildPawnTest
 
 
