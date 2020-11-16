@@ -106,10 +106,6 @@ SkillEffect.AddGrapple = function(self, source, target, anim, ...)
     oldAddGrapple(self, source, target, anim, ...)
 end
 
-local function isUserdataPoint(var)
-	return type(var) == 'userdata' and type(var.x) == 'number' and type(var.y) == 'number'
-end
-
 local function overrideProjectileOrArtillery(funcName, oldFunc)
     local damageList = modApi:stringStartsWith(funcName, "AddQueued") and "q_effect" or "effect"
     local metadataType = funcName:gsub("^Add", ""):gsub("^Queued", ""):lower()
