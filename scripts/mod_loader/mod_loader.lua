@@ -90,6 +90,7 @@ function mod_loader:init()
 	end
 	
 	Assert.Traceback = true
+	modApi:setCurrentMod(nil)
 
 	fireHooksSafely(modApi.modsInitializedHooks, "A modsInitializedHook failed: ")
 	modApi.modsInitializedHooks = nil
@@ -518,6 +519,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 	end
 	
 	Assert.Traceback = true
+	modApi:setCurrentMod(nil)
 
 	fireHooksSafely(modApi.modsLoadedHooks, "A modsLoadedHook failed: ")
 end
