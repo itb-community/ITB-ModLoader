@@ -66,6 +66,8 @@ function mod_loader:init()
 	end
 
 	self:loadAdditionalSprites()
+	
+	Assert.Traceback = false
 
 	-- Process all mods for metadata first.
 	-- orderMods only returns a list with enabled mods, so we iterate over the
@@ -86,6 +88,8 @@ function mod_loader:init()
 		modApi:setCurrentMod(id)
 		self:initMod(id)
 	end
+	
+	Assert.Traceback = true
 
 	fireHooksSafely(modApi.modsInitializedHooks, "A modsInitializedHook failed: ")
 	modApi.modsInitializedHooks = nil
@@ -449,6 +453,8 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 	modApi:resetModContent()
 	modApi:loadLanguage(modApi:getLanguageIndex())
 	
+	Assert.Traceback = false
+	
 	local orderedMods = self:orderMods(mod_options, savedOrder)
 	
 	for i, id in ipairs(orderedMods) do
@@ -496,6 +502,8 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 			))
 		end
 	end
+	
+	Assert.Traceback = true
 
 	fireHooksSafely(modApi.modsLoadedHooks, "A modsLoadedHook failed: ")
 end
