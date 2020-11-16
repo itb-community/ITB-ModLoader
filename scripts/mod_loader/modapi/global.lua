@@ -266,3 +266,7 @@ function try(func)
 		end
 	}
 end
+
+function isUserdataPoint(var)
+	return type(var) == 'userdata' and type(var.x) == 'number' and type(var.y) == 'number'
+end
