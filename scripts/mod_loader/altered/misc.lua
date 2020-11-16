@@ -7,8 +7,7 @@ function save_table(target, depth)
 		if type(v) == "table" then
 			if v ~= target.__index then
 				if not depth or depth > 0 then
-					depth = depth and depth - 1 or nil
-					value = save_table(v, depth)
+					value = save_table(v, depth and depth - 1 or nil)
 				else
 					value = "table"
 				end
