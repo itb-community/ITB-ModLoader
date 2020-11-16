@@ -68,3 +68,8 @@ function Assert.TableEquals(expected, actual, msg)
 		error(msg .. traceback())
 	end
 end
+
+function Assert.ResourceDatIsOpen(msg)
+	msg = (msg and msg .. ": ") or ""
+	assert(modApi.resource ~= nil, msg .. "Resource.dat is closed. It can only be modified while mods are initializing" .. traceback())
+end
