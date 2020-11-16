@@ -12,6 +12,7 @@ local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 		String content to be written to the file
 --]]
 function modApi:writeAsset(resource, content)
+	Assert.ResourceDatIsOpen("writeAsset")
 	assert(type(resource) == "string")
 	assert(type(content) == "string")
 
@@ -49,6 +50,7 @@ end
 		Content of the file in string format
 --]]
 function modApi:readAsset(resource)
+	Assert.ResourceDatIsOpen("readAsset")
 	assert(type(resource) == "string")
 
 	for i, file in ipairs(self.resource._files) do
@@ -173,4 +175,6 @@ function modApi:finalize()
 	local output = self.resource:_write()
 	f:write(output)
 	f:close()
+	
+	self.resources = nil
 end
