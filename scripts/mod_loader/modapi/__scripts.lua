@@ -1,4 +1,5 @@
 local scripts = {
+	"assert",
 	"event",
 	"init",
 	"global",
