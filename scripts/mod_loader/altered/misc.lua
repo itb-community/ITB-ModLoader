@@ -4,8 +4,8 @@ function save_table(target, depth)
 	local ret = "{"
 	for i, v in pairs(target) do
 		local value = ""
-	    if type(v) == "table" then
-	        if v ~= target.__index then
+		if type(v) == "table" then
+			if v ~= target.__index then
 				if not depth or depth > 0 then
 					depth = depth and depth - 1 or nil
 					value = save_table(v, depth)
@@ -15,15 +15,15 @@ function save_table(target, depth)
 			end
 		elseif type(v) == "userdata" and v["GetLuaString"] ~= nil then
 			value = v:GetLuaString()
-        elseif type(v) ~= "userdata" and type(v) ~= "function" then
-            if type(v) == "string" then
-	    	    value = "\""..v.."\""
-	    	elseif type(v) == "boolean" then
-	    	    value = v and "true" or "false"
-	        else
-                value = v
-            end
-	    end
+		elseif type(v) ~= "userdata" and type(v) ~= "function" then
+			if type(v) == "string" then
+				value = "\""..v.."\""
+			elseif type(v) == "boolean" then
+				value = v and "true" or "false"
+			else
+				value = v
+			end
+		end
 		
 		if type(i) == "string" then
 			ret = ret.." \n[\""..i.."\"] = "..value..","
@@ -31,13 +31,13 @@ function save_table(target, depth)
 			ret = ret.." \n["..i.."] = "..value..","
 		end
 	end
-	
+
 	if string.len(ret) > 1 then
 		ret = string.sub(ret,1,string.len(ret)-1)
 	end
-	
+
 	ret = ret.." \n}"
-	
+
 	return ret
 end
 
