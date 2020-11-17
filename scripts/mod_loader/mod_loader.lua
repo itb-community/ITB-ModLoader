@@ -241,7 +241,15 @@ function mod_loader:enumerateFilesIn(dirPathRelativeToGameDir)
 	dirPathRelativeToGameDir = dirPathRelativeToGameDir:gsub("/", "\\")
 
 	if os and os.listfiles then
-		return os.listfiles(dirPathRelativeToGameDir)
+		-- os.listfiles returns a 0-indexed array, but lua expects 1-indexed.
+		-- otherwise checking length of array doesn't work properly, and returns
+		-- 0 for an array with 1 element at index 0.
+		local result = os.listfiles(dirPathRelativeToGameDir)
+		local luaResult = {}
+		for _, entry in pairs(result) do
+			table.insert(luaResult, entry)
+		end
+		return luaResult
 	else
 		local result = {}
 		local directory = io.popen(string.format([[dir ".\%s\" /B /A-D]], dirPathRelativeToGameDir))
