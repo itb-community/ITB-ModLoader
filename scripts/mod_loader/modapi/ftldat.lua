@@ -176,5 +176,5 @@ function modApi:finalize()
 	f:write(output)
 	f:close()
 	
-	self.resources = nil
+	self.resource = nil
 end
