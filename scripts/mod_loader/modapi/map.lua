@@ -3,28 +3,22 @@
 -- Map handling
 
 function modApi:fileExists(name)
-	assert(type(name) == "string", "Expected a string, got: "..type(name))
+	Assert.Equals('string', type(name), "Argument #1")
 
-	local f = io.open(name, "rb")
+	local ok, err, code = os.rename(name, name)
 
-	if f ~= nil then
-		io.close(f)
-		return true
-	else
-		return false
+	if not ok then
+		if code == 13 then
+			-- Permission denied, but it exists
+			return true
+		end
 	end
+
+	return ok, err
 end
 
 function modApi:directoryExists(path)
-	if type(path) ~= "string" then return false end
-
-	local response = os.execute("cd " .. path)
-
-	if response == 0 then
-		return true
-	end
-
-	return false
+	return self:fileExists(path .."/")
 end
 
 
