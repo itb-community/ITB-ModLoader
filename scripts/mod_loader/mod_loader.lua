@@ -219,13 +219,17 @@ end
 function mod_loader:enumerateFilesIn(dirPathRelativeToGameDir)
 	dirPathRelativeToGameDir = dirPathRelativeToGameDir:gsub("/", "\\")
 
-	local result = {}
-	local directory = io.popen(string.format([[dir ".\%s\" /B /A-D]], dirPathRelativeToGameDir))
-	for dir in directory:lines() do
-		table.insert(result, dir)
-	end
+	if os and os.listfiles then
+		return os.listfiles(dirPathRelativeToGameDir)
+	else
+		local result = {}
+		local directory = io.popen(string.format([[dir ".\%s\" /B /A-D]], dirPathRelativeToGameDir))
+		for file in directory:lines() do
+			table.insert(result, file)
+		end
 
-	directory:close()
+		directory:close()
+	end
 
 	return result
 end
