@@ -5,16 +5,20 @@
 function modApi:fileExists(name)
 	Assert.Equals('string', type(name), "Argument #1")
 
-	local ok, err, code = os.rename(name, name)
+	-- ignore the error, since typically we don't care about it
+	local ok, _, code = os.rename(name, name)
 
 	if not ok then
 		if code == 13 then
 			-- Permission denied, but it exists
 			return true
 		end
+
+		-- make sure we always return a non-nil, boolean value
+		return false
 	end
 
-	return ok, err
+	return true
 end
 
 function modApi:directoryExists(path)
