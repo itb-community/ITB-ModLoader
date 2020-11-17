@@ -289,20 +289,6 @@ function mod_loader:enumerateDirectoriesIn(dirPathRelativeToGameDir)
 	end
 end
 
-function mod_loader:enumerateFilesAndDirectoriesIn(dirPathRelativeToGameDir)
-	dirPathRelativeToGameDir = dirPathRelativeToGameDir:gsub("/", "\\")
-
-	local files = {}
-	local cmdResult = io.popen(string.format([[dir ".\%s\" /B]], dirPathRelativeToGameDir))
-	for dir in cmdResult:lines() do
-		table.insert(files, dir)
-	end
-
-	cmdResult:close()
-
-	return files
-end
-
 function mod_loader:initMod(id)
 	local mod = self.mods[id]
 
