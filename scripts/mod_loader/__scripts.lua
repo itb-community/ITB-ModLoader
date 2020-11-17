@@ -28,6 +28,11 @@ function GetParentPath(path)
 	return path:sub(0, path:find("[\\/][^\\/]*[\\/]?$"))
 end
 
+--- Return name of the file for the given path
+function GetFileName(path)
+	return path:match("^.+[\\/]([^\\/]+)$")
+end
+
 -- This particular file is loaded by the game itself, so we have
 -- to input the path manually, since (...) here returns nil.
 local rootpath = "scripts/mod_loader/"
