@@ -260,6 +260,8 @@ end
 	- tests: [ { name, func } ]
 	- testsuites: [ { name, suite } ]
 
+	The tables are sorted by the objects' names.
+
 	Usage:
 		local tests, testsuites = myTestsuite:EnumerateTests()
 --]]
@@ -275,6 +277,14 @@ function Tests.Testsuite:EnumerateTests()
 			table.insert(testsuites, { name = k, suite = v })
 		end
 	end
+
+	-- Sort them before returning
+	local lexicalSort = function(a, b)
+		return a.name < b.name
+	end
+
+	table.sort(tests, lexicalSort)
+	table.sort(testsuites, lexicalSort)
 
 	return tests, testsuites
 end
