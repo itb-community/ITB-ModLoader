@@ -9,6 +9,7 @@ testsuite.pawn = require(rootpath.."pawn")
 testsuite.sandbox = require(rootpath.."sandbox")
 testsuite.classes = require(rootpath.."classes")
 testsuite.event = require(rootpath.."event")
+testsuite.modApi = require(rootpath.."modApi")
 
 --[[
 	Usage, in console while in a mission:
