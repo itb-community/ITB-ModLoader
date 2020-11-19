@@ -246,8 +246,8 @@ function mod_loader:enumerateFilesIn(dirPathRelativeToGameDir)
 		-- 0 for an array with 1 element at index 0.
 		local result = os.listfiles(dirPathRelativeToGameDir)
 		local luaResult = {}
-		for _, entry in pairs(result) do
-			table.insert(luaResult, entry)
+		for i = 0, #result do
+			table.insert(luaResult, result[i])
 		end
 		return luaResult
 	else
@@ -272,8 +272,8 @@ function mod_loader:enumerateDirectoriesIn(dirPathRelativeToGameDir)
 		-- 0 for an array with 1 element at index 0.
 		local result = os.listdirs(dirPathRelativeToGameDir)
 		local luaResult = {}
-		for _, entry in pairs(result) do
-			table.insert(luaResult, entry)
+		for i = 0, #result do
+			table.insert(luaResult, result[i])
 		end
 		return luaResult
 	else
