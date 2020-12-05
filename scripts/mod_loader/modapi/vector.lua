@@ -5,6 +5,8 @@ math.vec4 = {}
 
 local mt_vec2 = {
 	x = 1, y = 2,
+	width = 1, height = 2,
+	w = 1, h = 2,
 	[1] = 1, [2] = 2
 }
 
@@ -15,14 +17,35 @@ local mt_vec3 = {
 }
 
 local mt_vec4 = {
-	top = 1, bottom = 2, left = 3, right = 4,
 	north = 1, south = 2, west = 3, east = 4,
-	n = 1, s = 2, w = 3, e = 4,
+	top = 1, bottom = 2, left = 3, right = 4,
 	t = 1, b = 2, l = 3, r = 4,
-	x = 1, y = 2, z = 3, time = 4,
-	i = 1, j = 2, k = 3,
+	
+	x = 1, y = 2, w = 3, h = 4, width = 3, height = 4,
 	[1] = 1, [2] = 2, [3] = 3, [4] = 4
 }
+
+local function traceback()
+	return Assert.Traceback and debug.traceback("\n", 3) or ""
+end
+
+local function AssertIsVector(name, expected, actual, msg)
+	msg = (msg and msg .. ": ") or ""
+	msg = msg .. string.format("Expected %s, but was %s", name, type(actual), traceback())
+	assert(getmetatable(actual) == expected, msg)
+end
+
+local function AssertIsVector2(actual, msg)
+	AssertIsVector("math.vec2", mt_vec2, actual, msg)
+end
+
+local function AssertIsVector3(actual, msg)
+	AssertIsVector("math.vec3", mt_vec3, actual, msg)
+end
+
+local function AssertIsVector4(actual, msg)
+	AssertIsVector("math.vec4", mt_vec4, actual, msg)
+end
 
 local function addVectors(a, b)
 	
@@ -60,7 +83,7 @@ end
 function mt_vec2:__call(x, y)
 	
 	if type(x) == 'table' and getmetatable(x) == mt_vec2 then
-		y = y[2] or y
+		y = x[2] or y
 		x = x[1] or x
 	end
 	
@@ -108,14 +131,20 @@ function mt_vec2:__sub(other)
 end
 
 function mt_vec2:__mul(other)
-	Assert.True(getmetatable(other) == mt_vec2, "math.vec2.__mul function mismatch")
+	AssertIsVector2(self, "math.vec2 dot product - Argument #1")
+	AssertIsVector2(other, "math.vec2 dot product - Argument #2")
 	
 	return self[1] * other[1] + self[2] * other[2]
 end
 
+function mt_vec2:dot(other)
+	return self * other
+end
+
 -- returns the magnitude of the cross product
 function mt_vec2:cross(other)
-	Assert.True(getmetatable(other) == mt_vec2, "math.vec2.cross function mismatch")
+	AssertIsVector2(self, "math.vec2 cross product - Argument #1")
+	AssertIsVector2(other, "math.vec2 cross product - Argument #2")
 	
 	return self[1] * other[2] - self[2] * other[1]
 end
@@ -188,13 +217,19 @@ function mt_vec3:__sub(other)
 end
 
 function mt_vec3:__mul(other)
-	Assert.True(getmetatable(other) == mt_vec3, "math.vec3.__mul function mismatch")
+	AssertIsVector3(self, "math.vec3 dot product - Argument #1")
+	AssertIsVector3(other, "math.vec3 dot product - Argument #2")
 	
 	return self[1] * other[1] + self[2] * other[2] + self[3] * other[3]
 end
 
+function mt_vec3:dot(other)
+	return self * other
+end
+
 function mt_vec3:cross(other)
-	Assert.True(getmetatable(other) == mt_vec3, "math.vec3.cross function mismatch")
+	AssertIsVector3(self, "math.vec3 cross product - Argument #1")
+	AssertIsVector3(other, "math.vec3 cross product - Argument #2")
 	
 	return self(
 		self[2] * other[3] - self[3] * other[2],
@@ -209,48 +244,52 @@ end
 
 
 -- metatable for 4-component vector
-function mt_vec4:__call(x,y,z,t)
+function mt_vec4:__call(x,y,w,h)
 	
 	if type(x) == 'table' and getmetatable(x) == mt_vec4 then
-		t = x[4] or t
-		z = x[3] or z
+		h = x[4] or h
+		w = x[3] or w
 		y = x[2] or y
 		x = x[1] or x
 		
 	elseif type(x) == 'table' and getmetatable(x) == mt_vec3 then
-		t = z
-		z = x[3] or z
+		h = y
+		w = x[3] or w
 		y = x[2] or y
 		x = x[1] or x
 		
 	elseif type(x) == 'table' and getmetatable(x) == mt_vec2 then
-		t = z
-		z = y
+		h = w
+		w = y
 		y = x[2] or y
 		x = x[1] or x
 		
-		if type(z) == 'table' and getmetatable(z) == mt_vec2 then
-			t = z[2] or t
-			z = z[1] or z
+		if type(w) == 'table' and getmetatable(w) == mt_vec2 then
+			h = w[2] or h
+			w = w[1] or w
 		end
 		
 	elseif type(y) == 'table' and getmetatable(y) == mt_vec3 then
-		t = y[3] or t
-		z = y[2] or z
+		h = y[3] or h
+		w = y[2] or w
 		y = y[1] or y
 		
 	elseif type(y) == 'table' and getmetatable(y) == mt_vec2 then
-		t = z
-		z = y[2] or z
+		h = w
+		w = y[2] or w
 		y = y[1] or y
+		
+	elseif type(w) == 'table' and getmetatable(w) == mt_vec2 then
+		h = w[2] or h
+		w = w[1] or w
 	end
 	
 	x = type(x) == 'number' and x or 0
 	y = type(y) == 'number' and y or 0
-	z = type(z) == 'number' and z or 0
-	t = type(t) == 'number' and t or 0
+	w = type(w) == 'number' and w or 0
+	h = type(h) == 'number' and h or 0
 	
-	local vec4 = {x, y, z, t}
+	local vec4 = {x, y, w, h}
 	
 	setmetatable(vec4, mt_vec4)
 	
@@ -291,9 +330,14 @@ function mt_vec4:__sub(other)
 end
 
 function mt_vec4:__mul(other)
-	Assert.True(getmetatable(other) == mt_vec4, "math.vec4.__mul function mismatch")
+	AssertIsVector4(self, "math.vec4 dot product - Argument #1")
+	AssertIsVector4(other, "math.vec4 dot product - Argument #2")
 	
 	return self[1] * other[1] + self[2] * other[2] + self[3] * other[3] + self[4] * other[4]
+end
+
+function mt_vec4:dot(other)
+	return self * other
 end
 
 function mt_vec4:GetString()
