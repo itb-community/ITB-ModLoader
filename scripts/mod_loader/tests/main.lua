@@ -10,6 +10,7 @@ testsuite.sandbox = require(rootpath.."sandbox")
 testsuite.classes = require(rootpath.."classes")
 testsuite.event = require(rootpath.."event")
 testsuite.modApi = require(rootpath.."modApi")
+testsuite.vector = require(rootpath.."vector")
 
 --[[
 	Usage, in console while in a mission:
