@@ -241,15 +241,7 @@ function mod_loader:enumerateFilesIn(dirPathRelativeToGameDir)
 	dirPathRelativeToGameDir = dirPathRelativeToGameDir:gsub("/", "\\")
 
 	if os and os.listfiles then
-		-- os.listfiles returns a 0-indexed array, but lua expects 1-indexed.
-		-- otherwise checking length of array doesn't work properly, and returns
-		-- 0 for an array with 1 element at index 0.
-		local result = os.listfiles(dirPathRelativeToGameDir)
-		local luaResult = {}
-		for i = 0, #result do
-			table.insert(luaResult, result[i])
-		end
-		return luaResult
+		return os.listfiles(dirPathRelativeToGameDir)
 	else
 		local result = {}
 		local directory = io.popen(string.format([[dir ".\%s\" /B /A-D]], dirPathRelativeToGameDir))
@@ -267,15 +259,7 @@ function mod_loader:enumerateDirectoriesIn(dirPathRelativeToGameDir)
 	dirPathRelativeToGameDir = dirPathRelativeToGameDir:gsub("/", "\\")
 
 	if os and os.listdirs then
-		-- os.listdirs returns a 0-indexed array, but lua expects 1-indexed.
-		-- otherwise checking length of array doesn't work properly, and returns
-		-- 0 for an array with 1 element at index 0.
-		local result = os.listdirs(dirPathRelativeToGameDir)
-		local luaResult = {}
-		for i = 0, #result do
-			table.insert(luaResult, result[i])
-		end
-		return luaResult
+		return os.listdirs(dirPathRelativeToGameDir)
 	else
 		local directories = {}
 		local cmdResult = io.popen(string.format([[dir ".\%s\" /B /AD]], dirPathRelativeToGameDir))
