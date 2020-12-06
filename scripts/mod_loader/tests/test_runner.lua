@@ -24,6 +24,12 @@ function Tests.Runner:ChangeStatus(newStatus)
 	self.onStatusChanged:fire(self, oldStatus, newStatus)
 end
 
+--- Convenience function for running directly via console
+function Tests.Runner:RunAllTests(testsuite)
+	testsuite = testsuite or Testsuites
+	self:Start(function() testsuite:EnumerateTests(true) end)
+end
+
 function Tests.Runner:Start(testEnumeratorFn)
 	Assert.Equals("function", type(testEnumeratorFn), "Argument #1")
 
