@@ -1,21 +1,10 @@
 local rootpath = GetParentPath(...)
 
-local testsuite = Tests.Testsuite()
-function testsuite:RunAllTests(testEnumeratorFn)
-	self.__index.RunAllTests(self, "Root Testsuite", testEnumeratorFn)
-end
+Testsuites = Tests.Testsuite()
 
-testsuite.pawn = require(rootpath.."pawn")
-testsuite.sandbox = require(rootpath.."sandbox")
-testsuite.classes = require(rootpath.."classes")
-testsuite.event = require(rootpath.."event")
-testsuite.modApi = require(rootpath.."modApi")
+Testsuites.pawn = require(rootpath.."pawn")
+Testsuites.sandbox = require(rootpath.."sandbox")
+Testsuites.classes = require(rootpath.."classes")
+Testsuites.event = require(rootpath.."event")
+Testsuites.modApi = require(rootpath.."modApi")
 
---[[
-	Usage, in console while in a mission:
-			Testsuites:RunAllTests()
-		or:
-			Testsuites.name_of_testsuite:RunAllTests()
---]]
-
-Testsuites = testsuite
