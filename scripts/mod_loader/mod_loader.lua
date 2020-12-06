@@ -130,9 +130,30 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir)
 
 	for i, dir in pairs(self.mod_dirs) do
 		local err = ""
-		local path = string.format(dirPathRelativeToGameDir .."%s/scripts/init.lua",dir)
+		local modDirPath = dirPathRelativeToGameDir..dir.."/"
+		local initFilePath = modDirPath .. "scripts/init.lua"
+
+		if not modApi:fileExists(initFilePath) then
+			local allDirectories = self:enumerateDirectoriesIn(modDirPath)
+
+			-- filter out directories whose names start with '.' - by convention, these
+			-- typically contain configuration or other files that programs generally
+			-- shouldn't try to list / index.
+			local visibleDirectories = {}
+			for _, entry in ipairs(allDirectories) do
+				if not modApi:stringStartsWith(entry, ".") then
+					table.insert(visibleDirectories, entry)
+				end
+			end
+
+			if #visibleDirectories == 1 then
+				modDirPath = modDirPath..visibleDirectories[1].."/"
+				initFilePath = modDirPath .. "scripts/init.lua"
+			end
+		end
+
 		local function fn()
-			return dofile(path)
+			return dofile(initFilePath)
 		end
 		
 		local ok, data = xpcall(fn,function(e) err = e end)
@@ -192,9 +213,9 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir)
 
 		if ok then
 			data.dir = dir
-			data.path = path
-			data.scriptPath = string.format(dirPathRelativeToGameDir .."%s/scripts/",dir)
-			data.resourcePath = string.format(dirPathRelativeToGameDir .."%s/",dir)
+			data.path = initFilePath
+			data.scriptPath = modDirPath .. "scripts/"
+			data.resourcePath = modDirPath
 			
 			data.initialized = false
 			data.installed = false
@@ -240,15 +261,15 @@ function mod_loader:enumerateDirectoriesIn(dirPathRelativeToGameDir)
 	if os and os.listdirs then
 		return os.listdirs(dirPathRelativeToGameDir)
 	else
-		local result = {}
-		local directory = io.popen(string.format([[dir ".\%s\" /B /AD]], dirPathRelativeToGameDir))
-		for dir in directory:lines() do
-			table.insert(result, dir)
+		local directories = {}
+		local cmdResult = io.popen(string.format([[dir ".\%s\" /B /AD]], dirPathRelativeToGameDir))
+		for dir in cmdResult:lines() do
+			table.insert(directories, dir)
 		end
 
-		directory:close()
+		cmdResult:close()
 
-		return result
+		return directories
 	end
 end
 
