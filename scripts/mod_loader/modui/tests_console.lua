@@ -165,7 +165,7 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 			DecoButton(),
 			DecoCheckbox(),
 			DecoAlign(4, 2),
-			DecoText(testsuiteEntry.name)
+			DecoText(testsuiteEntry.suite.name or testsuiteEntry.name)
 		})
 		:addTo(entryHeaderHolder)
 	checkbox.checked = true

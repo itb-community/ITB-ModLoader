@@ -1,6 +1,7 @@
 local rootpath = GetParentPath(...)
 
 Testsuites = Tests.Testsuite()
+Testsuites.name = "Root Testsuite"
 
 Testsuites.pawn = require(rootpath.."pawn")
 Testsuites.sandbox = require(rootpath.."sandbox")
