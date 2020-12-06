@@ -138,10 +138,12 @@ function Tests.Runner:ProcessResults(results)
 
 				local failedTests = {}
 				local failedCount = 0
+				local totalCount = 0
 				for testsuite, resultTable in pairs(results) do
 					failedTests[testsuite] = {}
 					local t = failedTests[testsuite]
 
+					totalCount = totalCount + #resultTable
 					for _, entry in ipairs(resultTable) do
 						-- 'result' is also used to hold error information, so compare it to true
 						if not (entry.ok and entry.result == true) then
@@ -151,14 +153,12 @@ function Tests.Runner:ProcessResults(results)
 					end
 				end
 
-				if #results > 0 then
-					LOGF("Tests summary: passed %s / %s tests", #results - failedCount, #results)
+				if totalCount > 0 then
+					LOGF("Tests summary: passed %s / %s tests", totalCount - failedCount, totalCount)
 
-					for testsuite, resultTable in pairs(failedTests) do
-						if #resultTable > 0 then
-							for _, entry in ipairs(resultTable) do
-								LOGF("%s.%s: %s", entry.parent.name, entry.name, entry.result)
-							end
+					for _, resultTable in pairs(failedTests) do
+						for _, entry in ipairs(resultTable) do
+							LOGF("%s.%s: %s", entry.parent.name, entry.name, entry.result)
 						end
 					end
 				end
