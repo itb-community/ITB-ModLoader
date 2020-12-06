@@ -225,30 +225,7 @@ end
 
 Tests.Testsuite = Class.new()
 
-Tests.Testsuite.STATUS_READY_TO_RUN_TEST = "READY_TO_RUN_TEST"
-Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH = "WAITING_FOR_TEST_FINISH"
-Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS = "READY_TO_PROCESS_RESULTS"
-Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS = "READY_TO_RUN_NESTED_TESTS"
-Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH = "WAITING_FOR_NESTED_FINISH"
-Tests.Testsuite.STATUS_COMPLETED = "COMPLETED"
-
 function Tests.Testsuite:new()
-	self.onTestsuiteStarting = Event()
-	self.onTestsuiteCompleted = Event()
-	self.onTestSubmitted = Event()
-	self.onTestStarted = Event()
-	self.onTestSuccess = Event()
-	self.onTestFailed = Event()
-	self.onStatusChanged = Event()
-
-	self.status = Tests.Testsuite.STATUS_COMPLETED
-end
-
-function Tests.Testsuite:ChangeStatus(newStatus)
-	local oldStatus = self.status
-	self.status = newStatus
-
-	self.onStatusChanged:fire(self, oldStatus, newStatus)
 end
 
 --[[
@@ -263,9 +240,9 @@ end
 	The tables are sorted by the objects' names.
 
 	Usage:
-		local tests, testsuites = myTestsuite:EnumerateTests()
+		local tests, testsuites = myTestsuite:EnumerateTestsAndTestsuites()
 --]]
-function Tests.Testsuite:EnumerateTests()
+function Tests.Testsuite:EnumerateTestsAndTestsuites()
 	local tests = {}
 	local testsuites = {}
 
@@ -289,6 +266,33 @@ function Tests.Testsuite:EnumerateTests()
 	return tests, testsuites
 end
 
+function Tests.Testsuite:EnumerateTests(isRecursive, checkFn)
+	local tests = {}
+
+	-- Enumerate all tests
+	for k, v in pairs(self) do
+		if type(v) == "function" and modApi:stringStartsWith(k, "test_") then
+			if not checkFn or checkFn(self, k, v) then
+				table.insert(tests, { name = k, func = v, parent = self })
+			end
+		elseif isRecursive and type(v) == "table" and Class.instanceOf(v, Tests.Testsuite) then
+			local nestedTests = v:EnumerateTests(isRecursive, checkFn)
+			for i, v in ipairs(nestedTests) do
+				table.insert(tests, v)
+			end
+		end
+	end
+
+	-- Sort them before returning
+	local lexicalSort = function(a, b)
+		return a.name < b.name
+	end
+
+	table.sort(tests, lexicalSort)
+
+	return tests
+end
+
 --[[
 	Returns a string representation of this testsuite, listing all tests it contains
 	and nested testsuites.
@@ -302,7 +306,7 @@ function Tests.Testsuite:GetString(holder, indent)
 
 	local testsuiteName = findTestsuiteName(self, holder)
 
-	local tests, testsuites = self:EnumerateTests()
+	local tests, testsuites = self:EnumerateTestsAndTestsuites()
 
 	local testsMsg = ""
 	for _, entry in ipairs(tests) do
@@ -323,190 +327,4 @@ function Tests.Testsuite:GetString(holder, indent)
 	end
 
 	return testsuiteName .. ": " .. testsMsg .. testsuitesMsg
-end
-
-function Tests.Testsuite:RunAllTests(testsuiteName, testEnumeratorFn, isSecondaryCall)
-	testsuiteName = testsuiteName or findTestsuiteName(self)
-	testEnumeratorFn = testEnumeratorFn or self.EnumerateTests
-	isSecondaryCall = isSecondaryCall or false
-	Assert.Equals("string", type(testsuiteName), "Argument #1")
-	Assert.Equals("function", type(testEnumeratorFn), "Argument #2")
-	Assert.Equals("boolean", type(isSecondaryCall), "Argument #3")
-
-	local tests, testsuites = testEnumeratorFn(self)
-	self.onTestsuiteStarting:fire(self, tests, testsuites)
-
-	-- Shuffle the tests table so that we run tests in random order
-	tests = randomize(tests)
-	testsuites = randomize(testsuites)
-
-	local message = string.format("Running testuite '%s'", testsuiteName)
-	LOG(string.rep("=", string.len(message)))
-	LOG(message)
-
-	local resultsHolder = {}
-	self:RunTests(tests, resultsHolder)
-
-	self:ProcessResults(testsuiteName, resultsHolder)
-
-	self:RunNestedTestsuites(testsuiteName, testsuites, testEnumeratorFn, true)
-
-	modApi:conditionalHook(
-		function()
-			return self.status == Tests.Testsuite.STATUS_COMPLETED
-		end,
-		function()
-			DoSaveGame()
-			self.onTestsuiteCompleted:fire(self)
-		end
-	)
-
-	self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_TEST)
-end
-
-function Tests.Testsuite:RunTests(tests, resultsHolder)
-	Assert.Equals("table", type(tests), "Argument #1")
-	Assert.Equals("table", type(resultsHolder), "Argument #2")
-
-	modApi:conditionalHook(
-		function()
-			return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_TEST
-		end,
-		function()
-			-- Suppress log output so that the results stay somewhat readable
-			local pendingTests = #tests
-			for _, entry in ipairs(tests) do
-				self.onTestSubmitted:fire(entry)
-
-				modApi:conditionalHook(
-					function()
-						return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_TEST
-					end,
-					function()
-						self:ChangeStatus(Tests.Testsuite.STATUS_WAITING_FOR_TEST_FINISH)
-						self.onTestStarted:fire(entry)
-
-						LOG("    Running test", entry.name)
-
-						local resultTable = {}
-						resultTable.done = false
-						resultTable.name = entry.name
-
-						local ok, result = pcall(function()
-							return entry.func(resultTable)
-						end)
-
-						resultTable.ok = resultTable.ok or ok
-						resultTable.result = resultTable.result or result
-
-						table.insert(resultsHolder, resultTable)
-
-						modApi:conditionalHook(
-							function()
-								return not ok or not resultTable.ok or resultTable.result ~= nil or resultTable.done
-							end,
-							function()
-								self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_TEST)
-								if resultTable.ok and resultTable.result == true then
-									self.onTestSuccess:fire(entry, resultTable)
-									LOG("    Success:", entry.name)
-								else
-									self.onTestFailed:fire(entry, resultTable)
-									LOG("    FAILURE:", entry.name)
-								end
-								pendingTests = pendingTests - 1
-							end
-						)
-					end
-				)
-			end
-
-			modApi:conditionalHook(
-				function()
-					return pendingTests == 0
-				end,
-				function()
-					self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS)
-				end
-			)
-		end
-	)
-end
-
-function Tests.Testsuite:ProcessResults(testsuiteName, results)
-	Assert.Equals("string", type(testsuiteName), "Argument #1")
-	Assert.Equals("table", type(results), "Argument #2")
-
-	modApi:conditionalHook(
-		function()
-			return self.status == Tests.Testsuite.STATUS_READY_TO_PROCESS_RESULTS
-		end,
-		function()
-			local failedTests = {}
-			for _, entry in ipairs(results) do
-				-- 'result' is also used to hold error information, so compare it to true
-				if not (entry.ok and entry.result == true) then
-					table.insert(failedTests, entry)
-				end
-			end
-
-			if #results > 0 then
-				LOG(string.format("Testsuite '%s' summary: passed %s / %s tests", testsuiteName, #results - #failedTests, #results))
-
-				for _, entry in ipairs(failedTests) do
-					LOG(string.format("%s.%s:", testsuiteName, entry.name), entry.result)
-				end
-			end
-
-			self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS)
-		end
-	)
-end
-
-function Tests.Testsuite:RunNestedTestsuites(testsuiteName, testsuites, testEnumeratorFn, isSecondaryCall)
-	Assert.Equals("string", type(testsuiteName), "Argument #1")
-	Assert.Equals("table", type(testsuites), "Argument #2")
-	Assert.Equals("function", type(testEnumeratorFn), "Argument #3")
-	Assert.Equals("boolean", type(isSecondaryCall), "Argument #4")
-
-	modApi:conditionalHook(
-		function()
-			return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
-		end,
-		function()
-			local pendingNestedTests = #testsuites
-			if pendingNestedTests > 0 then
-				for _, entry in ipairs(testsuites) do
-					modApi:conditionalHook(
-						function()
-							return self.status == Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS
-						end,
-						function()
-							self:ChangeStatus(Tests.Testsuite.STATUS_WAITING_FOR_NESTED_FINISH)
-							entry.suite:RunAllTests(string.format("%s.%s", testsuiteName, entry.name), testEnumeratorFn, isSecondaryCall)
-
-							modApi:conditionalHook(
-								function()
-									return entry.suite.status == nil or entry.suite.status == Tests.Testsuite.STATUS_COMPLETED
-								end,
-								function()
-									self:ChangeStatus(Tests.Testsuite.STATUS_READY_TO_RUN_NESTED_TESTS)
-									pendingNestedTests = pendingNestedTests - 1
-								end
-							)
-						end
-					)
-				end
-			end
-
-			modApi:conditionalHook(
-				function()
-					return pendingNestedTests == 0
-				end,
-				function()
-					self:ChangeStatus(Tests.Testsuite.STATUS_COMPLETED)
-				end
-			)
-		end
-	)
 end
