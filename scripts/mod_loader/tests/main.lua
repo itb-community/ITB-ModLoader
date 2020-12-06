@@ -5,10 +5,10 @@ local rootpath = GetParentPath(...)
 		Either use the Tests UI visible in test mech scenario when
 		Mod Loader development mode is enabled (recommended),
 		or execute one of the following commands in console while in a mission:
-			Tests.Runner:RunAllTests()
+			Tests.Runner():RunAllTests()
 		or:
-			Tests.Runner:RunAllTests(Testsuites.name_of_testsuite)
-			eg.: Tests.Runner:RunAllTests(Testsuites.pawn)
+			Tests.Runner():RunAllTests(Testsuites.name_of_testsuite)
+			eg.: Tests.Runner():RunAllTests(Testsuites.pawn)
 --]]
 Testsuites = Tests.Testsuite()
 Testsuites.name = "Root Testsuite"
