@@ -1,4 +1,5 @@
 local testsuite = Tests.Testsuite()
+testsuite.name = "Pawn-related tests"
 
 local assertEquals = Assert.Equals
 local buildPawnTest = Tests.BuildPawnTest

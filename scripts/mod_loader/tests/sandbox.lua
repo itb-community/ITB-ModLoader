@@ -1,4 +1,5 @@
 local testsuite = Tests.Testsuite()
+testsuite.name = "Script sandbox tests"
 
 local assertEquals = Assert.Equals
 
