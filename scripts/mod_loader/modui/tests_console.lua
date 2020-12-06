@@ -77,18 +77,18 @@ local function buildTestUi(testEntry)
 		statusBox.onclicked = Ui.onMouseEnter
 	end
 	entryHolder.onTestStarted = function(entry)
-		if entry.name == testEntry.name then
+		if entry.parent == testEntry.parent and entry.name == testEntry.name then
 			statusBox.decorations[1].bordercolor = TestConsole.colors.border_running
 		end
 	end
 	entryHolder.onTestSuccess = function(entry, resultTable)
-		if entry.name == testEntry.name then
+		if entry.parent == testEntry.parent and entry.name == testEntry.name then
 			statusBox.decorations[1].bordercolor = deco.colors.buttonborder
 			statusBox.decorations[2].surface = deco.surfaces.markTick
 		end
 	end
 	entryHolder.onTestFailed = function(entry, resultTable)
-		if entry.name == testEntry.name then
+		if entry.parent == testEntry.parent and entry.name == testEntry.name then
 			statusBox.decorations[1].bordercolor = deco.colors.buttonborder
 			statusBox.decorations[2].surface = deco.surfaces.markCross
 			statusBox.disabled = false
@@ -214,26 +214,32 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 		statusBox.updateStatus()
 	end))
 
-	local onTestSubmitted = function()
-		local old = testsCounter.total
-		testsCounter.total = testsCounter.total + 1
-		statusBox.updateStatus()
+	local onTestSubmitted = function(entry)
+		if testsuiteEntry.suite == entry.parent then
+			local old = testsCounter.total
+			testsCounter.total = testsCounter.total + 1
+			statusBox.updateStatus()
 
-		statusBox.onStatusChanged:fire("total", old, testsCounter.total)
+			statusBox.onStatusChanged:fire("total", old, testsCounter.total)
+		end
 	end
-	local onTestSuccess = function()
-		local old = testsCounter.success
-		testsCounter.success = testsCounter.success + 1
-		statusBox.updateStatus()
+	local onTestSuccess = function(entry)
+		if testsuiteEntry.suite == entry.parent then
+			local old = testsCounter.success
+			testsCounter.success = testsCounter.success + 1
+			statusBox.updateStatus()
 
-		statusBox.onStatusChanged:fire("success", old, testsCounter.success)
+			statusBox.onStatusChanged:fire("success", old, testsCounter.success)
+		end
 	end
-	local onTestFailed = function()
-		local old = testsCounter.failed
-		testsCounter.failed = testsCounter.failed + 1
-		statusBox.updateStatus()
+	local onTestFailed = function(entry)
+		if testsuiteEntry.suite == entry.parent then
+			local old = testsCounter.failed
+			testsCounter.failed = testsCounter.failed + 1
+			statusBox.updateStatus()
 
-		statusBox.onStatusChanged:fire("failed", old, testsCounter.failed)
+			statusBox.onStatusChanged:fire("failed", old, testsCounter.failed)
+		end
 	end
 
 	table.insert(subscriptions, testsuiteEntry.suite.onTestSubmitted:subscribe(onTestSubmitted))

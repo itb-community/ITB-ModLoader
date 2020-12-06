@@ -272,9 +272,9 @@ function Tests.Testsuite:EnumerateTests()
 	-- Enumerate all tests
 	for k, v in pairs(self) do
 		if type(v) == "function" and modApi:stringStartsWith(k, "test_") then
-			table.insert(tests, { name = k, func = v })
+			table.insert(tests, { name = k, func = v, parent = self })
 		elseif type(v) == "table" and Class.instanceOf(v, Tests.Testsuite) then
-			table.insert(testsuites, { name = k, suite = v })
+			table.insert(testsuites, { name = k, suite = v, parent = self })
 		end
 	end
 
