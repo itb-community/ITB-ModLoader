@@ -112,7 +112,7 @@ end
 
 local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 	indentLevel = indentLevel or 0
-	local tests, testsuites = testsuiteEntry.suite:EnumerateTests()
+	local tests, testsuites = testsuiteEntry.suite:EnumerateTestsAndTestsuites()
 
 	local entryBoxHolder = UiBoxLayout()
 		:vgap(5)
@@ -242,9 +242,9 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 		end
 	end
 
-	table.insert(subscriptions, testsuiteEntry.suite.onTestSubmitted:subscribe(onTestSubmitted))
-	table.insert(subscriptions, testsuiteEntry.suite.onTestSuccess:subscribe(onTestSuccess))
-	table.insert(subscriptions, testsuiteEntry.suite.onTestFailed:subscribe(onTestFailed))
+	table.insert(subscriptions, TestConsole.runner.onTestSubmitted:subscribe(onTestSubmitted))
+	table.insert(subscriptions, TestConsole.runner.onTestSuccess:subscribe(onTestSuccess))
+	table.insert(subscriptions, TestConsole.runner.onTestFailed:subscribe(onTestFailed))
 
 	-- Add child ui elements as fields in the parent object,
 	-- for convenient access
@@ -258,9 +258,9 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 			:addTo(entryContentHolder)
 
 		table.insert(subscriptions, resetEvent:subscribe(testUi.onReset))
-		table.insert(subscriptions, testsuiteEntry.suite.onTestStarted:subscribe(testUi.onTestStarted))
-		table.insert(subscriptions, testsuiteEntry.suite.onTestSuccess:subscribe(testUi.onTestSuccess))
-		table.insert(subscriptions, testsuiteEntry.suite.onTestFailed:subscribe(testUi.onTestFailed))
+		table.insert(subscriptions, TestConsole.runner.onTestStarted:subscribe(testUi.onTestStarted))
+		table.insert(subscriptions, TestConsole.runner.onTestSuccess:subscribe(testUi.onTestSuccess))
+		table.insert(subscriptions, TestConsole.runner.onTestFailed:subscribe(testUi.onTestFailed))
 		table.insert(subscriptions, checkbox.onToggled:subscribe(testUi.onParentToggled))
 	end
 
@@ -318,42 +318,24 @@ local function findHolderForTestsuite(testsuite, holder)
 end
 
 local function isSelected(holder, testFunc)
-	if testFunc then
-		for _, child in ipairs(holder.content.children) do
-			if child.entry.func == testFunc then
-				return child.checkbox.checked
-			end
+	for _, child in ipairs(holder.content.children) do
+		if child.entry.func == testFunc then
+			return child.checkbox.checked
 		end
-
-		return false
-	else
-		return holder.header and holder.header.checkbox and holder.header.checkbox.checked
 	end
+
+	return false
 end
 
-local function enumerateSelectedTests(testsuite)
-	local tests = {}
-	local testsuites = {}
+local function enumerateAllTests()
+	return Testsuites:EnumerateTests(true)
+end
 
-	local holder = findHolderForTestsuite(testsuite)
-	if not isSelected(holder) then
-		return tests, testsuites
-	end
-
-	-- Enumerate all selected tests
-	for k, v in pairs(testsuite) do
-		if type(v) == "function" and modApi:stringStartsWith(k, "test_") then
-			if isSelected(holder, v) then
-				table.insert(tests, { name = k, func = v })
-			end
-		elseif type(v) == "table" and Class.instanceOf(v, Tests.Testsuite) then
-			if isSelected(findHolderForTestsuite(v, holder)) then
-				table.insert(testsuites, { name = k, suite = v })
-			end
-		end
-	end
-
-	return tests, testsuites
+local function enumerateSelectedTests()
+	return Testsuites:EnumerateTests(true, function(testsuiteInner, testName, testFn)
+		local holder = findHolderForTestsuite(testsuiteInner)
+		return isSelected(holder, testFn)
+	end)
 end
 
 local function buildTestingConsoleContent(scroll)
@@ -372,7 +354,7 @@ local function buildTestingConsoleButtons(buttonLayout)
 		nil,
 		function()
 			resetEvent:fire()
-			Testsuites:RunAllTests()
+			TestConsole.runner:Start(enumerateAllTests)
 		end
 	)
 	btnRunAll:heightpx(40)
@@ -383,22 +365,23 @@ local function buildTestingConsoleButtons(buttonLayout)
 		nil,
 		function()
 			resetEvent:fire()
-			Testsuites:RunAllTests(enumerateSelectedTests)
+			TestConsole.runner:Start(enumerateSelectedTests)
 		end
 	)
 	btnRunSelected:heightpx(40)
 	btnRunSelected:addTo(buttonLayout)
 
-	btnRunAll.disabled = Testsuites.status ~= Tests.Testsuite.STATUS_COMPLETED
-	btnRunSelected.disabled = Testsuites.status ~= Tests.Testsuite.STATUS_COMPLETED
+	btnRunAll.disabled = TestConsole.runner.status ~= Tests.Runner.STATUS_COMPLETED
+	btnRunSelected.disabled = TestConsole.runner.status ~= Tests.Runner.STATUS_COMPLETED
 
-	table.insert(subscriptions, Testsuites.onTestsuiteStarting:subscribe(function(suite, tests, testsuites)
-		btnRunAll.disabled = true
-		btnRunSelected.disabled = true
-	end))
-	table.insert(subscriptions, Testsuites.onTestsuiteCompleted:subscribe(function(suite, tests, testsuites)
-		btnRunAll.disabled = false
-		btnRunSelected.disabled = false
+	table.insert(subscriptions, TestConsole.runner.onStatusChanged:subscribe(function(suite, oldStatus, newStatus)
+		if newStatus == Tests.Runner.STATUS_COMPLETED then
+			btnRunAll.disabled = false
+			btnRunSelected.disabled = false
+		else
+			btnRunAll.disabled = true
+			btnRunSelected.disabled = true
+		end
 	end))
 end
 
@@ -430,6 +413,8 @@ local function calculateOpenTestingConsoleButtonPosition()
 end
 
 local function createOpenTestingConsoleButton(root)
+	TestConsole.runner = Tests.Runner()
+
 	local button = sdlext.buildButton(
 		GetText("TestingConsole_ToggleButton_Text"),
 		GetText("TestingConsole_ToggleButton_Tooltip"),
