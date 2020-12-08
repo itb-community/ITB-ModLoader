@@ -221,6 +221,11 @@ function Ui:heightpx(h)
 	return self
 end
 
+function Ui:crop(crop)
+	self.cropped = crop ~= false
+	return self
+end
+
 function Ui:wheel(mx,my,y)
 	if not self.visible then return false end
 	if self.ignoreMouse then return false end
@@ -464,6 +469,11 @@ function Ui:relayout()
 	
 	self.innerWidth = innerWidth
 	self.innerHeight = innerHeight
+	
+	if self.cropped then
+		self.w = innerWidth
+		self.h = innerHeight
+	end
 end
 
 function Ui:draw(screen)
