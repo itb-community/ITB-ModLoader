@@ -165,6 +165,22 @@ function Ui:posCentered(x, y)
 	return self
 end
 
+function Ui:anchor(anchorH, anchorV)
+	self:anchorH(anchorH)
+	self:anchorV(anchorV)
+	return self
+end
+
+function Ui:anchorH(anchorH)
+	self.anchorHorizontal = anchorH
+	return self
+end
+
+function Ui:anchorV(anchorV)
+	self.anchorVertical = anchorV
+	return self
+end
+
 function Ui:pospx(x, y)
 	self.x = x
 	self.y = y
@@ -433,6 +449,8 @@ function Ui:keyup(keycode)
 end
 
 function Ui:relayout()
+	local innerX = self.x
+	local innerY = self.y
 	local innerWidth = 0
 	local innerHeight = 0
 
@@ -456,15 +474,46 @@ function Ui:relayout()
 			child.yPercent = nil
 		end
 		
-		child.screenx = self.screenx + self.padl - self.dx + child.x
-		child.screeny = self.screeny + self.padt - self.dy + child.y
+		local childleft, childright, childtop, childbottom
+		
+		if child.anchorHorizontal == nil or child.anchorHorizontal == "left" then
+			child.screenx = self.screenx + self.padl - self.dx + child.x
+		elseif child.anchorHorizontal == "center" then
+			child.screenx = self.screenx + self.w/2 - child.w/2 - self.dx + child.x
+		elseif child.anchorHorizontal == "right" then
+			child.screenx = self.screenx + self.w - self.padr - child.w + self.dx - child.x
+		end
+		
+		if child.anchorVertical == nil or child.anchorVertical == "top" then
+			child.screeny = self.screeny + self.padt - self.dy + child.y
+		elseif child.anchorVertical == "center" then
+			child.screeny = self.screeny + self.h/2 - child.h/2 - self.dy + child.y
+		elseif child.anchorVertical == "bottom" then
+			child.screeny = self.screeny + self.h - self.padb - child.h + self.dy - child.y
+		end
 		
 		child:relayout()
 		
-		local childright = self.padl + child.x + child.w + self.padr
-		local childbottom = self.padt + child.y + child.h + self.padb
-		if innerWidth < childright then innerWidth = childright end
-		if innerHeight < childbottom then innerHeight = childbottom end
+		if child.anchorHorizontal == nil or child.anchorHorizontal == "left" then
+			childright = self.padl + child.x + child.w + self.padr
+		elseif child.anchorHorizontal == "center" then
+			childright = self.w/2 - child.w/2 + child.x + child.w + self.padr
+		elseif child.anchorHorizontal == "right" then
+			childleft = self.w - self.padl - child.x - child.w - self.padr
+		end
+		
+		if child.anchorVertical == nil or child.anchorVertical == "top" then
+			childbottom = self.padt + child.y + child.h + self.padb
+		elseif child.anchorVertical == "center" then
+			childbottom = self.h/2 - child.h/2 + child.y + child.h + self.padb
+		elseif child.anchorVertical == "bottom" then
+			childtop = self.h - self.padt - child.y - child.h - self.padb
+		end
+		
+		if childleft and innerX < childleft then innerX = childleft end
+		if childright and innerWidth < childright then innerWidth = childright end
+		if childtop and innerY < childtop then innerY = childtop end
+		if childbottom and innerHeight < childbottom then innerHeight = childbottom end
 		
 		child.rect.x = child.screenx
 		child.rect.y = child.screeny
@@ -476,6 +525,8 @@ function Ui:relayout()
 	self.innerHeight = innerHeight
 	
 	if self.cropped then
+	--	self.x = innerX
+	--	self.y = innerY
 		self.w = innerWidth
 		self.h = innerHeight
 	end
