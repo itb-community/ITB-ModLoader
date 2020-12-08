@@ -7,6 +7,8 @@ local mt_vec2 = {
 	x = 1, y = 2,
 	width = 1, height = 2,
 	w = 1, h = 2,
+	top = 1, bottom = 1, left = 2, right = 2,
+	t = 1, b = 1, l = 2, r = 2,
 	[1] = 1, [2] = 2
 }
 
