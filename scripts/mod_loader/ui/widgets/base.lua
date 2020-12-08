@@ -226,6 +226,11 @@ function Ui:crop(crop)
 	return self
 end
 
+function Ui:clip(clip)
+	self.clipped = clip == false
+	return self
+end
+
 function Ui:wheel(mx,my,y)
 	if not self.visible then return false end
 	if self.ignoreMouse then return false end
@@ -476,8 +481,22 @@ function Ui:relayout()
 	end
 end
 
+local clipRect = sdl.rect(0,0,0,0)
 function Ui:draw(screen)
 	if not self.visible then return end
+	
+	local clip = self.clipped
+	
+	if clip then
+		clipRect.x = self.rect.x
+		clipRect.y = self.rect.y
+		clipRect.w = self.rect.w
+		clipRect.h = self.rect.h
+		
+		clipRect = clipRect:getIntersect(screen:getClipRect())
+		
+		screen:clip(clipRect)
+	end
 	
 	if self.animations then
 		for _, anim in pairs(self.animations) do
@@ -495,6 +514,10 @@ function Ui:draw(screen)
 	for i=#self.children,1,-1 do
 		local child = self.children[i]
 		child:draw(screen)
+	end
+	
+	if clip then
+		screen:unclip()
 	end
 end
 
