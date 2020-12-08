@@ -155,6 +155,18 @@ function mt_vec2:GetString()
 	return string.format("math.vec2{ %s, %s }", self[1], self[2])
 end
 
+function mt_vec2:GetContent()
+	return self[1], self[2]
+end
+
+function mt_vec4:GetPosition()
+	return self[1], self[2]
+end
+
+function mt_vec4:GetExtents()
+	return self[1], self[2]
+end
+
 
 -- metatable for 3-component vector
 function mt_vec3:__call(x, y, z)
@@ -242,6 +254,10 @@ end
 
 function mt_vec3:GetString()
 	return string.format("math.vec3{ %s, %s, %s }", self[1], self[2], self[3])
+end
+
+function mt_vec3:GetContent()
+	return self[1], self[2], self[3]
 end
 
 
@@ -344,6 +360,18 @@ end
 
 function mt_vec4:GetString()
 	return string.format("math.vec4{ %s, %s, %s, %s }", self[1], self[2], self[3], self[4])
+end
+
+function mt_vec4:GetContent()
+	return self[1], self[2], self[3], self[4]
+end
+
+function mt_vec4:GetPosition()
+	return self[1], self[2]
+end
+
+function mt_vec4:GetExtents()
+	return self[3], self[4]
 end
 
 
