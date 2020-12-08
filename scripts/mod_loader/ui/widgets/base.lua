@@ -217,6 +217,12 @@ function Ui:padding(v)
 	return self
 end
 
+function Ui:size(w, h)
+	self.wPercent = w
+	self.hPercent = h
+	return self
+end
+
 function Ui:width(w)
 	self.wPercent = w
 	return self
