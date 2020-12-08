@@ -45,26 +45,25 @@ function DecoFixedCAlign:draw(screen, widget)
 end
 
 DecoAnchor = Class.inherit(UiDeco)
-function DecoAnchor:new(alignH, alignV, offset)
+function DecoAnchor:new(alignH, alignV)
 	UiDeco.new(self)
 	self.alignH = alignH or "right"
 	self.alignV = alignV or "top"
-	self.offset = offset or 0
 end
 function DecoAnchor:draw(screen, widget)
 	if self.alignH == "right" then
-		widget.decorationx = self.offset
+		widget.decorationx = 0
 	elseif self.alignH == "left" then
-		widget.decorationx = widget.rect.w - self.offset
+		widget.decorationx = widget.rect.w
 	elseif self.alignH == "center" then
-		widget.decorationx = widget.rect.w/2 + self.offset
+		widget.decorationx = widget.rect.w/2
 	end
 	
 	if self.alignV == "top" then
-		widget.decorationy = self.offset
+		widget.decorationy = 0
 	elseif self.alignV == "bottom" then
-		widget.decorationy = widget.rect.h - self.offset
+		widget.decorationy = widget.rect.h
 	elseif self.alignV == "center" then
-		widget.decorationy = widget.rect.h/2 + self.offset
+		widget.decorationy = widget.rect.h/2
 	end
 end
