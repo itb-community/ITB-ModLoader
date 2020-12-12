@@ -165,19 +165,19 @@ function Ui:posCentered(x, y)
 	return self
 end
 
-function Ui:anchor(anchorH, anchorV)
-	self:anchorH(anchorH)
-	self:anchorV(anchorV)
+function Ui:anchor(alignH, alignV)
+	self:anchorH(alignH)
+	self:anchorV(alignV)
 	return self
 end
 
-function Ui:anchorH(anchorH)
-	self.anchorHorizontal = anchorH
+function Ui:anchorH(alignH)
+	self.alignH = alignH
 	return self
 end
 
-function Ui:anchorV(anchorV)
-	self.anchorVertical = anchorV
+function Ui:anchorV(alignV)
+	self.alignV = alignV
 	return self
 end
 
@@ -482,37 +482,37 @@ function Ui:relayout()
 		
 		local childleft, childright, childtop, childbottom
 		
-		if child.anchorHorizontal == nil or child.anchorHorizontal == "left" then
+		if child.alignH == nil or child.alignH == "left" then
 			child.screenx = self.screenx + self.padl - self.dx + child.x
-		elseif child.anchorHorizontal == "center" then
+		elseif child.alignH == "center" then
 			child.screenx = self.screenx + self.w/2 - child.w/2 - self.dx + child.x
-		elseif child.anchorHorizontal == "right" then
+		elseif child.alignH == "right" then
 			child.screenx = self.screenx + self.w - self.padr - child.w + self.dx - child.x
 		end
 		
-		if child.anchorVertical == nil or child.anchorVertical == "top" then
+		if child.alignV == nil or child.alignV == "top" then
 			child.screeny = self.screeny + self.padt - self.dy + child.y
-		elseif child.anchorVertical == "center" then
+		elseif child.alignV == "center" then
 			child.screeny = self.screeny + self.h/2 - child.h/2 - self.dy + child.y
-		elseif child.anchorVertical == "bottom" then
+		elseif child.alignV == "bottom" then
 			child.screeny = self.screeny + self.h - self.padb - child.h + self.dy - child.y
 		end
 		
 		child:relayout()
 		
-		if child.anchorHorizontal == nil or child.anchorHorizontal == "left" then
+		if child.alignH == nil or child.alignH == "left" then
 			childright = self.padl + child.x + child.w + self.padr
-		elseif child.anchorHorizontal == "center" then
+		elseif child.alignH == "center" then
 			childright = self.w/2 - child.w/2 + child.x + child.w + self.padr
-		elseif child.anchorHorizontal == "right" then
+		elseif child.alignH == "right" then
 			childleft = self.w - self.padl - child.x - child.w - self.padr
 		end
 		
-		if child.anchorVertical == nil or child.anchorVertical == "top" then
+		if child.alignV == nil or child.alignV == "top" then
 			childbottom = self.padt + child.y + child.h + self.padb
-		elseif child.anchorVertical == "center" then
+		elseif child.alignV == "center" then
 			childbottom = self.h/2 - child.h/2 + child.y + child.h + self.padb
-		elseif child.anchorVertical == "bottom" then
+		elseif child.alignV == "bottom" then
 			childtop = self.h - self.padt - child.y - child.h - self.padb
 		end
 		
