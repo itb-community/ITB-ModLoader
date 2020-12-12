@@ -149,3 +149,144 @@ end
 function UiScrollArea:onMouseExit()
 	self.scrollHovered = false
 end
+
+UiScrollAreaH = Class.inherit(UiScrollArea)
+
+function UiScrollAreaH:new()
+	Ui.new(self)
+	
+	self.scrollrect = sdl.rect(0,0,0,0)
+	self.scrollbuttonrect = sdl.rect(0,0,0,0)
+
+	self.scrollheight = 16
+	self.buttonwidth = 0
+	
+	self.padb = self.padb + self.scrollheight
+	self.nofitx = true
+
+	self.scrollPressed = false
+	self.scrollHovered = false
+	self.clipRect = sdl.rect(0,0,0,0)
+end
+
+function UiScrollAreaH:draw(screen)
+	local clipRect = self.clipRect
+	
+	local currentClipRect = screen:getClipRect()
+	if currentClipRect then
+		clipRect = self.clipRect:getIntersect(currentClipRect)
+	end
+	
+	screen:clip(clipRect)
+	Ui.draw(self, screen)
+	
+	if self.innerWidth > self.w then
+		screen:drawrect(deco.colors.black, self.scrollrect)
+		drawborder(screen, deco.colors.white, self.scrollrect, 2)
+
+		if self.scrollPressed then
+			screen:drawrect(deco.colors.focus, self.scrollbuttonrect)
+		elseif self.scrollHovered then
+			screen:drawrect(deco.colors.buttonborderhl, self.scrollbuttonrect)
+		else
+			screen:drawrect(deco.colors.white, self.scrollbuttonrect)
+		end
+	end
+	
+	screen:unclip()
+end
+
+function UiScrollAreaH:relayout()
+	Ui.relayout(self)
+	
+	self.scrollrect.x = self.screenx
+	self.scrollrect.y = self.screeny + self.h - self.scrollheight
+	self.scrollrect.w = self.w
+	self.scrollrect.h = self.scrollheight
+
+	if self.innerWidth > self.w and self.dx + self.w > self.innerWidth then
+		self.dx = self.innerWidth - self.w
+	elseif self.innerWidth < self.w and self.dx > 0 then
+		self.dx = 0
+	end
+	
+	local ratio = self.w / self.innerWidth
+	local offset = self.dx / (self.innerWidth - self.w)
+	if ratio > 1 then ratio = 1 end
+	
+	self.buttonwidth = ratio * self.w
+	self.scrollbuttonrect.x = self.screenx + offset * (self.w - self.buttonwidth)
+	self.scrollbuttonrect.y = self.screeny + self.h - self.scrollheight
+	self.scrollbuttonrect.w = self.buttonwidth
+	self.scrollbuttonrect.h = self.scrollheight
+
+	self.clipRect.x = self.screenx
+	self.clipRect.y = self.screeny
+	self.clipRect.w = self.w
+	self.clipRect.h = self.h
+end
+
+function UiScrollAreaH:mousedown(x, y, button)
+	if y >= self.scrollrect.y then
+		if self.root.pressedchild ~= nil then
+			self.root.pressedchild.pressed = false
+		end
+
+		self.root.pressedchild = self
+		self.pressed = true
+
+		if self.innerWidth > self.w then
+			local ratio = (x - self.screenx - self.buttonwidth/2) / (self.w - self.buttonwidth)
+			if ratio < 0 then ratio = 0 end
+			if ratio > 1 then ratio = 1 end
+
+			self.dx = ratio * (self.innerWidth - self.w)
+
+			self.scrollPressed = true
+			return true
+		end
+	end
+
+	return Ui.mousedown(self, x, y, button)
+end
+
+function UiScrollAreaH:wheel(mx, my, y)
+	self:relayout()
+
+	-- Have the scrolling speed scale with the width of the inner area,
+	-- but capped by the width of the viewport.
+	local d = math.max(20, self.innerWidth * 0.1)
+	d = math.min(d, self.w * 0.8)
+	d = d * y
+
+	local startdx = self.dx
+
+	self.dx = self.dx - d
+	if self.dx < 0 then self.dx = 0 end
+	if self.dx + self.w > self.innerWidth then self.dx = self.innerWidth - self.w end
+	if self.w > self.innerWidth then self.dw = 0 end
+
+	-- Call back to mousemove to update hover and tooltip statuses of the area's
+	-- child elements.
+	Ui.mousemove(self, mx + (self.dx - startdx), my)
+
+	return Ui.wheel(self, mx, my, y)
+end
+
+function UiScrollAreaH:mousemove(x, y)
+	self.scrollHovered = y >= self.scrollrect.y
+
+	if self.scrollPressed then
+		self:relayout()
+
+		local ratio = (x - self.screenx - self.buttonwidth/2) / (self.w-self.buttonwidth)
+		if ratio < 0 then ratio = 0 end
+		if ratio > 1 then ratio = 1 end
+		
+		self.dx = ratio * (self.innerWidth - self.w)
+
+		return true
+	end
+
+	return Ui.mousemove(self, x, y)
+end
