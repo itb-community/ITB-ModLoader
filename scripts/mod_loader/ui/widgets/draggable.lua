@@ -90,6 +90,22 @@ function UiDraggable:stopDrag(mx, my, button)
 
 	self.dragMoving   = false
 	self.dragResizing = false
+	
+	if self.dropTargets then
+		local target = self.hoverTarget
+		if target then
+			if target.onDragTargetStop then
+				target:onDragTargetStop(self)
+			end
+			
+			if target.onDragTargetDrop then
+				target:onDragTargetDrop(self)
+			end
+			
+			target.hovered = false
+			self.hoverTarget = nil
+		end
+	end
 end
 
 function UiDraggable:dragMove(mx, my)
@@ -134,6 +150,40 @@ function UiDraggable:dragMove(mx, my)
 		self.y = self.y + my - self.dragY
 		self.dragX = mx
 		self.dragY = my
+		
+		if self.dropTargets then
+			local first = 1
+			local target = self.hoverTarget
+			
+			if target then
+				if not rect_contains(target.rect, mx, my) then
+					self.hoverTarget = nil
+					target.hovered = false
+					
+					if target.onDragTargetStop then
+						target:onDragTargetStop(self)
+					end
+				end
+				first = 2
+			end
+			
+			for i = first, #self.dropTargets do
+				local target = self.dropTargets[i]
+				if rect_contains(target.rect, mx, my) then
+					self.hoverTarget = target
+					target.hovered = true
+					
+					if target.onDragTargetStart then
+						target:onDragTargetStart(self)
+					end
+					
+					-- swap to front, to save iterations later
+					self.dropTargets[1], self.dropTargets[i] = self.dropTargets[i], self.dropTargets[1]
+					
+					break
+				end
+			end
+		end
 	else
 		self.__index.dragMove(self, mx, my)
 	end
@@ -176,4 +226,9 @@ function Ui:registerDragResize(resizeHandleSize, minSize)
 	self.dragResizable = true
 	self.__resizeHandle = resizeHandleSize or self.__resizeHandle
 	self.__minSize = minSize or self.__minSize
+end
+
+function Ui:registerDropTarget(target)
+	self.dropTargets = self.dropTargets or {}
+	table.insert(self.dropTargets, target)
 end
