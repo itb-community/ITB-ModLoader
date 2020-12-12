@@ -19,10 +19,14 @@ function UiScrollArea:new()
 end
 
 function UiScrollArea:draw(screen)
-	--[[local oldClip = self.root.clippingrect
-	self.root.clippingrect = sdl.rect(self.screenx,self.screeny,self.w,self.h)
-	screen:clip(self.root.clippingrect)]]
-	screen:clip(self.clipRect)
+	local clipRect = self.clipRect
+	
+	local currentClipRect = screen:getClipRect()
+	if currentClipRect then
+		clipRect = self.clipRect:getIntersect(currentClipRect)
+	end
+	
+	screen:clip(clipRect)
 	Ui.draw(self, screen)
 	
 	if self.innerHeight > self.h then
@@ -39,9 +43,6 @@ function UiScrollArea:draw(screen)
 	end
 	
 	screen:unclip()
-	--[[if oldClip then
-		screen:clip(oldClip)
-	end]]
 end
 
 function UiScrollArea:relayout()
