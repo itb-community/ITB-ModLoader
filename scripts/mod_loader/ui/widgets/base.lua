@@ -253,6 +253,19 @@ function Ui:clip(clip)
 	return self
 end
 
+function Ui:setTranslucent(translucent, cascade)
+	translucent = translucent ~= false
+	self.translucent = translucent
+	
+	if cascade then
+		for _, child in ipairs(self.children) do
+			child:setTranslucent(transluceent, cascade)
+		end
+	end
+	
+	return self
+end
+
 function Ui:wheel(mx,my,y)
 	if not self.visible then return false end
 	if self.ignoreMouse then return false end
