@@ -249,7 +249,7 @@ function Ui:crop(crop)
 end
 
 function Ui:clip(clip)
-	self.clipped = clip == false
+	self.clipped = clip ~= false
 	return self
 end
 
@@ -545,12 +545,15 @@ function Ui:draw(screen)
 	local clip = self.clipped
 	
 	if clip then
-		clipRect.x = self.rect.x
-		clipRect.y = self.rect.y
-		clipRect.w = self.rect.w
-		clipRect.h = self.rect.h
+		clipRect.x = self.rect.x + self.padl
+		clipRect.y = self.rect.y + self.padt
+		clipRect.w = self.rect.w - self.padl - self.padr
+		clipRect.h = self.rect.h - self.padt - self.padb
 		
-		clipRect = clipRect:getIntersect(screen:getClipRect())
+		local currentClipRect = screen:getClipRect()
+		if currentClipRect then
+			clipRect = clipRect:getIntersect(currentClipRect)
+		end
 		
 		screen:clip(clipRect)
 	end
