@@ -259,7 +259,7 @@ function Ui:setTranslucent(translucent, cascade)
 	
 	if cascade then
 		for _, child in ipairs(self.children) do
-			child:setTranslucent(transluceent, cascade)
+			child:setTranslucent(translucent, cascade)
 		end
 	end
 	
