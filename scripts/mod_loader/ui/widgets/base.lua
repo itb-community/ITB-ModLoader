@@ -500,7 +500,7 @@ function Ui:relayout()
 		elseif child.alignH == "center" then
 			child.screenx = self.screenx + self.w/2 - child.w/2 - self.dx + child.x
 		elseif child.alignH == "right" then
-			child.screenx = self.screenx + self.w - self.padr - child.w + self.dx - child.x
+			child.screenx = self.screenx + self.w - self.padr - child.w - self.dx - child.x
 		end
 		
 		if child.alignV == nil or child.alignV == "top" then
@@ -508,7 +508,7 @@ function Ui:relayout()
 		elseif child.alignV == "center" then
 			child.screeny = self.screeny + self.h/2 - child.h/2 - self.dy + child.y
 		elseif child.alignV == "bottom" then
-			child.screeny = self.screeny + self.h - self.padb - child.h + self.dy - child.y
+			child.screeny = self.screeny + self.h - self.padb - child.h - self.dy - child.y
 		end
 		
 		child:relayout()
