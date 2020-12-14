@@ -94,12 +94,20 @@ function UiDraggable:stopDrag(mx, my, button)
 	if self.dropTargets then
 		local target = self.hoverTarget
 		if target then
-			if target.onDragTargetStop then
-				target:onDragTargetStop(self)
+			if target.onDraggableExited then
+				target:onDraggableExited(self, target)
 			end
 			
-			if target.onDragTargetDrop then
-				target:onDragTargetDrop(self)
+			if self.onDraggableExited then
+				self:onDraggableExited(self, target)
+			end
+			
+			if target.onDraggableDropped then
+				target:onDraggableDropped(self, target)
+			end
+			
+			if self.onDraggableDropped then
+				self:onDraggableDropped(self, target)
 			end
 			
 			target.hovered = false
@@ -160,8 +168,8 @@ function UiDraggable:dragMove(mx, my)
 					self.hoverTarget = nil
 					target.hovered = false
 					
-					if target.onDragTargetStop then
-						target:onDragTargetStop(self)
+					if target.onDraggableExited then
+						target:onDraggableExited(self, target)
 					end
 				end
 				first = 2
@@ -173,8 +181,12 @@ function UiDraggable:dragMove(mx, my)
 					self.hoverTarget = target
 					target.hovered = true
 					
-					if target.onDragTargetStart then
-						target:onDragTargetStart(self)
+					if target.onDraggableEntered then
+						target:onDraggableEntered(self, target)
+					end
+					
+					if self.onDraggableEntered then
+						self:onDraggableEntered(self, target)
 					end
 					
 					-- swap to front, to save iterations later
