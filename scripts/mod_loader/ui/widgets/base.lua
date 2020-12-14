@@ -407,6 +407,9 @@ function Ui:mousemove(mx, my)
 	self.root.hoveredchild = self
 	self.hovered = true
 
+	table.insert(self.root.highlightedChildren, self)
+	self.highlighted = true
+
 	if self.dragged then
 		self:dragMove(mx, my)
 		return true
