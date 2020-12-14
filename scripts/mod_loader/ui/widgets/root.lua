@@ -122,6 +122,7 @@ function UiRoot:event(eventloop)
 		-- Notify pressed children of the event, even if the mouse is released
 		-- outside of them.
 		if self.pressedchild and self.pressedchild:mouseup(mx, my, button) then
+			self.pressedchild.pressed = false
 			self.pressedchild = nil
 			return true
 		end
