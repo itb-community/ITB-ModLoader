@@ -3,6 +3,19 @@
 
 local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 
+function modApi:assetExists(resource)
+	Assert.ResourceDatIsOpen("writeAsset")
+	assert(type(resource) == "string")
+	
+	for i, file in ipairs(self.resource._files) do
+		if file._meta._filename == resource then
+			return true
+		end
+	end
+	
+	return false
+end
+
 --[[
 	Writes a new file to the resource.dat archive with the specified content.
 
