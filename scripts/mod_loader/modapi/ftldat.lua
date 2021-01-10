@@ -4,7 +4,7 @@
 local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 
 function modApi:assetExists(resource)
-	Assert.ResourceDatIsOpen("writeAsset")
+	Assert.ResourceDatIsOpen("assetExists")
 	assert(type(resource) == "string")
 	
 	for i, file in ipairs(self.resource._files) do
