@@ -33,7 +33,7 @@ end
 
 local function AssertIsVector(name, expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected %s, but was %s", name, type(actual), traceback())
+	msg = msg .. string.format("Expected %s, but was %s%s", name, type(actual), traceback())
 	assert(getmetatable(actual) == expected, msg)
 end
 
