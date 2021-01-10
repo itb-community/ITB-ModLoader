@@ -124,6 +124,10 @@ function mt_vec2:__newindex(key, value)
 	end
 end
 
+function mt_vec2:__unm()
+	return math.vec2(-self[1], -self[2])
+end
+
 function mt_vec2:__add(other)
 	return addVectors(self, other)
 end
@@ -220,6 +224,10 @@ function mt_vec3:__newindex(key, value)
 	if type(index) == 'number' and type(value) == 'number' then
 		rawset(self, index, value)
 	end
+end
+
+function mt_vec3:__unm()
+	return math.vec3(-self[1], -self[2], -self[3])
 end
 
 function mt_vec3:__add(other)
@@ -337,6 +345,10 @@ function mt_vec4:__newindex(key, value)
 	if type(index) == 'number' and type(value) == 'number' then
 		rawset(self, index, value)
 	end
+end
+
+function mt_vec4:__unm()
+	return math.vec4(-self[1], -self[2], -self[3], -self[4])
 end
 
 function mt_vec4:__add(other)
