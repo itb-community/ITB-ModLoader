@@ -1,6 +1,6 @@
 local testsuite = Tests.Testsuite()
 
-function testsuite.test_vector2_xy()
+function testsuite.test_vector2_constructor_number_number()
 	local v = math.vec2(11,22)
 
 	Assert.TableEquals({11,22}, v, "math.vec2(x, y)")
@@ -8,7 +8,7 @@ function testsuite.test_vector2_xy()
 	return true
 end
 
-function testsuite.test_vector2_v2()
+function testsuite.test_vector2_constructor_vec2()
 	local v2 = math.vec2(11,22)
 	local v = math.vec2(v2)
 
@@ -17,7 +17,7 @@ function testsuite.test_vector2_v2()
 	return true
 end
 
-function testsuite.test_vector3_xyz()
+function testsuite.test_vector3_constructor_number_number_number()
 	local v = math.vec3(111,222,333)
 
 	Assert.TableEquals({111,222,333}, v, "math.vec3(x, y, z)")
@@ -25,7 +25,7 @@ function testsuite.test_vector3_xyz()
 	return true
 end
 
-function testsuite.test_vector3_v3()
+function testsuite.test_vector3_constructor_vec3()
 	local v3 = math.vec3(111,222,333)
 	local v = math.vec3(v3)
 
@@ -34,7 +34,7 @@ function testsuite.test_vector3_v3()
 	return true
 end
 
-function testsuite.test_vector3_v2z()
+function testsuite.test_vector3_contstructor_vec2_number()
 	local v2 = math.vec2(11,22)
 	local v = math.vec3(v2,333)
 
@@ -43,7 +43,7 @@ function testsuite.test_vector3_v2z()
 	return true
 end
 
-function testsuite.test_vector3_xv2()
+function testsuite.test_vector3_constructor_number_vec2()
 	local v2 = math.vec2(11,22)
 	local v = math.vec3(111,v2)
 
@@ -52,7 +52,7 @@ function testsuite.test_vector3_xv2()
 	return true
 end
 
-function testsuite.test_vector4_xywh()
+function testsuite.test_vector4_constructor_number_number_number_number()
 	local v = math.vec4(1111,2222,3333,4444)
 
 	Assert.TableEquals({1111,2222,3333,4444}, v, "math.vec4(x, y, w, h)")
@@ -60,7 +60,7 @@ function testsuite.test_vector4_xywh()
 	return true
 end
 
-function testsuite.test_vector4_v4()
+function testsuite.test_vector4_constructor_vec4()
 	local v4 = math.vec4(1111,2222,3333,4444)
 	local v = math.vec4(v4)
 
@@ -69,7 +69,7 @@ function testsuite.test_vector4_v4()
 	return true
 end
 
-function testsuite.test_vector4_v3h()
+function testsuite.test_vector4_constructor_vec3_number()
 	local v3 = math.vec3(111,222,333)
 	local v = math.vec4(v3,4444)
 
@@ -78,7 +78,7 @@ function testsuite.test_vector4_v3h()
 	return true
 end
 
-function testsuite.test_vector4_xv3()
+function testsuite.test_vector4_constructor_number_vec3()
 	local v3 = math.vec3(111,222,333)
 	local v = math.vec4(1111,v3)
 
@@ -87,7 +87,7 @@ function testsuite.test_vector4_xv3()
 	return true
 end
 
-function testsuite.test_vector4_v2wh()
+function testsuite.test_vector4_constructor_vec2_number_number()
 	local v2 = math.vec2(11,22)
 	local v = math.vec4(v2,3333,4444)
 
@@ -96,7 +96,7 @@ function testsuite.test_vector4_v2wh()
 	return true
 end
 
-function testsuite.test_vector4_xv2h()
+function testsuite.test_vector4_constructor_number_vec2_number()
 	local v2 = math.vec2(11,22)
 	local v = math.vec4(1111,v2,4444)
 
@@ -105,7 +105,7 @@ function testsuite.test_vector4_xv2h()
 	return true
 end
 
-function testsuite.test_vector4_xyv2()
+function testsuite.test_vector4_constructor_number_number_vec2()
 	local v2 = math.vec2(11,22)
 	local v = math.vec4(1111,2222,v2)
 
@@ -114,7 +114,7 @@ function testsuite.test_vector4_xyv2()
 	return true
 end
 
-function testsuite.test_vector4_v2v2()
+function testsuite.test_vector4_constructor_vec2_vec2()
 	local v2 = math.vec2(11,22)
 	local v = math.vec4(v2,v2)
 
@@ -123,7 +123,7 @@ function testsuite.test_vector4_v2v2()
 	return true
 end
 
-function testsuite.test_vector2_add()
+function testsuite.test_vector2_addition()
 	local a = math.vec2(1,2)
 	local b = math.vec2(3,4)
 
@@ -132,7 +132,7 @@ function testsuite.test_vector2_add()
 	return true
 end
 
-function testsuite.test_vector3_add()
+function testsuite.test_vector3_addition()
 	local a = math.vec3(1,2,3)
 	local b = math.vec3(4,5,6)
 
@@ -141,7 +141,7 @@ function testsuite.test_vector3_add()
 	return true
 end
 
-function testsuite.test_vector4_add()
+function testsuite.test_vector4_addition()
 	local a = math.vec4(1,2,3,4)
 	local b = math.vec4(5,6,7,8)
 
@@ -150,7 +150,7 @@ function testsuite.test_vector4_add()
 	return true
 end
 
-function testsuite.test_vector2_sub()
+function testsuite.test_vector2_subtraction()
 	local a = math.vec2(5,5)
 	local b = math.vec2(1,2)
 
@@ -159,7 +159,7 @@ function testsuite.test_vector2_sub()
 	return true
 end
 
-function testsuite.test_vector3_sub()
+function testsuite.test_vector3_subtraction()
 	local a = math.vec3(5,5,5)
 	local b = math.vec3(1,2,3)
 
@@ -168,7 +168,7 @@ function testsuite.test_vector3_sub()
 	return true
 end
 
-function testsuite.test_vector4_sub()
+function testsuite.test_vector4_subtraction()
 	local a = math.vec4(5,5,5,5)
 	local b = math.vec4(1,2,3,4)
 
@@ -177,7 +177,7 @@ function testsuite.test_vector4_sub()
 	return true
 end
 
-function testsuite.test_vector2_dot()
+function testsuite.test_vector2_dot_product()
 	local a = math.vec2(1,2)
 	local b = math.vec2(3,4)
 
@@ -186,7 +186,7 @@ function testsuite.test_vector2_dot()
 	return true
 end
 
-function testsuite.test_vector3_dot()
+function testsuite.test_vector3_dot_product()
 	local a = math.vec3(1,2,3)
 	local b = math.vec3(4,5,6)
 
@@ -195,7 +195,7 @@ function testsuite.test_vector3_dot()
 	return true
 end
 
-function testsuite.test_vector4_dot()
+function testsuite.test_vector4_dot_product()
 	local a = math.vec4(1,2,3,4)
 	local b = math.vec4(5,6,7,8)
 
@@ -204,7 +204,7 @@ function testsuite.test_vector4_dot()
 	return true
 end
 
-function testsuite.test_vector2_cross()
+function testsuite.test_vector2_cross_product()
 	local a = math.vec2(1,2)
 	local b = math.vec2(3,4)
 
@@ -213,7 +213,7 @@ function testsuite.test_vector2_cross()
 	return true
 end
 
-function testsuite.test_vector3_cross()
+function testsuite.test_vector3_cross_product()
 	local a = math.vec3(1,2,3)
 	local b = math.vec3(4,5,6)
 
