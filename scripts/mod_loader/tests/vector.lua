@@ -123,6 +123,30 @@ function testsuite.test_vector4_constructor_vec2_vec2()
 	return true
 end
 
+function testsuite.test_vector2_unary_minus()
+	local v = math.vec2(1,2)
+
+	Assert.TableEquals({-1,-2}, -v, "math.vec2().__unm")
+	
+	return true
+end
+
+function testsuite.test_vector3_unary_minus()
+	local v = math.vec3(1,2,3)
+
+	Assert.TableEquals({-1,-2,-3}, -v, "math.vec3().__unm")
+	
+	return true
+end
+
+function testsuite.test_vector4_unary_minus()
+	local v = math.vec4(1,2,3,4)
+
+	Assert.TableEquals({-1,-2,-3,-4}, -v, "math.vec4().__unm")
+	
+	return true
+end
+
 function testsuite.test_vector2_addition()
 	local a = math.vec2(1,2)
 	local b = math.vec2(3,4)
