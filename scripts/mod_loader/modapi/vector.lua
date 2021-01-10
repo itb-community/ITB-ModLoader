@@ -27,13 +27,13 @@ local mt_vec4 = {
 	[1] = 1, [2] = 2, [3] = 3, [4] = 4
 }
 
-local function traceback()
-	return Assert.Traceback and debug.traceback("\n", 3) or ""
+local function traceback(level)
+	return Assert.Traceback and debug.traceback("\n", level or 2) or ""
 end
 
 local function AssertIsVector(name, expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
-	msg = msg .. string.format("Expected %s, but was %s%s", name, type(actual), traceback())
+	msg = msg .. string.format("Expected %s, but was %s%s", name, type(actual), traceback(3))
 	assert(getmetatable(actual) == expected, msg)
 end
 
