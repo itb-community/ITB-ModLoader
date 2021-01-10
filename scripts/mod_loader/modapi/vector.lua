@@ -73,7 +73,7 @@ local function addVectors(a, b)
 		)
 	end
 	
-	return nil
+	error(string.format("addVectors - Unexpected error: neither vector had 2, 3 or 4 components%s"), traceback(2))
 end
 
 local function subVectors(a, b)
