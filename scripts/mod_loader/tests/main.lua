@@ -1,22 +1,21 @@
 local rootpath = GetParentPath(...)
 
-local testsuite = Tests.Testsuite()
-function testsuite:RunAllTests(testEnumeratorFn)
-	self.__index.RunAllTests(self, "Root Testsuite", testEnumeratorFn)
-end
-
-testsuite.pawn = require(rootpath.."pawn")
-testsuite.sandbox = require(rootpath.."sandbox")
-testsuite.classes = require(rootpath.."classes")
-testsuite.event = require(rootpath.."event")
-testsuite.modApi = require(rootpath.."modApi")
-testsuite.vector = require(rootpath.."vector")
-
 --[[
-	Usage, in console while in a mission:
-			Testsuites:RunAllTests()
+	Usage:
+		Either use the Tests UI visible in test mech scenario when
+		Mod Loader development mode is enabled (recommended),
+		or execute one of the following commands in console while in a mission:
+			Tests.Runner():RunAllTests()
 		or:
-			Testsuites.name_of_testsuite:RunAllTests()
+			Tests.Runner():RunAllTests(Testsuites.name_of_testsuite)
+			eg.: Tests.Runner():RunAllTests(Testsuites.pawn)
 --]]
+Testsuites = Tests.Testsuite()
+Testsuites.name = "Root Testsuite"
 
-Testsuites = testsuite
+Testsuites.pawn = require(rootpath.."pawn")
+Testsuites.sandbox = require(rootpath.."sandbox")
+Testsuites.classes = require(rootpath.."classes")
+Testsuites.event = require(rootpath.."event")
+Testsuites.modApi = require(rootpath.."modApi")
+Testsuites.vector = require(rootpath.."vector")

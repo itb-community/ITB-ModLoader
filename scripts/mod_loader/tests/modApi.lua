@@ -1,4 +1,5 @@
 local testsuite = Tests.Testsuite()
+testsuite.name = "Mod API tests"
 
 function testsuite.test_FileExistsSlashes()
 	Assert.True(modApi:fileExists("./scripts/scripts.lua"))

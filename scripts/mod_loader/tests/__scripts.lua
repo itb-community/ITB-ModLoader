@@ -1,5 +1,6 @@
 local scripts = {
 	"base",
+	"test_runner",
 	"main"
 }
 

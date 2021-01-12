@@ -1,4 +1,5 @@
 local testsuite = Tests.Testsuite()
+testsuite.name = "Classes system tests"
 
 local assertTrue = Assert.True
 local assertFalse = Assert.False
