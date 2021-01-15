@@ -76,6 +76,50 @@ function DecoCAlignedText:draw(screen, widget)
 end
 
 
+DecoAlignedText = Class.inherit(DecoText)
+function DecoAlignedText:new(text, font, textset, alignH, alignV)
+	DecoText.new(self, text, font, textset)
+	
+	self.alignH = alignH
+	self.alignV = alignV
+end
+
+function DecoAlignedText:draw(screen, widget)
+	if self.surface == nil then return end
+	local r = widget.rect
+	local x, y
+	
+	if self.alignH == nil or self.alignH == "left" then
+		x = math.floor(r.x + widget.decorationx)
+		
+	elseif self.alignH == "center" then
+		x = math.floor(r.x + widget.decorationx + r.w / 2 - self.surface:w() / 2)
+		
+	elseif self.alignH == "right" then
+		x = math.floor(r.x - widget.decorationx + r.w - self.surface:w())
+	end
+	
+	if self.alignV == nil or self.alignV == "top" then
+		y = math.floor(r.y + widget.decorationy)
+		
+	elseif self.alignV == "center" then
+		y = math.floor(r.y + widget.decorationy + r.h / 2 - self.surface:h() / 2)
+		
+	elseif self.alignV == "bottom" then
+		y = math.floor(r.y - widget.decorationy + r.h - self.surface:h())
+	end
+
+	screen:blit(self.surface, nil, x, y)
+	
+	if self.alignH == nil or self.alignH == "left" or self.alignH == "center" then
+		widget.decorationx = widget.decorationx + self.surface:w()
+		
+	elseif self.alignH == "right" then
+		widget.decorationx = widget.decorationx - self.surface:w()
+	end
+end
+
+
 DecoCaption = Class.inherit(DecoText)
 function DecoCaption:new(font, textset, colorNormal, colorDisabled)
 	DecoText.new(self, self.text, font, textset)

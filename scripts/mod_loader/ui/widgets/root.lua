@@ -3,6 +3,7 @@ UiRoot = Class.inherit(Ui)
 function UiRoot:new()
 	Ui.new(self)
 	
+	self.highlightedChildren = {}
 	self.hoveredchild = nil
 	self.pressedchild = nil
 	self.focuschild = self
@@ -122,6 +123,7 @@ function UiRoot:event(eventloop)
 		-- Notify pressed children of the event, even if the mouse is released
 		-- outside of them.
 		if self.pressedchild and self.pressedchild:mouseup(mx, my, button) then
+			self.pressedchild.pressed = false
 			self.pressedchild = nil
 			return true
 		end
@@ -132,6 +134,10 @@ function UiRoot:event(eventloop)
 	end
 	
 	if type == sdl.events.mousemotion then
+		for i = #self.highlightedChildren, 1, -1 do
+			self.highlightedChildren[i].highlighted = false
+			table.remove(self.highlightedChildren, i)
+		end
 		if self.hoveredchild ~= nil then
 			self.hoveredchild.hovered = false
 		end

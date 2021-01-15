@@ -165,6 +165,22 @@ function Ui:posCentered(x, y)
 	return self
 end
 
+function Ui:anchor(alignH, alignV)
+	self:anchorH(alignH)
+	self:anchorV(alignV)
+	return self
+end
+
+function Ui:anchorH(alignH)
+	self.alignH = alignH
+	return self
+end
+
+function Ui:anchorV(alignV)
+	self.alignV = alignV
+	return self
+end
+
 function Ui:pospx(x, y)
 	self.x = x
 	self.y = y
@@ -201,6 +217,12 @@ function Ui:padding(v)
 	return self
 end
 
+function Ui:size(w, h)
+	self.wPercent = w
+	self.hPercent = h
+	return self
+end
+
 function Ui:width(w)
 	self.wPercent = w
 	return self
@@ -218,6 +240,29 @@ end
 
 function Ui:heightpx(h)
 	self.h = h
+	return self
+end
+
+function Ui:crop(crop)
+	self.cropped = crop ~= false
+	return self
+end
+
+function Ui:clip(clip)
+	self.clipped = clip ~= false
+	return self
+end
+
+function Ui:setTranslucent(translucent, cascade)
+	translucent = translucent ~= false
+	self.translucent = translucent
+	
+	if cascade then
+		for _, child in ipairs(self.children) do
+			child:setTranslucent(translucent, cascade)
+		end
+	end
+	
 	return self
 end
 
@@ -362,6 +407,9 @@ function Ui:mousemove(mx, my)
 	self.root.hoveredchild = self
 	self.hovered = true
 
+	table.insert(self.root.highlightedChildren, self)
+	self.highlighted = true
+
 	if self.dragged then
 		self:dragMove(mx, my)
 		return true
@@ -423,6 +471,8 @@ function Ui:keyup(keycode)
 end
 
 function Ui:relayout()
+	local innerX = self.x
+	local innerY = self.y
 	local innerWidth = 0
 	local innerHeight = 0
 
@@ -446,15 +496,46 @@ function Ui:relayout()
 			child.yPercent = nil
 		end
 		
-		child.screenx = self.screenx + self.padl - self.dx + child.x
-		child.screeny = self.screeny + self.padt - self.dy + child.y
+		local childleft, childright, childtop, childbottom
+		
+		if child.alignH == nil or child.alignH == "left" then
+			child.screenx = self.screenx + self.padl - self.dx + child.x
+		elseif child.alignH == "center" then
+			child.screenx = self.screenx + self.w/2 - child.w/2 - self.dx + child.x
+		elseif child.alignH == "right" then
+			child.screenx = self.screenx + self.w - self.padr - child.w - self.dx - child.x
+		end
+		
+		if child.alignV == nil or child.alignV == "top" then
+			child.screeny = self.screeny + self.padt - self.dy + child.y
+		elseif child.alignV == "center" then
+			child.screeny = self.screeny + self.h/2 - child.h/2 - self.dy + child.y
+		elseif child.alignV == "bottom" then
+			child.screeny = self.screeny + self.h - self.padb - child.h - self.dy - child.y
+		end
 		
 		child:relayout()
 		
-		local childright = self.padl + child.x + child.w + self.padr
-		local childbottom = self.padt + child.y + child.h + self.padb
-		if innerWidth < childright then innerWidth = childright end
-		if innerHeight < childbottom then innerHeight = childbottom end
+		if child.alignH == nil or child.alignH == "left" then
+			childright = self.padl + child.x + child.w + self.padr
+		elseif child.alignH == "center" then
+			childright = self.w/2 - child.w/2 + child.x + child.w + self.padr
+		elseif child.alignH == "right" then
+			childleft = self.w - self.padl - child.x - child.w - self.padr
+		end
+		
+		if child.alignV == nil or child.alignV == "top" then
+			childbottom = self.padt + child.y + child.h + self.padb
+		elseif child.alignV == "center" then
+			childbottom = self.h/2 - child.h/2 + child.y + child.h + self.padb
+		elseif child.alignV == "bottom" then
+			childtop = self.h - self.padt - child.y - child.h - self.padb
+		end
+		
+		if childleft and innerX < childleft then innerX = childleft end
+		if childright and innerWidth < childright then innerWidth = childright end
+		if childtop and innerY < childtop then innerY = childtop end
+		if childbottom and innerHeight < childbottom then innerHeight = childbottom end
 		
 		child.rect.x = child.screenx
 		child.rect.y = child.screeny
@@ -464,10 +545,34 @@ function Ui:relayout()
 	
 	self.innerWidth = innerWidth
 	self.innerHeight = innerHeight
+	
+	if self.cropped then
+	--	self.x = innerX
+	--	self.y = innerY
+		self.w = innerWidth
+		self.h = innerHeight
+	end
 end
 
+local clipRect = sdl.rect(0,0,0,0)
 function Ui:draw(screen)
 	if not self.visible then return end
+	
+	local clip = self.clipped
+	
+	if clip then
+		clipRect.x = self.rect.x + self.padl
+		clipRect.y = self.rect.y + self.padt
+		clipRect.w = self.rect.w - self.padl - self.padr
+		clipRect.h = self.rect.h - self.padt - self.padb
+		
+		local currentClipRect = screen:getClipRect()
+		if currentClipRect then
+			clipRect = clipRect:getIntersect(currentClipRect)
+		end
+		
+		screen:clip(clipRect)
+	end
 	
 	if self.animations then
 		for _, anim in pairs(self.animations) do
@@ -485,6 +590,10 @@ function Ui:draw(screen)
 	for i=#self.children,1,-1 do
 		local child = self.children[i]
 		child:draw(screen)
+	end
+	
+	if clip then
+		screen:unclip()
 	end
 end
 

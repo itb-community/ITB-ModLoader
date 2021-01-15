@@ -91,7 +91,7 @@ function BasicLoggerImpl:preprocessInput(...)
 	for i = 1, #arg do
 		local a = arg[i]
 		
-		if type(a) == "userdata" then
+		if type(a) == "userdata" or type(a) == "table" then
 			if type(a.GetLuaString) == "function" then
 				a = a:GetLuaString()
 			elseif type(a.GetString) == "function" then
