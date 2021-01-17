@@ -12,6 +12,7 @@ BufferedLogger = BasicLogger:extend()
 local bufferSize = 200
 local pageSize = 20
 function BufferedLogger:new()
+	BasicLogger.new(self)
 	self.bufferOffset = 0
 	self.buffer = DequeList()
 end
@@ -19,6 +20,25 @@ end
 local delimiter = "\n"
 function BufferedLogger:log(caller, ...)
 	local message = self:preprocessInput(...)
+
+	if (self:getLoggingLevel() == Logger.LOG_LEVEL_NONE) then
+		return
+	end
+	if (self:getLoggingLevel() == Logger.LOG_LEVEL_FILE) then
+		if (not self.logFileHandle) then
+			self.logFileHandle = self:openLogFile(self:getLogFileName())
+		end
+
+		local t = ""
+		if (self:getPrintCallerInfo()) then
+			t = caller .. "\n"
+		end
+
+		t = t .. message .. "\n"
+
+		self.logFileHandle:write(t)
+		self.logFileHandle:flush()
+	end
 
 	if self:getPrintCallerInfo() then
 		self:pushMessage(caller)

@@ -68,7 +68,7 @@ function BasicLoggerImpl:setPrintCallerInfo(printCallerInfo)
 	self.printCallerInfo = printCallerInfo
 end
 
-local function openLogFile(fileName)
+function BasicLoggerImpl:openLogFile(fileName)
 	local fileHandle = io.open(fileName, "a+")
 
 	local t = string.format("\n===== Logging started at: %s =====\n", getCurrentDate())
@@ -84,6 +84,27 @@ end
 
 function BasicLoggerImpl:log(caller, ...)
 	local message = self:preprocessInput(...)
+
+	if (self:getLoggingLevel() == Logger.LOG_LEVEL_NONE) then
+		return
+	end
+
+	if (self:getLoggingLevel() == Logger.LOG_LEVEL_FILE) then
+		if (not self.logFileHandle) then
+			self.logFileHandle = self:openLogFile(self:getLogFileName())
+		end
+
+		local t = ""
+		if (self:getPrintCallerInfo()) then
+			t = caller .. "\n"
+		end
+
+		t = t .. message .. "\n"
+
+		self.logFileHandle:write(t)
+		self.logFileHandle:flush()
+	end
+
 	self:output(message, caller)
 end
 
@@ -109,26 +130,6 @@ end
 
 local delimiter = "\n"
 function BasicLoggerImpl:output(message, caller)
-	if (self:getLoggingLevel() == Logger.LOG_LEVEL_NONE) then
-		return
-	end
-
-	if (self:getLoggingLevel() == Logger.LOG_LEVEL_FILE) then
-		if (not self.logFileHandle) then
-			self.logFileHandle = openLogFile(self:getLogFileName())
-		end
-
-		local t = ""
-		if (self:getPrintCallerInfo()) then
-			t = caller .. "\n"
-		end
-
-		t = t .. message .. "\n"
-
-		self.logFileHandle:write(t)
-		self.logFileHandle:flush()
-	end
-
 	if (self:getPrintCallerInfo()) then
 		ConsolePrint(caller)
 		print(caller)
