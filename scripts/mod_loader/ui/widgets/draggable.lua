@@ -11,6 +11,10 @@ function UiDraggable:new()
 end
 
 function UiDraggable:isEdge(mx, my)
+	if not self.containsMouse then
+		return false
+	end
+
 	local resizeHandle = self.__resizeHandle
 	return mx < self.screenx + resizeHandle          or
 	       my < self.screeny + resizeHandle          or
