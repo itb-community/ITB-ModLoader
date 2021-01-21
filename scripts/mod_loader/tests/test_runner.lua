@@ -82,6 +82,7 @@ function Tests.Runner:RunTests(tests, resultsHolder)
 								local resultTable = {}
 								resultTable.done = false
 								resultTable.name = entry.name
+								resultTable.parent = entry.parent
 
 								local ok, result = pcall(function()
 									return entry.func(resultTable)
