@@ -1,4 +1,5 @@
 local testsuite = Tests.Testsuite()
+testsuite.name = "Vector-related tests"
 
 function testsuite.test_vector2_constructor_number_number()
 	local v = math.vec2(11,22)
