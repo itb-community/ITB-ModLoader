@@ -47,3 +47,79 @@ function Move:GetSkillEffect(p1, p2)
 
 	return oldMoveGetSkillEffect(self, p1, p2)
 end
+
+-------------------------------------------------------------
+--- Override all Skills' GetTipDamage to implement
+--- tooltip hide & show hooks
+-------------------------------------------------------------
+
+local tipSkillLast = nil
+local tipSkillCurrent = nil
+local function buildGetTipDamageOverride(skill)
+	local originalFn = skill.GetTipDamage
+
+	return function(self, pawn, ...)
+		tipSkillCurrent = self
+
+		return originalFn(self, pawn, ...)
+	end
+end
+
+sdlext.addFrameDrawnHook(function()
+	if tipSkillLast and tipSkillCurrent ~= tipSkillLast then
+		modApi:fireTipImageHiddenHooks(tipSkillLast)
+	end
+
+	if tipSkillCurrent and tipSkillCurrent ~= tipSkillLast then
+		modApi:fireTipImageShownHooks(tipSkillCurrent)
+	end
+
+	tipSkillLast = tipSkillCurrent
+	tipSkillCurrent = nil
+end)
+
+local function overrideSkillFunction(skill, functionName, fn)
+	Assert.Equals("table", type(skill), "Argument #1")
+	Assert.Equals(
+			"function", type(skill.GetSkillEffect),
+			string.format("Argument #1 does not reference a Skill", skill)
+	)
+	Assert.Equals("string", type(functionName), "Argument #2")
+	Assert.Equals("function", type(fn), "Argument #3")
+
+	skill[functionName] = fn
+	-- TODO: Could add a metatable with with __newindex function to protect overrides
+	-- added by the mod loader / reapply the override with the new argument as originalFn
+	-- This would remove the need for ModsInitializedHook here, but what about newly added
+	-- weapons, or weapons created dynamically, after the game is initialized?
+	-- Add metatable with __newindex to _G, that checks if newly added variable is a Skill...?
+end
+
+local function overrideAllSkills()
+	for k, v in pairs(_G) do
+		if type(v) == "table" and v.GetSkillEffect then
+			-- Make it possible to identify skills with no ambiguity
+			v.__Id = k
+
+			overrideSkillFunction(v, "GetTipDamage", buildGetTipDamageOverride(v))
+		end
+	end
+end
+
+modApi:addModsInitializedHook(function()
+	-- Defer the call until all mods have been loaded, so that they don't break the detection
+	overrideAllSkills()
+end)
+
+function modApi:getHoveredSkill()
+	return tipSkillLast
+end
+
+function modApi:isHoveredSkill(id)
+	Assert.Equals("string", type(id), "Argument #1")
+	return tipSkillLast and tipSkillLast.__Id == id
+end
+
+function modApi:isTipImage()
+	return tipSkillLast ~= nil
+end

@@ -69,6 +69,8 @@ local hooks = {
 	"TestMechEntered",
 	"TestMechExited",
 	"SaveDataUpdated",
+	"TipImageShown",
+	"TipImageHidden",
 }
 
 for _, name in ipairs(hooks) do
