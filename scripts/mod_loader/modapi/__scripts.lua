@@ -18,6 +18,7 @@ local scripts = {
 	"map",
 	"skills",
 	"savedata",
+	"hotkey",
 	"board",
 	"pawn",
 	"localization",
