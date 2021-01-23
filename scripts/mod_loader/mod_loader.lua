@@ -45,8 +45,6 @@ function mod_loader:init()
 
 	self.unmountedMods = {} -- mods which had malformed init.lua
 	self.firsterror = nil
-	
-	modApi.modsInitializedHooks = {}
 
 	self:enumerateMods("mods/")
 
