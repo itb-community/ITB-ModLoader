@@ -351,10 +351,10 @@ function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
 	sdlext.showButtonDialog(title, text, responseFn, nil, nil, buttons, nil)
 end
 
-function sdlext.showInfoDialog(title, text, fn, w, h)
-	sdlext.showAlertDialog(title, text, fn, w, h, GetText("Button_Ok"))
+function sdlext.showInfoDialog(title, text, responseFn, w, h)
+	sdlext.showAlertDialog(title, text, responseFn, w, h, GetText("Button_Ok"))
 end
 
-function sdlext.showConfirmDialog(title, text, fn, w, h)
-	sdlext.showAlertDialog(title, text, fn, w, h, GetText("Button_Yes"), GetText("Button_No"))
+function sdlext.showConfirmDialog(title, text, responseFn, w, h)
+	sdlext.showAlertDialog(title, text, responseFn, w, h, GetText("Button_Yes"), GetText("Button_No"))
 end

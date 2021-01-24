@@ -374,6 +374,10 @@ local lastScreenSize = { x = ScreenSizeX(), y = ScreenSizeY() }
 sdlext.CurrentWindowRect = sdl.rect(0, 0, 0, 0)
 sdlext.LastWindowRect = sdl.rect(0, 0, 0, 0)
 MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
+	if not modApi or not modApi.initialized then
+		return
+	end
+
 	local wasMainMenu = isInMainMenu
 	local wasHangar = isInHangar
 	local wasGame = isInGame

@@ -10,22 +10,42 @@ function modApi:init()
 	self.version = "2.6.0.dev"
 	LOG("MOD-API VERSION "..self.version)
 
-	if not self:fileExists("resources/resource.dat.bak") then
-		LOG("Backing up resource.dat")
-		modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
+	if not self:fileExists("resources/resource.dat") then
+		if self:fileExists("resources/resource.dat.bak") then
+			LOG("Resource.dat was missing, restoring from backup.")
+			modApi:copyFileOS("resources/resource.dat.bak", "resources/resource.dat")
+		else
+			-- Call error() inside of a sdl.drawHook - this way we get an actual message box that halts the game.
+			-- Without it, error() produces a blank white rectangle with no text, and the game closes on its own
+			-- shortly after.
+			sdl.drawHook(function()
+				-- This message gets printed twice in error.txt, but whatever.
+				error(
+						"\nThe mod loader could not find the game's resource.dat file, and backup was missing.\n\n" ..
+								"Reinstalling the game or using the 'Verify integrity of game files' option on Steam should fix this."
+				)
+			end)
+			-- Call error() here to halt loading of further files
+			error("")
+		end
 	else
-		LOG("Reading resource.dat to check mod loader signature...")
-		local file = io.open("resources/resource.dat","rb")
-		local content = file:read("*all")
-		file:close()
-		local instance = FtlDat.FtlDat:from_string(content)
-
-		if not instance.signature then
-			LOG("resource.dat has been updated since last launch, re-acquiring backup")
+		if not self:fileExists("resources/resource.dat.bak") then
+			LOG("Backing up resource.dat")
 			modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
 		else
-			LOG("Restoring resource.dat")
-			modApi:copyFileOS("resources/resource.dat.bak", "resources/resource.dat")
+			LOG("Reading resource.dat to check mod loader signature...")
+			local file = io.open("resources/resource.dat","rb")
+			local content = file:read("*all")
+			file:close()
+			local instance = FtlDat.FtlDat:from_string(content)
+
+			if not instance.signature then
+				LOG("resource.dat has been updated since last launch, re-acquiring backup")
+				modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
+			else
+				LOG("Restoring resource.dat")
+				modApi:copyFileOS("resources/resource.dat.bak", "resources/resource.dat")
+			end
 		end
 	end
 
@@ -84,6 +104,7 @@ function modApi:init()
 	)
 
 	sdlext.executeAddModContent()
+	self.initialized = true
 end
 
 function modApi:delayedInit()
