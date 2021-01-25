@@ -5,8 +5,8 @@
 --]]
 
 local MAX_PILOTS = 13
-local hangarBackdrop = sdlext.getSurface({ path = "resources/mods/ui/pilot-arrange-hangar.png" })
-local pilotLock = sdlext.getSurface({ path = "img/main_menus/lock.png" })
+local hangarBackdrop = nil
+local pilotLock = nil
 local updateImmediately = true
 -- copy of the list before we make any changes to it
 local PilotListDefault = shallow_copy(PilotList)
@@ -77,6 +77,9 @@ local function responseFn(btnIndex)
 end
 
 local function createUi()
+	hangarBackdrop = sdlext.getSurface({ path = "resources/mods/ui/pilot-arrange-hangar.png" })
+	pilotLock = sdlext.getSurface({ path = "img/main_menus/lock.png" })
+
 	local pilotButtons = {}
 
 	local onExit = function(self)

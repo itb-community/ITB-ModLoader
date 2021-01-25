@@ -1,11 +1,14 @@
-local menuFontLarge = sdlext.font("fonts/JustinFont11Bold.ttf", 24)
+local menuFontLarge = nil
 -- This is not the correct font for tiny buttons. It seems like it's
 -- Justin15, but non-bold?
-local menuFontSmall = sdlext.font("fonts/Justin15.ttf", 15)
+local menuFontSmall = nil
 
 MainMenuButton = Class.inherit(Ui)
 
 function MainMenuButton:new(style)
+	menuFontLarge = sdlext.font("fonts/JustinFont11Bold.ttf", 24)
+	menuFontSmall = sdlext.font("fonts/Justin15.ttf", 15)
+
 	Ui.new(self)
 
 	style = style or "short"

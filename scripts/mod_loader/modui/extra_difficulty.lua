@@ -8,7 +8,7 @@ local arrRight = nil
 local diffText = nil
 
 --Closest match to the vanilla font; one pixel too wide.
-local justinFont = sdlext.font("fonts/Justin15.ttf", 14)
+local justinFont = nil
 local diffTextset = deco.textset(deco.colors.white, nil, nil, false)
 
 
@@ -22,6 +22,8 @@ local function changeDifficulty(newDiff)
 end
 
 local function createUi(root)
+	justinFont = sdlext.font("fonts/Justin15.ttf", 14)
+
 	local pane = Ui()
 		:width(1):height(1)
 		:addTo(root)

@@ -43,35 +43,39 @@ deco.textset = function(color, outlineColor, outlineWidth, antialias)
 	return res
 end
 
-deco.fonts = {}
-deco.fonts.justin12 = sdlext.font("fonts/JustinFont12Bold.ttf", 12)
-deco.fonts.menufont = sdlext.font("fonts/JustinFont11Bold.ttf", 24)
-deco.fonts.tooltipTitle = sdlext.font("fonts/NunitoSans_Bold.ttf", 14)
-deco.fonts.tooltipText = sdlext.font("fonts/NunitoSans_Regular.ttf", 12)
-deco.fonts.tooltipTextLarge = sdlext.font("fonts/NunitoSans_Regular.ttf", 14)
+function deco.reloadFonts()
+	deco.fonts = {}
+	deco.fonts.justin12 = sdlext.font("fonts/JustinFont12Bold.ttf", 12)
+	deco.fonts.menufont = sdlext.font("fonts/JustinFont11Bold.ttf", 24)
+	deco.fonts.tooltipTitle = sdlext.font("fonts/NunitoSans_Bold.ttf", 14)
+	deco.fonts.tooltipText = sdlext.font("fonts/NunitoSans_Regular.ttf", 12)
+	deco.fonts.tooltipTextLarge = sdlext.font("fonts/NunitoSans_Regular.ttf", 14)
 
-deco.uifont = {
-	default = {
-		font = deco.fonts.justin12,
-		set = deco.textset(deco.colors.white),
-	},
-	title = {
-		font = deco.fonts.menufont,
-		set = deco.textset(deco.colors.white, deco.colors.buttonhl, 2),
-	},
-	tooltipTitle = {
-		font = deco.fonts.tooltipTitle,
-		set = deco.textset(deco.colors.white, nil, nil, true)
-	},
-	tooltipText = {
-		font = deco.fonts.tooltipText,
-		set = deco.textset(deco.colors.white, nil, nil, true)
-	},
-	tooltipTextLarge = {
-		font = deco.fonts.tooltipTextLarge,
-		set = deco.textset(deco.colors.white, nil, nil, true)
+	deco.uifont = {
+		default = {
+			font = deco.fonts.justin12,
+			set = deco.textset(deco.colors.white),
+		},
+		title = {
+			font = deco.fonts.menufont,
+			set = deco.textset(deco.colors.white, deco.colors.buttonhl, 2),
+		},
+		tooltipTitle = {
+			font = deco.fonts.tooltipTitle,
+			set = deco.textset(deco.colors.white, nil, nil, true)
+		},
+		tooltipText = {
+			font = deco.fonts.tooltipText,
+			set = deco.textset(deco.colors.white, nil, nil, true)
+		},
+		tooltipTextLarge = {
+			font = deco.fonts.tooltipTextLarge,
+			set = deco.textset(deco.colors.white, nil, nil, true)
+		}
 	}
-}
+end
+
+deco.reloadFonts()
 
 deco.surfaces = {}
 

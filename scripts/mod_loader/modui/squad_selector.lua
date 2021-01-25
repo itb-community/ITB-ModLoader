@@ -52,9 +52,11 @@ function loadSquadSelection()
 	end
 end
 
-local largefont = sdlext.font("fonts/NunitoSans_Bold.ttf", 44)
-local squadPalettes = sdlext.squadPalettes()
+local largefont = nil
+local squadPalettes = nil
 local function createUi()
+	largefont = sdlext.font("fonts/NunitoSans_Bold.ttf", 44)
+	squadPalettes = sdlext.squadPalettes()
 	local checkboxes = {}
 
 	local onExit = function(self)

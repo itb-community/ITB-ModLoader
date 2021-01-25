@@ -14,6 +14,7 @@ function modApi:init()
 		if self:fileExists("resources/resource.dat.bak") then
 			LOG("Resource.dat was missing, restoring from backup.")
 			modApi:copyFileOS("resources/resource.dat.bak", "resources/resource.dat")
+			deco.reloadFonts()
 		else
 			-- Call error() inside of a sdl.drawHook - this way we get an actual message box that halts the game.
 			-- Without it, error() produces a blank white rectangle with no text, and the game closes on its own

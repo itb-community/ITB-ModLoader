@@ -13,7 +13,7 @@ local BUTTON_HEIGHT = 40
 local surfaces = {}
 
 --- Extra UI components
-local WEAPON_FONT = sdlext.font("fonts/NunitoSans_Regular.ttf", 10)
+local WEAPON_FONT = nil
 local MOD_COLOR = sdl.rgb(50, 125, 75)
 
 --[[--
@@ -119,6 +119,7 @@ end
 	Logic to create the actual weapon UI
 ]]
 local function createUi()
+	WEAPON_FONT = sdlext.font("fonts/NunitoSans_Regular.ttf", 10)
 	-- load old config and available presets, used for the new item display
 	local oldConfig = {}
 	local presets = {}

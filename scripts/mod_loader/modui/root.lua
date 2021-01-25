@@ -2,9 +2,8 @@
 	Root UI object provided by the modloader. 
 --]]
 
-local bgRobot = sdlext.getSurface({ path = "img/main_menus/bg3.png" })
-local bgHangar = sdlext.getSurface({ path = "img/strategy/hangar_main.png" })
-local loading = sdlext.getSurface({ path = "img/main_menus/Loading_main.png" })
+local bgRobot = nil
+local bgHangar = nil
 
 -- //////////////////////////////////////////////////////////////////////
 
@@ -382,6 +381,11 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 	local wasHangar = isInHangar
 	local wasGame = isInGame
 	local wasTestMech = isTestMech
+
+	if not bgRobot then
+		bgRobot = sdlext.getSurface({ path = "img/main_menus/bg3.png" })
+		bgHangar = sdlext.getSurface({ path = "img/strategy/hangar_main.png" })
+	end
 
 	isInMainMenu = bgRobot:wasDrawn() and bgRobot.x < screen:w() and not bgHangar:wasDrawn()
 	isInHangar = bgHangar:wasDrawn()

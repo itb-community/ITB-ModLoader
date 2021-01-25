@@ -63,6 +63,7 @@ local function checkResource()
 	local mtime = os.mtime("resources/resource.dat")
 	if resourceDatMtime ~= mtime then
 		resourceDatMtime = mtime
+		resourceDat = sdl.resourceDat("resources/resource.dat")
 		resourceDat:reload()
 	end
 end
