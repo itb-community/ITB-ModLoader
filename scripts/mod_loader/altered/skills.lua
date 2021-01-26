@@ -106,9 +106,63 @@ local function overrideAllSkills()
 	end
 end
 
+-------------------------------------------------------------
+--- Override all Pawns' GetIsPortrait to implement
+--- pawn unfocuesd & focused hooks.
+-------------------------------------------------------------
+
+local focusedPawnLast = nil
+local focusedPawnCurrent = nil
+local function buildGetIsPortraitOverride(pawn)
+	local originalFn = pawn.GetIsPortrait
+
+	return function(self, ...)
+		focusedPawnCurrent = self
+
+		return originalFn(self, ...)
+	end
+end
+
+sdlext.addFrameDrawnHook(function()
+	if focusedPawnLast and focusedPawnCurrent ~= focusedPawnLast then
+		modApi:firePawnUnfocusedHooks(focusedPawnLast)
+	end
+
+	if focusedPawnCurrent and focusedPawnCurrent ~= focusedPawnLast then
+		modApi:firePawnFocusedHooks(focusedPawnCurrent)
+	end
+
+	focusedPawnLast = focusedPawnCurrent
+	focusedPawnCurrent = nil
+end)
+
+local function overridePawnFunction(pawn, functionName, fn)
+	Assert.Equals("table", type(pawn), "Argument #1")
+	Assert.Equals(
+			"function", type(pawn.GetIsPortrait),
+			string.format("Argument #1 does not reference IsPortrait", pawn)
+	)
+	Assert.Equals("string", type(functionName), "Argument #2")
+	Assert.Equals("function", type(fn), "Argument #3")
+
+	pawn[functionName] = fn
+end
+
+local function overrideAllPawns()
+	for k, v in pairs(_G) do
+		if type(v) == "table" and v.GetIsPortrait then
+			-- Make it possible to identify pawns with no ambiguity
+			v.__Id = k
+
+			overridePawnFunction(v, "GetIsPortrait", buildGetIsPortraitOverride(v))
+		end
+	end
+end
+
 modApi:addModsInitializedHook(function()
 	-- Defer the call until all mods have been loaded, so that they don't break the detection
 	overrideAllSkills()
+	overrideAllPawns()
 end)
 
 function modApi:getHoveredSkill()
@@ -122,4 +176,17 @@ end
 
 function modApi:isTipImage()
 	return tipSkillLast ~= nil
+end
+
+function modApi:getFocusedPawn()
+	return focusedPawnLast
+end
+
+function modApi:isPawnFocused(id)
+	Assert.Equals("string", type(id), "Argument #1")
+	return focusedPawnLast and focusedPawnLast.__Id == id
+end
+
+function modApi:isAnyPawnFocused()
+	return focusedPawnLast ~= nil
 end
