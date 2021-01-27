@@ -38,6 +38,8 @@ function modApi:ResetHooks()
 			self[name .."Hooks"] = {}
 		end
 	end
+
+	self.hotkey:resetHooks()
 end
 
 local hooks = {
