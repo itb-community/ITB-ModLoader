@@ -32,6 +32,11 @@ modApi.hotkey = {
 	hooks_up = {}
 }
 
+function modApi.hotkey:resetHooks()
+	self.hooks_down = {}
+	self.hooks_up = {}
+end
+
 sdlext.addSettingsChangedHook(function(oldSettings, newSettings)
 	modApi.hotkey.keys = newSettings.hotkeys
 end)
