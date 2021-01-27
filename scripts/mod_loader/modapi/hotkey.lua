@@ -75,6 +75,7 @@ end)
 function modApi:suppressHotkey(keyIndex, suppress)
 	Assert.Equals('number', type(keyIndex), "Argument #1")
 	Assert.Range(1, 23, keyIndex, "Argument #1")
+	Assert.Equals({'nil', 'boolean'}, type(suppress), "Argument #2")
 	
 	suppress = suppress ~= false
 	if suppress then
