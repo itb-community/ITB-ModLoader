@@ -94,3 +94,27 @@ BoardClass.IsHighlighted = function(self, loc)
 	
 	return loc == mouseTile()
 end
+
+BoardClass.GetSelectedPawn = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	
+	local pawns = Board:GetPawns(TEAM_ANY)
+	for i = 1, pawns:size() do
+		local pawn = Board:GetPawn(pawns:index(i))
+		if pawn and pawn:IsSelected() then
+			return pawn
+		end
+	end
+	
+	return nil
+end
+
+BoardClass.GetSelectedPawnId = function(self)
+	local selectedPawn = self:GetSelectedPawn()
+	
+	if selectedPawn then
+		return selectedPawn:GetId()
+	end
+	
+	return nil
+end
