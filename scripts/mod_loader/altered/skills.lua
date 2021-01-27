@@ -113,6 +113,7 @@ end
 
 local focusedPawnLast = nil
 local focusedPawnCurrent = nil
+local selectedPawnIdLast = nil
 local function buildGetIsPortraitOverride(pawn)
 	local originalFn = pawn.GetIsPortrait
 
@@ -124,14 +125,19 @@ local function buildGetIsPortraitOverride(pawn)
 end
 
 sdlext.addFrameDrawnHook(function()
-	if focusedPawnLast and focusedPawnCurrent ~= focusedPawnLast then
-		modApi:firePawnUnfocusedHooks(focusedPawnLast)
+	local selectedPawnIdCurrent = Board and Board:GetSelectedPawnId() or nil
+
+	if focusedPawnCurrent ~= focusedPawnLast or selectedPawnIdCurrent ~= selectedPawnIdLast then
+		if focusedPawnLast then
+			modApi:firePawnUnfocusedHooks(focusedPawnLast)
+		end
+
+		if focusedPawnCurrent then
+			modApi:firePawnFocusedHooks(focusedPawnCurrent)
+		end
 	end
 
-	if focusedPawnCurrent and focusedPawnCurrent ~= focusedPawnLast then
-		modApi:firePawnFocusedHooks(focusedPawnCurrent)
-	end
-
+	selectedPawnIdLast = selectedPawnIdCurrent
 	focusedPawnLast = focusedPawnCurrent
 	focusedPawnCurrent = nil
 end)
