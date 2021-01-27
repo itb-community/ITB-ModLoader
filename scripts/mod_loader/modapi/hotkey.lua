@@ -73,7 +73,7 @@ sdlext.addPostKeyUpHook(function(keycode)
 end)
 
 function modApi:suppressHotkey(keyIndex, suppress)
-	Assert.Equals('numbeer', type(keyIndex), "Argument #1")
+	Assert.Equals('number', type(keyIndex), "Argument #1")
 	Assert.Range(1, 23, keyIndex, "Argument #1")
 	
 	suppress = suppress ~= false
