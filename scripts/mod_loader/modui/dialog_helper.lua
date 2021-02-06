@@ -96,7 +96,7 @@ local function buildBackgroundPane()
 	return pane
 end
 
-sdlext.addGameWindowResizedHook(function(screen)
+modApi.events.onGameWindowResized:subscribe(function(screen)
 	for i, pane in ipairs(dialogStack) do
 		pane:widthpx(screen:w()):heightpx(screen:h())
 		pane:relayout()

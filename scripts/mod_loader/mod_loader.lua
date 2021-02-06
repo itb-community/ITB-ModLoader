@@ -98,7 +98,7 @@ function mod_loader:init()
 	self:loadPilotList()
 	modApi:affirmProfileData()
 
-	sdlext.addInitialLoadingFinishedHook(function()
+	modApi.events.onInitialLoadingFinished:subscribe(function()
 		self:loadModContent(self:getModConfig(), self:getSavedModOrder())
 		fireHooksSafely(modApi.modsFirstLoadedHooks, "A modsFirstLoaded hook failed: ")
 	end)

@@ -6,18 +6,10 @@
 	State machine golf, fun fun fun!
 --]]
 
-local hangarLeavingHooks = {}
-function sdlext.addHangarLeavingHook(fn)
-	assert(type(fn) == "function")
-	table.insert(hangarLeavingHooks, fn)
-end
-
 local leaving = false
 local function fireHangarLeavingHooks(startGame)
 	leaving = true
-	for i, hook in ipairs(hangarLeavingHooks) do
-		hook(startGame)
-	end
+	modApi.events.onHangarLeaving:dispatch(startGame)
 end
 
 -- //////////////////////////////////////////////////////////////////////
@@ -178,11 +170,11 @@ local function overrideGetImages()
 	end
 end
 
-sdlext.addHangarEnteredHook(function()
+modApi.events.onHangarEntered:subscribe(function()
 	overrideGetImages()
 end)
 
-sdlext.addHangarLeavingHook(function()
+modApi.events.onHangarLeaving:subscribe(function()
 	restoreGetImages()
 end)
 
@@ -771,7 +763,7 @@ local function createUi(root)
 		Ui.draw(self, screen)
 	end
 
-	sdlext.addPostKeyDownHook(function(keycode)
+	modApi.events.onKeyPressed:subscribe(function(keycode)
 		if
 			holder.visible                and
 			not btnBack.disabled          and
@@ -795,7 +787,7 @@ local function createUi(root)
 		return false
 	end)
 
-	sdlext.addHangarEnteredHook(function(screen)
+	modApi.events.onHangarEntered:subscribe(function(screen)
 		Profile = modApi:loadProfile()
 		isSecretSquadUnlocked = Profile.squads[11]
 		isSecretPilotsUnlocked = Hangar_lastProfileHadSecretPilots or
@@ -815,23 +807,23 @@ local function createUi(root)
 		end)
 	end)
 
-	sdlext.addGameWindowResizedHook(function(screen)
+	modApi.events.onGameWindowResized:subscribe(function(screen)
 		holder:width(1):height(1)
 		setupButtonBack(btnBack)
 		setupButtonStart(btnStart)
 	end)
 
-	sdlext.addSettingsChangedHook(function()
+	modApi.events.onSettingsChanged:subscribe(function()
 		setupButtonBack(btnBack)
 		setupButtonStart(btnStart)
 	end)
 end
 
-sdlext.addUiRootCreatedHook(function(screen, root)
+modApi.events.onUiRootCreated:subscribe(function(screen, root)
 	createUi(root)
 end)
 
-sdlext.addGameWindowResizedHook(function(screen, oldSize)
+modApi.events.onGameWindowResized:subscribe(function(screen, oldSize)
 	portraitBtn = Buttons.hangar_pilot.hitstats
 	selectBtn =   Buttons.hangar_select.hitstats
 	squadBtn =    Buttons.hangar_squad.hitstats
