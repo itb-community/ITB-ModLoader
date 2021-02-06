@@ -27,16 +27,9 @@ function modApi:AddHook(name)
 	end
 end
 
--- hooks in this list do not reset when other hooks reset
-local persistentHooks = {
-	modsFirstLoaded = true,
-	modsInitialized = true
-}
 function modApi:ResetHooks()
 	for _, name in ipairs(self.hooks) do
-		if not persistentHooks[name] then
-			self[name .."Hooks"] = {}
-		end
+		self[name .."Hooks"] = {}
 	end
 
 	self.hotkey:resetHooks()
@@ -65,9 +58,6 @@ local hooks = {
 	"PreprocessVekRetreat",
 	"ProcessVekRetreat",
 	"PostprocessVekRetreat",
-	"ModsLoaded",
-	"ModsFirstLoaded",
-	"ModsInitialized",
 	"TestMechEntered",
 	"TestMechExited",
 	"SaveDataUpdated",

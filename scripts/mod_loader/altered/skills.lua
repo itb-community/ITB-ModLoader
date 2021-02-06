@@ -115,7 +115,7 @@ local function overrideSkillFunction(skill, functionName, fn)
 	skill[functionName] = fn
 	-- TODO: Could add a metatable with with __newindex function to protect overrides
 	-- added by the mod loader / reapply the override with the new argument as originalFn
-	-- This would remove the need for ModsInitializedHook here, but what about newly added
+	-- This would remove the need for ModsInitialized event here, but what about newly added
 	-- weapons, or weapons created dynamically, after the game is initialized?
 	-- Add metatable with __newindex to _G, that checks if newly added variable is a Skill...?
 end
@@ -190,7 +190,7 @@ local function overrideAllPawns()
 	end
 end
 
-modApi:addModsInitializedHook(function()
+modApi.events.onModsInitialized:subscribe(function()
 	-- Defer the call until all mods have been loaded, so that they don't break the detection
 	overrideAllSkills()
 	overrideAllPawns()

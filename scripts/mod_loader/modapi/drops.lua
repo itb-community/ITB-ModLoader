@@ -44,7 +44,7 @@ end
 GAME = oldGame
 
 -- load in the config based on what should be enabled
-modApi:addModsFirstLoadedHook(function()
+modApi.events.onModsFirstLoaded:subscribe(function()
 	-- import weapons as second time to catch those added by overriding initializeDecks
 	local oldGame = GAME
 	GAME = {}

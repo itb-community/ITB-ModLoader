@@ -7,6 +7,7 @@ modApi.events = {}
 local t = modApi.events
 t.onModsInitialized = Event()
 t.onModsLoaded = Event()
+t.onModsFirstLoaded = Event()
 t.onInitialLoadingFinished = Event()
 
 t.onUiRootCreating = Event()
