@@ -57,7 +57,7 @@ end
 
 -- add final override after mods have loaded, to ensure the import had time to run
 -- note this runs after the hook in drops.lua
-modApi:addModsFirstLoadedHook(function()
+modApi.events.onModsFirstLoaded:subscribe(function()
 	-- override inititlize decks to pull from the mod api list
 	local oldInitializeDecks = initializeDecks
 	function initializeDecks(...)

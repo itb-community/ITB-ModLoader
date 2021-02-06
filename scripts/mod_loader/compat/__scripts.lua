@@ -1,5 +1,6 @@
 local scripts = {
 	"sdlext",
+	"hooks",
 	"event"
 }
 
