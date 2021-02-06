@@ -1,8 +1,8 @@
 local scripts = {
+	"bootstrap/__scripts",
+
 	"hard-alter",
 	
-	"classes",
-
 	"sdlext/serialize",
 	"sdlext/extensions",
 	"sdlext/keycode_lookup",
