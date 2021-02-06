@@ -1,8 +1,6 @@
 local testsuite = Tests.Testsuite()
 testsuite.name = "Script sandbox tests"
 
-local assertEquals = Assert.Equals
-
 function testsuite.test_GlobalTablesChanges_ShouldNotLeak()
 	-- Changes to fields of global tables should not leak out to the real environment
 	test = {}
@@ -10,8 +8,8 @@ function testsuite.test_GlobalTablesChanges_ShouldNotLeak()
 	test.t = function(self)
 		self.a = 7
 		_G.test.a = 7
-		assertEquals(7, test.a)
-		assertEquals(7, _G.test.a)
+		Assert.Equals(7, test.a)
+		Assert.Equals(7, _G.test.a)
 	end
 
 	local env, ok, result = modApi:runInEnv("test:t()")
@@ -19,8 +17,8 @@ function testsuite.test_GlobalTablesChanges_ShouldNotLeak()
 	local _test = test
 	test = nil
 
-	assertEquals(5, _test.a)
-	assertEquals(7, env.test.a)
+	Assert.Equals(5, _test.a)
+	Assert.Equals(7, env.test.a)
 
 	if ok then
 		return true
@@ -41,8 +39,8 @@ function testsuite.test_GlobalChanges_ShouldNotLeak()
 	test = nil
 	a = nil
 
-	assertEquals(5, _a)
-	assertEquals(7, env.a)
+	Assert.Equals(5, _a)
+	Assert.Equals(7, env.a)
 
 	if ok then
 		return true
@@ -55,14 +53,14 @@ function testsuite.test_UpvalueChanges_ShouldNotLeak()
 
 	test = function()
 		a = 7
-		assertEquals(7, a)
+		Assert.Equals(7, a)
 	end
 
 	local env, ok, result = modApi:runInEnv("test()")
 	
 	test = nil
 
-	assertEquals(5, a)
+	Assert.Equals(5, a)
 
 	if ok then
 		return true
@@ -78,9 +76,9 @@ function testsuite.test_ShouldReturnMultipleValues()
 	test = function()
 		local a1, a2, a3 = test1()
 
-		assertEquals(1, a1)
-		assertEquals(2, a2)
-		assertEquals(3, a3)
+		Assert.Equals(1, a1)
+		Assert.Equals(2, a2)
+		Assert.Equals(3, a3)
 	end
 
 	local env, ok, result = modApi:runInEnv("test()")
@@ -100,16 +98,16 @@ function testsuite.test_ShouldRestoreNilUpvalues()
 	test = function()
 		a = 7
 		b = 8
-		assertEquals(7, a)
-		assertEquals(8, b)
+		Assert.Equals(7, a)
+		Assert.Equals(8, b)
 	end
 
 	local env, ok, result = modApi:runInEnv("test()")
 
 	test = nil
 
-	assertEquals(5, a)
-	assertEquals(nil, b)
+	Assert.Equals(5, a)
+	Assert.Equals(nil, b)
 
 	if ok then
 		return true
@@ -122,7 +120,7 @@ function testsuite.test_ShouldPersistUpvalues_ThroughSameFunctionCalls()
 	test = function()
 		_G.counter = _G.counter + 1
 		a = a + 1
-		assertEquals(_G.counter, a - 5)
+		Assert.Equals(_G.counter, a - 5)
 	end
 
 	local env = {}
@@ -131,8 +129,8 @@ function testsuite.test_ShouldPersistUpvalues_ThroughSameFunctionCalls()
 
 	test = nil
 
-	assertEquals(5, a)
-	assertEquals(2, env.counter)
+	Assert.Equals(5, a)
+	Assert.Equals(2, env.counter)
 
 	if ok then
 		return true
@@ -144,11 +142,11 @@ function testsuite.test_ShouldPersistUpvalues_ThroughDifferentFunctionCalls()
 	local a = 1
 	test = function()
 		a = a + 1
-		assertEquals(2, a)
+		Assert.Equals(2, a)
 	end
 	test2 = function()
 		a = a + 1
-		assertEquals(3, a)
+		Assert.Equals(3, a)
 	end
 
 	local env, ok, result = modApi:runInEnv("test(); test2();")
@@ -156,7 +154,7 @@ function testsuite.test_ShouldPersistUpvalues_ThroughDifferentFunctionCalls()
 	test = nil
 	test2 = nil
 
-	assertEquals(1, a)
+	Assert.Equals(1, a)
 
 	if ok then
 		return true
@@ -178,9 +176,9 @@ function testsuite.test_ShouldPersistUpvalues_ThroughDifferentNestedFunctionCall
 		test3()
 	end
 	test3 = function()
-		assertEquals(3, a)
-		assertEquals(nil, b)
-		assertEquals(nil, c)
+		Assert.Equals(3, a)
+		Assert.Equals(nil, b)
+		Assert.Equals(nil, c)
 	end
 
 	local env, ok, result = modApi:runInEnv("test()")
@@ -189,9 +187,9 @@ function testsuite.test_ShouldPersistUpvalues_ThroughDifferentNestedFunctionCall
 	test2 = nil
 	test3 = nil
 
-	assertEquals(1, a)
-	assertEquals(nil, b)
-	assertEquals(nil, c)
+	Assert.Equals(1, a)
+	Assert.Equals(nil, b)
+	Assert.Equals(nil, c)
 
 	if ok then
 		return true
@@ -203,12 +201,12 @@ function testsuite.test_RunInEnv_ShouldWorkWithFunctionReferences()
 	local a = 1
 	local test = function()
 		a = a + 1
-		assertEquals(2, a)
+		Assert.Equals(2, a)
 	end
 
 	local env, ok, result = modApi:runInEnv(test)
 
-	assertEquals(1, a)
+	Assert.Equals(1, a)
 
 	if ok then
 		return true
@@ -221,15 +219,15 @@ function testsuite.test_ScriptErrors_ShouldNotBreakSandbox()
 	test = function()
 		b = 10
 		a = a + 1
-		assertEquals(1, a, "This assertion is supposed to fail.")
+		Assert.Equals(1, a, "This assertion is supposed to fail.")
 	end
 
 	local env, ok, result = modApi:runInEnv("test()")
 
 	test = nil
 
-	assertEquals(1, a)
-	assertEquals(nil, b)
+	Assert.Equals(1, a)
+	Assert.Equals(nil, b)
 
 	-- Expected failure
 	if not ok then
@@ -246,29 +244,29 @@ function testsuite.test_ShouldPersistUpvalues_ThroughNestedScopes()
 			local test3 = function()
 				a = a + 1
 				b = b + 1
-				assertEquals(3, a)
-				assertEquals(3, b)
+				Assert.Equals(3, a)
+				Assert.Equals(3, b)
 			end
 
 			a = a + 1
 			b = b + 1
 
-			assertEquals(2, a)
-			assertEquals(2, b)
+			Assert.Equals(2, a)
+			Assert.Equals(2, b)
 
 			test3()
 		end
 
 		test2()
 
-		assertEquals(3, a)
-		assertEquals(nil, b)
+		Assert.Equals(3, a)
+		Assert.Equals(nil, b)
 	end
 
 	local env, ok, result = modApi:runInEnv(test)
 
-	assertEquals(nil, a)
-	assertEquals(nil, b)
+	Assert.Equals(nil, a)
+	Assert.Equals(nil, b)
 
 	if ok then
 		return true
