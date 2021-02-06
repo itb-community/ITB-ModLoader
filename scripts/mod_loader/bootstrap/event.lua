@@ -160,7 +160,7 @@ local function unpack2(t) return unpack(t, 1, t.n) end
 ---	Arguments are passed as-is without any cloning or protection, so if you
 ---	pass a table, and one subscriber modifies it, the changes will propagate
 ---	to subsequent subscribers.
-function Event:fire(...)
+function Event:dispatch(...)
 	local args = pack2(...)
 	local snapshot = shallow_copy(self.subscribers)
 	for _, sub in ipairs(snapshot) do

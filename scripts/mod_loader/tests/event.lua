@@ -10,10 +10,10 @@ function testsuite.test_EventFire()
 	end)
 
 	local expectedValue = 5
-	event:fire(expectedValue)
+	event:dispatch(expectedValue)
 
-	Assert.NotEquals(0, value, "Event:fire() did not notify the subscriber")
-	Assert.Equals(expectedValue, value, "Event:fire() did not pass arguments to the subscriber")
+	Assert.NotEquals(0, value, "Event:dispatch() did not notify the subscriber")
+	Assert.Equals(expectedValue, value, "Event:dispatch() did not pass arguments to the subscriber")
 	Assert.False(sub:isClosed(), "Subscriber was marked as closed, even though it did not unsubscribe.")
 
 	return true
@@ -31,10 +31,10 @@ function testsuite.test_EventNotifyAllSubscribers()
 		notified2 = true
 	end)
 
-	event:fire()
+	event:dispatch()
 
-	Assert.True(notified1, "Event:fire() did not notify the first subscriber")
-	Assert.True(notified2, "Event:fire() did not notify the second subscriber")
+	Assert.True(notified1, "Event:dispatch() did not notify the first subscriber")
+	Assert.True(notified2, "Event:dispatch() did not notify the second subscriber")
 
 	return true
 end
@@ -48,7 +48,7 @@ function testsuite.test_EventUnsubscribe()
 	end)
 
 	local unsubResult = sub:unsubscribe()
-	event:fire()
+	event:dispatch()
 
 	Assert.True(unsubResult, "Event:unsubscribe() returned false for valid subscriber")
 	Assert.True(sub:isClosed(), "Subscriber was not marked as closed after it unsubscribed.")
@@ -68,7 +68,7 @@ function testsuite.test_EventUnsubscribeWithFunction()
 	event:subscribe(fn)
 
 	local unsubResult = event:unsubscribe(fn)
-	event:fire()
+	event:dispatch()
 
 	Assert.True(unsubResult, "Event:unsubscribe() returned false for valid subscriber")
 	Assert.False(fired, "Subscriber got notified after it unsubscribed from the event.")
@@ -148,11 +148,11 @@ function testsuite.test_EventOptionShortcircuit()
 		notified3 = true
 	end)
 
-	event:fire()
+	event:dispatch()
 
-	Assert.True(notified1, "Event:fire() did not notify the first subscriber")
-	Assert.True(notified2, "Event:fire() did not notify the second subscriber")
-	Assert.False(notified3, "Event:fire() notified the third subscriber, after shortcircuit")
+	Assert.True(notified1, "Event:dispatch() did not notify the first subscriber")
+	Assert.True(notified2, "Event:dispatch() did not notify the second subscriber")
+	Assert.False(notified3, "Event:dispatch() notified the third subscriber, after shortcircuit")
 
 	return true
 end

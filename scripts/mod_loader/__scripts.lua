@@ -2,7 +2,7 @@ local scripts = {
 	"bootstrap/__scripts",
 
 	"hard-alter",
-	
+
 	"sdlext/serialize",
 	"sdlext/extensions",
 	"sdlext/keycode_lookup",
@@ -20,6 +20,8 @@ local scripts = {
 	"modui/popup_opengl",
 
 	"tests/__scripts",
+
+	"compat/__scripts"
 }
 
 -- In files loaded via require(), (...) in top-level scope returns

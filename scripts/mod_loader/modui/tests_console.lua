@@ -220,7 +220,7 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 			testsCounter.total = testsCounter.total + 1
 			statusBox.updateStatus()
 
-			statusBox.onStatusChanged:fire("total", old, testsCounter.total)
+			statusBox.onStatusChanged:dispatch("total", old, testsCounter.total)
 		end
 	end
 	local onTestSuccess = function(entry)
@@ -229,7 +229,7 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 			testsCounter.success = testsCounter.success + 1
 			statusBox.updateStatus()
 
-			statusBox.onStatusChanged:fire("success", old, testsCounter.success)
+			statusBox.onStatusChanged:dispatch("success", old, testsCounter.success)
 		end
 	end
 	local onTestFailed = function(entry)
@@ -238,7 +238,7 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 			testsCounter.failed = testsCounter.failed + 1
 			statusBox.updateStatus()
 
-			statusBox.onStatusChanged:fire("failed", old, testsCounter.failed)
+			statusBox.onStatusChanged:dispatch("failed", old, testsCounter.failed)
 		end
 	end
 
@@ -275,7 +275,7 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 			testsCounter[status] = testsCounter[status] + (childNew - childOld)
 			statusBox.updateStatus()
 
-			statusBox.onStatusChanged:fire(status, old, testsCounter[status])
+			statusBox.onStatusChanged:dispatch(status, old, testsCounter[status])
 		end))
 	end
 
@@ -286,7 +286,7 @@ local function buildTestsuiteUi(testsuiteEntry, isNestedTestsuite)
 
 	entryBoxHolder.onParentToggled = function(checked)
 		checkbox.checked = checked
-		checkbox.onToggled:fire(checked)
+		checkbox.onToggled:dispatch(checked)
 	end
 
 	return entryBoxHolder
@@ -353,7 +353,7 @@ local function buildTestingConsoleButtons(buttonLayout)
 		GetText("TestingConsole_RunAll"),
 		nil,
 		function()
-			resetEvent:fire()
+			resetEvent:dispatch()
 			TestConsole.runner:Start(enumerateAllTests)
 		end
 	)
@@ -364,7 +364,7 @@ local function buildTestingConsoleButtons(buttonLayout)
 		GetText("TestingConsole_RunSelected"),
 		nil,
 		function()
-			resetEvent:fire()
+			resetEvent:dispatch()
 			TestConsole.runner:Start(enumerateSelectedTests)
 		end
 	)
@@ -442,6 +442,9 @@ local function createOpenTestingConsoleButton(root)
 end
 
 sdlext.addUiRootCreatedHook(function(screen, root)
+	if resetEvent then
+		resetEvent:unsubscribeAll()
+	end
 	resetEvent = Event()
 	createOpenTestingConsoleButton(root)
 end)

@@ -21,7 +21,7 @@ function Tests.Runner:ChangeStatus(newStatus)
 	local oldStatus = self.status
 	self.status = newStatus
 
-	self.onStatusChanged:fire(self, oldStatus, newStatus)
+	self.onStatusChanged:dispatch(self, oldStatus, newStatus)
 end
 
 --- Convenience function for running directly via console
@@ -69,7 +69,7 @@ function Tests.Runner:RunTests(tests, resultsHolder)
 				-- Suppress log output so that the results stay somewhat readable
 				local pendingTests = #tests
 				for _, entry in ipairs(tests) do
-					self.onTestSubmitted:fire(entry)
+					self.onTestSubmitted:dispatch(entry)
 
 					modApi:conditionalHook(
 							function()
@@ -77,7 +77,7 @@ function Tests.Runner:RunTests(tests, resultsHolder)
 							end,
 							function()
 								self:ChangeStatus(Tests.Runner.STATUS_WAITING_FOR_TEST_FINISH)
-								self.onTestStarted:fire(entry)
+								self.onTestStarted:dispatch(entry)
 
 								local resultTable = {}
 								resultTable.done = false
@@ -104,9 +104,9 @@ function Tests.Runner:RunTests(tests, resultsHolder)
 										function()
 											self:ChangeStatus(Tests.Runner.STATUS_READY_TO_RUN_TEST)
 											if resultTable.ok and resultTable.result == true then
-												self.onTestSuccess:fire(entry, resultTable)
+												self.onTestSuccess:dispatch(entry, resultTable)
 											else
-												self.onTestFailed:fire(entry, resultTable)
+												self.onTestFailed:dispatch(entry, resultTable)
 											end
 											pendingTests = pendingTests - 1
 										end
