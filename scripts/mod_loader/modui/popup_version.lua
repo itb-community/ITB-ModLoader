@@ -20,7 +20,7 @@ local function showVersionDialog(text)
 end
 
 local versionFrameShown = false
-sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
+modApi.events.onMainMenuEntered:subscribe(function(screen, wasHangar, wasGame)
 	if modApi.showVersionFrame then
 		if not versionFrameShown then
 			versionFrameShown = true

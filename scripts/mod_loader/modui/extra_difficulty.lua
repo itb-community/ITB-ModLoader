@@ -163,12 +163,12 @@ local function createUi(root)
 		Ui.draw(self, screen)
 	end
 
-	sdlext.addHangarEnteredHook(function(screen)
+	modApi.events.onHangarEntered:subscribe(function(screen)
 		-- Apply the difficulty we're starting with
 		changeDifficulty(GetDifficulty())
 	end)
 
-	sdlext.addHangarLeavingHook(function(startGame)
+	modApi.events.onHangarLeaving:subscribe(function(startGame)
 		leaving = true
 
 		if startGame then
@@ -176,17 +176,17 @@ local function createUi(root)
 		end
 	end)
 
-	sdlext.addHangarExitedHook(function(screen)
+	modApi.events.onHangarExited:subscribe(function(screen)
 		leaving = false
 		mask.animations.fadeIn:stop()
 		mask.decorations[1].color = deco.colors.transparent
 	end)
 
-	sdlext.addGameWindowResizedHook(function(screen)
+	modApi.events.onGameWindowResized:subscribe(function(screen)
 		pane:width(1):height(1)
 	end)
 end
 
-sdlext.addUiRootCreatedHook(function(screen, root)
+modApi.events.onUiRootCreated:subscribe(function(screen, root)
 	createUi(root)
 end)

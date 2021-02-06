@@ -210,6 +210,6 @@ function modApi:updateScheduledHooks()
 	end
 end
 
-sdlext.addGameExitedHook(function()
+modApi.events.onGameExited:subscribe(function()
 	modApi.runLaterQueue = {}
 end)

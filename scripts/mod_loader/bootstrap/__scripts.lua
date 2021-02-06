@@ -2,6 +2,7 @@ local scripts = {
 	"utils",
 	"classes",
 	"event",
+	"main"
 }
 
 local rootpath = GetParentPath(...)

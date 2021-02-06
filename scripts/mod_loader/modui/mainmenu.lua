@@ -2,42 +2,11 @@
 	Click handler for main menu buttons
 --]]
 
---[[
-	Fired when the Continue button is clicked.
---]]
-local continueClickHooks = {}
-function sdlext.addContinueClickHook(fn)
-	assert(type(fn) == "function")
-	table.insert(continueClickHooks, fn)
-end
-
---[[
-	Fired when the New Game button is clicked.
-	This does NOT account for the confirmation box
-	that pops up when you have a game in progress.
---]]
-local newGameClickHooks = {}
-function sdlext.addNewGameClickHook(fn)
-	assert(type(fn) == "function")
-	table.insert(newGameClickHooks, fn)
-end
-
---[[
-	Fired when the leaves the Main Menu for the Hangar
---]]
-local mainMenuLeavingHooks = {}
-function sdlext.addMainMenuLeavingHook(fn)
-	assert(type(fn) == "function")
-	table.insert(mainMenuLeavingHooks, fn)
-end
-
 local leaving = false
 local pendingConfirm = false
 local function fireMainMenuLeavingHooks()
 	leaving = true
-	for i, hook in ipairs(mainMenuLeavingHooks) do
-		hook()
-	end
+	modApi.events.onMainMenuLeaving:dispatch()
 end
 
 local function isWindowVisible()
@@ -59,9 +28,7 @@ local function createUi(root)
 	btnContinue.translucent = true
 	btnContinue.mousedown = function(self, x, y, button)
 		if button == 1 and not isWindowVisible() and not leaving then
-			for i, hook in ipairs(continueClickHooks) do
-				hook()
-			end
+			modApi.events.onContinueClicked:dispatch()
 		end
 		return Ui.mousedown(self, x, y, button)
 	end
@@ -72,9 +39,7 @@ local function createUi(root)
 	btnNewGame.translucent = true
 	btnNewGame.mousedown = function(self, x, y, button)
 		if button == 1 and not isWindowVisible() and not leaving then
-			for i, hook in ipairs(newGameClickHooks) do
-				hook()
-			end
+			modApi.events.onNewGameClicked:dispatch()
 		end
 		return Ui.mousedown(self, x, y, button)
 	end
@@ -95,7 +60,7 @@ local function createUi(root)
 		return Ui.mousedown(self, x, y, button)
 	end
 
-	sdlext.addPreKeyDownHook(function(keycode)
+	modApi.events.onKeyPressing:subscribe(function(keycode)
 		if
 			holder.visible and
 			(keycode == SDLKeycodes.RETURN or keycode == SDLKeycodes.RETURN2) and
@@ -125,7 +90,7 @@ local function createUi(root)
 	end
 end
 
-sdlext.addNewGameClickHook(function()
+modApi.events.onNewGameClicked:subscribe(function()
 	modApi:scheduleHook(10, function()
 		local r = sdlext.CurrentWindowRect
 
@@ -137,15 +102,15 @@ sdlext.addNewGameClickHook(function()
 	end)
 end)
 
-sdlext.addContinueClickHook(function()
+modApi.events.onContinueClicked:subscribe(function()
 	fireMainMenuLeavingHooks()
 end)
 
-sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
+modApi.events.onMainMenuEntered:subscribe(function(screen, wasHangar, wasGame)
 	leaving = false
 	Profile = modApi:loadProfile()
 end)
 
-sdlext.addUiRootCreatedHook(function(screen, root)
+modApi.events.onUiRootCreated:subscribe(function(screen, root)
 	createUi(root)
 end)

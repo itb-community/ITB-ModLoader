@@ -17,7 +17,7 @@ function sdlext.addModContent(text, func, tip)
 end
 
 local buttonModContent
-sdlext.addUiRootCreatedHook(function(screen, uiRoot)
+modApi.events.onUiRootCreated:subscribe(function(screen, uiRoot)
 	if buttonModContent then return end
 	
 	buttonModContent = MainMenuButton("short")
@@ -26,7 +26,7 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 		:addTo(uiRoot)
 	buttonModContent.visible = false
 
-	sdlext.addGameWindowResizedHook(function(screen, oldSize)
+	modApi.events.onGameWindowResized:subscribe(function(screen, oldSize)
 		buttonModContent:pospx(0, screen:h() - 186)
 	end)
 
@@ -82,13 +82,13 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 	end
 end)
 
-sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
+modApi.events.onMainMenuEntered:subscribe(function(screen, wasHangar, wasGame)
 	if not buttonModContent.visible or wasGame then
 		buttonModContent.visible = true
 		buttonModContent.animations.slideIn:start()
 	end
 end)
 
-sdlext.addMainMenuExitedHook(function(screen)
+modApi.events.onMainMenuExited:subscribe(function(screen)
 	buttonModContent.visible = false
 end)

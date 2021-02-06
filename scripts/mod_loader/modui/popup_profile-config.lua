@@ -10,7 +10,7 @@ local function responseFn(btnIndex)
 	end
 end
 
-sdlext.addSettingsChangedHook(function(old, new)
+modApi.events.onSettingsChanged:subscribe(function(old, new)
 	if
 		modApi.showProfileSettingsFrame and modApi.profileConfig
 	then

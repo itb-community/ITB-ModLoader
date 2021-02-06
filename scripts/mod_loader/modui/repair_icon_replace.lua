@@ -17,7 +17,7 @@ function RegisterRepairIconReplacement(personalityId, iconPath)
 	repairReplacementIcons[personalityId] = (iconPath and sdlext.getSurface({ path = iconPath })) or nil
 end
 
-sdlext.addUiRootCreatedHook(function(screen, uiRoot)
+modApi.events.onUiRootCreated:subscribe(function(screen, uiRoot)
 	iconHolder = Ui()
 		:widthpx(32):heightpx(80)
 		:decorate({ DecoSurface() })

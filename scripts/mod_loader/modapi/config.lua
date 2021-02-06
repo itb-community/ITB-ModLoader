@@ -131,7 +131,7 @@ function ApplyModLoaderConfig(config)
 	modApi.showProfileSettingsFrame = config.showProfileSettingsFrame
 end
 
-sdlext.addSettingsChangedHook(function(old, neu)
+modApi.events.onSettingsChanged:subscribe(function(old, neu)
 	if modApi.profileConfig and old.last_profile ~= neu.last_profile then
 		ApplyModLoaderConfig(LoadModLoaderConfig())
 	end

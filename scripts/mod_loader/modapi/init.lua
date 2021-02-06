@@ -2,7 +2,7 @@
 local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 local parentDirectory = GetParentPath(...)
 
-modApi = {}
+modApi = modApi or {}
 function modApi:init()
 	Settings = self:loadSettings()
 	ApplyModLoaderConfig(LoadModLoaderConfig())
@@ -82,7 +82,7 @@ function modApi:init()
 	self:ResetHooks()
 
 	if MOD_API_DRAW_HOOK then
-		sdlext.addFrameDrawnHook(function(screen)
+		modApi.events.onFrameDrawn:subscribe(function(screen)
 			local t = modApi.timer:elapsed()
 			if t > modApi.msLastElapsed then
 				modApi.msDeltaTime = t - modApi.msLastElapsed
@@ -202,7 +202,7 @@ function modApi:getGameVersion()
 	return "1.0.22"
 end
 
-sdlext.addSettingsChangedHook(function(old, neu)
+modApi.events.onSettingsChanged:subscribe(function(old, neu)
 	if old.language ~= neu.language then
 		if GAME then
 			mod_loader:loadModContent(GAME.modOptions, GAME.modLoadOrder)

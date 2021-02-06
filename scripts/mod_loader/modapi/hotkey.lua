@@ -37,11 +37,11 @@ function modApi.hotkey:resetHooks()
 	self.hooks_up = {}
 end
 
-sdlext.addSettingsChangedHook(function(oldSettings, newSettings)
+modApi.events.onSettingsChanged:subscribe(function(oldSettings, newSettings)
 	modApi.hotkey.keys = newSettings.hotkeys
 end)
 
-sdlext.addPostKeyDownHook(function(keycode)
+modApi.events.onKeyPressed:subscribe(function(keycode)
 	local index = list_indexof(modApi.hotkey.keys, keycode)
 	if sdlext.isConsoleOpen() then return false end
 	if index == -1 then return false end
@@ -61,7 +61,7 @@ sdlext.addPostKeyDownHook(function(keycode)
     return false
 end)
 
-sdlext.addPostKeyUpHook(function(keycode)
+modApi.events.onKeyReleased:subscribe(function(keycode)
 	local index = list_indexof(modApi.hotkey.keys, keycode)
 	if index == -1 then return false end
 	if not keystatus[index] then return false end
