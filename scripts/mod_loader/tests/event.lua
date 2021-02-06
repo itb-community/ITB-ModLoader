@@ -131,7 +131,7 @@ function testsuite.test_EventIsSubscribedWithFunction()
 	return true
 end
 
-function testsuite.test_EventOptionShortcircuit()
+function testsuite.test_EventOptionShortcircuitEnabled()
 	local event = Event({ [Event.SHORTCIRCUIT] = true })
 
 	local notified1 = false
@@ -153,6 +153,32 @@ function testsuite.test_EventOptionShortcircuit()
 	Assert.True(notified1, "Event:dispatch() did not notify the first subscriber")
 	Assert.True(notified2, "Event:dispatch() did not notify the second subscriber")
 	Assert.False(notified3, "Event:dispatch() notified the third subscriber, after shortcircuit")
+
+	return true
+end
+
+function testsuite.test_EventOptionShortcircuitDisabled()
+	local event = Event({ [Event.SHORTCIRCUIT] = false })
+
+	local notified1 = false
+	local notified2 = false
+	local notified3 = false
+	event:subscribe(function()
+		notified1 = true
+	end)
+	event:subscribe(function()
+		notified2 = true
+		return true
+	end)
+	event:subscribe(function()
+		notified3 = true
+	end)
+
+	event:dispatch()
+
+	Assert.True(notified1, "Event:dispatch() did not notify the first subscriber")
+	Assert.True(notified2, "Event:dispatch() did not notify the second subscriber")
+	Assert.True(notified3, "Event:dispatch() did not notify the third subscriber, after second attempted to shortcircuit")
 
 	return true
 end
