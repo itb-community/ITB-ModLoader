@@ -105,4 +105,27 @@ testsuite.test_PawnExtinguishOnFireTile_ShouldRemainOnFire = buildPawnTest({
 	end
 })
 
+testsuite.test_PawnArmorWithAcid_ShouldReturnTrue = Tests.BuildPawnTest({
+	-- BoardPawn:IsArmor() shouldn't check for presence of ACID, since there are cases where
+	-- we might want to know whether a pawn has armor, even when it is covered in ACID.
+	prepare = function()
+		pawnId = Board:SpawnPawn("JudoMech")
+		pawn = Board:GetPawn(pawnId)
+		loc = pawn:GetSpace()
+		terrain = Board:GetTerrain(loc)
+		Board:SetTerrain(loc, TERRAIN_ROAD)
+	end,
+	execute = function()
+		pawn:SetAcid(true)
+	end,
+	check = function()
+		isArmor = pawn:IsArmor()
+		Assert.Equals(true, isArmor, "BoardPawn.IsArmor returned false for a pawn covered in ACID")
+	end,
+	cleanup = function()
+		Board:RemovePawn(pawn)
+		Board:SetTerrain(loc, terrain)
+	end
+})
+
 return testsuite
