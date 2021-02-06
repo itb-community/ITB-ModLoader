@@ -1,11 +1,8 @@
 local testsuite = Tests.Testsuite()
 testsuite.name = "Pawn-related tests"
 
-local assertEquals = Assert.Equals
-local buildPawnTest = Tests.BuildPawnTest
 
-
-testsuite.test_ApplyDamage_ShouldReduceHealth = buildPawnTest({
+testsuite.test_ApplyDamage_ShouldReduceHealth = Tests.BuildPawnTest({
 	-- The pawn should be correctly damaged
 	prepare = function()
 		pawnId = Board:SpawnPawn("PunchMech")
@@ -20,14 +17,14 @@ testsuite.test_ApplyDamage_ShouldReduceHealth = buildPawnTest({
 	check = function()
 		local actualHealth = pawn:GetHealth()
 
-		assertEquals(expectedHealth, actualHealth, "Pawn did not take correct amount of damage")
+		Assert.Equals(expectedHealth, actualHealth, "Pawn did not take correct amount of damage")
 	end,
 	cleanup = function()
 		Board:RemovePawn(pawn)
 	end
 })
 
-testsuite.test_SafeDamageOnForest_ShouldNotCreateFire = buildPawnTest({
+testsuite.test_SafeDamageOnForest_ShouldNotCreateFire = Tests.BuildPawnTest({
 	-- When standing on a forest and receiving safe damage, the pawn should not be set on fire
 	prepare = function()
 		pawnId = Board:SpawnPawn("PunchMech")
@@ -44,8 +41,8 @@ testsuite.test_SafeDamageOnForest_ShouldNotCreateFire = buildPawnTest({
 		local actualFire = pawn:IsFire()
 		local actualTerrain = Board:GetTerrain(loc)
 
-		assertEquals(false, actualFire, "Pawn had been set on fire")
-		assertEquals(TERRAIN_FOREST, actualTerrain, "Terrain type has been changed")
+		Assert.Equals(false, actualFire, "Pawn had been set on fire")
+		Assert.Equals(TERRAIN_FOREST, actualTerrain, "Terrain type has been changed")
 	end,
 	cleanup = function()
 		Board:SetTerrain(loc, terrain)
@@ -53,7 +50,7 @@ testsuite.test_SafeDamageOnForest_ShouldNotCreateFire = buildPawnTest({
 	end
 })
 
-testsuite.test_PawnSetFire_ShouldNotSetBoardFire = buildPawnTest({
+testsuite.test_PawnSetFire_ShouldNotSetBoardFire = Tests.BuildPawnTest({
 	-- Setting a pawn on fire using SetFire(true) should set the pawn on fire, but leave the board unaffected
 	prepare = function()
 		pawnId = Board:SpawnPawn("PunchMech")
@@ -70,7 +67,7 @@ testsuite.test_PawnSetFire_ShouldNotSetBoardFire = buildPawnTest({
 	check = function()
 		local actualFire = pawn:IsFire()
 
-		assertEquals(true, actualFire, "Pawn had not been set on fire")
+		Assert.Equals(true, actualFire, "Pawn had not been set on fire")
 	end,
 	cleanup = function()
 		Board:RemovePawn(pawn)
@@ -78,7 +75,7 @@ testsuite.test_PawnSetFire_ShouldNotSetBoardFire = buildPawnTest({
 	end
 })
 
-testsuite.test_PawnExtinguishOnFireTile_ShouldRemainOnFire = buildPawnTest({
+testsuite.test_PawnExtinguishOnFireTile_ShouldRemainOnFire = Tests.BuildPawnTest({
 	-- Attempting to extinguish a pawn on fire while it is standing on a fire tile should have no effect
 	prepare = function()
 		pawnId = Board:SpawnPawn("PunchMech")
@@ -95,8 +92,8 @@ testsuite.test_PawnExtinguishOnFireTile_ShouldRemainOnFire = buildPawnTest({
 		local actualPawnFire = pawn:IsFire()
 		local actualBoardFire = Board:IsFire(loc)
 
-		assertEquals(true, actualPawnFire, "Pawn had been extinguished")
-		assertEquals(true, actualBoardFire, "Board had been extinguished")
+		Assert.Equals(true, actualPawnFire, "Pawn had been extinguished")
+		Assert.Equals(true, actualBoardFire, "Board had been extinguished")
 	end,
 	cleanup = function()
 		Board:RemovePawn(pawn)

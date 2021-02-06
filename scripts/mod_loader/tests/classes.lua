@@ -1,15 +1,12 @@
 local testsuite = Tests.Testsuite()
 testsuite.name = "Classes system tests"
 
-local assertTrue = Assert.True
-local assertFalse = Assert.False
-
 function testsuite.test_ClassHierarchy()
 	local rootClass = Class.new()
 	local subClass = rootClass:extend()
 
-	assertTrue(rootClass:isSuperclassOf(subClass))
-	assertTrue(subClass:isSubclassOf(rootClass))
+	Assert.True(rootClass:isSuperclassOf(subClass))
+	Assert.True(subClass:isSubclassOf(rootClass))
 
 	return true
 end
@@ -21,11 +18,11 @@ function testsuite.test_Instance()
 	local rootInstance = rootClass()
 	local subInstance = subClass()
 
-	assertTrue(Class.instanceOf(rootInstance, rootClass))
-	assertTrue(Class.instanceOf(subInstance, subClass))
+	Assert.True(Class.instanceOf(rootInstance, rootClass))
+	Assert.True(Class.instanceOf(subInstance, subClass))
 
-	assertTrue(Class.instanceOf(subInstance, rootClass))
-	assertFalse(Class.instanceOf(rootInstance, subClass))
+	Assert.True(Class.instanceOf(subInstance, rootClass))
+	Assert.False(Class.instanceOf(rootInstance, subClass))
 
 	return true
 end
