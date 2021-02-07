@@ -218,3 +218,50 @@ function alphanum(a, b)
 	local ca, cb = conv(a), conv(b)
 	return ca < cb or ca == cb and a < b
 end
+
+
+local function less_than_comp(a, b)
+	return a < b
+end
+
+--- Sort a table. This interface should be identical to table.sort().
+--- The difference to table.sort() is that this sort is stable.
+---
+--- Parameters:
+---
+--- list - The table to sort (we do an in-place sort!).
+---
+--- comp - Comparator used for the sorting
+function stablesort(list, comp)
+	local comp = comp or less_than_comp
+
+	-- A table could contain non-integer keys which we have to ignore.
+	local num = 0
+	for k, v in ipairs(list) do
+		num = num + 1
+	end
+
+	if num <= 1 then
+		-- Nothing to do
+		return
+	end
+
+	-- Sort until everything is sorted :)
+	local sorted = false
+	local n = num
+	while not sorted do
+		sorted = true
+		for i = 1, n - 1 do
+			-- Two equal elements won't be swapped -> we are stable
+			if comp(list[i+1], list[i]) then
+				local tmp = list[i]
+				list[i] = list[i+1]
+				list[i+1] = tmp
+
+				sorted = false
+			end
+		end
+		-- The last element is now guaranteed to be in the right spot
+		n = n - 1
+	end
+end
