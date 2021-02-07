@@ -198,3 +198,23 @@ end
 function isUserdataPoint(var)
 	return type(var) == 'userdata' and type(var.x) == 'number' and type(var.y) == 'number'
 end
+
+function alphanum(a, b)
+	local function conv(s)
+		local res, dot = "", ""
+		for n, m, c in tostring(s):gmatch"(0*(%d*))(.?)" do
+			if n == "" then
+				dot, c = "", dot..c
+			else
+				res = res..(dot == "" and ("%03d%s"):format(#m, m)
+						or "."..n)
+				dot, c = c:match"(%.?)(.*)"
+			end
+			res = res..c:gsub(".", "\0%0")
+		end
+		return res
+	end
+
+	local ca, cb = conv(a), conv(b)
+	return ca < cb or ca == cb and a < b
+end
