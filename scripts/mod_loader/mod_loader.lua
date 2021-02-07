@@ -123,7 +123,7 @@ function mod_loader:loadAdditionalSprites()
 	ANIMS.placeholder_enemy = ANIMS.SingleImage:new{Image = "units/placeholder_enemy.png"}
 end
 
-function mod_loader:enumerateMods(dirPathRelativeToGameDir)
+function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 	self.mod_dirs = self:enumerateDirectoriesIn(dirPathRelativeToGameDir)
 
 	for i, dir in pairs(self.mod_dirs) do
@@ -226,6 +226,32 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir)
 				enabled = true,
 				version = data.version,
 			}
+			
+			if parentMod then
+				table.insert(parentMod.children, data.id)
+				data.parent = parentMod.id
+				
+				data.requirements = data.requirements or {}
+				
+				-- Initialize and load parent mod before submods
+				if not list_contains(data.requirements, parentMod.id) then
+					table.insert(data.requirements, parentMod.id)
+				end
+			end
+			
+			if data.submodFolders then
+				data.children = {}
+				
+				if type(data.submodFolders) == "string" then
+					data.submodFolders = {data.submodFolders}
+				end
+				
+				for _, subpath in ipairs(data.submodFolders) do
+					if type(subpath) == "string" then
+						self:enumerateMods(modDirPath .. subpath, data)
+					end
+				end
+			end
 		end
 		
 		if not ok then
