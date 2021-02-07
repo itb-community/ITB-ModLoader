@@ -142,16 +142,23 @@ end
 
 local function sortChildren(self, sortBy, sortOrder)
 	if sortBy == SORT_BY_NAME then
-		table.sort(self.children, function(a,b) return a.mod.name < b.mod.name end)
+		stablesort(self.children, function(a, b)
+			return alphanum(a.mod.name:lower(), b.mod.name:lower())
+		end)
 	elseif sortBy == SORT_BY_ID then
-		table.sort(self.children, function(a,b) return a.mod.id < b.mod.id end)
+		stablesort(self.children, function(a, b)
+			return alphanum(a.mod.id:lower(), b.mod.id:lower())
+		end)
 	end
 	
 	if sortOrder == SORT_ENABLED_FIRST then
-		table.sort(self.children, function(a,b) return a.modEntry.checked and not b.modEntry.checked end)
-		
+		stablesort(self.children, function(a,b)
+			return a.modEntry.checked and not b.modEntry.checked
+		end)
 	elseif sortOrder == SORT_ENABLED_LAST then
-		table.sort(self.children, function(a,b) return not a.modEntry.checked and b.modEntry.checked end)
+		stablesort(self.children, function(a,b)
+			return not a.modEntry.checked and b.modEntry.checked
+		end)
 	end
 	
 	for _, child in ipairs(self.children) do
@@ -541,7 +548,7 @@ local function showModConfig()
 	
 	sdlext.showDialog(function(ui, quit)
 		ui.onDialogExit = onExit
-			
+
 		local frame = sdlext.buildButtonDialog(
 			GetText("ModConfig_FrameTitle"),
 			0.6 * ScreenSizeX(), 0.8 * ScreenSizeY(),
