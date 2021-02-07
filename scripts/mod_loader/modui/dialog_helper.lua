@@ -271,6 +271,48 @@ function sdlext.buildButton(text, tooltip, clickHandler)
 	return btn
 end
 
+function sdlext.buildDropDownButton(text, tooltip, choices, choiceHandler)
+	local decoText = DecoText(text)
+	local maxChoiceWidth = 0
+
+	local values = {}
+	for i = 1, #choices do
+		values[#values+1] = i
+		
+		local decoChoice = DecoRAlignedText(choices[i])
+		maxChoiceWidth = math.max(maxChoiceWidth, decoChoice.surface:w())
+	end
+
+	local btn = UiDropDown(values, choices, choices[1])
+			:widthpx(math.max(95, decoText.surface:w() + maxChoiceWidth + 33))
+			:heightpx(40)
+			:decorate({
+				DecoButton(),
+				DecoAlign(0, 2),
+				decoText,
+				DecoDropDownText(nil, nil, nil, 33),
+				DecoAlign(0, -2),
+				DecoDropDown()
+			})
+
+	btn.destroyDropDown = function(self)
+		UiDropDown.destroyDropDown(self)
+
+		if choiceHandler then
+			choiceHandler(self.value)
+		end
+	end
+
+	if tooltip and tooltip ~= "" then
+		btn:settooltip(tooltip)
+	end
+
+	-- No sound is currently added to hovering or clicking dropdown choices
+	sdlext.addButtonSoundHandlers(btn)
+
+	return btn
+end
+
 function sdlext.showTextDialog(title, text, w, h)
 	w = w or 700
 	h = h or 400
