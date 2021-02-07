@@ -14,3 +14,5 @@ function UiCheckbox:clicked(button)
 	
 	return Ui.clicked(self, button)
 end
+
+UiTriCheckbox = Class.inherit(UiCheckbox)
