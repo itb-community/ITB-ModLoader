@@ -13,3 +13,9 @@ end
 function modApi:remModsFirstLoadedHook(fn)
 	return modApi.events.onModsFirstLoaded:unsubscribe(fn)
 end
+
+-- Other backward compatibility
+
+function modApi:addMissionAvailableHook(fn)
+	self:addPostMissionAvailableHook(fn)
+end
