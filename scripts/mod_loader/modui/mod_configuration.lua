@@ -281,7 +281,7 @@ local function buildModEntry(mod, parentModEntry)
 	local entry = mod_loader.mod_options[mod.id]
 	local entry_editable = currentSelectedOptions[mod.id]
 	
-	local modHasChildren = mod.children ~= nil
+	local modHasChildren = mod.children ~= nil and #mod.children > 0
 	local modHasParent = mod.parent ~= nil
 	
 	local uiTriCheckbox = UiCheckbox
