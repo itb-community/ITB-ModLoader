@@ -4,6 +4,19 @@
 	options they have defined.
 --]]
 
+deco.surfaces.config_checked = sdlext.getSurface({ path = "resources/mods/ui/config-checked.png" })
+deco.surfaces.config_unchecked = sdlext.getSurface({ path = "resources/mods/ui/config-unchecked.png" })
+
+local currentSelectedOptions = nil
+local scrollContent = nil
+local openDropdowns = nil
+local sortMods = nil
+
+local SORT_BY_NAME = 1
+local SORT_BY_ID = 2
+local SORT_ENABLED_FIRST = 1
+local SORT_ENABLED_LAST = 2
+
 local function saveModConfig()
 	local saveConfig = function(obj)
 		obj.modOptions = mod_loader:getCurrentModContent()
@@ -15,6 +28,63 @@ local function saveModConfig()
 	sdlext.config(modcontent, saveConfig)
 end
 
+-- builds a lightweight mirror of mod options,
+-- with only the values we want to be able to edit.
+local function buildLightModOptions()
+	local config_current = mod_loader:getModConfig()
+	local lightModOptions = {}
+	
+	for id, entry in pairs(mod_loader.mod_options) do
+		entry_current = config_current[id]
+		local options = {}
+		lightModOptions[id] = {
+			enabled = entry_current.enabled,
+			options = options,
+			version = entry.version
+		}
+		
+		for i, opt in ipairs(entry.options) do
+			local opt_current = entry_current.options[opt.id]
+			if opt.check then
+				options[i] = { enabled = opt_current.enabled }
+			else
+				options[i] = { value = opt_current.value }
+			end
+		end
+	end
+	
+	return lightModOptions
+end
+
+-- builds a new mod content object with
+-- our newly configured mod options.
+local function buildNewModContent()
+	local modContent = {}
+	
+	for id, entry in pairs(mod_loader.mod_options) do
+		local entry_editable = currentSelectedOptions[id]
+		local options = {}
+		modContent[id] = {
+			enabled = entry_editable.enabled,
+			options = options,
+			version = entry.version
+		}
+		
+		if modContent[id].enabled then
+			for i, opt in ipairs(entry.options) do
+				local opt_editable = entry_editable.options[i]
+				if opt.check then
+					options[opt.id] = { enabled = opt_editable.enabled }
+				else
+					options[opt.id] = { value = opt_editable.value }
+				end
+			end
+		end
+	end
+	
+	return modContent
+end
+
 local function responseFn(btnIndex)
 	if btnIndex == 2 then
 		modApi.showRestartReminder = false
@@ -22,38 +92,431 @@ local function responseFn(btnIndex)
 	end
 end
 
-local function createUi()
-	local checkboxes = {}
-	local configboxes = {}
-	local optionboxes = {}
-	local mod_options = mod_loader.mod_options
-	local modSelection = mod_loader:getModConfig()
+local function getDisplayName(mod)
+	return mod.name
+end
 
-	local onExit = function(self)
-		modSelection = {}
+local function getDisplayDescription(mod)
+	local r = mod.description
+	if mod.version then
+		if r == nil then
+			r = ""
+		else
+			r = r .."\n"
+		end
+		r = r .."v".. mod.version
+	end
+	return r
+end
+
+local function isDescendantOf(child, parent)
+	while child.parent do
+		child = child.parent
 		
-		for i, checkbox in ipairs(checkboxes) do
-			local options = {}
-			modSelection[checkbox.modId] = {
-				enabled = checkbox.checked,
-				options = options,
-				version = mod_options[checkbox.modId].version,
-			}
-			
-			if optionboxes[i] and checkbox.checked then
-				for j, option in ipairs(optionboxes[i]) do
-					if option.data.check then
-						options[option.data.id] = {enabled = option.checked}
-					else
-						options[option.data.id] = {value = option.value}
+		if child == parent then
+			return true
+		end
+	end
+	
+	return false
+end
+
+local function closeDropdown(self)
+	if not list_contains(openDropdowns, self) then
+		return
+	end
+	
+	remove_element(openDropdowns, self)
+	
+	for _, entry in ipairs(self.dropdownEntries.children) do
+		entry:hide()
+	end
+	
+	self.checked = false
+	scrollContent.parent:relayout()
+end
+
+local function openDropdown(self)
+	if not list_contains(openDropdowns, self) then
+		table.insert(openDropdowns, self)
+	end
+	
+	for _, entry in ipairs(self.dropdownEntries.children) do
+		entry:show()
+	end
+	
+	scrollContent.parent:relayout()
+end
+
+local function sortChildren(self, sortBy, sortOrder)
+	if sortBy == SORT_BY_NAME then
+		table.sort(self.children, function(a,b) return a.mod.name < b.mod.name end)
+	elseif sortBy == SORT_BY_ID then
+		table.sort(self.children, function(a,b) return a.mod.id < b.mod.id end)
+	end
+	
+	if sortOrder == SORT_ENABLED_FIRST then
+		table.sort(self.children, function(a,b) return a.modEntry.checked and not b.modEntry.checked end)
+		
+	elseif sortOrder == SORT_ENABLED_LAST then
+		table.sort(self.children, function(a,b) return not a.modEntry.checked and b.modEntry.checked end)
+	end
+	
+	for _, child in ipairs(self.children) do
+		if child.nestedEntriesHolder then
+			child.nestedEntriesHolder:sortChildren(sortBy, sortOrder)
+		end
+	end
+end
+
+local function clickConfiguration(self, button)
+	if button == 1 then
+		if #openDropdowns > 0 then
+			for _, dropdown in ipairs(openDropdowns) do
+				if dropdown ~= self then
+					if not isDescendantOf(self.owner, dropdown.owner) then
+						closeDropdown(dropdown)
 					end
 				end
 			end
 		end
 		
-		local savedOrder = mod_loader:getSavedModOrder()
-		local orderedMods = mod_loader:orderMods(modSelection, savedOrder)
+		if self.checked then
+			openDropdown(self)
+		else
+			closeDropdown(self)
+		end
+		
+		return true
+	end
+	
+	return false
+end
 
+local function buildOptionBox(mod)
+
+	local optionBox = UiCheckbox()
+		:widthpx(41):heightpx(41)
+		:decorate({
+			DecoButton(),
+			DecoCheckbox(
+				deco.surfaces.config_checked,
+				deco.surfaces.config_unchecked,
+				deco.surfaces.config_checked,
+				deco.surfaces.config_unchecked
+			)
+		})
+
+	optionBox.onclicked = clickConfiguration
+
+	return optionBox
+end
+
+local function buildOptionEntries(mod)
+	local entry = mod_loader.mod_options[mod.id]
+	local entry_editable = currentSelectedOptions[mod.id]
+	
+	local optionsHolder = UiBoxLayout()
+		:vgap(5)
+		:width(0.965)
+	optionsHolder.padt = 5
+	optionsHolder.alignH = "right"
+	
+	for i, opt in ipairs(entry.options) do
+		local opt_editable = entry_editable.options[i]
+		local optionEntry
+		
+		if opt.check then
+			optionEntry = UiCheckbox()
+				:width(1):heightpx(41)
+				:settooltip(opt.tip)
+				:decorate({
+					DecoButton(),
+					DecoAlign(0, 2),
+					DecoText(opt.name),
+					DecoAlign(0, -2),
+					DecoRAlign(33),
+					DecoCheckbox()
+				})
+			
+			optionEntry.checked = opt_editable.enabled
+			
+			optionEntry.onclicked = function(self, button)
+				if button == 1 then
+					opt_editable.enabled = self.checked
+					
+					return true
+				end
+				
+				return false
+			end
+		else
+			optionEntry = UiDropDown(opt.values, opt.strings, opt_editable.value)
+				:width(1):heightpx(41)
+				:settooltip(opt.tip)
+				:decorate({
+					DecoButton(),
+					DecoAlign(0, 2),
+					DecoText(opt.name),
+					DecoDropDownText(nil, nil, nil, 33),
+					DecoAlign(0, -2),
+					DecoDropDown()
+				})
+				
+			optionEntry.destroyDropDown = function(self)
+				UiDropDown.destroyDropDown(self)
+				opt_editable.value = self.value
+			end
+		end
+		
+		optionEntry
+			:hide()
+			:addTo(optionsHolder)
+	end
+	
+	return optionsHolder
+end
+
+local function buildModEntry(mod, parentModEntry)
+	local entry = mod_loader.mod_options[mod.id]
+	local entry_editable = currentSelectedOptions[mod.id]
+	
+	local modHasChildren = mod.children ~= nil
+	local modHasParent = mod.parent ~= nil
+	
+	local uiTriCheckbox = UiCheckbox
+	local decoTriCheckbox = DecoCheckbox
+	local nestedEntriesHolder = nil
+	
+	local entryBoxHolder = UiBoxLayout()
+		:vgap(5)
+		:width(1)
+		
+	local entryHeaderHolder = UiWeightLayout()
+		:width(1):heightpx(41)
+		:addTo(entryBoxHolder)
+		
+	if modHasChildren then
+		uiTriCheckbox = UiTriCheckbox
+		decoTriCheckbox = DecoTriCheckbox
+		
+		-- Add a collapse button for nested testsuites.
+		-- This is just a checkbox, but skinned differently.
+		local collapse = UiCheckbox()
+			:widthpx(41):heightpx(41)
+			:decorate({
+				DecoButton(),
+				DecoCheckbox(
+					deco.surfaces.dropdownOpenRight,
+					deco.surfaces.dropdownClosed,
+					deco.surfaces.dropdownOpenRightHovered,
+					deco.surfaces.dropdownClosedHovered
+				)
+			})
+			:addTo(entryHeaderHolder)
+		
+		nestedEntriesHolder = UiBoxLayout()
+			:vgap(5)
+			:width(1)
+		
+		collapse.onclicked = clickConfiguration
+		collapse.dropdownEntries = nestedEntriesHolder
+		collapse.owner = entryBoxHolder
+		
+		entryBoxHolder.nestedEntriesHolder = nestedEntriesHolder
+		nestedEntriesHolder.sortChildren = sortChildren
+	end
+	
+	local modEntry = uiTriCheckbox()
+		:width(1):heightpx(41)
+		:settooltip(getDisplayDescription(mod))
+		:decorate({
+			DecoButton(),
+			decoTriCheckbox(),
+			DecoSurfaceOutlined(
+				sdlext.getSurface({ path = mod.icon or "resources/mods/squads/unknown.png" }),
+				nil,
+				nil,
+				nil,
+				1
+			),
+			DecoAlign(0, 2),
+			DecoText(getDisplayName(mod))
+		})
+		:addTo(entryHeaderHolder)
+	
+	entryBoxHolder.mod = mod
+	entryBoxHolder.modEntry = modEntry
+	modEntry.checked = entry_editable.enabled
+	
+	modEntry.updateChildrenCheckedState = function(self)
+		if not modHasChildren then return end
+		
+		for _, entryBoxHolder in ipairs(nestedEntriesHolder.children) do
+			entryBoxHolder.modEntry.checked = self.checked
+			entryBoxHolder.modEntry:updateCheckedState()
+			entryBoxHolder.modEntry:updateChildrenCheckedState()
+		end
+	end
+	
+	modEntry.updateParentCheckedState = function(self)
+		if not modHasChildren then return end
+		
+		local count = 0
+		for i, entryBoxHolder in ipairs(nestedEntriesHolder.children) do
+			local entry = entryBoxHolder.modEntry
+			
+			if entry.checked == true then
+				count = count + 1
+			elseif entry.checked == false or entry.checked == nil then
+				count = count - 1
+			end
+			
+			if math.abs(count) ~= i then
+				break
+			end
+		end
+		
+		if count == #nestedEntriesHolder.children then
+			self.checked = true
+		elseif count == -#nestedEntriesHolder.children then
+			self.checked = false
+		else
+			self.checked = "mixed"
+		end
+		
+		self:updateCheckedState()
+		
+		if modHasParent then
+			parentModEntry:updateParentCheckedState()
+		end
+	end
+	
+	modEntry.updateCheckedState = function(self)
+		entry_editable.enabled = self.checked ~= false and self.checked ~= nil
+	end
+	
+	modEntry.onclicked = function(self, button)
+		if button == 1 then
+			self:updateCheckedState()
+			self:updateChildrenCheckedState()
+			
+			if modHasParent then
+				parentModEntry:updateParentCheckedState()
+			end
+		end
+		
+		return false
+	end
+	
+	if #entry.options > 0 then
+		local optionBox = buildOptionBox(mod)
+			:addTo(entryHeaderHolder)
+		local optionEntries = buildOptionEntries(mod)
+			:addTo(entryBoxHolder)
+		
+		optionBox.dropdownEntries = optionEntries
+		optionBox.owner = entryBoxHolder
+	end
+	
+	if modHasParent then
+		entryBoxHolder.padl = 46
+	end
+	
+	-- Recursively build ui elements for nested mods in this modpack
+	if modHasChildren then
+		
+		nestedEntriesHolder:addTo(entryBoxHolder)
+		
+		for _, submod_id in ipairs(mod.children) do
+			local submod = mod_loader.mods[submod_id]
+			local uiSubmod = buildModEntry(submod, modEntry)
+				:hide()
+				:addTo(nestedEntriesHolder)
+		end
+		
+		modEntry:updateParentCheckedState()
+	end
+	
+	return entryBoxHolder
+end
+
+local function buildModConfigContent(scroll)
+	
+	if currentSelectedOptions == nil then
+		currentSelectedOptions = buildLightModOptions()
+	end
+	
+	openDropdowns = {}
+	
+	scrollContent = UiBoxLayout()
+		:vgap(5)
+		:width(1)
+		:height(1)
+		:addTo(scroll)
+	
+	for id, option in pairs(mod_loader.mod_options) do
+		if mod_loader:hasMod(id) then
+			local mod = mod_loader.mods[id]
+			if mod.parent == nil then
+				buildModEntry(mod)
+					:addTo(scrollContent)
+			end
+		end
+	end
+	
+	scrollContent.sortChildren = sortChildren
+end
+
+local function buildModConfigButtons(buttonLayout)
+	local sortBy = 1
+	local sortOrder = 1
+	
+	local btnSortBy = sdlext.buildDropDownButton(
+		GetText("ModConfig_Button_Sort_Title"),
+		GetText("ModConfig_Button_Sort_Tooltip"),
+		{
+			GetText("ModConfig_Button_Sort_Choice_1"),
+			GetText("ModConfig_Button_Sort_Choice_2")
+		},
+		function(choice)
+			sortBy = choice
+			scrollContent:sortChildren(sortBy, sortOrder)
+		end
+	)
+	
+	btnSortBy
+		:addTo(buttonLayout)
+		
+	local btnSortOrder = sdlext.buildDropDownButton(
+		GetText("ModConfig_Button_Sort_Enabled_Mods_Title"),
+		GetText("ModConfig_Button_Sort_Enabled_Mods_Tooltip"),
+		{
+			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_1"),
+			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_2"),
+			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_3")
+		},
+		function(choice)
+			sortOrder = choice
+			scrollContent:sortChildren(sortBy, sortOrder)
+		end
+	)
+	
+	btnSortOrder
+		:addTo(buttonLayout)
+	
+	scrollContent:sortChildren(sortBy, sortOrder)
+end
+
+local function showModConfig()
+
+	local onExit = function(self)
+		
+		local mod_content_new = buildNewModContent()
+		
+		local savedOrder = mod_loader:getSavedModOrder()
+		local orderedMods = mod_loader:orderMods(mod_content_new, savedOrder)
+		
 		local initializedCount = 0
 		for i, id in ipairs(orderedMods) do
 			if not mod_loader.mods[id].initialized then
@@ -61,7 +524,7 @@ local function createUi()
 			end
 		end
 
-		mod_loader:loadModContent(modSelection, savedOrder)
+		mod_loader:loadModContent(mod_content_new, savedOrder)
 
 		saveModConfig()
 
@@ -82,296 +545,24 @@ local function createUi()
 			)
 		end
 	end
-
+	
 	sdlext.showDialog(function(ui, quit)
 		ui.onDialogExit = onExit
-
-		local frametop = Ui()
-			:width(0.6):height(0.575)
-			:posCentered()
-			:caption(GetText("ModConfig_FrameTitle"))
-			:decorate({
-				DecoFrameHeader(),
-				DecoFrame()
-			})
-			:addTo(ui)
-
-		local scrollarea = UiScrollArea()
-			:width(1):height(1)
-			:padding(12)
-			:addTo(frametop)
-
-		local entryHolder = UiBoxLayout()
-			:vgap(5)
-			:width(1)
-			:addTo(scrollarea)
-
-		ui:relayout()
-		
-		local configuringMod = nil
-		
-		local function clickConfiguration(self, button)
-			if button == 1 then
-				if configuringMod then
-					local numOptions = #optionboxes[configuringMod]
-					
-					for i, optionbox in pairs(optionboxes[configuringMod]) do
-						optionbox:hide()
-					end
-					
-					configboxes[configuringMod].decorations[2].surface = sdlext.getSurface({ path = "resources/mods/ui/config-unchecked.png" })
-				end
-				
-				if self.configi == configuringMod then
-					configuringMod = nil
-				else
-					configuringMod = self.configi
-					local numOptions = #optionboxes[configuringMod]
-					
-					configboxes[configuringMod].decorations[2].surface = sdlext.getSurface({ path = "resources/mods/ui/config-checked.png" })
-					
-					for i, optionbox in pairs(optionboxes[configuringMod]) do
-						optionbox:show()
-					end
-				end
-				
-				scrollarea:relayout()
-				return true
-			end
-			return false
-		end
-		
-		local line = Ui()
-				:width(1):heightpx(frametop.decorations[1].bordersize)
-				:decorate({ DecoSolid(frametop.decorations[1].bordercolor) })
-				:addTo(frametop)
-
-		local buttonHeight = 40
-		local buttonLayout = UiBoxLayout()
-				:hgap(20)
-				:padding(24)
-				:width(1)
-				:addTo(frametop)
-		buttonLayout:heightpx(buttonHeight + buttonLayout.padt + buttonLayout.padb)
-
-		ui:relayout()
-		scrollarea:heightpx(scrollarea.h - (buttonLayout.h + line.h))
-
-		line:pospx(0, scrollarea.y + scrollarea.h)
-		buttonLayout:pospx(0, line.y + line.h)
-
-		local getDisplayName = function(mod)
-			local r = mod.name
-			if mod.version then
-				r = r .. "  v".. mod.version
-			end
-			return r
-		end
-		
-		local sortDropDownOptions = {
-			GetText("ModConfig_Button_Sort_Choice_1"),
-			GetText("ModConfig_Button_Sort_Choice_2")
-		}
-		local sortEnabledModsDropDownOptions = {
-			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_1"),
-			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_2"),
-			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_3")
-		}
-		
-		-- dropdown button to choose a sorting
-		local buttonLayoutRight = UiBoxLayout()
-			:hgap(20)
-			:heightpx(40)
-			:addTo(buttonLayout)
-		buttonLayoutRight.alignH = "right"
-		local sortDropdown = UiDropDown({1,2}, sortDropDownOptions, sortEnabledModsDropDownOptions[3])
-			:widthpx(260):heightpx(40)
-			:settooltip(GetText("ModConfig_Button_Sort_Tooltip"))
-			:decorate({
-				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText(GetText("ModConfig_Button_Sort_Title")),
-				DecoDropDownText(nil, nil, nil, 33),
-				DecoAlign(0, -2),
-				DecoDropDown(),
-			})
-			:addTo(buttonLayoutRight)
-		local sortEnabledModsDropdown = UiDropDown({1,2,3}, sortEnabledModsDropDownOptions, sortEnabledModsDropDownOptions[3])
-			:widthpx(260):heightpx(40)
-			:settooltip(GetText("ModConfig_Button_Sort_Enabled_Mods_Tooltip"))
-			:decorate({
-				DecoButton(),
-				DecoAlign(0, 2),
-				DecoText(GetText("ModConfig_Button_Sort_Enabled_Mods_Title")),
-				DecoDropDownText(nil, nil, nil, 33),
-				DecoAlign(0, -2),
-				DecoDropDown(),
-			})
-			:addTo(buttonLayoutRight)
-		
-		for id, option in pairs(mod_options) do
-			if mod_loader:hasMod(id) then
-				local mod = mod_loader.mods[id]
-				
-				if #option.options > 0 then
-					local entryBox = UiBoxLayout()
-						:vgap(0)
-						:width(1)
-						:addTo(entryHolder)
-					entryBox.modId = id
-
-					local entryHeader = UiBoxLayout()
-						:hgap(5)
-						:heightpx(41)
-						:addTo(entryBox)
-
-					local checkbox = UiCheckbox()
-						:widthpx((scrollarea.w - scrollarea.padl - scrollarea.padr) - 41 - 5)
-						:heightpx(41)
-						:settooltip(mod.description)
-						:decorate({
-							DecoButton(),
-							DecoCheckbox(),
-							DecoSurfaceOutlined(
-								sdlext.getSurface({ path = mod.icon or "resources/mods/squads/unknown.png" }),
-								nil,
-								nil,
-								nil,
-								1
-							),
-							DecoAlign(0, 2),
-							DecoText(getDisplayName(mod))
-						})
-						:addTo(entryHeader)
-					
-					entryBox.checkbox = checkbox
-					checkbox.modId = id
-					checkbox.checked = modSelection[id].enabled
-					table.insert(checkboxes, checkbox)
-					
-					local configbox = UiCheckbox()
-						:widthpx(41):heightpx(41)
-						:decorate({
-							DecoButton(),
-							DecoSurface(sdlext.getSurface({ path = "resources/mods/ui/config-unchecked.png" }))
-						})
-						:addTo(entryHeader)
-					function checkbox:clicked(button)
-						sortEnabledModsDropdown.choice = 3
-						return UiCheckbox.clicked(self, button)
-					end
-					
-					configbox.configi = #checkboxes
-					configbox.onclicked = clickConfiguration
-					configboxes[configbox.configi] = configbox
-					optionboxes[configbox.configi] = {}
-
-					local optionsHolder = UiBoxLayout()
-						:vgap(5)
-						:width(0.965)
-						:addTo(entryBox)
-					optionsHolder.padt = 5
-					optionsHolder.alignH = "right"
-
-					for i, opt in ipairs(option.options) do
-						local optionbox
-						
-						if opt.check then
-							optionbox = UiCheckbox()
-								:width(1):heightpx(41)
-								:settooltip(opt.tip)
-								:decorate({
-									DecoButton(),
-									DecoAlign(0, 2),
-									DecoText(opt.name),
-									DecoAlign(0, -2),
-									DecoRAlign(33),
-									DecoCheckbox()
-								})
-							
-							optionbox.checked = modSelection[id].options[opt.id].enabled
-						else
-							local value = modSelection[id].options[opt.id].value
-							optionbox = UiDropDown(opt.values, opt.strings, value)
-								:width(1):heightpx(41)
-								:settooltip(opt.tip)
-								:decorate({
-									DecoButton(),
-									DecoAlign(0, 2),
-									DecoText(opt.name),
-									DecoDropDownText(nil, nil, nil, 33),
-									DecoAlign(0, -2),
-									DecoDropDown()
-								})
-						end
-						
-						optionbox.data = opt
-						
-						optionbox:hide()
-						optionsHolder:add( optionbox )
-						table.insert(optionboxes[configbox.configi], optionbox)
-					end
-				else
-					local checkbox = UiCheckbox()
-						:width(1):heightpx(41)
-						:settooltip(mod.description)
-						:decorate({
-							DecoButton(),
-							DecoCheckbox(),
-							DecoSurfaceOutlined(
-								sdlext.getSurface({ path = mod.icon or "resources/mods/squads/unknown.png" }),
-								nil,
-								nil,
-								nil,
-								1
-							),
-							DecoAlign(0, 2),
-							DecoText(getDisplayName(mod))
-						})
-						:addTo(entryHolder)
-					function checkbox:clicked(button)
-						sortEnabledModsDropdown.choice = 3
-						return UiCheckbox.clicked(self, button)
-					end
-					
-					checkbox.checkbox = checkbox
-					checkbox.checked = modSelection[id].enabled
-					checkbox.modId = id
-					table.insert(checkboxes, checkbox)
-				end
-			end
-		end
-		
-		local function sortMods()
-			if sortDropdown.value == 1 then
-				table.sort(entryHolder.children, function(a,b) return mod_loader.mods[a.modId].name < mod_loader.mods[b.modId].name end)
-			elseif sortDropdown.value == 2 then
-				table.sort(entryHolder.children, function(a,b) return mod_loader.mods[a.modId].id < mod_loader.mods[b.modId].id end)
-			end
 			
-			if sortEnabledModsDropdown.value == 1 then
-				table.sort(entryHolder.children, function(a,b) return a.checkbox.checked and not b.checkbox.checked end)
-			elseif sortEnabledModsDropdown.value == 2 then
-				table.sort(entryHolder.children, function(a,b) return not a.checkbox.checked and b.checkbox.checked end)
-			end
-		end
+		local frame = sdlext.buildButtonDialog(
+			GetText("ModConfig_FrameTitle"),
+			0.6 * ScreenSizeX(), 0.8 * ScreenSizeY(),
+			buildModConfigContent,
+			buildModConfigButtons
+		)
 		
-		function sortDropdown:destroyDropDown()
-			UiDropDown.destroyDropDown(self)
-			sortMods()
-		end
-		
-		function sortEnabledModsDropdown:destroyDropDown()
-			UiDropDown.destroyDropDown(self)
-			sortMods()
-		end
-		
-		sortMods()
+		frame:addTo(ui)
+			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
 	end)
 end
 
 function ConfigureMods()
 	loadSquadSelection()
 	
-	createUi()
+	showModConfig()
 end
