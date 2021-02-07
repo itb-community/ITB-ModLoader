@@ -10,6 +10,7 @@ function modApi:AddHook(name)
 
 	table.insert(self.hooks, name)
 	self[name .."Hooks"] = {}
+	self.events["on".. Name] = Event()
 
 	self["add".. Name .."Hook"] = function(self, fn)
 		assert(type(fn) == "function")
@@ -21,10 +22,14 @@ function modApi:AddHook(name)
 	end
 
 	self["fire".. Name .."Hooks"] = function(self, ...)
+		self.events["on".. Name]:dispatch(...)
+	end
+
+	self.events["on".. Name]:subscribe(function(...)
 		for _, fn in ipairs(self[name .."Hooks"]) do
 			fn(...)
 		end
-	end
+	end)
 end
 
 function modApi:ResetHooks()
@@ -58,6 +63,7 @@ local hooks = {
 	"PreprocessVekRetreat",
 	"ProcessVekRetreat",
 	"PostprocessVekRetreat",
+	"ModsLoaded",
 	"TestMechEntered",
 	"TestMechExited",
 	"SaveDataUpdated",
