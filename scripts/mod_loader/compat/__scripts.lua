@@ -1,6 +1,6 @@
 local scripts = {
 	"sdlext",
-	"hooks",
+	"modApi",
 	"event"
 }
 
