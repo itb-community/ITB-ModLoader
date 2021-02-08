@@ -29,6 +29,10 @@ local oldMoveGetTargetArea = Move.GetTargetArea
 function Move:GetTargetArea(point)
 	local moveSkill = _G[Pawn:GetType()].MoveSkill
 	
+	if type(moveSkill) == 'string' then
+		moveSkill = _G[moveSkill]
+	end
+	
 	if moveSkill ~= nil and moveSkill.GetTargetArea ~= nil then
 		return moveSkill:GetTargetArea(point)
 	end
@@ -41,6 +45,10 @@ local oldMoveGetSkillEffect = Move.GetSkillEffect
 function Move:GetSkillEffect(p1, p2)
 	local moveSkill = _G[Pawn:GetType()].MoveSkill
 
+	if type(moveSkill) == 'string' then
+		moveSkill = _G[moveSkill]
+	end
+	
 	if moveSkill ~= nil and moveSkill.GetSkillEffect ~= nil then
 		return moveSkill:GetSkillEffect(p1, p2)
 	end
