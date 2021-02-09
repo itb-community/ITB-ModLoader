@@ -25,7 +25,7 @@ function hex2rgba(hex)
 		return r, g, b, a
 	end
 
-    return r, g, b
+	return r, g, b
 end
 
 local oldsdltext = sdl.text
@@ -90,32 +90,27 @@ function sdlext.surface(path)
 	if blob.length==0 then
 		return sdl.surface(path)
 	end
-	
+
 	return sdl.surfaceFromBlob(blob)
 end
 
 function sdlext.squadPalettes()
-	local GetColorMapOld = GetColorMap
-	local GL_ColorOld = GL_Color
-	function GL_Color(r,g,b,a)
+	local colorMapEnv = {}
+	colorMapEnv.GL_Color = function(r, g, b, a)
 		if a == nil then
-			return sdl.rgb(r,g,b)
+			return sdl.rgb(r, g, b)
 		else
-			return sdl.rgba(r,g,b,a)
+			return sdl.rgba(r, g, b, a)
 		end
 	end
-	
-	require("scripts/color_map")
-	local res = {}
-	
-	for i=1,GetColorCount() do
-		res[i]=GetColorMap(i)
-	end
-	
-	GetColorMap = GetColorMapOld
-	GL_Color = GL_ColorOld
 
-	return res
+	modApi:loadIntoEnv("scripts/color_map.lua", colorMapEnv)
+	local palettes = {}
+	for i = 1, colorMapEnv.GetColorCount() do
+		palettes[i] = colorMapEnv.GetColorMap(i)
+	end
+
+	return palettes
 end
 
 function sdlext.config(filename, func)
