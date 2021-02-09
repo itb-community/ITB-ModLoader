@@ -127,10 +127,8 @@ local function closeDropdown(self)
 	end
 	
 	remove_element(openDropdowns, self)
-	
-	for _, entry in ipairs(self.dropdownEntries.children) do
-		entry:hide()
-	end
+
+	self.dropdownHolder:hide()
 	
 	self.checked = false
 	scrollContent.parent:relayout()
@@ -140,10 +138,8 @@ local function openDropdown(self)
 	if not list_contains(openDropdowns, self) then
 		table.insert(openDropdowns, self)
 	end
-	
-	for _, entry in ipairs(self.dropdownEntries.children) do
-		entry:show()
-	end
+
+	self.dropdownHolder:show()
 	
 	scrollContent.parent:relayout()
 end
@@ -193,7 +189,7 @@ local function clickConfiguration(self, button)
 	return false
 end
 
-local function buildOptionBox(mod)
+local function buildOptionCheckbox(mod)
 
 	local optionBox = UiCheckbox()
 		:widthpx(41):heightpx(41)
@@ -219,7 +215,6 @@ local function buildOptionEntries(mod)
 	local optionsHolder = UiBoxLayout()
 		:vgap(5)
 		:width(0.965)
-	optionsHolder.padt = 5
 	optionsHolder.alignH = "right"
 	
 	for i, opt in ipairs(entry.options) do
@@ -270,7 +265,6 @@ local function buildOptionEntries(mod)
 		end
 		
 		optionEntry
-			:hide()
 			:addTo(optionsHolder)
 	end
 	
@@ -300,7 +294,7 @@ local function buildModEntry(mod, parentModEntry)
 		uiTriCheckbox = UiTriCheckbox
 		decoTriCheckbox = DecoTriCheckbox
 		
-		-- Add a collapse button for nested testsuites.
+		-- Add a collapse button for nested mods.
 		-- This is just a checkbox, but skinned differently.
 		local collapse = UiCheckbox()
 			:widthpx(41):heightpx(41)
@@ -318,9 +312,10 @@ local function buildModEntry(mod, parentModEntry)
 		nestedEntriesHolder = UiBoxLayout()
 			:vgap(5)
 			:width(1)
+			:hide()
 		
 		collapse.onclicked = clickConfiguration
-		collapse.dropdownEntries = nestedEntriesHolder
+		collapse.dropdownHolder = nestedEntriesHolder
 		collapse.owner = entryBoxHolder
 		
 		entryBoxHolder.nestedEntriesHolder = nestedEntriesHolder
@@ -410,12 +405,13 @@ local function buildModEntry(mod, parentModEntry)
 	end
 	
 	if #entry.options > 0 then
-		local optionBox = buildOptionBox(mod)
+		local optionBox = buildOptionCheckbox(mod)
 			:addTo(entryHeaderHolder)
 		local optionEntries = buildOptionEntries(mod)
+			:hide()
 			:addTo(entryBoxHolder)
 		
-		optionBox.dropdownEntries = optionEntries
+		optionBox.dropdownHolder = optionEntries
 		optionBox.owner = entryBoxHolder
 	end
 	
@@ -431,7 +427,6 @@ local function buildModEntry(mod, parentModEntry)
 		for _, submod_id in ipairs(mod.children) do
 			local submod = mod_loader.mods[submod_id]
 			local uiSubmod = buildModEntry(submod, modEntry)
-				:hide()
 				:addTo(nestedEntriesHolder)
 		end
 		
