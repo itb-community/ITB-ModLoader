@@ -40,8 +40,8 @@ end
 
 local function buildBackgroundPane()
 	local pane = Ui()
-		:width(1):height(1)
-		:decorate({ DecoSolid(deco.colors.dialogbg) })
+			:width(1):height(1)
+			:decorate({ DecoSolid(deco.colors.dialogbg) })
 	pane.dismissible = true
 
 	pane.onclicked = function(self, button)
@@ -87,9 +87,9 @@ local function buildBackgroundPane()
 
 	pane.animations.fadeIn = UiAnim(pane, 100, function(anim, widget, percent)
 		widget.decorations[1].color = InterpolateColor(
-			deco.colors.transparent,
-			deco.colors.dialogbg,
-			percent
+				deco.colors.transparent,
+				deco.colors.dialogbg,
+				percent
 		)
 	end)
 
@@ -137,8 +137,10 @@ end
 -- //////////////////////////////////////////////////////////////////////
 
 function sdlext.buildSimpleDialog(title, w, h)
-	local frame = Ui()
+	local frame = UiWeightLayout()
 			:widthpx(w):heightpx(h)
+			:vgap(0)
+			:orientation(false)
 			:decorate({ DecoFrameHeader(), DecoFrame() })
 			:caption(title)
 
@@ -154,13 +156,13 @@ end
 
 function sdlext.buildTextDialog(title, text, w, h)
 	local frame = sdlext.buildSimpleDialog(title, w, h)
-	local scroll = frame.children[1]
+	local scroll = frame.scroll
 
 	local font = deco.uifont.tooltipTextLarge.font
 	local textset = deco.uifont.tooltipTextLarge.set
 	local wrap = UiWrappedText(text, font, textset)
-		:widthpx(scroll.w)
-		:addTo(scroll)
+			:widthpx(scroll.w)
+			:addTo(scroll)
 
 	wrap.pixelWrap = true
 	wrap:rebuild()
@@ -186,33 +188,31 @@ function sdlext.buildButtonDialog(title, w, h, contentBuilderFn, buttonsBuilderF
 			:addTo(frame)
 	frame.line = line
 
+	local buttonHolder = UiBoxLayout()
+			:width(1)
+			:vgap(0)
+			:addTo(frame)
+
 	local buttonLayout = UiBoxLayout()
+			:height(1)
 			:hgap(50)
 			:padding(18)
-			:addTo(frame)
-	buttonLayout:heightpx(45 + buttonLayout.padt + buttonLayout.padb)
+	buttonLayout.alignH = "center"
+
+	buttonHolder:heightpx(45 + buttonLayout.padt + buttonLayout.padb)
+	buttonLayout:addTo(buttonHolder)
+
 	frame.buttonLayout = buttonLayout
 
 	if buttonsBuilderFn then
 		buttonsBuilderFn(buttonLayout)
 	end
 
-	frame:relayout()
-
-	if scroll.innerHeight < h - frame.padt - frame.padb then
-		scroll:heightpx(scroll.innerHeight)
-	end
-
-	line:pospx(0, scroll.y + scroll.h)
-
-	w = math.max(w, buttonLayout.w + frame.padl + frame.padr)
+	w = math.max(w, buttonHolder.w + frame.padl + frame.padr)
+	h = math.min(h, scroll.innerHeight + frame.padt + frame.padb + buttonHolder.h + line.h)
 	frame:widthpx(w)
-	buttonLayout:pospx((frame.w - frame.padl - frame.padr - buttonLayout.w) / 2, line.y + line.h)
-
-	h = math.min(h, scroll.innerHeight + frame.padt + frame.padb)
-	h = math.max(h, buttonLayout.y + buttonLayout.h + frame.padt + frame.padb)
-
 	frame:heightpx(h)
+	frame:relayout()
 
 	return frame
 end
@@ -278,7 +278,7 @@ function sdlext.buildDropDownButton(text, tooltip, choices, choiceHandler)
 	local values = {}
 	for i = 1, #choices do
 		values[#values+1] = i
-		
+
 		local decoChoice = DecoRAlignedText(choices[i])
 		maxChoiceWidth = math.max(maxChoiceWidth, decoChoice.surface:w())
 	end
@@ -287,13 +287,13 @@ function sdlext.buildDropDownButton(text, tooltip, choices, choiceHandler)
 			:widthpx(math.max(95, decoText.surface:w() + maxChoiceWidth + 33))
 			:heightpx(40)
 			:decorate({
-				DecoButton(),
-				DecoAlign(0, 2),
-				decoText,
-				DecoDropDownText(nil, nil, nil, 33),
-				DecoAlign(0, -2),
-				DecoDropDown()
-			})
+		DecoButton(),
+		DecoAlign(0, 2),
+		decoText,
+		DecoDropDownText(nil, nil, nil, 33),
+		DecoAlign(0, -2),
+		DecoDropDown()
+	})
 
 	btn.destroyDropDown = function(self)
 		UiDropDown.destroyDropDown(self)
@@ -330,9 +330,9 @@ function sdlext.showTextDialog(title, text, w, h)
 		h = math.min(h, scroll.innerHeight + frame.padt + frame.padb)
 
 		frame
-			:heightpx(h)
-			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
-			:addTo(ui)
+				:heightpx(h)
+				:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
+				:addTo(ui)
 	end)
 end
 
@@ -353,33 +353,33 @@ function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, t
 		end
 
 		local frame = sdlext.buildButtonDialog(
-			title, maxW, maxH,
-			function(scroll)
-				local font = deco.uifont.tooltipTextLarge.font
-				local textset = deco.uifont.tooltipTextLarge.set
-				local wrap = UiWrappedText(text, font, textset)
-					:widthpx(scroll.w)
-					:addTo(scroll)
+				title, maxW, maxH,
+				function(scroll)
+					local font = deco.uifont.tooltipTextLarge.font
+					local textset = deco.uifont.tooltipTextLarge.set
+					local wrap = UiWrappedText(text, font, textset)
+							:widthpx(scroll.w)
+							:addTo(scroll)
 
-				wrap.pixelWrap = true
-				wrap:rebuild()
-			end,
-			function(buttonLayout)
-				for i, text in ipairs(buttons) do
-					local tooltip = tooltips and tooltips[i]
-					local btn = sdlext.buildButton(text, tooltip, function()
-						ui.response = i
-						quit()
-					end)
+					wrap.pixelWrap = true
+					wrap:rebuild()
+				end,
+				function(buttonLayout)
+					for i, text in ipairs(buttons) do
+						local tooltip = tooltips and tooltips[i]
+						local btn = sdlext.buildButton(text, tooltip, function()
+							ui.response = i
+							quit()
+						end)
 
-					btn:addTo(buttonLayout)
+						btn:addTo(buttonLayout)
+					end
 				end
-			end
 		)
 
 		frame
-			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
-			:addTo(ui)
+				:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
+				:addTo(ui)
 	end)
 end
 
