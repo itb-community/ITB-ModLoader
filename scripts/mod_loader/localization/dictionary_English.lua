@@ -35,6 +35,17 @@ return {
 	["PilotArrange_ButtonTooltip_Off"] = "New Game was pressed, so the pilots in the hangar can no longer be updated.\n\nYou must restart the game for changes to take effect.",
 	["PilotArrange_FrameTitle"] = "Arrange Pilots",
 	["PilotArrange_RestartWarning_Text"] = "The hangar was already loaded, so you must restart the game for your changes to take effect.",
+	
+	["ModContent_Button_PaletteArrange"] = "Arrange Palettes",
+	["ModContent_ButtonTooltip_PaletteArrange"] = "Select which 11 palettes will be available on the hanger screen.\n\nRequires a restart to take effect\n\nWarning: Breaks current savegame.",
+	["PaletteArrange_RiftWalkers_Tooltip"] = "Rift Walkers must be the first palette. All other palettes are based on it.",
+	["PaletteArrange_FrameTitle"] = "Arrange Palettes",
+	["PaletteArrange_Current_Title"] = "Current",
+	["PaletteArrange_Current_Tooltip"] = "Resets palettes to the current loaded order",
+	["PaletteArrange_Default_Title"] = "Default",
+	["PaletteArrange_Default_Tooltip"] = "Resets palettes to their default order",
+	["PaletteArrange_Random_Title"] = "Random",
+	["PaletteArrange_Random_Tooltip"] = "Randomizes palettes",
 
 	["ModContent_Button_ConfigureWeaponDeck"] = "Select Weapon Deck",
 	["ModContent_ButtonTooltip_ConfigureWeaponDeck"] = "Select which weapons are available in runs from the shop, time pods, and perfect island bonuses. Will not have any affect in existing save games.",

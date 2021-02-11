@@ -18,6 +18,12 @@ function sdlext.executeAddModContent()
 	)
 
 	sdlext.addModContent(
+		GetText("ModContent_Button_PaletteArrange"),
+		ArrangePalettes,
+		GetText("ModContent_ButtonTooltip_PaletteArrange")
+	)
+
+	sdlext.addModContent(
 		GetText("ModContent_Button_ConfigureWeaponDeck"),
 		ConfigureWeaponDeck,
 		GetText("ModContent_ButtonTooltip_ConfigureWeaponDeck")
