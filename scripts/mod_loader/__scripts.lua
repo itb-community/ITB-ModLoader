@@ -14,14 +14,14 @@ local scripts = {
 	"modapi/__scripts",
 	"ftldat/__scripts",
 	"altered/__scripts",
+	"compat/__scripts",
+
 	"mod_loader",
 
 	-- Needs to be loaded out-of-order
 	"modui/popup_opengl",
 
-	"tests/__scripts",
-
-	"compat/__scripts"
+	"tests/__scripts"
 }
 
 -- In files loaded via require(), (...) in top-level scope returns
