@@ -37,7 +37,7 @@ return {
 	["PilotArrange_RestartWarning_Text"] = "The hangar was already loaded, so you must restart the game for your changes to take effect.",
 	
 	["ModContent_Button_PaletteArrange"] = "Arrange Palettes",
-	["ModContent_ButtonTooltip_PaletteArrange"] = "Select which 11 palettes will be available on the hanger screen.\n\nRequires a restart to take effect\n\nWarning: Breaks current savegame.",
+	["ModContent_ButtonTooltip_PaletteArrange"] = "Select which palettes will be available to pick.",
 	["PaletteArrange_RiftWalkers_Tooltip"] = "Rift Walkers must be the first palette. All other palettes are based on it.",
 	["PaletteArrange_FrameTitle"] = "Arrange Palettes",
 	["PaletteArrange_Current_Title"] = "Current",
