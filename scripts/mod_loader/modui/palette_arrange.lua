@@ -1,14 +1,15 @@
 
 local IMAGE_PUNCH_MECH = "img/units/player/mech_punch_ns.png"
+local FADE_RECT = sdl.rect(0,0,50,50)
 local SURFACE_LOCK = sdlext.getSurface({
-	path = "img/main_menus/lock.png",
-	transformations = {{ scale = 2 }}
-})
+						path = "img/main_menus/lock.png",
+						transformations = {{ scale = 2 }}
+					})
 local BUTTON_WIDTH = 134 + 8 + 5*2
 local BUTTON_HEIGHT = 66 + 8 + 5*2
 
 local currentPaletteOrder
-local colorMapBase = {}
+local colorMapBase
 
 local scrollarea
 local content
@@ -35,6 +36,8 @@ local function savePaletteOrder()
 end
 
 local function buildColorMapBase()
+	colorMapBase = {}
+
 	local basePalette = GetColorMap(1)
 	
 	for i, gl_color in ipairs(basePalette) do
@@ -127,12 +130,13 @@ local function uiSetDraggable(ui)
 				end
 
 				if #content.children > 11 then
-					content.children[11].deco_lock.surface = nil
-					content.children[12].deco_lock.surface = SURFACE_LOCK
+					content.children[11]:displayPaletteLocked(false)
+					content.children[12]:displayPaletteLocked(true)
+
 					if i > 11 then
-						self.deco_lock.surface = SURFACE_LOCK
+						self:displayPaletteLocked(true)
 					else
-						self.deco_lock.surface = nil
+						self:displayPaletteLocked(false)
 					end
 				end
 
@@ -146,14 +150,28 @@ local function uiSetDraggable(ui)
 			table.insert(content.children, placeholder)
 
 			if #content.children > 11 then
-				content.children[11].deco_lock.surface = nil
-				self.deco_lock.surface = SURFACE_LOCK
+				content.children[11]:displayPaletteLocked(false)
+				self:displayPaletteLocked(true)
 			end
 		end
 	end
 end
 
+local function displayPaletteLocked(self, displayLocked)
+	if self.deco_lock == nil then return end
+
+	if displayLocked == false then
+		self.deco_fade.color = deco.colors.transparent
+		self.deco_lock.surface = nil
+	else
+		self.deco_fade.color = deco.colors.halfblack
+		self.deco_lock.surface = SURFACE_LOCK
+	end
+end
+
 local function buildPaletteFrameContent(scroll)
+	local screen = sdl.screen()
+
 	if currentPaletteOrder == nil then
 		currentPaletteOrder = modApi:getPaletteIds()
 		buildColorMapBase()
@@ -195,6 +213,7 @@ local function buildPaletteFrameContent(scroll)
 							})
 
 		local deco_button = buildContractedDeco(5,5, DecoButton)
+		local deco_fade = DecoDraw(screen.drawrect, deco.colors.transparent, FADE_RECT)
 		local deco_lock = DecoSurfaceAligned(nil, "right", "center")
 		local button = Ui()
 			:widthpx(BUTTON_WIDTH)
@@ -206,6 +225,9 @@ local function buildPaletteFrameContent(scroll)
 				DecoAnchor(),
 				DecoAlign(-35,0),
 				DecoSurfaceAligned(surface_mech, "center", "center"),
+				DecoAnchor("right"),
+				DecoAlign(-67,17),
+				deco_fade,
 				DecoAnchor(),
 				DecoAlign(25,0),
 				deco_lock,
@@ -213,10 +235,12 @@ local function buildPaletteFrameContent(scroll)
 			:addTo(content)
 
 		button.paletteId = paletteId
+		button.deco_fade = deco_fade
 		button.deco_lock = deco_lock
+		button.displayPaletteLocked = displayPaletteLocked
 
 		if i > 11 then
-			button.deco_lock.surface = SURFACE_LOCK
+			button:displayPaletteLocked(true)
 		end
 
 		if i == 1 then
@@ -228,7 +252,7 @@ local function buildPaletteFrameContent(scroll)
 		end
 	end
 
-	placeholder.deco_lock = {}
+	placeholder.displayPaletteLocked = displayPaletteLocked
 	content:add(placeholder)
 	scrollarea:relayout()
 end
@@ -250,9 +274,9 @@ local function buildPaletteFrameButtons(buttonLayout)
 			table.insert(content.children, ui)
 			
 			if i > 11 then
-				ui.deco_lock.surface = SURFACE_LOCK
+				ui:displayPaletteLocked(true)
 			else
-				ui.deco_lock.surface = nil
+				ui:displayPaletteLocked(false)
 			end
 		end
 		
