@@ -47,13 +47,13 @@ end
 DecoAnchor = Class.inherit(UiDeco)
 function DecoAnchor:new(alignH, alignV)
 	UiDeco.new(self)
-	self.alignH = alignH or "right"
+	self.alignH = alignH or "left"
 	self.alignV = alignV or "top"
 end
 function DecoAnchor:draw(screen, widget)
-	if self.alignH == "right" then
+	if self.alignH == "left" then
 		widget.decorationx = 0
-	elseif self.alignH == "left" then
+	elseif self.alignH == "right" then
 		widget.decorationx = widget.rect.w
 	elseif self.alignH == "center" then
 		widget.decorationx = widget.rect.w/2
