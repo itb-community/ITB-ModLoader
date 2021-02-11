@@ -111,7 +111,13 @@ function modApi.getColorMap(paletteIndex)
 end
 
 function modApi.getColorCount()
-	return palettes:getCount()
+	local count = palettes:getCount()
+	
+	if count > 11 and sdlext.isHangar() then
+		return 11
+	end
+	
+	return count
 end
 
 function modApi:canAddPalettes()
