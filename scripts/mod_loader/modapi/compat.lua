@@ -64,3 +64,18 @@ local statusMetatable = {
 	end
 }
 STATUS_TOOLTIPS = setmetatable(STATUS_TOOLTIPS, statusMetatable)
+
+-- ///////////////////////////////////////////////////////////////////////////////////
+-- compatibility code for KnightMiner's customPalettes
+local palettes = { VERSION = "1" }
+CUSTOM_PALETTES = palettes
+
+function palettes.addPalette(...)
+	for _, palette in ipairs({...}) do
+		modApi:addPalette(palette, palette.ID)
+	end
+end
+
+function palettes.getOffset(id)
+	return modApi:getPaletteIndex(id)
+end
