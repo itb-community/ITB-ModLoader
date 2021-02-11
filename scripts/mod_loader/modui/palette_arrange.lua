@@ -39,26 +39,25 @@ local function buildColorMapBase()
 	colorMapBase = {}
 
 	local basePalette = GetColorMap(1)
-	
 	for i, gl_color in ipairs(basePalette) do
 		local rgb = sdl.rgb(gl_color.r, gl_color.g, gl_color.b)
 		colorMapBase[i*2-1] = rgb
 		colorMapBase[i*2] = rgb
 	end
-	
+
 	return colorMapBase
 end
 
 local function buildColorMap(palette)
 	local res = shallow_copy(colorMapBase)
-	
+
 	for i = 1, 8 do
 		local gl_color = palette[i]
 		if gl_color ~= nil then
 			res[i*2] = sdl.rgb(gl_color.r, gl_color.g, gl_color.b)
 		end
 	end
-	
+
 	return res
 end
 
@@ -265,10 +264,10 @@ local function buildPaletteFrameButtons(buttonLayout)
 			if ui.paletteId ~= nil then
 				uis[ui.paletteId] = ui
 			end
-			
+
 			table.remove(content.children, i)
 		end
-		
+
 		for i, paletteId in ipairs(paletteOrder) do
 			local ui = uis[paletteId]
 			table.insert(content.children, ui)
@@ -279,10 +278,10 @@ local function buildPaletteFrameButtons(buttonLayout)
 				ui:displayPaletteLocked(false)
 			end
 		end
-		
+
 		table.insert(content.children, placeholder)
 	end
-	
+
 	sdlext.buildButton(
 		GetText("PaletteArrange_Current_Title"),
 		GetText("PaletteArrange_Current_Tooltip"),
@@ -292,7 +291,7 @@ local function buildPaletteFrameButtons(buttonLayout)
 	)
 	:heightpx(40)
 	:addTo(buttonLayout)
-	
+
 	sdlext.buildButton(
 		GetText("PaletteArrange_Default_Title"),
 		GetText("PaletteArrange_Default_Tooltip"),
@@ -302,7 +301,7 @@ local function buildPaletteFrameButtons(buttonLayout)
 	)
 	:heightpx(40)
 	:addTo(buttonLayout)
-	
+
 	sdlext.buildButton(
 		GetText("PaletteArrange_Random_Title"),
 		GetText("PaletteArrange_Random_Tooltip"),
@@ -310,10 +309,10 @@ local function buildPaletteFrameButtons(buttonLayout)
 			local paletteOrder = modApi:getPaletteIds()
 			local firstPalette = paletteOrder[1]
 			table.remove(paletteOrder, 1)
-			
+
 			paletteOrder = randomize(paletteOrder)
 			table.insert(paletteOrder, 1, firstPalette)
-			
+
 			reorderPalettes(paletteOrder)
 		end
 	)
