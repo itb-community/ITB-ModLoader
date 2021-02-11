@@ -290,6 +290,6 @@ function Mission_Test:MissionEnd()
 	modApi.current_mission = nil
 end
 
-sdlext.addGameExitedHook(function()
+modApi.events.onGameExited:subscribe(function()
 	modApi.current_mission = nil
 end)

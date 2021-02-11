@@ -11,7 +11,7 @@ local function responseFn(btnIndex)
 end
 
 local srf = nil
-sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
+modApi.events.onMainMenuEntered:subscribe(function(screen, wasHangar, wasGame)
 	if not srf and modApi.showResourceWarning then
 		srf = sdlext.getSurface({ path = "img/nullResource.png" })
 		srf:wasDrawn()

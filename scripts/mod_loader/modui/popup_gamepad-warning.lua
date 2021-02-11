@@ -23,7 +23,7 @@ end
 -- Only show the warning once, to prevent having to switch back to mouse all the time
 -- just to dismiss the warning
 local warningShown = false
-sdlext.addFrameDrawnHook(function(screen)
+modApi.events.onFrameDrawn:subscribe(function(screen)
 	if type(IsGamepad) == "function" and IsGamepad() and not warningShown and modApi.showGamepadWarning then
 		warningShown = true
 

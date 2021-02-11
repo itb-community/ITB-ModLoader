@@ -2,7 +2,7 @@
 	Adds a version string in bottom right corner of the screen when in main menu.
 --]]
 
-sdlext.addUiRootCreatedHook(function(screen, uiRoot)
+modApi.events.onUiRootCreated:subscribe(function(screen, uiRoot)
 	local versionText = Ui()
 		:pospx(screen:w() - 200, screen:h() - 50)
 		:widthpx(200):heightpx(20)
@@ -23,5 +23,5 @@ sdlext.addUiRootCreatedHook(function(screen, uiRoot)
 		versionText.decorations[1].rSpace = 8
 	end
 
-	sdlext.addGameWindowResizedHook(relayout)
+	modApi.events.onGameWindowResized:subscribe(relayout)
 end)

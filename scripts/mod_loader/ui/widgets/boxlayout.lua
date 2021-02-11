@@ -105,7 +105,6 @@ function UiBoxLayout:relayout()
 				end
 
 				child.x = nextOffset
-				nextOffset = nextOffset + child.w + self.gapHorizontal
 			elseif self:isVBox() then
 				if not child.alignH or child.alignH == "left" then
 					child.x = 0
@@ -116,13 +115,18 @@ function UiBoxLayout:relayout()
 				end
 
 				child.y = nextOffset
-				nextOffset = nextOffset + child.h + self.gapVertical
 			end
 			
 			child.screenx = self.screenx + self.padl - self.dx + child.x
 			child.screeny = self.screeny + self.padt - self.dy + child.y
 			
 			child:relayout()
+			
+			if self:isHBox() then
+				nextOffset = nextOffset + child.w + self.gapHorizontal
+			elseif self:isVBox() then
+				nextOffset = nextOffset + child.h + self.gapVertical
+			end
 			
 			child.rect.x = child.screenx
 			child.rect.y = child.screeny

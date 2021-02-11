@@ -10,14 +10,14 @@ end
 -- a pilot must be in PilotList to be unlocked, however we cannot have more than 13 pilots in the list for the UI
 -- fix that by using PilotListExtended in game, and the smaller pilot list in the hangar
 local hangarPilotList = nil
-sdlext.addGameEnteredHook(function()
+modApi.events.onGameEntered:subscribe(function()
 	-- prevent overwriting the list twice accidently
 	if hangarPilotList == nil then
 		hangarPilotList = PilotList
 		PilotList = PilotListExtended
 	end
 end)
-sdlext.addGameExitedHook(function()
+modApi.events.onGameExited:subscribe(function()
 	-- only update if we have an old list
 	if hangarPilotList ~= nil then
 		PilotList = hangarPilotList
@@ -57,7 +57,7 @@ end
 
 -- add final override after mods have loaded, to ensure the import had time to run
 -- note this runs after the hook in drops.lua
-modApi:addModsFirstLoadedHook(function()
+modApi.events.onModsFirstLoaded:subscribe(function()
 	-- override inititlize decks to pull from the mod api list
 	local oldInitializeDecks = initializeDecks
 	function initializeDecks(...)

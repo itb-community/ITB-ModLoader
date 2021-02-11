@@ -129,17 +129,21 @@ function UiWeightLayout:relayout()
 			if self.horizontal then
 				nextX = nextX + child.w + self.gapHorizontal
 				currentMaxSize = math.max(currentMaxSize, child.h)
-				self.innerWidth = math.min(self.w, self.innerWidth + child.w + self.gapHorizontal)
 			else
 				nextY = nextY + child.h + self.gapVertical
 				currentMaxSize = math.max(currentMaxSize, child.w)
-				self.innerHeight = math.min(self.h, self.innerHeight + child.h + self.gapVertical)
 			end
 
 			child.screenx = self.screenx + self.padl - self.dx + child.x
 			child.screeny = self.screeny + self.padt - self.dy + child.y
 
 			child:relayout()
+			
+			if self.horizontal then
+				self.innerWidth = math.min(self.w, self.innerWidth + child.w + self.gapHorizontal)
+			else
+				self.innerHeight = math.min(self.h, self.innerHeight + child.h + self.gapVertical)
+			end
 
 			child.rect.x = child.screenx
 			child.rect.y = child.screeny

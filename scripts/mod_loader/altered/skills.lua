@@ -25,9 +25,27 @@ end
 --- of pawn Move Skills
 -------------------------------------------------------------
 
+local function traceback()
+	return Assert.Traceback and debug.traceback("\n", 3) or ""
+end
+
+local function assertIsStringToSkillTable(skill_id, msg)
+	local skill = _G[skill_id]
+	msg = (msg and msg .. ": ") or ""
+	msg = msg .. string.format("Expected _G[%q] to be a valid Skill/Weapon, but was %s%s", skill_id, type(skill), traceback())
+	assert(type(skill) == "table" and type(skill.GetTargetArea) == "function" and type(skill.GetSkillEffect) == "function", msg)
+end
+
 local oldMoveGetTargetArea = Move.GetTargetArea
 function Move:GetTargetArea(point)
-	local moveSkill = _G[Pawn:GetType()].MoveSkill
+	local pawnType = Pawn:GetType()
+	local moveSkill = _G[pawnType].MoveSkill
+	
+	if type(moveSkill) == 'string' then
+		assertIsStringToSkillTable(moveSkill, string.format("%s.moveSkill = %q", pawnType, tostring(moveSkill)))
+		
+		moveSkill = _G[moveSkill]
+	end
 	
 	if moveSkill ~= nil and moveSkill.GetTargetArea ~= nil then
 		return moveSkill:GetTargetArea(point)
@@ -39,8 +57,15 @@ end
 
 local oldMoveGetSkillEffect = Move.GetSkillEffect
 function Move:GetSkillEffect(p1, p2)
-	local moveSkill = _G[Pawn:GetType()].MoveSkill
+	local pawnType = Pawn:GetType()
+	local moveSkill = _G[pawnType].MoveSkill
 
+	if type(moveSkill) == 'string' then
+		assertIsStringToSkillTable(moveSkill, string.format("%s.moveSkill = %q", pawnType, tostring(moveSkill)))
+		
+		moveSkill = _G[moveSkill]
+	end
+	
 	if moveSkill ~= nil and moveSkill.GetSkillEffect ~= nil then
 		return moveSkill:GetSkillEffect(p1, p2)
 	end
@@ -65,7 +90,7 @@ local function buildGetTipDamageOverride(skill)
 	end
 end
 
-sdlext.addFrameDrawnHook(function()
+modApi.events.onFrameDrawn:subscribe(function()
 	if tipSkillLast and tipSkillCurrent ~= tipSkillLast then
 		modApi:fireTipImageHiddenHooks(tipSkillLast)
 	end
@@ -90,7 +115,7 @@ local function overrideSkillFunction(skill, functionName, fn)
 	skill[functionName] = fn
 	-- TODO: Could add a metatable with with __newindex function to protect overrides
 	-- added by the mod loader / reapply the override with the new argument as originalFn
-	-- This would remove the need for ModsInitializedHook here, but what about newly added
+	-- This would remove the need for ModsInitialized event here, but what about newly added
 	-- weapons, or weapons created dynamically, after the game is initialized?
 	-- Add metatable with __newindex to _G, that checks if newly added variable is a Skill...?
 end
@@ -124,7 +149,7 @@ local function buildGetIsPortraitOverride(pawn)
 	end
 end
 
-sdlext.addFrameDrawnHook(function()
+modApi.events.onFrameDrawn:subscribe(function()
 	local selectedPawnIdCurrent = Board and Board:GetSelectedPawnId() or nil
 
 	if focusedPawnCurrent ~= focusedPawnLast or selectedPawnIdCurrent ~= selectedPawnIdLast then
@@ -165,7 +190,7 @@ local function overrideAllPawns()
 	end
 end
 
-modApi:addModsInitializedHook(function()
+modApi.events.onModsInitialized:subscribe(function()
 	-- Defer the call until all mods have been loaded, so that they don't break the detection
 	overrideAllSkills()
 	overrideAllPawns()

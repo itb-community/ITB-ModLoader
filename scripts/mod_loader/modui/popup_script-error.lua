@@ -23,7 +23,7 @@ local function showErrorDialog(text)
 end
 
 local errorFrameShown = false
-sdlext.addMainMenuEnteredHook(function(screen, wasHangar, wasGame)
+modApi.events.onMainMenuEntered:subscribe(function(screen, wasHangar, wasGame)
 	if modApi.showErrorFrame then
 		if not errorFrameShown then
 			errorFrameShown = true

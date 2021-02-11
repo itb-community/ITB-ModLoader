@@ -1,7 +1,6 @@
 local scripts = {
 	"assert",
 	"vector",
-	"event",
 	"init",
 	"global",
 	"statistics",

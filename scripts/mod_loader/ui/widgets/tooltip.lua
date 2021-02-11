@@ -24,31 +24,41 @@ end
 	the screen bounds, this function instead returns coordinate value positioning
 	'self' aligned with the target widget's end.
 --]]
-local function computeAlignedPos(self, widget, screen, horizontal)
+local function computeAlignedPos(self, widget, horizontal)
 	if horizontal then
-		return (widget.screenx + self.w <= screen:w())
+		return (widget.screenx + self.w <= ScreenSizeX())
 			and widget.screenx
 			or  (widget.screenx + widget.w - self.w)
 	else
-		return (widget.screeny + self.h <= screen:h())
+		return (widget.screeny + self.h <= ScreenSizeY())
 			and widget.screeny
 			or  (widget.screeny + widget.h - self.h)
 	end
 end
 
-function UiTooltip:draw(screen)
+function UiTooltip:updateText()
+	if self.text ~= self.root.tooltip then
+		self.w = 0
+		self:setText(self.root.tooltip)
+		self.w = self:maxChildSize() + self.padl + self.padr
+	end
+
+	self.visible = self.text and self.text ~= ""
+end
+
+function UiTooltip:relayout()
 	if modApi.floatyTooltips then
 		-- Attach to the mouse cursor
 		local x = sdl.mouse.x()
 		local y = sdl.mouse.y()
 
-		if x + 20 + self.w <= screen:w() then
+		if x + 20 + self.w <= ScreenSizeX() then
 			self.x = x + 20
 		else
 			self.x = x - self.w
 		end
 
-		if y + self.h <= screen:h() then
+		if y + self.h <= ScreenSizeY() then
 			self.y = y
 		else
 			self.y = y - self.h
@@ -68,25 +78,25 @@ function UiTooltip:draw(screen)
 		local x = 0
 		local y = 0
 
-		if c.screenx + self.tooltipOffset + c.w + self.w <= screen:w() then
+		if c.screenx + self.tooltipOffset + c.w + self.w <= ScreenSizeX() then
 			x = c.screenx + self.tooltipOffset + c.w
-			y = computeAlignedPos(self, c, screen, false)
+			y = computeAlignedPos(self, c, false)
 		elseif c.screenx - self.tooltipOffset - self.w >= 0 then
 			x = c.screenx - self.tooltipOffset - self.w
-			y = computeAlignedPos(self, c, screen, false)
+			y = computeAlignedPos(self, c, false)
 		else
 			-- Can't fit the tooltip on either horizontal side
 			-- of the widget, try vertical alignment
-			x = computeAlignedPos(self, c, screen, true)
+			x = computeAlignedPos(self, c, true)
 
-			if c.screeny + self.tooltipOffset + c.h + self.h <= screen:h() then
+			if c.screeny + self.tooltipOffset + c.h + self.h <= ScreenSizeY() then
 				y = c.screeny + self.tooltipOffset + c.h
 			elseif c.screeny - self.tooltipOffset - self.h >= 0 then
 				y = c.screeny - self.tooltipOffset - self.h
 			else
 				-- Can't fit the tooltip anywhere outside of the widget.
 				-- Give up, we'll just cover a part of it.
-				y = computeAlignedPos(self, c, screen, false)
+				y = computeAlignedPos(self, c, false)
 			end
 		end
 
@@ -96,25 +106,6 @@ function UiTooltip:draw(screen)
 		self.screeny = self.y
 	end
 
-	UiWrappedText.draw(self, screen)
-
-	-- Update *after* our first call to draw()
-	-- otherwise we get nasty flickering, since apparently
-	-- the ui element is not being updated fast enough before
-	-- it gets drawn?
-	self.laidOut = true
 	self:updateText()
-end
-
-function UiTooltip:updateText()
-	if self.text ~= self.root.tooltip then
-		self.w = 0
-		self:setText(self.root.tooltip)
-		self.w = self:maxChildSize() + self.padl + self.padr
-
-		self:relayout()
-		self.laidOut = false
-	end
-
-	self.visible = self.laidOut and self.text and self.text ~= ""
+	UiWrappedText.relayout(self)
 end

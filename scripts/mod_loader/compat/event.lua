@@ -1,0 +1,1 @@
+Event.fire = Event.dispatch
