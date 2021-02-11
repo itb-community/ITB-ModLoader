@@ -84,7 +84,7 @@ function mouseTileAndEdge()
 	return screenPointToTile({ x = sdl.mouse.x(), y = sdl.mouse.y() }, true)
 end
 
-function getScreenRefs(screen, scale)
+function getScreenRefs(scale)
 	scale = scale or GetBoardScale()
 	local uiScale = GetUiScale()
 
@@ -93,8 +93,8 @@ function getScreenRefs(screen, scale)
 
 	-- Top corner of the (0, 0) tile
 	local tile00 = {
-		x = screen:w() / 2,
-		y = screen:h() / 2 - 8 * th * scale
+		x = ScreenSizeX() / 2,
+		y = ScreenSizeY() / 2 - 8 * th * scale
 	}
 
 	if scale == 2 then
@@ -155,11 +155,10 @@ end
 function screenPointToTile(sourcePointScreenSpace, findTileEdge)
 	if not Board then return nil end
 
-	local screen = sdl.screen()
 	local scale = GetBoardScale()
 	local uiScale = GetUiScale()
 
-	local tile00, lineX, lineY, tw, th = getScreenRefs(screen, scale)
+	local tile00, lineX, lineY, tw, th = getScreenRefs(scale)
 
 	-- Change sourcePointScreenSpace to be relative to the (0, 0) tile
 	-- and move to unscaled space.
