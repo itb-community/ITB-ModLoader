@@ -36,7 +36,19 @@ local function computeAlignedPos(self, widget, screen, horizontal)
 	end
 end
 
-function UiTooltip:draw(screen)
+function UiTooltip:updateText()
+	if self.text ~= self.root.tooltip then
+		self.w = 0
+		self:setText(self.root.tooltip)
+		self.w = self:maxChildSize() + self.padl + self.padr
+	end
+
+	self.visible = self.text and self.text ~= ""
+end
+
+function UiTooltip:relayout()
+	local screen = sdl.screen()
+
 	if modApi.floatyTooltips then
 		-- Attach to the mouse cursor
 		local x = sdl.mouse.x()
@@ -96,25 +108,6 @@ function UiTooltip:draw(screen)
 		self.screeny = self.y
 	end
 
-	UiWrappedText.draw(self, screen)
-
-	-- Update *after* our first call to draw()
-	-- otherwise we get nasty flickering, since apparently
-	-- the ui element is not being updated fast enough before
-	-- it gets drawn?
-	self.laidOut = true
 	self:updateText()
-end
-
-function UiTooltip:updateText()
-	if self.text ~= self.root.tooltip then
-		self.w = 0
-		self:setText(self.root.tooltip)
-		self.w = self:maxChildSize() + self.padl + self.padr
-
-		self:relayout()
-		self.laidOut = false
-	end
-
-	self.visible = self.laidOut and self.text and self.text ~= ""
+	UiWrappedText.relayout(self)
 end
