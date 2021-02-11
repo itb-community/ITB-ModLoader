@@ -129,9 +129,7 @@ local function closeDropdown(self)
 	remove_element(openDropdowns, self)
 
 	self.dropdownHolder:hide()
-	
 	self.checked = false
-	scrollContent.parent:relayout()
 end
 
 local function openDropdown(self)
@@ -140,8 +138,6 @@ local function openDropdown(self)
 	end
 
 	self.dropdownHolder:show()
-	
-	scrollContent.parent:relayout()
 end
 
 local function sortChildren(self, sortBy, sortOrder)
@@ -170,7 +166,7 @@ local function clickConfiguration(self, button)
 		if #openDropdowns > 0 then
 			for _, dropdown in ipairs(openDropdowns) do
 				if dropdown ~= self then
-					if not isDescendantOf(self.owner, dropdown.owner) then
+					if isDescendantOf(dropdown.owner, self.owner) then
 						closeDropdown(dropdown)
 					end
 				end
@@ -182,6 +178,8 @@ local function clickConfiguration(self, button)
 		else
 			closeDropdown(self)
 		end
+		
+		scrollContent.parent:relayout()
 		
 		return true
 	end
