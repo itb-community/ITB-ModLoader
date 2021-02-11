@@ -481,19 +481,15 @@ function Ui:relayout()
 		
 		if child.wPercent ~= nil then
 			child.w = (self.w - self.padl - self.padr) * child.wPercent
-			child.wPercent = nil
 		end
 		if child.hPercent ~= nil then
 			child.h = (self.h - self.padt - self.padb) * child.hPercent
-			child.hPercent = nil
 		end
 		if child.xPercent ~= nil then
 			child.x = (self.w - self.padl - self.padr) * child.xPercent
-			child.xPercent = nil
 		end
 		if child.yPercent ~= nil then
 			child.y = (self.h - self.padt - self.padb) * child.yPercent
-			child.yPercent = nil
 		end
 		
 		local childleft, childright, childtop, childbottom

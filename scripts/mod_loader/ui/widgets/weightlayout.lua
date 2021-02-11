@@ -36,10 +36,6 @@ function UiWeightLayout:orientation(horizontal)
 end
 
 function UiWeightLayout:relayout()
-	if self.wPercent or self.hPercent then
-		return
-	end
-
 	assert(type(self.horizontal) == "boolean")
 
 	local remainingSpaceW = self.w - self.padl - self.padr
@@ -78,20 +74,16 @@ function UiWeightLayout:relayout()
 			if self.horizontal then
 				if child.wPercent ~= nil then
 					child.w = remainingSpaceW * (child.wPercent / weightSumW)
-					child.wPercent = nil
 				end
 				if child.hPercent ~= nil then
 					child.h = (self.h - self.padt - self.padb) * child.hPercent
-					child.hPercent = nil
 				end
 			else
 				if child.wPercent ~= nil then
 					child.w = (self.w - self.padl - self.padr) * child.wPercent
-					child.wPercent = nil
 				end
 				if child.hPercent ~= nil then
 					child.h = remainingSpaceH * (child.hPercent / weightSumH)
-					child.hPercent = nil
 				end
 			end
 		end

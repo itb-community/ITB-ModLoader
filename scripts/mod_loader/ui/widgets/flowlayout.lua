@@ -44,11 +44,9 @@ function UiFlowLayout:relayout()
 		if child.visible then
 			if child.wPercent ~= nil then
 				child.w = (self.w - self.padl - self.padr) * child.wPercent
-				child.wPercent = nil
 			end
 			if child.hPercent ~= nil then
 				child.h = (self.h - self.padt - self.padb) * child.hPercent
-				child.hPercent = nil
 			end
 		end
 	end
