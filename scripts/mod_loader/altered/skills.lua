@@ -25,11 +25,25 @@ end
 --- of pawn Move Skills
 -------------------------------------------------------------
 
+local function traceback()
+	return Assert.Traceback and debug.traceback("\n", 3) or ""
+end
+
+local function assertIsStringToSkillTable(skill_id, msg)
+	local skill = _G[skill_id]
+	msg = (msg and msg .. ": ") or ""
+	msg = msg .. string.format("Expected _G[%q] to be a valid Skill/Weapon, but was %s%s", skill_id, type(skill), traceback())
+	assert(type(skill) == "table" and type(skill.GetTargetArea) == "function" and type(skill.GetSkillEffect) == "function", msg)
+end
+
 local oldMoveGetTargetArea = Move.GetTargetArea
 function Move:GetTargetArea(point)
-	local moveSkill = _G[Pawn:GetType()].MoveSkill
+	local pawnType = Pawn:GetType()
+	local moveSkill = _G[pawnType].MoveSkill
 	
 	if type(moveSkill) == 'string' then
+		assertIsStringToSkillTable(moveSkill, string.format("%s.moveSkill = %q", pawnType, tostring(moveSkill)))
+		
 		moveSkill = _G[moveSkill]
 	end
 	
@@ -43,9 +57,12 @@ end
 
 local oldMoveGetSkillEffect = Move.GetSkillEffect
 function Move:GetSkillEffect(p1, p2)
-	local moveSkill = _G[Pawn:GetType()].MoveSkill
+	local pawnType = Pawn:GetType()
+	local moveSkill = _G[pawnType].MoveSkill
 
 	if type(moveSkill) == 'string' then
+		assertIsStringToSkillTable(moveSkill, string.format("%s.moveSkill = %q", pawnType, tostring(moveSkill)))
+		
 		moveSkill = _G[moveSkill]
 	end
 	
