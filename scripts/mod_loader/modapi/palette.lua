@@ -328,7 +328,7 @@ function modApi:addPalette(palette, id)
 	palettes:addPalette(id, new_palette)
 end
 
-function modApi:getPaletteIndex(id)
+function modApi:getPaletteImageOffset(id)
 	Assert.Equals('string', type(id), "Argument #1")
 	
 	local paletteIndex = palettes:getIndex(id)

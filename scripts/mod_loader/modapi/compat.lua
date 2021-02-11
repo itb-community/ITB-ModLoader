@@ -77,5 +77,5 @@ function palettes.addPalette(...)
 end
 
 function palettes.getOffset(id)
-	return modApi:getPaletteIndex(id)
+	return modApi:getPaletteImageOffset(id)
 end
