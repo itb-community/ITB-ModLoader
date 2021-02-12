@@ -2,7 +2,8 @@ local scripts = {
 	"sdlext",
 	"modApi",
 	"event",
-	"asserts"
+	"asserts",
+	"dialog_helper"
 }
 
 local rootpath = GetParentPath(...)

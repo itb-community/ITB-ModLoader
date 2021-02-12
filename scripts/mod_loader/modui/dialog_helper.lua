@@ -20,7 +20,7 @@ local function popDialog()
 end
 
 local function pushDialog(ui)
-	assert(type(ui) == "table", "Expected table, got " .. type(ui))
+	Assert.Equals("table", type(ui))
 
 	local root = sdlext.getUiRoot()
 
@@ -110,7 +110,7 @@ function sdlext.dialogVisible()
 end
 
 function sdlext.showDialog(init)
-	assert(type(init) == "function", "Expected function, got " .. type(init))
+	Assert.Equals("function", type(init))
 
 	local ui = buildBackgroundPane()
 
@@ -136,9 +136,18 @@ end
 
 -- //////////////////////////////////////////////////////////////////////
 
-function sdlext.buildSimpleDialog(title, w, h)
+function sdlext.buildSimpleDialog(title, options)
+	if options then
+		Assert.Equals("table", type(options))
+	else
+		options = {}
+	end
+
+	local maxW = options.maxW or 0.5 * ScreenSizeX()
+	local maxH = options.maxH or 0.5 * ScreenSizeY()
+
 	local frame = UiWeightLayout()
-			:widthpx(w):heightpx(h)
+			:widthpx(maxW):heightpx(maxH)
 			:vgap(0)
 			:orientation(false)
 			:decorate({ DecoFrameHeader(), DecoFrame() })
@@ -154,8 +163,8 @@ function sdlext.buildSimpleDialog(title, w, h)
 	return frame
 end
 
-function sdlext.buildTextDialog(title, text, w, h)
-	local frame = sdlext.buildSimpleDialog(title, w, h)
+function sdlext.buildTextDialog(title, text, options)
+	local frame = sdlext.buildSimpleDialog(title, options)
 	local scroll = frame.scroll
 
 	local font = deco.uifont.tooltipTextLarge.font
@@ -170,17 +179,23 @@ function sdlext.buildTextDialog(title, text, w, h)
 	return frame
 end
 
-function sdlext.buildButtonDialog(title, w, h, contentBuilderFn, buttonsBuilderFn)
-	w = w or 700
-	h = h or 400
-
-	local frame = sdlext.buildSimpleDialog(title, w, h)
-	local scroll = frame.scroll
-
-	if contentBuilderFn then
-		contentBuilderFn(scroll)
-		frame:relayout()
+function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, options)
+	Assert.Equals("function", type(contentBuilderFn))
+	Assert.Equals("function", type(buttonsBuilderFn))
+	if options then
+		Assert.Equals("table", type(options))
+	else
+		options = {}
 	end
+
+	local maxW = options.maxW or 0.5 * ScreenSizeX()
+	local maxH = options.maxH or 0.5 * ScreenSizeY()
+	local minW = options.minW or 700
+	local minH = options.minH or 100
+	local compact = (options.compact == nil and true) or options.compact
+
+	local frame = sdlext.buildSimpleDialog(title, options)
+	local scroll = frame.scroll
 
 	local line = Ui()
 			:width(1):heightpx(frame.decorations[1].bordersize)
@@ -204,12 +219,17 @@ function sdlext.buildButtonDialog(title, w, h, contentBuilderFn, buttonsBuilderF
 
 	frame.buttonLayout = buttonLayout
 
-	if buttonsBuilderFn then
-		buttonsBuilderFn(buttonLayout)
-	end
+	contentBuilderFn(scroll)
+	buttonsBuilderFn(buttonLayout)
 
-	w = math.max(w, buttonHolder.w + frame.padl + frame.padr)
-	h = math.min(h, scroll.innerHeight + frame.padt + frame.padb + buttonHolder.h + line.h)
+	frame:relayout()
+
+	local w = math.max(minW, buttonHolder.w + frame.padl + frame.padr)
+	w = math.min(w, maxW)
+	local contentH = compact and scroll.innerHeight or scroll.h
+	local h = math.max(minH, contentH + frame.padt + frame.padb + buttonHolder.h + line.h)
+	h = math.min(h, maxH)
+
 	frame:widthpx(w)
 	frame:heightpx(h)
 	frame:relayout()
@@ -313,12 +333,9 @@ function sdlext.buildDropDownButton(text, tooltip, choices, choiceHandler)
 	return btn
 end
 
-function sdlext.showTextDialog(title, text, w, h)
-	w = w or 700
-	h = h or 400
-
+function sdlext.showTextDialog(title, text, options)
 	sdlext.showDialog(function(ui, quit)
-		local frame = sdlext.buildTextDialog(title, text, w, h)
+		local frame = sdlext.buildTextDialog(title, text, options)
 		local scroll = frame.children[1]
 
 		frame:relayout()
@@ -336,12 +353,16 @@ function sdlext.showTextDialog(title, text, w, h)
 	end)
 end
 
-function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, tooltips)
-	assert(#buttons > 0, "ButtonDialog must have at least one button!")
-	assert(not tooltips or #tooltips == #buttons, "Number of tooltips must be equal to number of buttons. Use empty string (\"\") for no tooltip.")
-
-	maxW = maxW or 700
-	maxH = maxH or 400
+function sdlext.showButtonDialog(title, text, responseFn, buttons, tooltips, options)
+	if (responseFn) then
+		Assert.Equals("function", type(responseFn))
+	end
+	Assert.Equals("table", type(buttons))
+	Assert.True(#buttons > 0, "sdlext.showButtonDialog: argument #4 must have at least one button")
+	if (tooltips) then
+		Assert.Equals("table", type(tooltips))
+		Assert.True(#tooltips == #buttons, "sdlext.showButtonDialog: argument #5 - number of tooltips must be equal to number of buttons. Use empty string (\"\") for no tooltip.")
+	end
 
 	sdlext.showDialog(function(ui, quit)
 		ui.dismissible = false
@@ -353,7 +374,7 @@ function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, t
 		end
 
 		local frame = sdlext.buildButtonDialog(
-				title, maxW, maxH,
+				title,
 				function(scroll)
 					local font = deco.uifont.tooltipTextLarge.font
 					local textset = deco.uifont.tooltipTextLarge.set
@@ -374,7 +395,8 @@ function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, t
 
 						btn:addTo(buttonLayout)
 					end
-				end
+				end,
+				options
 		)
 
 		frame
@@ -383,20 +405,19 @@ function sdlext.showButtonDialog(title, text, responseFn, maxW, maxH, buttons, t
 	end)
 end
 
-function sdlext.showAlertDialog(title, text, responseFn, w, h, ...)
+function sdlext.showAlertDialog(title, text, responseFn, options, ...)
 	local buttons = {...}
 	if type(buttons[1]) == "table" then
 		buttons = buttons[1]
 	end
-	assert(#buttons > 0, "AlertDialog must have at least one button!")
 
-	sdlext.showButtonDialog(title, text, responseFn, nil, nil, buttons, nil)
+	sdlext.showButtonDialog(title, text, responseFn, buttons, nil, options)
 end
 
-function sdlext.showInfoDialog(title, text, responseFn, w, h)
-	sdlext.showAlertDialog(title, text, responseFn, w, h, GetText("Button_Ok"))
+function sdlext.showInfoDialog(title, text, responseFn, options)
+	sdlext.showAlertDialog(title, text, responseFn, options, GetText("Button_Ok"))
 end
 
-function sdlext.showConfirmDialog(title, text, responseFn, w, h)
-	sdlext.showAlertDialog(title, text, responseFn, w, h, GetText("Button_Yes"), GetText("Button_No"))
+function sdlext.showConfirmDialog(title, text, responseFn, options)
+	sdlext.showAlertDialog(title, text, responseFn, options, GetText("Button_Yes"), GetText("Button_No"))
 end
