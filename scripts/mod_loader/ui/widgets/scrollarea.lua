@@ -55,7 +55,7 @@ function UiScrollArea:relayout()
 
 	if self.innerHeight > self.h and self.dy + self.h > self.innerHeight then
 		self.dy = self.innerHeight - self.h
-	elseif self.innerHeight < self.h and self.dy > 0 then
+	elseif self.innerHeight <= self.h and self.dy > 0 then
 		self.dy = 0
 	end
 	
@@ -206,7 +206,7 @@ function UiScrollAreaH:relayout()
 
 	if self.innerWidth > self.w and self.dx + self.w > self.innerWidth then
 		self.dx = self.innerWidth - self.w
-	elseif self.innerWidth < self.w and self.dx > 0 then
+	elseif self.innerWidth <= self.w and self.dx > 0 then
 		self.dx = 0
 	end
 	
