@@ -11,14 +11,15 @@ local function responseFn(btnIndex)
 end
 
 local function showErrorDialog(text)
-	local maxW = math.max(600, math.min(1000, 0.5 * ScreenSizeX()))
-	local maxH = math.max(400, math.min(800, 0.8 * ScreenSizeY()))
-
 	sdlext.showButtonDialog(
 		GetText("ScriptError_FrameTitle"), text,
-		responseFn, maxW, maxH,
+		responseFn,
 		{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
-		{ "", GetText("ButtonTooltip_DisablePopup") }
+		{ "", GetText("ButtonTooltip_DisablePopup") },
+		{
+			minW = 600,
+			minH = 400
+		}
 	)
 end
 

@@ -21,7 +21,7 @@ modApi.events.onMainMenuEntered:subscribe(function(screen, wasHangar, wasGame)
 				sdlext.showButtonDialog(
 					GetText("ResourceError_FrameTitle"),
 					GetText("ResourceError_FrameText"),
-					responseFn, nil, nil,
+					responseFn,
 					{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
 					{ "", GetText("ButtonTooltip_DisablePopup") }
 				)

@@ -98,7 +98,7 @@ local function createUi()
 				sdlext.showButtonDialog(
 					GetText("OpenGL_FrameTitle"),
 					GetText("PilotArrange_RestartWarning_Text"),
-					responseFn, nil, nil,
+					responseFn,
 					{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
 					{ "", GetText("ButtonTooltip_DisablePopup") }
 				)
