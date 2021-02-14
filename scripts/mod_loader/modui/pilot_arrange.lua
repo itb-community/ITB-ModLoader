@@ -76,7 +76,6 @@ local function buildHangarBackdrop()
 		hangarDecorations = {}
 		table.insert(hangarDecorations, DecoAlign(0, -4))
 		table.insert(hangarDecorations, DecoSurface(hangarBackdrop))
-		table.insert(hangarDecorations, DecoAlign(-hangarBackdrop:w(), 4))
 	end
 
 	local backdrop = Ui()
@@ -179,6 +178,23 @@ local function buildPilotButton(pilotId, placeholder)
 		self:clearDropTargets()
 
 		pilotsLayout:relayout()
+	end
+
+	button.dragWheel = function(self, mx, my, y)
+		local offset = pilotsLayout.parent:computeOffset(y)
+
+		pilotsLayout.parent:wheel(mx, my, y)
+
+		self:processDropTargets(mx, my + offset)
+
+		-- Scrollarea's wheel() function calls back to children's mousemove(), which
+		-- updates hovered states. We need to correct that here.
+		if self.root.hoveredchild ~= nil then
+			self.root.hoveredchild.hovered = false
+		end
+
+		self.root.hoveredchild = self
+		self.hovered = true
 	end
 
 	return button
