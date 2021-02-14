@@ -35,7 +35,7 @@ local function savePaletteOrder()
 	end)
 end
 
-local function buildColorMapBase()
+local function buildSdlColorMapBase()
 	colorMapBase = {}
 
 	local basePalette = GetColorMap(1)
@@ -48,7 +48,7 @@ local function buildColorMapBase()
 	return colorMapBase
 end
 
-local function buildColorMap(palette)
+local function buildSdlColorMap(palette)
 	local res = shallow_copy(colorMapBase)
 
 	for i = 1, 8 do
@@ -172,8 +172,8 @@ local function buildPaletteFrameContent(scroll)
 	local screen = sdl.screen()
 
 	if currentPaletteOrder == nil then
-		currentPaletteOrder = modApi:getPaletteIds()
-		buildColorMapBase()
+		currentPaletteOrder = modApi:getCurrentPaletteOrder()
+		buildSdlColorMapBase()
 	end
 
 	scrollarea = scroll
@@ -192,9 +192,10 @@ local function buildPaletteFrameContent(scroll)
 		:addTo(scroll)
 
 	for i, paletteId in ipairs(currentPaletteOrder) do
-		local image = modApi:getPalettePawnImage(paletteId) or IMAGE_PUNCH_MECH
 		local palette = modApi:getPalette(paletteId)
-		local colormap = buildColorMap(palette)
+		local image = palette.images[1] or IMAGE_PUNCH_MECH
+		local name = palette.name or "Unnamed Palette"
+		local colormap = buildSdlColorMap(palette.colorMap)
 		local surface_mech = sdlext.getSurface({
 								path = image,
 								transformations = {
@@ -217,6 +218,7 @@ local function buildPaletteFrameContent(scroll)
 		local button = Ui()
 			:widthpx(BUTTON_WIDTH)
 			:heightpx(BUTTON_HEIGHT)
+			:settooltip(name)
 			:decorate({
 				deco_button,
 				DecoAlign(3,0),
@@ -243,7 +245,7 @@ local function buildPaletteFrameContent(scroll)
 		end
 
 		if i == 1 then
-			button.tooltip = GetText("PaletteArrange_RiftWalkers_Tooltip")
+			button.tooltip = button.tooltip .."\n\n".. GetText("PaletteArrange_RiftWalkers_Tooltip_Extra")
 			deco_button.hlcolor = deco_button.color
 			deco_button.borderhlcolor = deco_button.bordercolor
 		else
@@ -286,7 +288,7 @@ local function buildPaletteFrameButtons(buttonLayout)
 		GetText("PaletteArrange_Current_Title"),
 		GetText("PaletteArrange_Current_Tooltip"),
 		function()
-			reorderPalettes(modApi:getPaletteIds())
+			reorderPalettes(modApi:getCurrentPaletteOrder())
 		end
 	)
 	:heightpx(40)
@@ -296,7 +298,7 @@ local function buildPaletteFrameButtons(buttonLayout)
 		GetText("PaletteArrange_Default_Title"),
 		GetText("PaletteArrange_Default_Tooltip"),
 		function()
-			reorderPalettes(modApi:getDefaultPaletteIds())
+			reorderPalettes(modApi:getDefaultPaletteOrder())
 		end
 	)
 	:heightpx(40)
@@ -306,7 +308,7 @@ local function buildPaletteFrameButtons(buttonLayout)
 		GetText("PaletteArrange_Random_Title"),
 		GetText("PaletteArrange_Random_Tooltip"),
 		function()
-			local paletteOrder = modApi:getPaletteIds()
+			local paletteOrder = modApi:getCurrentPaletteOrder()
 			local firstPalette = paletteOrder[1]
 			table.remove(paletteOrder, 1)
 

@@ -1,90 +1,26 @@
 
-local canAddPalettes = true
-local defaultPaletteOrder
-
-local palettes = {
-	index = {},
-	hash = {},
-	palette = {},
-	redirect = {},
-	image = {},
-	
-	getIndex = function(self, hash)
-		return self.index[hash]
-	end,
-	
-	getHash = function(self, index)
-		return self.hash[index]
-	end,
-	
-	getPalette = function(self, index)
-		local hash = self.hash[index]
-		if not hash then return nil end
-		
-		return self.palette[hash]
-	end,
-	
-	getCount = function(self)
-		return #self.hash
-	end,
-	
-	addPalette = function(self, hash, palette)
-		if self.index[hash] ~= nil then return end
-		
-		local index = #self.hash + 1
-		self.hash[index] = hash
-		self.index[hash] = index
-		self.palette[hash] = palette
-	end,
-	
-	swap = function(self, idx_a, idx_b)
-		local hash_a, hash_b = self.hash[idx_a], self.hash[idx_b]
-		
-		self.index[hash_a], self.index[hash_b] = idx_b, idx_a
-		self.hash[idx_a], self.hash[idx_b] = hash_b, hash_a
-		
-		self.redirect[idx_a], self.redirect[idx_b] = self:getRedirect(idx_b), self:getRedirect(idx_a)
-	end,
-	
-	getRedirect = function(self, index)
-		return self.redirect[index] or index
-	end,
-	
-	getRedirectList = function(self)
-		local res = {}
-		
-		for i,v in pairs(self.redirect) do
-			res[v] = i
-		end
-		
-		return res
-	end,
-	
-	setPaletteImage = function(self, index, image)
-		local hash = self.hash[index]
-		if not hash then return end
-		
-		self.image[hash] = "img/".. image
-	end,
-	
-	getPaletteImage = function(self, index)
-		local hash = self.hash[index]
-		if not hash then return nil end
-		
-		return self.image[hash]
-	end
+local VANILLA_PALETTE_ID = {
+	GetText("Squad_Archive_A"),
+	GetText("Squad_Rust_A"),
+	GetText("Squad_Pinnacle_A"),
+	GetText("Squad_Detritus_A"),
+	GetText("Squad_Archive_B"),
+	GetText("Squad_Rust_B"),
+	GetText("Squad_Pinnacle_B"),
+	GetText("Squad_Detritus_B"),
+	GetText("Squad_Secret")
 }
 
-local VANILLA_PALETTE_ID = {
-	"Rift Walkers",
-	"Rusting Hulks",
-	"Zenith Guard",
-	"Blitzkrieg",
-	"Steel Judoka",
-	"Flame Behemoths",
-	"Frozen Titans",
-	"Hazardous Mechs",
-	"Secret Squad"
+local VANILLA_PALETTE_NAME = {
+	GetText(VANILLA_PALETTE_ID[1].." Olive"),
+	GetText(VANILLA_PALETTE_ID[2].." Orange"),
+	GetText(VANILLA_PALETTE_ID[3].." Blue"),
+	GetText(VANILLA_PALETTE_ID[4].." Yellow"),
+	GetText(VANILLA_PALETTE_ID[5].." Shivan"),
+	GetText(VANILLA_PALETTE_ID[6].." Red"),
+	GetText(VANILLA_PALETTE_ID[7].." Blue"),
+	GetText(VANILLA_PALETTE_ID[8].." Tan"),
+	GetText(VANILLA_PALETTE_ID[9].." Purple")
 }
 
 local COLOR_NAME_2_INDEX = {
@@ -106,22 +42,106 @@ local COLOR_NAME_2_INDEX = {
 	BodyHighlight = 8
 }
 
+local canAddPalettes = true
+
+local PaletteDictionary = {
+	_dictionary = {},
+	_array = {},
+	add = function(self, id, palette)
+		assert(type(id) == 'string')
+		assert(type(palette) == 'table')
+
+		local index = #self._array + 1
+
+		palette.id = id
+		palette.imageOffset = index
+		palette.imageOffsetOrig = index
+
+		self._dictionary[id] = palette
+		self._array[#self._array+1] = palette
+	end,
+
+	get = function(self, a)
+		if type(a) == 'number' then
+			return self._array[a]
+		else
+			return self._dictionary[a]
+		end
+	end,
+
+	swap = function(self, a, b)
+		local paletteA, paletteB
+		if type(a) == 'number' then
+			paletteA = self._array[a]
+		else
+			paletteA = self._dictionary[a]
+		end
+
+		if type(b) == 'number' then
+			paletteB = self._array[b]
+		else
+			paletteB = self._dictionary[b]
+		end
+
+		local indexA = paletteB.imageOffset
+		local indexB = paletteA.imageOffset
+
+		paletteA.imageOffset = indexA
+		paletteB.imageOffset = indexB
+		self._array[indexA] = paletteA
+		self._array[indexB] = paletteB
+	end,
+
+	size = function(self)
+		return #self._array
+	end
+}
+
+local Palette = {}
+CreateClass(Palette)
+
+local new = Palette.new
+function Palette:new(...)
+	local instance = new(self, ...)
+
+	if rawget(instance, "images") == nil then
+		instance.images = {}
+	end
+
+	return instance
+end
+
+local function ensureImgPrefix(str)
+	-- if string starts with "\" or "/"
+	if str:find("^[\\/]") then
+		str = "img"..str
+	-- if string does not start with "img\" or "img/"
+	elseif not str:find("^img[\\/]") then
+		str = "img/"..str
+	end
+
+	return str
+end
+
+function Palette:addImage(image)
+	table.insert(self.images, ensureImgPrefix(image))
+end
+
 function modApi.getColorMap(paletteIndex)
-	return palettes:getPalette(paletteIndex)
+	local palette = PaletteDictionary:get(paletteIndex)
+	if palette == nil then return nil end
+
+	return palette.colorMap
 end
 
 function modApi.getColorCount()
-	local count = palettes:getCount()
-	
+	local count = PaletteDictionary:size()
+
 	if count > 11 and sdlext.isHangar() then
 		return 11
 	end
-	
-	return count
-end
 
-function modApi:canAddPalettes()
-	return canAddPalettes
+	return count
 end
 
 local function isPlayerUnitType(pawnType)
@@ -135,12 +155,8 @@ local function isPlayerUnitType(pawnType)
 		local image = ANIMS[pawnType.Image].Image
 		return modApi:stringStartsWith(image, "units/player")
 	end
-	
-	return false
-end
 
-local function getVanillaId(paletteIndex)
-	return VANILLA_PALETTE_ID[paletteIndex]
+	return false
 end
 
 local function getFurlId(paletteIndex)
@@ -151,208 +167,267 @@ local function getFurlId(paletteIndex)
 			end
 		end
 	end
-	
+
 	return nil
 end
 
-local function stringize_color(gl_color)
-	return string.format("0x%X%X%X%X", gl_color.r, gl_color.g, gl_color.b, gl_color.a)
+local function buildPaletteId(paletteIndex)
+	if modApi.currentMod == nil then return -1 end
+
+	local mod = mod_loader.mods[modApi.currentMod]
+
+	local i = 1
+	while PaletteDictionary:get(mod.id..i) ~= nil do
+		i = i + 1
+	end
+
+	return mod.id..i
 end
 
-local function getPaletteHash(palette)
-	local res = {}
-	
-	for i = 1, 8 do
-		local color = palette[i]
-		if color then
-			res[i] = stringize_color(color)
-		else
-			res[i] = ""
+local function buildPaletteName(paletteIndex)
+	if modApi.currentMod == nil then return "Unnamed" end
+
+	local mod = mod_loader.mods[modApi.currentMod]
+
+	return mod.name
+end
+
+local function buildPaletteColorMap(colorMap)
+	local gl_colorMap = {}
+	for color_name, color in pairs(colorMap) do
+		local color_index = COLOR_NAME_2_INDEX[color_name]
+
+		if color_index then
+			if type(color) == 'table' then
+				for i = 1, 3 do
+					Assert.Equals('number', type(color[i]), string.format("Argument #1 - color %s entry %s", color_name, i))
+				end
+
+				color = GL_Color(color[1], color[2], color[3])
+			end
+
+			gl_colorMap[color_index] = color
 		end
 	end
-	
-	return save_table(res)
+
+	for i = 1, 8 do
+		Assert.Equals('userdata', type(gl_colorMap[i]), string.format("Argument #1 - incomplete colorMap"))
+	end
+
+	return gl_colorMap
 end
 
-local function saveDefaultPaletteOrder()
-	defaultPaletteOrder = shallow_copy(palettes.hash)
+local function buildPaletteImages(palette)
+	local images = palette.images or palette.Images
+
+	Assert.Equals({'nil', 'table'}, type(images), string.format("images of palette", i))
+
+	if images == nil then
+		images = { palette.image or palette.Image }
+	end
+
+	for i, image in ipairs(images) do
+		Assert.Equals({'nil', 'string'}, type(image), string.format("image #%s of palette", i))
+		images[i] = ensureImgPrefix(image)
+	end
+
+	return images
 end
 
 local function loadPaletteOrder()
 	sdlext.config("modcontent.lua", function(config)
 		local loadedPaletteOrder = config.paletteOrder or {}
-		
+
 		-- fetch palette ids from modcontent.lua.
 		-- ignore palette #1 because it is forced.
 		-- ignore palettes beyond 11 because they
 		-- are not selectable in the hangar.
 		-- ignore palettes beyond our current
 		-- palette count.
-		for new_index = 2, math.min(11, palettes:getCount()) do
+		for new_index = 2, math.min(11, PaletteDictionary:size()) do
 			local palette_id = loadedPaletteOrder[new_index]
-			
-			if
-				palette_id ~= nil                    and
-				type(palette_id) == 'string'         and
-				palettes:getIndex(palette_id) ~= nil
-			then
-				local old_index = palettes:getIndex(palette_id)
-				
-				if old_index ~= new_index and old_index ~= 1 then
-					palettes:swap(old_index, new_index)
+
+			if palette_id ~= nil and type(palette_id) == 'string' then
+				local palette = PaletteDictionary:get(palette_id)
+
+				if palette ~= nil then
+					local old_index = palette.imageOffset
+					
+					if old_index ~= new_index and old_index ~= 1 then
+						PaletteDictionary:swap(old_index, new_index)
+					end
 				end
 			end
 		end
-		
-		local redirectList = palettes:getRedirectList()
-		
+
+		-- build a list of imageOffset redirects in order
+		-- to correct already set imageOffsets
+		local redirectList = {}
+		for imageOffset, palette in ipairs(PaletteDictionary._array) do
+			redirectList[palette.imageOffsetOrig] = imageOffset
+		end
+
 		-- apply new color index offsets to pawn types
 		for name, pawnType in pairs(_G) do
 			if isPlayerUnitType(pawnType) then
-				local newIndex = redirectList[pawnType.ImageOffset+1]
-				
-				if newIndex and pawnType.ImageOffset ~= newIndex-1 then
-					pawnType.ImageOffset = newIndex-1
+				local newIndex = redirectList[pawnType.ImageOffset + 1]
+
+				if newIndex and pawnType.ImageOffset ~= newIndex - 1 then
+					pawnType.ImageOffset = newIndex - 1
 				end
-				
+
 				-- while we are looping through all pawns,
 				-- save a pawn using this image offset for
 				-- use in palette ui
-				local index = pawnType.ImageOffset + 1
-				
-				if
-					palettes:getHash(index) ~= nil         and
-					palettes:getPaletteImage(index) == nil
-				then
-					
+				local palette = PaletteDictionary:get(pawnType.ImageOffset + 1)
+
+				if palette ~= nil then
 					local animation = ANIMS[pawnType.Image .."_ns"]
 					if
 						type(animation) == 'table'        and
 						type(animation.Image) == 'string'
 					then
-						palettes:setPaletteImage(index, animation.Image)
+						palette:addImage(animation.Image)
 					end
 				end
 			end
 		end
-		
+
+		-- build new palette order to save to config
 		local new_paletteOrder = {}
-		for i = 2, 11 do
-			new_paletteOrder[i] = palettes:getHash(i)
+		for imageOffset = 2, 11 do
+			local palette = PaletteDictionary:get(imageOffset)
+
+			if palette ~= nil then
+				new_paletteOrder[imageOffset] = palette.id
+			end
 		end
-		
+
 		config.paletteOrder = new_paletteOrder
 	end)
 end
 
 local function migrateColorMaps()
-	local fromIndex = palettes:getCount() + 1
+	local fromIndex = PaletteDictionary:size() + 1
 	local toIndex = GetColorCount()
-	
+
 	if fromIndex > toIndex then return end
-	
+
 	for i = fromIndex, toIndex do
-		local palette = GetColorMap(i)
-		local hash = getVanillaId(i) or getFurlId(i) or getPaletteHash(palette)
-		
-		palettes:addPalette(hash, palette)
+		local colorMap = GetColorMap(i)
+		local id = VANILLA_PALETTE_ID[i] or getFurlId(i) or buildPaletteId()
+		local name = VANILLA_PALETTE_NAME[i] or buildPaletteName()
+
+		local palette = Palette:new{
+			name = name,
+			colorMap = colorMap,
+		}
+		PaletteDictionary:add(id, palette)
 	end
-	
+
 	GetColorMap = modApi.getColorMap
 	GetColorCount = modApi.getColorCount
 end
 
-function modApi:finalizePalettes()
-	
+function finalizePalettes()
 	migrateColorMaps()
-	saveDefaultPaletteOrder()
 	loadPaletteOrder()
-	
+
 	local playerAnimationHeight = GetColorCount()
-	
+
 	for anim_name, animation in pairs(ANIMS) do
 		if
 			type(animation) == 'table'         and
 			type(animation.Height) == 'number' and
 			type(animation.Image) == 'string'
 		then
-			local isPlayerUnitAnimation = self:stringStartsWith(animation.Image, "units/player")
+			local isPlayerUnitAnimation = modApi:stringStartsWith(animation.Image, "units/player")
 			
 			if isPlayerUnitAnimation then
 				animation.Height = playerAnimationHeight
 			end
 		end
 	end
-	
-    -- update base objects that cannot be determined
-	-- with Image starting with "units/player"
-    ANIMS.MechColors = playerAnimationHeight
-    ANIMS.MechIcon.Height = playerAnimationHeight
-	
-    ANIMS.BaseUnit.Height = 1
-    ANIMS.EnemyUnit.Height = 3
+
+	-- update base objects that cannot be determined
+	-- with Image; starting with "units/player"
+	ANIMS.MechColors = playerAnimationHeight
+	ANIMS.MechIcon.Height = playerAnimationHeight
+
+	ANIMS.BaseUnit.Height = 1
+	ANIMS.EnemyUnit.Height = 3
 
 	-- remove ability to add palettes after init
 	canAddPalettes = false
 end
 
-function modApi:addPalette(palette, id)
+function modApi:canAddPalettes()
+	return canAddPalettes
+end
+
+function modApi:addPalette(palette)
+	Assert.ModInitializingOrLoading("Cannot add palette at this time")
 	Assert.True(canAddPalettes, "Cannot add palettes after game init")
 	Assert.Equals('table', type(palette), "Argument #1")
-	Assert.Equals('string', type(id), "Argument #2")
-	
+
 	migrateColorMaps()
-	
-	if palettes:getIndex(id) ~= nil then
-		LOGF("A palette with id %s has already been added", id)
-		return
-	end
-	
-	local new_palette = {}
-	for color_name, color in pairs(palette) do
-		local color_index = COLOR_NAME_2_INDEX[color_name]
-		
-		if color_index then
-			if type(color) == 'table' then
-				for i = 1, 3 do
-					Assert.Equals('number', type(color[i]), string.format("Argument #1 - color %s entry %s", color_name, i))
-				end
-				
-				color = GL_Color(color[1], color[2], color[3])
-			end
-			
-			new_palette[color_index] = color
-		end
-	end
-	
-	for i = 1, 8 do
-		Assert.Equals('userdata', type(new_palette[i]), string.format("Argument #1 - incomplete palette"))
-	end
-	
-	palettes:addPalette(id, new_palette)
+
+	local id = palette.id or palette.ID or buildPaletteId()
+	local name = palette.name or palette.Name or buildPaletteName()
+	local colorMap = buildPaletteColorMap(palette.colorMap or palette)
+	local images = buildPaletteImages(palette)
+
+	Assert.Equals('string', type(id), "id of palette")
+	Assert.Equals('string', type(name), "name of palette")
+
+	local data = Palette:new{
+		name = name,
+		colorMap = colorMap,
+		images = images
+	}
+
+	Assert.Equals('nil', type(PaletteDictionary:get(id)), "Palette with id ".. id .." already exist")
+
+	PaletteDictionary:add(id, data)
 end
 
 function modApi:getPaletteImageOffset(id)
 	Assert.Equals('string', type(id), "Argument #1")
-	
-	local paletteIndex = palettes:getIndex(id)
-	Assert.Equals('number', type(paletteIndex), string.format("Palette index for id %s not found", id))
-	
-	return paletteIndex - 1
+
+	local palette = PaletteDictionary:get(id)
+	Assert.NotEquals('nil', type(palette), string.format("Palette for id %s not found", id))
+
+	return palette.imageOffset - 1
 end
 
-function modApi:getPaletteIds()
-	return shallow_copy(palettes.hash)
+function modApi:getCurrentPaletteOrder()
+	local currentPaletteOrder = {}
+
+	for imageOffset, palette in ipairs(PaletteDictionary._array) do
+		local id = palette.id
+
+		currentPaletteOrder[imageOffset] = id
+	end
+
+	return currentPaletteOrder
 end
 
-function modApi:getDefaultPaletteIds()
-	return shallow_copy(defaultPaletteOrder)
+function modApi:getDefaultPaletteOrder()
+	local defaultPaletteOrder = {}
+
+	for _, palette in ipairs(PaletteDictionary._array) do
+		local id = palette.id
+		local imageOffset_orig = palette.imageOffsetOrig
+
+		defaultPaletteOrder[imageOffset_orig] = id
+	end
+
+	return defaultPaletteOrder
 end
 
 function modApi:getPalette(id)
-	return palettes.palette[id]
+	return PaletteDictionary:get(id)
 end
 
-function modApi:getPalettePawnImage(id)
-	return palettes.image[id]
-end
+modApi.events.onModInitialized:subscribe(migrateColorMaps)
+modApi.events.onModsInitialized:subscribe(finalizePalettes)

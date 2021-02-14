@@ -72,7 +72,7 @@ CUSTOM_PALETTES = palettes
 
 function palettes.addPalette(...)
 	for _, palette in ipairs({...}) do
-		modApi:addPalette(palette, palette.ID)
+		modApi:addPalette(palette)
 	end
 end
 

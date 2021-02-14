@@ -38,7 +38,7 @@ return {
 	
 	["ModContent_Button_PaletteArrange"] = "Arrange Palettes",
 	["ModContent_ButtonTooltip_PaletteArrange"] = "Select which palettes will be available to pick.",
-	["PaletteArrange_RiftWalkers_Tooltip"] = "Rift Walkers must be the first palette. All other palettes are based on it.",
+	["PaletteArrange_RiftWalkers_Tooltip_Extra"] = "This palette is fixed to the first slot for technical reasons.",
 	["PaletteArrange_FrameTitle"] = "Arrange Palettes",
 	["PaletteArrange_Current_Title"] = "Current",
 	["PaletteArrange_Current_Tooltip"] = "Resets palettes to the current loaded order",
