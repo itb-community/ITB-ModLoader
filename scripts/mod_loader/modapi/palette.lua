@@ -291,11 +291,9 @@ function modApi:finalizePalettes()
 	
     ANIMS.BaseUnit.Height = 1
     ANIMS.EnemyUnit.Height = 3
-	
-	-- remove ability to add palettes and
-	-- clear these functions for further use.
+
+	-- remove ability to add palettes after init
 	canAddPalettes = false
-	self.finalizePalettes = nil
 end
 
 function modApi:addPalette(palette, id)

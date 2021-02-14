@@ -85,8 +85,7 @@ function mod_loader:init()
 
 	modApi.events.onModsInitialized:dispatch()
 	modApi.events.onModsInitialized:unsubscribeAll()
-	
-	modApi:finalizePalettes()
+
 	modApi:finalize()
 
 	self:loadPilotList()
