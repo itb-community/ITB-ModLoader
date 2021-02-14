@@ -270,6 +270,11 @@ function Ui:wheel(mx,my,y)
 	if not self.visible then return false end
 	if self.ignoreMouse then return false end
 
+	if self.dragged then
+		self:dragWheel(mx, my, y)
+		return true
+	end
+
 	for i=1,#self.children do
 		local child = self.children[i]
 		
@@ -635,6 +640,9 @@ function Ui:stopDrag(mx, my, button)
 end
 
 function Ui:dragMove(mx, my)
+end
+
+function Ui:dragWheel(mx, my, y)
 end
 
 function Ui:startDrag(mx, my, button)

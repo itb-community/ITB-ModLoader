@@ -116,6 +116,48 @@ function UiDraggable:stopDrag(mx, my, button)
 	end
 end
 
+function UiDraggable:processDropTargets(mx, my)
+	if not self.dropTargets then
+		return
+	end
+
+	local first = 1
+	local target = self.hoverTarget
+
+	if target then
+		if not rect_contains(target.rect, mx, my) then
+			self.hoverTarget = nil
+			target.hovered = false
+
+			if target.onDraggableExited then
+				target:onDraggableExited(self, target)
+			end
+		end
+		first = 2
+	end
+
+	for i = first, #self.dropTargets do
+		local target = self.dropTargets[i]
+		if rect_contains(target.rect, mx, my) then
+			self.hoverTarget = target
+			target.hovered = true
+
+			if target.onDraggableEntered then
+				target:onDraggableEntered(self, target)
+			end
+
+			if self.onDraggableEntered then
+				self:onDraggableEntered(self, target)
+			end
+
+			-- swap to front, to save iterations later
+			self.dropTargets[1], self.dropTargets[i] = self.dropTargets[i], self.dropTargets[1]
+
+			break
+		end
+	end
+end
+
 function UiDraggable:dragMove(mx, my)
 	if self.dragResizable and self.dragResizing then
 		local minsize = self.__minSize or 50
@@ -158,46 +200,18 @@ function UiDraggable:dragMove(mx, my)
 		self.y = self.y + my - self.dragY
 		self.dragX = mx
 		self.dragY = my
-		
-		if self.dropTargets then
-			local first = 1
-			local target = self.hoverTarget
-			
-			if target then
-				if not rect_contains(target.rect, mx, my) then
-					self.hoverTarget = nil
-					target.hovered = false
-					
-					if target.onDraggableExited then
-						target:onDraggableExited(self, target)
-					end
-				end
-				first = 2
-			end
-			
-			for i = first, #self.dropTargets do
-				local target = self.dropTargets[i]
-				if rect_contains(target.rect, mx, my) then
-					self.hoverTarget = target
-					target.hovered = true
-					
-					if target.onDraggableEntered then
-						target:onDraggableEntered(self, target)
-					end
-					
-					if self.onDraggableEntered then
-						self:onDraggableEntered(self, target)
-					end
-					
-					-- swap to front, to save iterations later
-					self.dropTargets[1], self.dropTargets[i] = self.dropTargets[i], self.dropTargets[1]
-					
-					break
-				end
-			end
-		end
+
+		self:processDropTargets(mx, my)
 	else
 		self.__index.dragMove(self, mx, my)
+	end
+end
+
+function UiDraggable:dragWheel(mx, my, y)
+	if self.dragMovable and self.dragMoving then
+		self:processDropTargets(mx, my)
+	else
+		self.__index.dragWheel(self, mx, my, y)
 	end
 end
 
@@ -219,11 +233,13 @@ end
 -- //////////////////////////////////////////////////////////////////////////////////
 
 local function registerDragFunctions(self)
-	self.startDrag   = UiDraggable.startDrag
-	self.stopDrag    = UiDraggable.stopDrag
-	self.dragMove    = UiDraggable.dragMove
-	self.mousemove   = UiDraggable.mousemove
-	self.mouseExited = UiDraggable.mouseExited
+	self.startDrag          = UiDraggable.startDrag
+	self.stopDrag           = UiDraggable.stopDrag
+	self.dragMove           = UiDraggable.dragMove
+	self.dragWheel          = UiDraggable.dragWheel
+	self.mousemove          = UiDraggable.mousemove
+	self.mouseExited        = UiDraggable.mouseExited
+	self.processDropTargets = UiDraggable.processDropTargets
 end
 
 function Ui:registerDragMove()
