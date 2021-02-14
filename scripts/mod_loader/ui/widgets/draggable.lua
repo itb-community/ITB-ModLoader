@@ -244,3 +244,7 @@ function Ui:registerDropTarget(target)
 	self.dropTargets = self.dropTargets or {}
 	table.insert(self.dropTargets, target)
 end
+
+function Ui:clearDropTargets()
+	self.dropTargets = nil
+end
