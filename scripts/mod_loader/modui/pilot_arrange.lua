@@ -254,12 +254,14 @@ local function btnDefaultHandlerFn()
 end
 
 local function btnRandomHandlerFn()
-	local pilotButtons = pilotsLayout.children
-
-	for i = #pilotButtons, 2, -1 do
-		local j = math.random(i)
-		pilotButtons[i], pilotButtons[j] = pilotButtons[j], pilotButtons[i]
+	local order = {}
+	for _, child in ipairs(pilotsLayout.children) do
+		order[child] = math.random()
 	end
+
+	table.sort(pilotsLayout.children, function(a, b)
+		return order[a] < order[b]
+	end)
 
 	pilotsLayout:relayout()
 
