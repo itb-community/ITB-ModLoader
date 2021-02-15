@@ -58,18 +58,8 @@ local PaletteDictionary = {
 	end,
 
 	swap = function(self, a, b)
-		local paletteA, paletteB
-		if type(a) == 'number' then
-			paletteA = self._array[a]
-		else
-			paletteA = self._dictionary[a]
-		end
-
-		if type(b) == 'number' then
-			paletteB = self._array[b]
-		else
-			paletteB = self._dictionary[b]
-		end
+		local paletteA = self:get(a)
+		local paletteB = self:get(b)
 
 		local indexA = paletteB.imageOffset
 		local indexB = paletteA.imageOffset
