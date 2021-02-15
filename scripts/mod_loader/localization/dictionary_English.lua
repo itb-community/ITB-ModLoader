@@ -169,4 +169,14 @@ return {
 	["TestingConsole_RootTestsuite"] = "Root Testsuite",
 	["TestingConsole_FailSummary_FrameTitle"] = "Failure Summary",
 	["TestingConsole_FailSummary_Tooltip"] = "This test has failed. Click to bring up a detailed summary.",
+	
+	["Palette_Name_Rift_Walkers"] = "Rift Walkers Olive",
+	["Palette_Name_Rusting_Hulks"] = "Rusting Hulks Orange",
+	["Palette_Name_Zenith_Guard"] = "Zenith Guard Blue",
+	["Palette_Name_Blitzkrieg"] = "Blitzkrieg Yellow",
+	["Palette_Name_Steel_Judoka"] = "Steel Judoka Shivan",
+	["Palette_Name_Flame_Behemoths"] = "Flame Behemoths Red",
+	["Palette_Name_Frozen_Titans"] = "Frozen Titans Blue",
+	["Palette_Name_Hazardous_Mechs"] = "Hazardous Mechs Tan",
+	["Palette_Name_Secret_Squad"] = "Secret Squad Purple",
 }

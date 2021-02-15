@@ -11,33 +11,6 @@ local VANILLA_PALETTE_ID = {
 	"Secret Squad"
 }
 
-local vanilla_palette_suffix = {
-	"Olive",
-	"Orange",
-	"Blue",
-	"Yellow",
-	"Shivan",
-	"Red",
-	"Blue",
-	"Tan",
-	"Purple"
-}
-
-local function setupVanillaTexts()
-	for i, palette_id in ipairs(VANILLA_PALETTE_ID) do
-		local text_id = "Palette_Name_"..palette_id:gsub("%s","_")
-		local text = palette_id .." ".. vanilla_palette_suffix[i]
-		
-		modApi.modLoaderDictionary[text_id] = text
-	end
-end
-
-local function onSettingsChanged(old, new)
-	if old.language ~= new.language then
-		setupVanillaTexts()
-	end
-end
-
 local COLOR_NAME_2_INDEX = {
 	lights = 1,
 	main_highlight = 2,
@@ -444,7 +417,5 @@ function modApi:getPalette(id)
 	return PaletteDictionary:get(id)
 end
 
-modApi.events.onSettingsChanged:subscribe(onSettingsChanged)
-modApi.events.onModsInitialized:subscribe(setupVanillaTexts)
 modApi.events.onModInitialized:subscribe(migrateColorMaps)
 modApi.events.onModsInitialized:subscribe(finalizePalettes)
