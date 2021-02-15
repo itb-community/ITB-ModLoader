@@ -1,27 +1,42 @@
 
 local VANILLA_PALETTE_ID = {
-	GetText("Squad_Archive_A"),
-	GetText("Squad_Rust_A"),
-	GetText("Squad_Pinnacle_A"),
-	GetText("Squad_Detritus_A"),
-	GetText("Squad_Archive_B"),
-	GetText("Squad_Rust_B"),
-	GetText("Squad_Pinnacle_B"),
-	GetText("Squad_Detritus_B"),
-	GetText("Squad_Secret")
+	"Rift Walkers",
+	"Rusting Hulks",
+	"Zenith Guard",
+	"Blitzkrieg",
+	"Steel Judoka",
+	"Flame Behemoths",
+	"Frozen Titans",
+	"Hazardous Mechs",
+	"Secret Squad"
 }
 
-local VANILLA_PALETTE_NAME = {
-	GetText(VANILLA_PALETTE_ID[1].." Olive"),
-	GetText(VANILLA_PALETTE_ID[2].." Orange"),
-	GetText(VANILLA_PALETTE_ID[3].." Blue"),
-	GetText(VANILLA_PALETTE_ID[4].." Yellow"),
-	GetText(VANILLA_PALETTE_ID[5].." Shivan"),
-	GetText(VANILLA_PALETTE_ID[6].." Red"),
-	GetText(VANILLA_PALETTE_ID[7].." Blue"),
-	GetText(VANILLA_PALETTE_ID[8].." Tan"),
-	GetText(VANILLA_PALETTE_ID[9].." Purple")
+local vanilla_palette_suffix = {
+	"Olive",
+	"Orange",
+	"Blue",
+	"Yellow",
+	"Shivan",
+	"Red",
+	"Blue",
+	"Tan",
+	"Purple"
 }
+
+local function setupVanillaTexts()
+	for i, palette_id in ipairs(VANILLA_PALETTE_ID) do
+		local text_id = "Palette_Name_"..palette_id:gsub("%s","_")
+		local text = palette_id .." ".. vanilla_palette_suffix[i]
+		
+		modApi.modLoaderDictionary[text_id] = text
+	end
+end
+
+local function onSettingsChanged(old, new)
+	if old.language ~= new.language then
+		setupVanillaTexts()
+	end
+end
 
 local COLOR_NAME_2_INDEX = {
 	lights = 1,
@@ -316,7 +331,7 @@ local function migrateColorMaps()
 	for i = fromIndex, toIndex do
 		local colorMap = GetColorMap(i)
 		local id = VANILLA_PALETTE_ID[i] or getFurlId(i) or buildPaletteId()
-		local name = VANILLA_PALETTE_NAME[i] or buildPaletteName()
+		local name = i > 9 and buildPaletteName() or nil
 
 		local palette = Palette:new{
 			name = name,
@@ -429,5 +444,7 @@ function modApi:getPalette(id)
 	return PaletteDictionary:get(id)
 end
 
+modApi.events.onSettingsChanged:subscribe(onSettingsChanged)
+modApi.events.onModsInitialized:subscribe(setupVanillaTexts)
 modApi.events.onModInitialized:subscribe(migrateColorMaps)
 modApi.events.onModsInitialized:subscribe(finalizePalettes)

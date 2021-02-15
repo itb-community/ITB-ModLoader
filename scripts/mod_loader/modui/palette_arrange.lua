@@ -61,6 +61,10 @@ local function buildSdlColorMap(palette)
 	return res
 end
 
+local function buildPaletteName(id)
+	return GetText("Palette_Name_"..id:gsub("%s", "_"))
+end
+
 local new_rect = sdl.rect(0,0,0,0)
 local function buildContractedDeco(marginx, marginy, uiDeco, ...)
 	local deco = uiDeco(...)
@@ -194,7 +198,7 @@ local function buildPaletteFrameContent(scroll)
 	for i, paletteId in ipairs(currentPaletteOrder) do
 		local palette = modApi:getPalette(paletteId)
 		local image = palette.images[1] or IMAGE_PUNCH_MECH
-		local name = palette.name or "Unnamed Palette"
+		local name = palette.name or buildPaletteName(palette.id)
 		local colormap = buildSdlColorMap(palette.colorMap)
 		local surface_mech = sdlext.getSurface({
 								path = image,
