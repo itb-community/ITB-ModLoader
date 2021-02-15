@@ -208,7 +208,7 @@ end
 local function buildPaletteImages(palette)
 	local images = palette.images or palette.Images
 
-	Assert.Equals({'nil', 'table'}, type(images), string.format("images of palette", i))
+	Assert.Equals({'nil', 'table'}, type(images), "images of palette")
 
 	if images == nil then
 		images = { palette.image or palette.Image }
