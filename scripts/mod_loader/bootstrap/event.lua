@@ -6,9 +6,10 @@ function Subscription:new(event)
 	assert(Class.instanceOf(event, Event), "Subscription.new: first argument must be an Event\n"..debug.traceback())
 
 	self.event = event
-	self.teardownFns = {}
 end
 
+--- Unsubscribes this Subscription. Returns true if it was successfully unsubscibed,
+--- or false if it wasn't open or subscribed in the first place.
 function Subscription:unsubscribe()
 	return self.event:unsubscribe(self)
 end
@@ -17,15 +18,39 @@ end
 --- this subscription is unsubscribed from its event.
 function Subscription:addTeardown(fn)
 	assert(type(fn) == "function", "Subscription.addTeardown: first argument must be a function\n"..debug.traceback())
+	self.teardownFns = self.teardownFns or {}
 	table.insert(self.teardownFns, fn)
+
+	return self
 end
 
 --- Fires teardown functions, and removes them once completed.
 function Subscription:executeTeardown()
+	if not self.teardownFns then
+		return
+	end
+
 	for _, teardownFn in ipairs(self.teardownFns) do
 		teardownFn()
 	end
 	self.teardownFns = nil
+end
+
+--- Unsubscribes this Subscription the next time the event passed in argument
+--- is triggered.
+function Subscription:openUntil(event)
+	local cleanupSubscription
+	cleanupSubscription = event:subscribe(function()
+		self:unsubscribe()
+	end)
+
+	-- Make sure we cleanup the subscription that's supposed to clean *us*
+	self:addTeardown(function()
+		cleanupSubscription:unsubscribe()
+		cleanupSubscription = nil
+	end)
+
+	return self
 end
 
 --- Returns true if this subscription is closed - ie. no longer valid and no longer notified of events.

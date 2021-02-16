@@ -183,4 +183,48 @@ function testsuite.test_EventOptionShortcircuitDisabled()
 	return true
 end
 
+function testsuite.test_EventOpenUntil_CleanupEvent()
+	local event = Event()
+	local cleanupEvent = Event()
+
+	local callCount = 0
+	event:subscribe(function()
+		callCount = callCount + 1
+	end):openUntil(cleanupEvent)
+
+	event:dispatch()
+
+	Assert.Equals(1, callCount, "Event:dispatch() did not notify the subscriber")
+
+	cleanupEvent:dispatch()
+	event:dispatch()
+
+	Assert.Equals(1, callCount, "Subscriber did not get unsubscribed when cleanup event was dispatched")
+	Assert.Equals(0, #cleanupEvent.subscribers, "The cleanup subscription did not get removed")
+	Assert.Equals(0, #event.subscribers, "Subscription did not get removed")
+
+	return true
+end
+
+function testsuite.test_EventOpenUntil_Unsubscribe()
+	local event = Event()
+	local cleanupEvent = Event()
+
+	local callCount = 0
+	local subscription = event:subscribe(function()
+		callCount = callCount + 1
+	end):openUntil(cleanupEvent)
+
+	event:dispatch()
+
+	Assert.Equals(1, callCount, "Event:dispatch() did not notify the subscriber")
+
+	subscription:unsubscribe()
+
+	Assert.Equals(0, #cleanupEvent.subscribers, "The cleanup subscription did not get removed")
+	Assert.Equals(0, #event.subscribers, "Subscription did not get removed")
+
+	return true
+end
+
 return testsuite
