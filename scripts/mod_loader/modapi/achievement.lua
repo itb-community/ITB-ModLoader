@@ -356,6 +356,12 @@ local function addAchievementProgress(self, mod_id, achievement_id, progress)
 	achievement:addProgress(progress)
 end
 
+local function isAchievementComplete(self, mod_id, achievement_id)
+	assertIsAchievement(mod_id, achievement_id)
+	local achievement = AchievementDictionary:get(mod_id, achievement_id)
+	return achievement:isComplete()
+end
+
 local function isAchievementStatus(self, mod_id, achievement_id, status)
 	assertIsAchievement(mod_id, achievement_id)
 	local achievement = AchievementDictionary:get(mod_id, achievement_id)
@@ -377,6 +383,7 @@ modApi.achievements = {
 	get = getAchievement,
 	trigger = triggerAchievement,
 	addprogress = addAchievementProgress,
+	isComplete = isAchievementComplete,
 	isStatus = isAchievementStatus,
 	getStatus = getAchievementStatus,
 	canBeAdded = achievementsCanBeAdded
