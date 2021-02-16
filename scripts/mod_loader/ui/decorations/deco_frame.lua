@@ -99,3 +99,38 @@ end
 function DecoFrameHeader:unapply(widget)
 	widget.padt = widget.padt - (self.height - self.bordersize)
 end
+
+DecoBorder = Class.inherit(UiDeco)
+function DecoBorder:new(bordercolor, bordersize, borderhlcolor, borderhlsize)
+    self.bordercolor = bordercolor or deco.colors.buttonborder
+    self.borderhlcolor = borderhlcolor or bordercolor
+    self.bordersize = bordersize or 2
+    self.borderhlsize = borderhlsize or bordersize
+    self.rect =  sdl.rect(0, 0, 0, 0)
+end
+
+function DecoBorder:draw(screen, widget)
+    local r = widget.rect
+	
+    self.rect.x = r.x
+    self.rect.y = r.y
+    self.rect.w = r.w
+    self.rect.h = r.h
+	
+    local color = self.bordercolor
+	local bordersize = self.bordersize
+    if widget.hovered then
+        color = self.borderhlcolor
+        bordersize = self.borderhlsize
+    end
+	
+    drawborder(screen, color, self.rect, bordersize)
+end
+
+function DecoBorder:apply(widget)
+    widget:padding(self.bordersize)
+end
+
+function DecoBorder:unapply(widget)
+    widget:padding(self.bordersize)
+end
