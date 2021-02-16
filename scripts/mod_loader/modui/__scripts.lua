@@ -22,6 +22,7 @@ local scripts = {
 	"squad_selector",
 	"weapon_deck_selector",
 	"modloader_configuration",
+	"toast",
 
 	"modcontent_entries",
 }
