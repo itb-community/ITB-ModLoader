@@ -2,8 +2,8 @@
 Subscription = Class.new()
 
 function Subscription:new(event)
-	assert(type(event) == "table", "Subscription.new: first argument must be a table\n"..debug.traceback())
-	assert(Class.instanceOf(event, Event), "Subscription.new: first argument must be an Event\n"..debug.traceback())
+	Assert.Equals("table", type(event), "Subscription.new: first argument must be a table")
+	Assert.True(Class.instanceOf(event, Event), "Subscription.new: first argument must be an Event")
 
 	self.event = event
 end
@@ -17,7 +17,7 @@ end
 --- Adds a teardown function to this subscription, which will be executed when
 --- this subscription is unsubscribed from its event.
 function Subscription:addTeardown(fn)
-	assert(type(fn) == "function", "Subscription.addTeardown: first argument must be a function\n"..debug.traceback())
+	Assert.Equals("function", type(fn), "Subscription.addTeardown: first argument must be a function")
 	self.teardownFns = self.teardownFns or {}
 	table.insert(self.teardownFns, fn)
 
@@ -39,6 +39,9 @@ end
 --- Unsubscribes this Subscription the next time the event passed in argument
 --- is triggered.
 function Subscription:openUntil(event)
+	Assert.Equals("table", type(event), "Subscription.openUntil: first argument must be a table")
+	Assert.True(Class.instanceOf(event, Event), "Subscription.openUntil: first argument must be an Event")
+
 	local cleanupSubscription
 	cleanupSubscription = event:subscribe(function()
 		self:unsubscribe()
@@ -82,7 +85,9 @@ Event = Class.new()
 Event.SHORTCIRCUIT = "shortcircuit"
 
 function Event:new(options)
-	assert(options == nil or type(options) == "table", "Event.new: first argument must be a table\n"..debug.traceback())
+	if options then
+		Assert.Equals("table", type(options), "Event.new: first argument must be a table")
+	end
 	self.subscribers = {}
 	self.options = {}
 
@@ -95,7 +100,7 @@ end
 
 --- Subscribes a function to this event; this call is analogous to modApi:add__Hook() in old hooks API.
 function Event:subscribe(fn)
-	assert(type(fn) == "function", "Event.subscribe: first argument must be a function\n"..debug.traceback())
+	Assert.Equals("function", type(fn), "Event.subscribe: first argument must be a function")
 	local sub = Subscription(self)
 	sub.fn = fn
 
@@ -106,6 +111,8 @@ end
 
 --- Returns true if the specified object is subscribed to this Event. False otherwise.
 function Event:isSubscribed(subscription)
+	Assert.Equals({"function", "table"}, type(subscription), "Event.isSubscribed: first argument must be a function or a table")
+
 	if type(subscription) == "table" and Class.instanceOf(subscription, Subscription) then
 		if subscription:isClosed() then
 			return false
@@ -127,14 +134,13 @@ end
 --- of the event being fired.
 --- Returns true if successfully unsubscribed, false otherwise.
 function Event:unsubscribe(subscription)
-	local argType = type(subscription)
-	assert(argType == "table" or argType == "function", "Event.unsubscribe: first argument must be a table or a function\n"..debug.traceback())
+	Assert.Equals({"function", "table"}, type(subscription), "Event.isSubscribed: first argument must be a function or a table")
 
 	if not self:isSubscribed(subscription) then
 		return false
 	end
 
-	if argType == "function" then
+	if type(subscription) == "function" then
 		for _, sub in ipairs(self.subscribers) do
 			if sub.fn == subscription then
 				subscription = sub
@@ -148,7 +154,7 @@ function Event:unsubscribe(subscription)
 		end
 	end
 
-	assert(Class.instanceOf(subscription, Subscription), "Event.unsubscribe: first argument must be a Subscription\n"..debug.traceback())
+	Assert.True(Class.instanceOf(subscription, Subscription), "Event.unsubscribe: first argument must be a Subscription")
 
 	if subscription:isClosed() then
 		return false
