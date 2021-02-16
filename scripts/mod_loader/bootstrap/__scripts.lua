@@ -1,4 +1,6 @@
 local scripts = {
+	"assert",
+	"io",
 	"utils",
 	"classes",
 	"event",
