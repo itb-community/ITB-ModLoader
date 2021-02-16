@@ -50,6 +50,10 @@ return {
 	["ConfigureWeaponDeck_PresetSave_Title"] = "Save",
 	["ConfigureWeaponDeck_PresetSave_Tooltip"] = "Saves the current weapons to the selected preset. If nothing is checked, deletes the current preset.",
 
+	["ModContent_Button_Achievements"] = "Achievements",
+	["ModContent_ButtonTooltip_Achievements"] = "Display achievements",
+	["Achievements_FrameTitle"] = "Achievements",
+
 	["ModContent_Button_ModLoaderConfig"] = "Configure Mod Loader",
 	["ModContent_ButtonTooltip_ModLoaderConfig"] = "Configure some features of the mod loader.",
 	["ModLoaderConfig_FrameTitle"] = "Mod Loader Configuration",
