@@ -51,14 +51,14 @@ local AchievementDictionary = {
 		assert(type(achievement) == 'table')
 
 		self._mods[mod_id] = self._mods[mod_id] or {}
-		table.insert(self._mods[mod_id], achievement)
+		self._mods[mod_id][achievement_id] = achievement
 	end,
 
 	get = function(self, mod_id, achievement_id)
 		if self._mods[mod_id] == nil then
 			return nil
 		end
-		
+
 		return self._mods[mod_id][achievement_id]
 	end,
 }
@@ -327,7 +327,7 @@ end
 local function assertIsAchievement(mod_id, achievement_id)
 	Assert.Equals('string', type(mod_id), "Argument #1")
 	Assert.Equals('string', type(achievement_id), "Argument #2")
-	Assert.NotEquals('string', AchievementDictionary:get(mod_id, achievement_id), "Achievement for mod ".. mod_id .." with id ".. achievement_id .." does not exist")
+	Assert.NotEquals('nil', type(AchievementDictionary:get(mod_id, achievement_id)), "Achievement for mod ".. mod_id .." with id ".. achievement_id .." does not exist")
 end
 
 local function getAchievement(self, mod_id, achievement_id)

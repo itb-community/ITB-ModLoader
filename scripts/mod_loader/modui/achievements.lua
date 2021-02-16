@@ -105,7 +105,7 @@ local function buildModContent(mod, modAchievements)
 	content.nofitx = true
 	content.nofity = true
 
-	for _, achievement in ipairs(modAchievements) do
+	for _, achievement in pairs(modAchievements) do
 		buildAchievementFrame(achievement)
 			:addTo(content)
 	end
