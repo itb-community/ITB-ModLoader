@@ -8,17 +8,18 @@ function UiRoot:new()
 	self.pressedchild = nil
 	self.focuschild = self
 	self.translucent = true
-	self.tooltipUi = UiTooltip():addTo(self)
+	self.priorityUi = Ui():addTo(self)
+	self.tooltipUi = UiTooltip():addTo(self.priorityUi)
 end
 
 function UiRoot:draw(screen)
+	-- priorityUi is relayed out last, but drawn first
+	self.priorityUi.visible = false
 	self:relayout()
 
-	-- Temporary hack until I figure out how to
-	-- update tooltip frame strata without causing flickering
-	if self.tooltipUi.visible then
-		self.tooltipUi:bringToTop()
-	end
+	self.priorityUi.visible = true
+	self.priorityUi:bringToTop()
+	self.priorityUi:relayout()
 
 	Ui.draw(self, screen)
 	
@@ -142,6 +143,8 @@ function UiRoot:event(eventloop)
 			self.hoveredchild.hovered = false
 		end
 		self.hoveredchild = nil
+		self.tooltip_static = false
+		self.tooltip_title = false
 		self.tooltip = ""
 
 		if self.pressedchild ~= nil then

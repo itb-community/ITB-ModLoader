@@ -123,6 +123,9 @@ function UiScrollArea:wheel(mx, my, y)
 
 	-- Call back to mousemove to update hover and tooltip statuses of the area's
 	-- child elements.
+	self.root.tooltip_static = false
+	self.root.tooltip_title = ""
+	self.root.tooltip = ""
 	Ui.mousemove(self, mx, my + (self.dy - startdy))
 
 	return Ui.wheel(self, mx, my, y)
@@ -268,6 +271,9 @@ function UiScrollAreaH:wheel(mx, my, y)
 
 	-- Call back to mousemove to update hover and tooltip statuses of the area's
 	-- child elements.
+	self.root.tooltip_static = false
+	self.root.tooltip_title = ""
+	self.root.tooltip = ""
 	Ui.mousemove(self, mx + (self.dx - startdx), my)
 
 	return Ui.wheel(self, mx, my, y)

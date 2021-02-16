@@ -100,9 +100,11 @@ function Ui:setroot(root)
 	return self
 end
 
-function Ui:settooltip(tip)
-	self.tooltip = tip
-	
+function Ui:settooltip(text, title, static)
+	self.tooltip_static = static
+	self.tooltip_title = title
+	self.tooltip = text
+
 	return self
 end
 
@@ -352,6 +354,8 @@ function Ui:mouseup(mx, my, button)
 		self.hovered = false
 		-- Cleanup the tooltip to prevent flickering when mouse is
 		-- first moved after the release
+		self.root.tooltip_static = false
+		self.root.tooltip_title = ""
 		self.root.tooltip = ""
 		self.root.tooltipUi:updateText()
 	end
@@ -416,6 +420,8 @@ function Ui:mousemove(mx, my)
 	end
 
 	if self.tooltip then
+		self.root.tooltip_static = self.tooltip_static
+		self.root.tooltip_title = self.tooltip_title
 		self.root.tooltip = self.tooltip
 	end
 
