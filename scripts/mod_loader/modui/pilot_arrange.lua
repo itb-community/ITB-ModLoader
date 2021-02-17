@@ -308,37 +308,36 @@ local function restartReminderDialogResponseFn(btnIndex)
 	end
 end
 
-local function createUi()
-	hangarBackdrop = sdlext.getSurface({ path = "resources/mods/ui/pilot-arrange-hangar.png" })
-	pilotLock = sdlext.getSurface({ path = "img/main_menus/lock.png" })
+local function onExit()
+	-- update a local variable into config
+	local pilots = {}
+	for i = 1, MAX_PILOTS do
+		pilots[i] = pilotsLayout.children[i].pilotId
+	end
+	pilotsLayout = nil
 
-	local onExit = function(self)
-		-- update a local variable into config
-		local pilots = {}
-		for i = 1, MAX_PILOTS do
-			pilots[i] = pilotsLayout.children[i].pilotId
-		end
-		pilotsLayout = nil
-		hangarPilots = {}
+	savePilotsOrder(pilots)
 
-		savePilotsOrder(pilots)
-
-		-- update the global if we have not entered the hangar
-		if updateImmediately then
-			PilotList = pilots
-		elseif modApi.showPilotRestartReminder then
-			-- alert the user to restart the game
-			modApi:scheduleHook(50, function()
-				sdlext.showButtonDialog(
+	-- update the global if we have not entered the hangar
+	if updateImmediately then
+		PilotList = pilots
+	elseif modApi.showPilotRestartReminder then
+		-- alert the user to restart the game
+		modApi:scheduleHook(50, function()
+			sdlext.showButtonDialog(
 					GetText("OpenGL_FrameTitle"),
 					GetText("PilotArrange_RestartWarning_Text"),
 					restartReminderDialogResponseFn,
 					{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
 					{ "", GetText("ButtonTooltip_DisablePopup") }
-				)
-			end)
-		end
+			)
+		end)
 	end
+end
+
+local function createUi()
+	hangarBackdrop = sdlext.getSurface({ path = "resources/mods/ui/pilot-arrange-hangar.png" })
+	pilotLock = sdlext.getSurface({ path = "img/main_menus/lock.png" })
 
 	sdlext.showDialog(function(ui, quit)
 		ui.onDialogExit = onExit
