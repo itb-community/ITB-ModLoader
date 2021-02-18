@@ -142,7 +142,7 @@ local Objective = {
 			local result = {}
 
 			for i, _ in pairs(objective) do
-				if progress[i] == nil then
+				if progress == nil or progress[i] == nil then
 					result[i] = objective[i]
 				else
 					result[i] = self:getMergedState(objective[i], progress[i])
