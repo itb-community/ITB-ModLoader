@@ -128,19 +128,8 @@ local Objective = {
 
 	-- returns 'objective' in its completed state
 	getCompleteState = function(self, objective)
-		if type(objective) == 'table' then
-			local result = {}
-
-			for i, obj in pairs(objective) do
-				result[i] = self:getCompleteState(obj)
-			end
-			return result
-
-		elseif type(objective) == 'number' then
-			return objective
-		end
-
-		return toboolean(objective)
+		local initialState = self:getInitialState(objective)
+		return self:getMergedState(initialState, objective)
 	end,
 
 	-- merges progress into objective and returns the result.
