@@ -105,7 +105,7 @@ local function buildModContent(mod, modAchievements)
 	content.nofitx = true
 	content.nofity = true
 
-	for _, achievement in pairs(modAchievements) do
+	for _, achievement in ipairs(modAchievements) do
 		buildAchievementFrame(achievement)
 			:addTo(content)
 	end
@@ -145,12 +145,14 @@ local function onExit()
 				local isComplete = achievement:isComplete()
 
 				obj.achievements[mod_id] = obj.achievements[mod_id] or {}
-				if frame.checked and not isComplete then
-					obj.achievements[mod_id][id] = shallow_copy(achievement.objective)
-					achievement:addReward()
-				elseif not frame.checked and isComplete then
-					obj.achievements[mod_id][id] = achievement:getResetObjective()
-					achievement:remReward()
+				if frame.checked ~= isComplete then
+					if isComplete then
+						obj.achievements[mod_id][id] = achievement:getObjectiveInitialState()
+						achievement:remReward()
+					else
+						obj.achievements[mod_id][id] = achievement:getObjectiveCompleteState()
+						achievement:addReward()
+					end
 				end
 			end
 
