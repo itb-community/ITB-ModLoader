@@ -53,6 +53,7 @@ return {
 	["ModContent_Button_Achievements"] = "Achievements",
 	["ModContent_ButtonTooltip_Achievements"] = "Display achievements",
 	["Achievements_FrameTitle"] = "Achievements",
+	["Achievements_ToastTitle"] = "Achievement!",
 
 	["ModContent_Button_ModLoaderConfig"] = "Configure Mod Loader",
 	["ModContent_ButtonTooltip_ModLoaderConfig"] = "Configure some features of the mod loader.",
