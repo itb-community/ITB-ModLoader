@@ -69,14 +69,23 @@ function mod_loader:init()
 		modApi:setCurrentMod(id)
 		self:initMetadata(id)
 		i = i + 1
+		modApi.events.onModMetadataDone:dispatch(id)
 	end
+
+	modApi.events.onModMetadataDone:unsubscribeAll()
+
+	modApi.events.onModsMetadataDone:dispatch()
+	modApi.events.onModsMetadataDone:unsubscribeAll()
 
 	local orderedMods = self:orderMods(self:getModConfig(), self:getSavedModOrder())
 	for i, id in ipairs(orderedMods) do
 		modApi:setCurrentMod(id)
 		self:initMod(id)
+		modApi.events.onModInitialized:dispatch(id)
 	end
-	
+
+	modApi.events.onModInitialized:unsubscribeAll()
+
 	Assert.Traceback = true
 	modApi:setCurrentMod(nil)
 
@@ -542,6 +551,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 					mod.name,
 					id
 				))
+				modApi.events.onModLoaded:dispatch(id)
 			else
 				mod.installed = false
 				mod.error = err
