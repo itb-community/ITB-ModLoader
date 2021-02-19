@@ -75,7 +75,10 @@ function mod_loader:init()
 	for i, id in ipairs(orderedMods) do
 		modApi:setCurrentMod(id)
 		self:initMod(id)
+
+		modApi.events.onModInitialized:dispatch(id)
 	end
+	modApi.events.onModInitialized:unsubscribeAll()
 	
 	Assert.Traceback = true
 	modApi:setCurrentMod(nil)

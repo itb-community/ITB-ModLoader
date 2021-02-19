@@ -6,6 +6,7 @@ modApi = {}
 modApi.events = {}
 
 local t = modApi.events
+t.onModInitialized = Event()
 t.onModsInitialized = Event()
 t.onModsLoaded = Event()
 t.onModsFirstLoaded = Event()
