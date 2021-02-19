@@ -339,17 +339,52 @@ local function buildAchievementObjective(objective)
 	return objective
 end
 
--- migrate achievements from lmn_achievements.chievos
 local function migrateAchievements()
-	local mods = lmn_achievements.chievos
+	local mod_id = modApi.currentMod
+	local achievements = lmn_achievements.chievos[mod_id]
 
-	for mod_id, achievements in pairs(mods) do
+	if type(achievements) == 'table' then
 		for _, old_achievement in ipairs(achievements) do
-			achievement = Achievement:new(old_achievement)
-			achievement.mod_id = mod_id
-			modApi.achievements:add(achievement)
+			local data = Achievement:new(old_achievement)
+			local achievement = modApi.achievements:add(data)
+
+			function achievement:TriggerChievo(progress) self:trigger(progress) end
+			function achievement:GeTStatus() return self:getProgress() end
+			function achievement:GetTip() return self:getTooltip() end
 		end
 	end
+end
+
+local function redirectLegacyApi()
+	local mod_id = modApi.currentMod
+	local mod = mod_loader.mods[mod_id]
+	local path = mod.scriptPath .. "achievements/api"
+
+	if not modApi:fileExists(path..".lua") then
+		return
+	end
+
+	local api = require(path)
+
+	if type(api) ~= 'table' then
+		return
+	end
+
+	function api:AddChievo() end
+	function api:AddChievos() end
+	function api:GetVersion() return 0 end
+	function api:GetHighestVersion() return 1 end
+	function api:GetChievo(id) return AchievementDictionary:get(mod_id, id) end
+	function api:GetChievoTipFormatted(id) return self:GetChievo(id):getTooltip() end
+	function api:TriggerChievo(id, progress) self:GetChievo(id):trigger(progress) end
+	function api:TriggerAll(progress)
+		for _, achievement in ipairs(AchievementDictionary._mods[mod_id]) do
+			achievment:trigger(progress)
+		end
+	end
+	function api:GetChievoStatus(id) return self:GetChievo(id):getProgress() end
+	function api:IsChievoProgress(id, progress) return self:GetChievo(id):isProgress(progress) end
+	function api:ToastUnlock(achievement) modApi.toasts:add(achievement) end
 end
 
 local function triggerRewards()
@@ -365,10 +400,25 @@ local function triggerRewards()
 end
 
 local function onModsInitialized()
-	migrateAchievements()
+	lmn_achievements.version = "1"
 	triggerRewards()
-
 	canAddAchievements = false
+end
+
+local function detectAchievementLibrary()
+	-- let all mods have the opportunity to take control of lmn_achievements.
+	-- once they do, we redirect all of their api functions to mod loader equivalents.
+	if not modApi:isVersion(lmn_achievements.version, "0") then
+		LOGF("Legacy achievement library detected for mod [%s] - redirecting functions to mod loader equivalents.", modApi.currentMod)
+
+		migrateAchievements()
+		redirectLegacyApi()
+
+		-- reset version to allow the next mod to take control,
+		-- so we can detect it, and redirect their achievement api.
+		lmn_achievements.version = "0"
+		lmn_achievements.chievos = {}
+	end
 end
 
 local function addAchievement(self, achievement)
@@ -477,4 +527,6 @@ modApi.achievements = {
 	canBeAdded = achievementsCanBeAdded
 }
 
+modApi.events.onModInitialized:subscribe(detectAchievementLibrary)
+modApi.events.onModMetadataDone:subscribe(detectAchievementLibrary)
 modApi.events.onModsInitialized:subscribe(onModsInitialized)
