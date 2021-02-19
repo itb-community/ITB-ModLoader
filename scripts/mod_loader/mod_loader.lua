@@ -69,7 +69,9 @@ function mod_loader:init()
 		modApi:setCurrentMod(id)
 		self:initMetadata(id)
 		i = i + 1
+		modApi.events.onModMetadataDone:dispatch(id)
 	end
+	modApi.events.onModMetadataDone:unsubscribeAll()
 
 	local orderedMods = self:orderMods(self:getModConfig(), self:getSavedModOrder())
 	for i, id in ipairs(orderedMods) do
