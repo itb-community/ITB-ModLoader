@@ -235,12 +235,12 @@ function Achievement:getObjectiveInitialState()
 end
 
 function Achievement:completeProgress()
-	local completeState = self:getCompleteState()
+	local completeState = self:getObjectiveCompleteState()
 	self:setProgress(completeState)
 end
 
 function Achievement:resetProgress()
-	local initialState = self:getInitialState()
+	local initialState = self:getObjectiveInitialState()
 	self:setProgress(initialState)
 end
 
@@ -298,7 +298,7 @@ function Achievement:isProgress(progress, objective_id)
 	return Objective:isProgress(progress, self:getProgress(), objective_id)
 end
 
-function Achievement:getTooltip(tooltip, objective_id)
+function Achievement:getTooltip()
 	return Objective:getFormattedTooltip(self)
 end
 
