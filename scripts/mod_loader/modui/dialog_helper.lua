@@ -179,6 +179,49 @@ function sdlext.buildTextDialog(title, text, options)
 	return frame
 end
 
+function sdlext.buildScrollDialog(title, contentBuilderFn, options)
+	Assert.Equals("function", type(contentBuilderFn))
+	if options then
+		Assert.Equals("table", type(options))
+	else
+		options = {}
+	end
+
+	local maxW = options.maxW or 0.5 * ScreenSizeX()
+	local maxH = options.maxH or 0.5 * ScreenSizeY()
+	local minW = options.minW or 700
+	local minH = options.minH or 100
+	local compactW = (options.compactW == nil and true) or options.compactW
+	local compactH = options.compactH or false
+
+	Assert.Equals("number", type(maxW))
+	Assert.Equals("number", type(maxH))
+	Assert.Equals("number", type(minW))
+	Assert.Equals("number", type(minH))
+	Assert.Equals("boolean", type(compactW))
+	Assert.Equals("boolean", type(compactH))
+
+	local frame = sdlext.buildSimpleDialog(title, options)
+	local scroll = frame.scroll
+
+	contentBuilderFn(scroll)
+
+	frame:relayout()
+
+	local contentW = compactW and (scroll.innerWidth + scroll.padl + scroll.padr) or scroll.w
+	local w = math.max(minW, contentW + frame.padl + frame.padr)
+	w = math.min(w, maxW)
+	local contentH = compactH and (scroll.innerHeight + scroll.padt + scroll.padb) or scroll.h
+	local h = math.max(minH, contentH + frame.padt + frame.padb)
+	h = math.min(h, maxH)
+
+	frame:widthpx(w)
+	frame:heightpx(h)
+	frame:relayout()
+
+	return frame
+end
+
 function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, options)
 	Assert.Equals("function", type(contentBuilderFn))
 	Assert.Equals("function", type(buttonsBuilderFn))
