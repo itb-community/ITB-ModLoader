@@ -205,6 +205,7 @@ local function buildPilotArrangeContent(scroll)
 
 	pilotsLayout = UiFlowLayout()
 		:width(1)
+		:compact(true)
 		:vgap(gap):hgap(gap)
 		:padding(8)
 		:addTo(scroll)
@@ -233,6 +234,7 @@ local function buildPilotArrangeContent(scroll)
 	-- drawn in reverse order)
 	local hangarLayout = UiFlowLayout()
 			:width(1)
+			:compact(true)
 			:vgap(gap):hgap(gap)
 			:padding(8)
 			:addTo(scroll)
@@ -349,7 +351,8 @@ local function createUi()
 				{
 					maxW = 0.8 * ScreenSizeX(),
 					maxH = 0.8 * ScreenSizeY(),
-					compact = false
+					compactW = true,
+					compactH = true
 				}
 		)
 
