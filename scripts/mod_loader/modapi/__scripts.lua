@@ -1,5 +1,4 @@
 local scripts = {
-	"assert",
 	"vector",
 	"init",
 	"global",
