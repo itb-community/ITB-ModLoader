@@ -192,7 +192,8 @@ function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, opt
 	local maxH = options.maxH or 0.5 * ScreenSizeY()
 	local minW = options.minW or 700
 	local minH = options.minH or 100
-	local compact = (options.compact == nil and true) or options.compact
+	local compactW = (options.compactW == nil and true) or options.compactW
+	local compactH = (options.compactH == nil and false) or options.compactH
 
 	local frame = sdlext.buildSimpleDialog(title, options)
 	local scroll = frame.scroll
@@ -224,10 +225,10 @@ function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, opt
 
 	frame:relayout()
 
-	local contentW = compact and (scroll.innerWidth + scroll.padl + scroll.padr) or scroll.w
+	local contentW = compactW and (scroll.innerWidth + scroll.padl + scroll.padr) or scroll.w
 	local w = math.max(minW, contentW + frame.padl + frame.padr)
 	w = math.min(w, maxW)
-	local contentH = compact and (scroll.innerHeight + scroll.padt + scroll.padb) or scroll.h
+	local contentH = compactH and (scroll.innerHeight + scroll.padt + scroll.padb) or scroll.h
 	local h = math.max(minH, contentH + frame.padt + frame.padb + buttonHolder.h + line.h)
 	h = math.min(h, maxH)
 

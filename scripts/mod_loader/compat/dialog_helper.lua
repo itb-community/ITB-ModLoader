@@ -38,7 +38,7 @@ function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, opt
 		options = {
 			maxW = w,
 			maxH = h,
-			compact = false
+			compactH = false
 		}
 		compatArg = nil
 	end

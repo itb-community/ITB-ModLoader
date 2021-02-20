@@ -556,7 +556,7 @@ local function showModConfig()
 			{
 				maxW = 0.6 * ScreenSizeX(),
 				maxH = 0.8 * ScreenSizeY(),
-				compact = false
+				compactH = false
 			}
 		)
 		
