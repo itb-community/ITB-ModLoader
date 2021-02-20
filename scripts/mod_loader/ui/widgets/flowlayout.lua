@@ -66,14 +66,20 @@ function UiFlowLayout:relayout()
 				if nextX + child.w > self.w then
 					nextX = 0
 					nextY = nextY + currentMaxSize + self.gapVertical
-					self.innerHeight = self.innerHeight + currentMaxSize + self.gapVertical
+					if self.innerHeight > 0 then
+						self.innerHeight = self.innerHeight + self.gapVertical
+					end
+					self.innerHeight = self.innerHeight + currentMaxSize
 					currentMaxSize = 0
 				end
 			else
 				if nextY + child.h > self.h then
 					nextY = 0
 					nextX = nextX + currentMaxSize + self.gapHorizontal
-					self.innerWidth = self.innerWidth + currentMaxSize + self.gapHorizontal
+					if self.innerWidth > 0 then
+						self.innerWidth = self.innerWidth + self.gapHorizontal
+					end
+					self.innerWidth = self.innerWidth + currentMaxSize
 					currentMaxSize = 0
 				end
 			end
@@ -82,13 +88,23 @@ function UiFlowLayout:relayout()
 			child.y = nextY
 
 			if self.horizontal then
-				nextX = nextX + child.w + self.gapHorizontal
+				nextX = nextX + child.w
 				currentMaxSize = math.max(currentMaxSize, child.h)
-				self.innerWidth = math.min(self.w, self.innerWidth + child.w + self.gapHorizontal)
+
+				if nextX <= self.w then
+					self.innerWidth = math.max(self.innerWidth, nextX)
+				end
+
+				nextX = nextX + self.gapHorizontal
 			else
-				nextY = nextY + child.h + self.gapVertical
+				nextY = nextY + child.h
 				currentMaxSize = math.max(currentMaxSize, child.w)
-				self.innerHeight = math.min(self.h, self.innerHeight + child.h + self.gapVertical)
+
+				if nextY <= self.h then
+					self.innerHeight = math.max(self.innerHeight, nextY)
+				end
+
+				nextY = nextY + self.gapVertical
 			end
 
 			child.screenx = self.screenx + self.padl - self.dx + child.x
