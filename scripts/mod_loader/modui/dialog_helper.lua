@@ -193,7 +193,14 @@ function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, opt
 	local minW = options.minW or 700
 	local minH = options.minH or 100
 	local compactW = (options.compactW == nil and true) or options.compactW
-	local compactH = (options.compactH == nil and false) or options.compactH
+	local compactH = options.compactH or false
+
+	Assert.Equals("number", type(maxW))
+	Assert.Equals("number", type(maxH))
+	Assert.Equals("number", type(minW))
+	Assert.Equals("number", type(minH))
+	Assert.Equals("boolean", type(compactW))
+	Assert.Equals("boolean", type(compactH))
 
 	local frame = sdlext.buildSimpleDialog(title, options)
 	local scroll = frame.scroll
