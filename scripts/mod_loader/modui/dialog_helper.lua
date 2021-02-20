@@ -224,9 +224,10 @@ function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, opt
 
 	frame:relayout()
 
-	local w = math.max(minW, buttonHolder.w + frame.padl + frame.padr)
+	local contentW = compact and (scroll.innerWidth + scroll.padl + scroll.padr) or scroll.w
+	local w = math.max(minW, contentW + frame.padl + frame.padr)
 	w = math.min(w, maxW)
-	local contentH = compact and scroll.innerHeight or scroll.h
+	local contentH = compact and (scroll.innerHeight + scroll.padt + scroll.padb) or scroll.h
 	local h = math.max(minH, contentH + frame.padt + frame.padb + buttonHolder.h + line.h)
 	h = math.min(h, maxH)
 
