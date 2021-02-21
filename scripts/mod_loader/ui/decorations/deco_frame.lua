@@ -132,5 +132,5 @@ function DecoBorder:apply(widget)
 end
 
 function DecoBorder:unapply(widget)
-    widget:padding(self.bordersize)
+    widget:padding(-self.bordersize)
 end
