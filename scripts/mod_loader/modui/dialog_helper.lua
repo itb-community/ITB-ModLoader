@@ -137,6 +137,7 @@ end
 -- //////////////////////////////////////////////////////////////////////
 
 function sdlext.buildSimpleDialog(title, options)
+	Assert.Equals("string", type(title))
 	if options then
 		Assert.Equals("table", type(options))
 	else
@@ -164,22 +165,25 @@ function sdlext.buildSimpleDialog(title, options)
 end
 
 function sdlext.buildTextDialog(title, text, options)
-	local frame = sdlext.buildSimpleDialog(title, options)
-	local scroll = frame.scroll
+	Assert.Equals("string", type(title))
+	Assert.Equals("string", type(text))
 
-	local font = deco.uifont.tooltipTextLarge.font
-	local textset = deco.uifont.tooltipTextLarge.set
-	local wrap = UiWrappedText(text, font, textset)
-		:widthpx(scroll.w)
-		:addTo(scroll)
+	local contentFn = function(scroll)
+		local font = deco.uifont.tooltipTextLarge.font
+		local textset = deco.uifont.tooltipTextLarge.set
+		local wrap = UiWrappedText(text, font, textset)
+				:widthpx(scroll.w)
+				:addTo(scroll)
 
-	wrap.pixelWrap = true
-	wrap:rebuild()
+		wrap.pixelWrap = true
+		wrap:rebuild()
+	end
 
-	return frame
+	return sdlext.buildScrollDialog(title, contentFn, options)
 end
 
 function sdlext.buildScrollDialog(title, contentBuilderFn, options)
+	Assert.Equals("string", type(title))
 	Assert.Equals("function", type(contentBuilderFn))
 	if options then
 		Assert.Equals("table", type(options))
@@ -223,6 +227,7 @@ function sdlext.buildScrollDialog(title, contentBuilderFn, options)
 end
 
 function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, options)
+	Assert.Equals("string", type(title))
 	Assert.Equals("function", type(contentBuilderFn))
 	Assert.Equals("function", type(buttonsBuilderFn))
 	if options then
@@ -388,18 +393,8 @@ end
 function sdlext.showTextDialog(title, text, options)
 	sdlext.showDialog(function(ui, quit)
 		local frame = sdlext.buildTextDialog(title, text, options)
-		local scroll = frame.children[1]
-
-		frame:relayout()
-
-		if scroll.innerHeight < h - frame.padt - frame.padb then
-			scroll:heightpx(scroll.innerHeight)
-		end
-
-		h = math.min(h, scroll.innerHeight + frame.padt + frame.padb)
 
 		frame
-			:heightpx(h)
 			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
 			:addTo(ui)
 	end)
