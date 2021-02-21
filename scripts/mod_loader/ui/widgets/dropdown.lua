@@ -22,6 +22,8 @@ function UiDropDown:new(values,strings,value)
 		self.value = values[1]
 	end
 	self.open = false
+
+	self.optionSelected = Event()
 end
 
 function UiDropDown:destroyDropDown()
@@ -59,11 +61,17 @@ function UiDropDown:createDropDown()
 		
 		item.onclicked = function(btn, button)
 			if button == 1 then
+				local oldChoice = self.choice
+				local oldValue = self.value
+
 				self.choice = i
 				self.value = self.values[i]
 				
 				self:destroyDropDown()
 				self.hovered = false
+
+				self.optionSelected:dispatch(oldChoice, oldValue)
+
 				return true
 			end
 			return false
