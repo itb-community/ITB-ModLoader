@@ -195,8 +195,8 @@ function sdlext.buildScrollDialog(title, contentBuilderFn, options)
 	local maxH = options.maxH or 0.5 * ScreenSizeY()
 	local minW = options.minW or 700
 	local minH = options.minH or 100
-	local compactW = (options.compactW == nil and true) or options.compactW
-	local compactH = options.compactH or false
+	local compactW = options.compactW or false
+	local compactH = (options.compactH == nil and true) or options.compactH
 
 	Assert.Equals("number", type(maxW))
 	Assert.Equals("number", type(maxH))
@@ -240,8 +240,8 @@ function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, opt
 	local maxH = options.maxH or 0.5 * ScreenSizeY()
 	local minW = options.minW or 700
 	local minH = options.minH or 100
-	local compactW = (options.compactW == nil and true) or options.compactW
-	local compactH = options.compactH or false
+	local compactW = options.compactW or false
+	local compactH = (options.compactH == nil and true) or options.compactH
 
 	Assert.Equals("number", type(maxW))
 	Assert.Equals("number", type(maxH))
