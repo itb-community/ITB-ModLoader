@@ -1,4 +1,7 @@
 
+local PALETTE_INDEX_FIRST_MOVABLE = 2
+local PALETTE_COUNT_VANILLA = 9
+local PALETTE_COUNT_HANGAR_MAX = 11
 local VANILLA_PALETTE_ID = {
 	"Rift Walkers",
 	"Rusting Hulks",
@@ -115,8 +118,8 @@ end
 function modApi.getColorCount()
 	local count = PaletteDictionary:size()
 
-	if count > 11 and sdlext.isHangar() then
-		return 11
+	if count > PALETTE_COUNT_HANGAR_MAX and sdlext.isHangar() then
+		return PALETTE_COUNT_HANGAR_MAX
 	end
 
 	return count
@@ -222,7 +225,7 @@ local function loadPaletteOrder()
 		-- are not selectable in the hangar.
 		-- ignore palettes beyond our current
 		-- palette count.
-		for new_index = 2, math.min(11, PaletteDictionary:size()) do
+		for new_index = PALETTE_INDEX_FIRST_MOVABLE, math.min(PALETTE_COUNT_HANGAR_MAX, PaletteDictionary:size()) do
 			local palette_id = loadedPaletteOrder[new_index]
 
 			if palette_id ~= nil and type(palette_id) == 'string' then
@@ -230,8 +233,8 @@ local function loadPaletteOrder()
 
 				if palette ~= nil then
 					local old_index = palette.imageOffset
-					
-					if old_index ~= new_index and old_index ~= 1 then
+
+					if old_index ~= new_index and old_index >= PALETTE_INDEX_FIRST_MOVABLE then
 						PaletteDictionary:swap(old_index, new_index)
 					end
 				end
@@ -273,7 +276,7 @@ local function loadPaletteOrder()
 
 		-- build new palette order to save to config
 		local new_paletteOrder = {}
-		for imageOffset = 2, 11 do
+		for imageOffset = PALETTE_INDEX_FIRST_MOVABLE, PALETTE_COUNT_HANGAR_MAX do
 			local palette = PaletteDictionary:get(imageOffset)
 
 			if palette ~= nil then
@@ -294,7 +297,7 @@ local function migrateColorMaps()
 	for i = fromIndex, toIndex do
 		local colorMap = GetColorMap(i)
 		local id = VANILLA_PALETTE_ID[i] or getFurlId(i) or buildPaletteId()
-		local name = i > 9 and buildPaletteName() or nil
+		local name = i > PALETTE_COUNT_VANILLA and buildPaletteName() or nil
 
 		local palette = Palette:new{
 			name = name,

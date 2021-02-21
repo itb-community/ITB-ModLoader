@@ -1,4 +1,7 @@
 
+local PALETTE_INDEX_BASE = 1
+local PALETTE_INDEX_FIRST_MOVABLE = 2
+local PALETTE_COUNT_HANGAR_MAX = 11
 local IMAGE_PUNCH_MECH = "img/units/player/mech_punch_ns.png"
 local FADE_RECT = sdl.rect(0,0,50,50)
 local SURFACE_LOCK = sdlext.getSurface({
@@ -26,7 +29,7 @@ local function savePaletteOrder()
 	end
 
 	local new_paletteOrder = {}
-	for i = 2, 11 do
+	for i = PALETTE_INDEX_FIRST_MOVABLE, PALETTE_COUNT_HANGAR_MAX do
 		new_paletteOrder[i] = currentPaletteOrder[i]
 	end
 
@@ -38,7 +41,7 @@ end
 local function buildSdlColorMapBase()
 	colorMapBase = {}
 
-	local basePalette = GetColorMap(1)
+	local basePalette = GetColorMap(PALETTE_INDEX_BASE)
 	for i, gl_color in ipairs(basePalette) do
 		local rgb = sdl.rgb(gl_color.r, gl_color.g, gl_color.b)
 		colorMapBase[i*2-1] = rgb
@@ -124,7 +127,7 @@ local function uiSetDraggable(ui)
 		UiDraggable.dragMove(self, mx, my)
 		if self.parent ~= scrollarea then return end
 
-		for i = 2, #content.children do
+		for i = PALETTE_INDEX_FIRST_MOVABLE, #content.children do
 			local ui = content.children[i]
 			if rect_contains(ui.rect, mx, my) then
 				if ui ~= placeholder then
@@ -132,11 +135,11 @@ local function uiSetDraggable(ui)
 					table.insert(content.children, i, placeholder)
 				end
 
-				if #content.children > 11 then
-					content.children[11]:displayPaletteLocked(false)
-					content.children[12]:displayPaletteLocked(true)
+				if #content.children > PALETTE_COUNT_HANGAR_MAX then
+					content.children[PALETTE_COUNT_HANGAR_MAX]:displayPaletteLocked(false)
+					content.children[PALETTE_COUNT_HANGAR_MAX + 1]:displayPaletteLocked(true)
 
-					if i > 11 then
+					if i > PALETTE_COUNT_HANGAR_MAX then
 						self:displayPaletteLocked(true)
 					else
 						self:displayPaletteLocked(false)
@@ -152,8 +155,8 @@ local function uiSetDraggable(ui)
 			table.remove(content.children, list_indexof(content.children, placeholder))
 			table.insert(content.children, placeholder)
 
-			if #content.children > 11 then
-				content.children[11]:displayPaletteLocked(false)
+			if #content.children > PALETTE_COUNT_HANGAR_MAX then
+				content.children[PALETTE_COUNT_HANGAR_MAX]:displayPaletteLocked(false)
 				self:displayPaletteLocked(true)
 			end
 		end
@@ -244,11 +247,11 @@ local function buildPaletteFrameContent(scroll)
 		button.deco_lock = deco_lock
 		button.displayPaletteLocked = displayPaletteLocked
 
-		if i > 11 then
+		if i > PALETTE_COUNT_HANGAR_MAX then
 			button:displayPaletteLocked(true)
 		end
 
-		if i == 1 then
+		if i < PALETTE_INDEX_FIRST_MOVABLE then
 			button.tooltip = button.tooltip .."\n\n".. GetText("PaletteArrange_RiftWalkers_Tooltip_Extra")
 			deco_button.hlcolor = deco_button.color
 			deco_button.borderhlcolor = deco_button.bordercolor
@@ -278,7 +281,7 @@ local function buildPaletteFrameButtons(buttonLayout)
 			local ui = uis[paletteId]
 			table.insert(content.children, ui)
 			
-			if i > 11 then
+			if i > PALETTE_COUNT_HANGAR_MAX then
 				ui:displayPaletteLocked(true)
 			else
 				ui:displayPaletteLocked(false)
@@ -313,11 +316,18 @@ local function buildPaletteFrameButtons(buttonLayout)
 		GetText("PaletteArrange_Random_Tooltip"),
 		function()
 			local paletteOrder = modApi:getCurrentPaletteOrder()
-			local firstPalette = paletteOrder[1]
-			table.remove(paletteOrder, 1)
+
+			local fixedPalettes = {}
+			for i = PALETTE_INDEX_FIRST_MOVABLE - 1, 1, -1 do
+				table.insert(fixedPalettes, paletteOrder[i])
+				table.remove(paletteOrder, i)
+			end
 
 			paletteOrder = randomize(paletteOrder)
-			table.insert(paletteOrder, 1, firstPalette)
+
+			for _, fixedPalette in ipairs(fixedPalettes) do
+				table.insert(paletteOrder, 1, fixedPalette)
+			end
 
 			reorderPalettes(paletteOrder)
 		end
