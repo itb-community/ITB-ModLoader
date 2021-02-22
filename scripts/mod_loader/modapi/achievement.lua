@@ -23,6 +23,7 @@ local function writeData(mod_id, achievement_id, obj)
 	sdlext.config(
 		"modcontent.lua",
 		function(readObj)
+			readObj.achievements[mod_id] = readObj.achievements[mod_id] or {}
 			readObj.achievements[mod_id][achievement_id] = obj
 			modApi.achievements.cachedSavedata = readObj.achievements
 		end
@@ -45,10 +46,10 @@ end
 
 local AchievementDictionary = {
 	_mods = {},
-	add = function(self, mod_id, achievement_id, achievement)
+	add = function(self, mod_id, achievement)
 		assert(type(mod_id) == 'string')
-		assert(type(achievement_id) == 'string')
 		assert(type(achievement) == 'table')
+		assert(type(achievement.id) == 'string')
 
 		self._mods[mod_id] = self._mods[mod_id] or {}
 		table.insert(self._mods[mod_id], achievement)
@@ -142,7 +143,11 @@ local Objective = {
 			local result = {}
 
 			for i, _ in pairs(objective) do
-				if progress == nil or progress[i] == nil then
+				if
+					progress == nil           or
+					type(progress) ~= 'table' or
+					progress[i] == nil
+				then
 					result[i] = objective[i]
 				else
 					result[i] = self:getMergedState(objective[i], progress[i])
@@ -151,7 +156,11 @@ local Objective = {
 			return result
 
 		elseif type(objective) == 'number' then
-			return objective + (progress or 0)
+			if progress == nil or type(progress) ~= 'number' then
+				return objective
+			end
+
+			return objective + progress
 		end
 
 		return toboolean(progress)
@@ -304,11 +313,11 @@ end
 
 local function buildAchievementId()
 	local mod_id = modApi.currentMod
-	local achievements = AchievementDictionary._mods[mod_id]
+	local achievements = AchievementDictionary:get(mod_id, mod_id)
 
 	if achievements ~= nil then
 		local i = 2
-		while achievements[mod_id..i] ~= nil do
+		while AchievementDictionary:get(mod_id, mod_id..i) ~= nil do
 			i = i + 1
 		end
 
@@ -455,7 +464,7 @@ local function addAchievement(self, achievement)
 
 	Assert.Equals('nil', type(AchievementDictionary:get(mod_id, id)), "Achievement for mod ".. mod_id .." with id ".. id .." already exists")
 
-	AchievementDictionary:add(mod_id, id, data)
+	AchievementDictionary:add(mod_id, data)
 	data:validateSavedData()
 
 	return data
