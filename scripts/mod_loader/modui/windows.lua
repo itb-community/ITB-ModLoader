@@ -21,6 +21,9 @@ function Window:isOpen()
 end
 
 local windows = {
+	Escape_Title = Window:new{
+		event_id = "EscapeMenu"
+	},
 	Hangar_Select = Window:new{
 		event_id = "SquadSelection"
 	},

@@ -34,6 +34,8 @@ t.onNewGameClicked = Event()
 t.onContinueClicked = Event()
 t.onSettingsChanged = Event()
 
+t.onEscapeMenuEntered = Event()
+t.onEscapeMenuExited = Event()
 t.onSquadSelectionEntered = Event()
 t.onSquadSelectionExited = Event()
 t.onPilotSelectionEntered = Event()
