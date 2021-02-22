@@ -2,6 +2,7 @@ local scripts = {
 	"root",
 	"dialog_helper",
 
+	"windows",
 	"mainmenu",
 	"hangar",
 	"version_string",
