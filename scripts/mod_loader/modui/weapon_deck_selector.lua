@@ -312,7 +312,7 @@ end
 
 local function buildButtons(buttonLayout)
 	-- Forward declaration
-	local enableSaveLoadPreset
+	local enableSaveLoadPresetButtonsFn
 
 	-- Hacky way to use a different parent button layout...
 	local buttonHolder = buttonLayout.parent
@@ -339,7 +339,7 @@ local function buildButtons(buttonLayout)
 			for _, button in ipairs(buttons) do
 				button.checked = true
 			end
-			enableSaveLoadPreset(true)
+			enableSaveLoadPresetButtonsFn(true)
 		end
 	):addTo(buttonLayoutLeft)
 
@@ -351,7 +351,7 @@ local function buildButtons(buttonLayout)
 			for _, button in ipairs(buttons) do
 				button.checked = false
 			end
-			enableSaveLoadPreset(true)
+			enableSaveLoadPresetButtonsFn(true)
 		end
 	):addTo(buttonLayoutLeft)
 
@@ -367,7 +367,7 @@ local function buildButtons(buttonLayout)
 		presets
 	):addTo(buttonLayoutRight)
 	presetDropdown.optionSelected:subscribe(function(oldChoice, oldValue)
-		enableSaveLoadPreset(true)
+		enableSaveLoadPresetButtonsFn(true)
 	end)
 
 	-- Load preset button
@@ -377,7 +377,7 @@ local function buildButtons(buttonLayout)
 		function()
 			local presetId = presets[presetDropdown.value]
 			loadPreset(presetId)
-			enableSaveLoadPreset(false)
+			enableSaveLoadPresetButtonsFn(false)
  		end
 	):addTo(buttonLayoutRight)
 
@@ -390,12 +390,12 @@ local function buildButtons(buttonLayout)
 			if presetId ~= PRESET_DEFAULT then
 				savePreset(presetId)
 			end
-			enableSaveLoadPreset(false)
+			enableSaveLoadPresetButtonsFn(false)
 		end
 	):addTo(buttonLayoutRight)
 	btnSavePreset.disabled = true
 
-	enableSaveLoadPreset = function(enable)
+	enableSaveLoadPresetButtonsFn = function(enable)
 		local presetId = presets[presetDropdown.value]
 
 		if enable then
@@ -420,10 +420,11 @@ local function buildButtons(buttonLayout)
 
 		-- Update selection
 		presetDropdown.value = list_indexof(presets, presetId)
+		enableSaveLoadPresetButtonsFn(true)
 	end)
 
 	weaponButtonClicked:subscribe(function(weaponButton)
-		enableSaveLoadPreset(true)
+		enableSaveLoadPresetButtonsFn(true)
 	end)
 end
 
