@@ -83,7 +83,7 @@ function Ui:detach()
 end
 
 function Ui:addTo(parent, index)
-	if parent == nil then return self end
+	Assert.Equals("table", type(parent))
 	
 	parent:add(self, index)
 	
