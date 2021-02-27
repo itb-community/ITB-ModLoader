@@ -314,11 +314,22 @@ local function buildButtons(buttonLayout)
 	-- Forward declaration
 	local enableSaveLoadPreset
 
+	-- Hacky way to use a different parent button layout...
+	local buttonHolder = buttonLayout.parent
+	buttonLayout:detach()
+	buttonLayout = UiWeightLayout()
+		:width(1):height(1)
+		:addTo(buttonHolder)
+	buttonHolder.parent.buttonLayout = buttonLayout
+
 	local buttonLayoutLeft = UiBoxLayout()
+		:padding(20)
 		:hgap(20)
 		:height(1)
 		:addTo(buttonLayout)
-	buttonLayoutLeft.alignH = "left"
+
+	-- Space filler
+	Ui():width(1):addTo(buttonLayout):setTranslucent(true)
 
 	-- Enable all button
 	sdlext.buildButton(
@@ -345,10 +356,10 @@ local function buildButtons(buttonLayout)
 	):addTo(buttonLayoutLeft)
 
 	local buttonLayoutRight = UiBoxLayout()
+		:padding(20)
 		:hgap(20)
 		:height(1)
 		:addTo(buttonLayout)
-	buttonLayoutRight.alignH = "right"
 
 	local presetDropdown = sdlext.buildDropDownButton(
 		GetText("ConfigureWeaponDeck_Preset_Title"),
