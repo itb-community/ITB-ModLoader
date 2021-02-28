@@ -105,25 +105,31 @@ function UiScrollArea:mouseup(x, y, button)
 	return Ui.mouseup(self, x, y, button)
 end
 
-function UiScrollArea:wheel(mx, my, y)
-	self:relayout()
+function UiScrollArea:computeOffset(scrollAmount)
+	local startdy = self.dy
 
 	-- Have the scrolling speed scale with the height of the inner area,
 	-- but capped by the height of the viewport.
 	local d = math.max(20, self.innerHeight * 0.1)
 	d = math.min(d, self.h * 0.8)
-	d = d * y
-
-	local startdy = self.dy
+	d = d * scrollAmount
 
 	self.dy = self.dy - d
 	if self.dy < 0 then self.dy = 0 end
 	if self.dy + self.h > self.innerHeight then self.dy = self.innerHeight - self.h end
 	if self.h > self.innerHeight then self.dy = 0 end
 
+	return self.dy - startdy
+end
+
+function UiScrollArea:wheel(mx, my, y)
+	self:relayout()
+
+	local offset = self:computeOffset(y)
+
 	-- Call back to mousemove to update hover and tooltip statuses of the area's
 	-- child elements.
-	Ui.mousemove(self, mx, my + (self.dy - startdy))
+	Ui.mousemove(self, mx, my + offset)
 
 	return Ui.wheel(self, mx, my, y)
 end
@@ -250,25 +256,31 @@ function UiScrollAreaH:mousedown(x, y, button)
 	return Ui.mousedown(self, x, y, button)
 end
 
-function UiScrollAreaH:wheel(mx, my, y)
-	self:relayout()
+function UiScrollAreaH:computeOffset(scrollAmount)
+	local startdx = self.dx
 
 	-- Have the scrolling speed scale with the width of the inner area,
 	-- but capped by the width of the viewport.
 	local d = math.max(20, self.innerWidth * 0.1)
 	d = math.min(d, self.w * 0.8)
-	d = d * y
-
-	local startdx = self.dx
+	d = d * scrollAmount
 
 	self.dx = self.dx - d
 	if self.dx < 0 then self.dx = 0 end
 	if self.dx + self.w > self.innerWidth then self.dx = self.innerWidth - self.w end
 	if self.w > self.innerWidth then self.dw = 0 end
 
+	return self.dx - startdx
+end
+
+function UiScrollAreaH:wheel(mx, my, y)
+	self:relayout()
+
+	local offset = self:computeOffset(y)
+
 	-- Call back to mousemove to update hover and tooltip statuses of the area's
 	-- child elements.
-	Ui.mousemove(self, mx + (self.dx - startdx), my)
+	Ui.mousemove(self, mx + offset, my)
 
 	return Ui.wheel(self, mx, my, y)
 end

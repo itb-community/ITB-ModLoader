@@ -37,7 +37,7 @@ end
 function Ui:add(child, index)
 	child:setroot(self.root)
 	if index then
-		assert(type(index) == "number")
+		Assert.Equals("number", type(index))
 		table.insert(self.children, index, child)
 	else
 		table.insert(self.children, child)
@@ -83,7 +83,7 @@ function Ui:detach()
 end
 
 function Ui:addTo(parent, index)
-	if parent == nil then return self end
+	Assert.Equals("table", type(parent))
 	
 	parent:add(self, index)
 	
@@ -269,6 +269,11 @@ end
 function Ui:wheel(mx,my,y)
 	if not self.visible then return false end
 	if self.ignoreMouse then return false end
+
+	if self.dragged then
+		self:dragWheel(mx, my, y)
+		return true
+	end
 
 	for i=1,#self.children do
 		local child = self.children[i]
@@ -481,19 +486,15 @@ function Ui:relayout()
 		
 		if child.wPercent ~= nil then
 			child.w = (self.w - self.padl - self.padr) * child.wPercent
-			child.wPercent = nil
 		end
 		if child.hPercent ~= nil then
 			child.h = (self.h - self.padt - self.padb) * child.hPercent
-			child.hPercent = nil
 		end
 		if child.xPercent ~= nil then
 			child.x = (self.w - self.padl - self.padr) * child.xPercent
-			child.xPercent = nil
 		end
 		if child.yPercent ~= nil then
 			child.y = (self.h - self.padt - self.padb) * child.yPercent
-			child.yPercent = nil
 		end
 		
 		local childleft, childright, childtop, childbottom
@@ -639,6 +640,9 @@ function Ui:stopDrag(mx, my, button)
 end
 
 function Ui:dragMove(mx, my)
+end
+
+function Ui:dragWheel(mx, my, y)
 end
 
 function Ui:startDrag(mx, my, button)

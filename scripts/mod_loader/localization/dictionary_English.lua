@@ -35,15 +35,19 @@ return {
 	["PilotArrange_ButtonTooltip_Off"] = "New Game was pressed, so the pilots in the hangar can no longer be updated.\n\nYou must restart the game for changes to take effect.",
 	["PilotArrange_FrameTitle"] = "Arrange Pilots",
 	["PilotArrange_RestartWarning_Text"] = "The hangar was already loaded, so you must restart the game for your changes to take effect.",
-	
+	["PilotArrange_Default_Text"] = "Default",
+	["PilotArrange_Default_Tooltip"] = "Restore default pilot order.",
+	["PilotArrange_Random_Text"] = "Randomize",
+	["PilotArrange_Random_Tooltip"] = "Randomize pilot order.",
+  
 	["ModContent_Button_PaletteArrange"] = "Arrange Palettes",
 	["ModContent_ButtonTooltip_PaletteArrange"] = "Select which palettes will be available to pick.",
 	["PaletteArrange_RiftWalkers_Tooltip_Extra"] = "This palette is fixed to the first slot for technical reasons.",
 	["PaletteArrange_FrameTitle"] = "Arrange Palettes",
 	["PaletteArrange_Current_Title"] = "Current",
-	["PaletteArrange_Current_Tooltip"] = "Resets palettes to the current loaded order",
+	["PaletteArrange_Current_Tooltip"] = "Resets palettes to the current loaded order.",
 	["PaletteArrange_Default_Title"] = "Default",
-	["PaletteArrange_Default_Tooltip"] = "Resets palettes to their default order",
+	["PaletteArrange_Default_Tooltip"] = "Resets palettes to their default order.",
 	["PaletteArrange_Random_Title"] = "Random",
 	["PaletteArrange_Random_Tooltip"] = "Randomizes palettes",
 

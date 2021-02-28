@@ -6,8 +6,7 @@ function UiDropDown:new(values,strings,value)
 	self.tooltip = ""
 	self.nofitx = true
 	self.nofity = true
-	self.values = values
-	self.strings = strings or {}
+	self:updateOptions(values, strings)
 	if value then
 		for i, v in pairs(values) do
 			if value == v then
@@ -22,6 +21,16 @@ function UiDropDown:new(values,strings,value)
 		self.value = values[1]
 	end
 	self.open = false
+
+	self.optionSelected = Event()
+end
+
+function UiDropDown:updateOptions(values, strings)
+	Assert.Equals("table", type(values))
+	Assert.Equals({"table", "nil"}, type(strings))
+
+	self.values = copy_table(values)
+	self.strings = strings ~= nil and copy_table(strings) or {}
 end
 
 function UiDropDown:destroyDropDown()
@@ -59,11 +68,17 @@ function UiDropDown:createDropDown()
 		
 		item.onclicked = function(btn, button)
 			if button == 1 then
+				local oldChoice = self.choice
+				local oldValue = self.value
+
 				self.choice = i
 				self.value = self.values[i]
 				
 				self:destroyDropDown()
 				self.hovered = false
+
+				self.optionSelected:dispatch(oldChoice, oldValue)
+
 				return true
 			end
 			return false

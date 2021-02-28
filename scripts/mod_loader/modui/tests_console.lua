@@ -33,7 +33,6 @@ end
 local function buildTestUi(testEntry)
 	local entryHolder = UiWeightLayout()
 		:width(1):heightpx(41)
-		:addTo(entryBoxHolder)
 
 	local checkbox = UiCheckbox()
 		:width(1):heightpx(41)
@@ -97,8 +96,7 @@ local function buildTestUi(testEntry)
 			sdlext.addButtonSoundHandlers(statusBox, function ()
 				sdlext.showTextDialog(
 						GetText("TestingConsole_FailSummary_FrameTitle"),
-						resultTable.result,
-						1000, 1000
+						resultTable.result
 				)
 			end)
 		end
@@ -393,9 +391,13 @@ local function showTestingConsole()
 
 		local frame = sdlext.buildButtonDialog(
 			GetText("TestingConsole_FrameTitle"),
-			0.6 * ScreenSizeX(), 0.8 * ScreenSizeY(),
 			buildTestingConsoleContent,
-			buildTestingConsoleButtons
+			buildTestingConsoleButtons,
+			{
+				maxW = 0.6 * ScreenSizeX(),
+				maxH = 0.8 * ScreenSizeY(),
+				compactH = false
+			}
 		)
 
 		frame:addTo(ui)
