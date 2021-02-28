@@ -287,7 +287,7 @@ function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, opt
 	if type(retHolder) == "table" and not retHolder.parent then
 		buttonHolder:detach()
 		retHolder:addTo(frame)
-		buttonLayout = retHolder
+		buttonHolder = retHolder
 		frame.buttonLayout = buttonHolder
 	end
 
