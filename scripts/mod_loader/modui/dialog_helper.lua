@@ -251,7 +251,7 @@ function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, opt
 	Assert.Equals("boolean", type(compactH))
 
 	local frame = sdlext.buildSimpleDialog(title, options)
-	local scroll = frame.scroll
+	local contentHolder = frame.scroll
 
 	local line = Ui()
 		:width(1):heightpx(frame.decorations[1].bordersize)
@@ -262,28 +262,41 @@ function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, opt
 	local buttonHolder = UiBoxLayout()
 		:width(1)
 		:vgap(0)
+		:padding(18)
 		:addTo(frame)
+	buttonHolder:heightpx(45 + buttonHolder.padt + buttonHolder.padb)
 
 	local buttonLayout = UiBoxLayout()
 		:height(1)
 		:hgap(50)
-		:padding(18)
+		:addTo(buttonHolder)
 	buttonLayout.alignH = "center"
 
-	buttonHolder:heightpx(45 + buttonLayout.padt + buttonLayout.padb)
-	buttonLayout:addTo(buttonHolder)
-
+	frame:relayout()
 	frame.buttonLayout = buttonLayout
 
-	contentBuilderFn(scroll)
-	buttonsBuilderFn(buttonLayout)
+	local retHolder = contentBuilderFn(contentHolder)
+	if type(retHolder) == "table" and not retHolder.parent then
+		contentHolder:detach()
+		retHolder:addTo(frame, 1)
+		contentHolder = retHolder
+		frame.scroll = contentHolder
+	end
+
+	retHolder = buttonsBuilderFn(buttonLayout)
+	if type(retHolder) == "table" and not retHolder.parent then
+		buttonHolder:detach()
+		retHolder:addTo(frame)
+		buttonLayout = retHolder
+		frame.buttonLayout = buttonHolder
+	end
 
 	frame:relayout()
 
-	local contentW = compactW and (scroll.innerWidth + scroll.padl + scroll.padr) or scroll.w
+	local contentW = compactW and (contentHolder.innerWidth + contentHolder.padl + contentHolder.padr) or contentHolder.w
 	local w = math.max(minW, contentW + frame.padl + frame.padr)
 	w = math.min(w, maxW)
-	local contentH = compactH and (scroll.innerHeight + scroll.padt + scroll.padb) or scroll.h
+	local contentH = compactH and (contentHolder.innerHeight + contentHolder.padt + contentHolder.padb) or contentHolder.h
 	local h = math.max(minH, contentH + frame.padt + frame.padb + buttonHolder.h + line.h)
 	h = math.min(h, maxH)
 
