@@ -1,74 +1,100 @@
 
-local openWindows = {}
+local showWindows = {}
+local visibleWindows = {}
 
 local Window = {}
 CreateClass(Window)
 
-function Window:open()
-	self.opened = true
-	table.insert(openWindows, self)
-	modApi.events[string.format("on%sEntered", self.event_id)]:dispatch()
+function Window:show(id)
+	self.visible = true
+	visibleWindows[id] = self
+	self.event_show:dispatch()
 end
 
-function Window:close()
-	self.opened = false
-	remove_element(self, openWindows)
-	modApi.events[string.format("on%sExited", self.event_id)]:dispatch()
+function Window:hide(id)
+	self.visible = false
+	visibleWindows[id] = nil
+	self.event_hide:dispatch()
 end
 
-function Window:isOpen()
-	return self.opened
+function Window:isVisible()
+	return self.visible == true
+end
+
+local function buildIsWindowVisibleFunction(window)
+	return function()
+		return window:isVisible()
+	end
 end
 
 local windows = {
 	Escape_Title = Window:new{
-		event_id = "EscapeMenu"
+		event_show = modApi.events.onEscapeMenuWindowShown,
+		event_hide = modApi.events.onEscapeMenuWindowHidden
 	},
 	Hangar_Select = Window:new{
-		event_id = "SquadSelection"
+		event_show = modApi.events.onSquadSelectionWindowShown,
+		event_hide = modApi.events.onSquadSelectionWindowHidden
 	},
 	Hangar_Achievements_Title = Window:new{
-		event_id = "AchievementWindow"
+		event_show = modApi.events.onAchievementsWindowShown,
+		event_hide = modApi.events.onAchievementsWindowHidden
 	},
 	Hangar_Pilot = Window:new{
-		event_id = "PilotSelection"
+		event_show = modApi.events.onPilotSelectionWindowShown,
+		event_hide = modApi.events.onPilotSelectionWindowHidden
 	},
 	Options_Title = Window:new{
-		event_id = "OptionWindow"
+		event_show = modApi.events.onOptionsWindowShown,
+		event_hide = modApi.events.onOptionsWindowHidden
 	},
 	Language_Title = Window:new{
-		event_id = "LanguageSelection"
+		event_show = modApi.events.onLanguageSelectionWindowShown,
+		event_hide = modApi.events.onLanguageSelectionWindowHidden
 	},
 	Hotkeys_Title = Window:new{
-		event_id = "HotkeyConfiguration"
+		event_show = modApi.events.onHotkeyConfigurationWindowShown,
+		event_hide = modApi.events.onHotkeyConfigurationWindowHidden
 	},
 	Profile_Title = Window:new{
-		event_id = "ProfileSelection"
+		event_show = modApi.events.onProfileSelectionWindowShown,
+		event_hide = modApi.events.onProfileSelectionWindowHidden
 	},
 	New_Profile_Title = Window:new{
-		event_id = "ProfileConfirm"
+		event_show = modApi.events.onProfileConfirmationWindowShown,
+		event_hide = modApi.events.onProfileConfirmationWindowHidden
 	},
 	Stats_Header = Window:new{
-		event_id = "StatisticsWindow"
+		event_show = modApi.events.onStatisticsWindowShown,
+		event_hide = modApi.events.onStatisticsWindowHidden
 	},
 	NewGame_Confirm_Title = Window:new{
-		event_id = "NewGameWindow"
+		event_show = modApi.events.onNewGameWindowShown,
+		event_hide = modApi.events.onNewGameWindowHidden
 	},
 	Abandon_Confirm_Title = Window:new{
-		event_id = "AbandonTimelineWindow"
+		event_show = modApi.events.onAbandonTimelineWindowShown,
+		event_hide = modApi.events.onAbandonTimelineWindowHidden
 	},
 }
 
-for _, window in pairs(windows) do
-	sdlext["is".. window.event_id] = function()
-		return window.isOpen()
-	end
-end
+sdlext.isEscapeMenuWindowShown = buildIsWindowVisibleFunction(windows.Escape_Title)
+sdlext.isSquadSelectionWindowShown = buildIsWindowVisibleFunction(windows.Hangar_Select)
+sdlext.isAchievementsWindowShown = buildIsWindowVisibleFunction(windows.Hangar_Achievements_Title)
+sdlext.isPilotSelectionWindowShown = buildIsWindowVisibleFunction(windows.Hangar_Pilot)
+sdlext.isOptionsWindowShown = buildIsWindowVisibleFunction(windows.Options_Title)
+sdlext.isLanguageSelectionWindowShown = buildIsWindowVisibleFunction(windows.Language_Title)
+sdlext.isHotkeyConfigurationWindowShown = buildIsWindowVisibleFunction(windows.Hotkeys_Title)
+sdlext.isProfileSelectionWindowShown = buildIsWindowVisibleFunction(windows.Profile_Title)
+sdlext.isProfileConfirmationWindowShown = buildIsWindowVisibleFunction(windows.New_Profile_Title)
+sdlext.isStatisticsWindowShown = buildIsWindowVisibleFunction(windows.Stats_Header)
+sdlext.isNewGameWindowShown = buildIsWindowVisibleFunction(windows.NewGame_Confirm_Title)
+sdlext.isAbandonTimelineWindowShown = buildIsWindowVisibleFunction(windows.Abandon_Confirm_Title)
 
 local oldGetText = GetText
 function GetText(id, ...)
 	if windows[id] ~= nil then
-		windows[id].request_opened = true
+		showWindows[id] = windows[id]
 	end
 
 	return oldGetText(id, ...)
@@ -76,17 +102,19 @@ end
 
 modApi.events.onFrameDrawn:subscribe(function()
 
-	for _, window in ipairs(openWindows) do
-		if not window.request_opened then
-			window:close()
+	for id, window in pairs(visibleWindows) do
+		if not showWindows[id] then
+			window:hide(id)
 		end
 	end
 
-	for _, window in pairs(windows) do
-		if not window.opened and window.request_opened then
-			window:open()
+	if next(showWindows) ~= nil then
+		for id, window in pairs(showWindows) do
+			if not window.visible then
+				window:show(id)
+			end
 		end
 
-		window.request_opened = false
+		showWindows = {}
 	end
 end)
