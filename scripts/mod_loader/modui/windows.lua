@@ -82,19 +82,19 @@ local windows = {
 	},
 }
 
-sdlext.isEscapeMenuWindowShown = buildIsWindowVisibleFunction(windows.Escape_Title)
-sdlext.isSquadSelectionWindowShown = buildIsWindowVisibleFunction(windows.Hangar_Select)
-sdlext.isAchievementsWindowShown = buildIsWindowVisibleFunction(windows.Hangar_Achievements_Title)
-sdlext.isPilotSelectionWindowShown = buildIsWindowVisibleFunction(windows.Hangar_Pilot)
-sdlext.isOptionsWindowShown = buildIsWindowVisibleFunction(windows.Options_Title)
-sdlext.isLanguageSelectionWindowShown = buildIsWindowVisibleFunction(windows.Language_Title)
-sdlext.isHotkeyConfigurationWindowShown = buildIsWindowVisibleFunction(windows.Hotkeys_Title)
-sdlext.isProfileSelectionWindowShown = buildIsWindowVisibleFunction(windows.Profile_Title)
-sdlext.isCreateProfileConfirmationWindowShown = buildIsWindowVisibleFunction(windows.New_Profile_Title)
-sdlext.isDeleteProfileConfirmationWindowShown = buildIsWindowVisibleFunction(windows.Delete_Confirm_Title)
-sdlext.isStatisticsWindowShown = buildIsWindowVisibleFunction(windows.Stats_Header)
-sdlext.isNewGameWindowShown = buildIsWindowVisibleFunction(windows.NewGame_Confirm_Title)
-sdlext.isAbandonTimelineWindowShown = buildIsWindowVisibleFunction(windows.Abandon_Confirm_Title)
+sdlext.isEscapeMenuWindowVisible = buildIsWindowVisibleFunction(windows.Escape_Title)
+sdlext.isSquadSelectionWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Select)
+sdlext.isAchievementsWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Achievements_Title)
+sdlext.isPilotSelectionWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Pilot)
+sdlext.isOptionsWindowVisible = buildIsWindowVisibleFunction(windows.Options_Title)
+sdlext.isLanguageSelectionWindowVisible = buildIsWindowVisibleFunction(windows.Language_Title)
+sdlext.isHotkeyConfigurationWindowVisible = buildIsWindowVisibleFunction(windows.Hotkeys_Title)
+sdlext.isProfileSelectionWindowVisible = buildIsWindowVisibleFunction(windows.Profile_Title)
+sdlext.isCreateProfileConfirmationWindowVisible = buildIsWindowVisibleFunction(windows.New_Profile_Title)
+sdlext.isDeleteProfileConfirmationWindowVisible = buildIsWindowVisibleFunction(windows.Delete_Confirm_Title)
+sdlext.isStatisticsWindowVisible = buildIsWindowVisibleFunction(windows.Stats_Header)
+sdlext.isNewGameWindowVisible = buildIsWindowVisibleFunction(windows.NewGame_Confirm_Title)
+sdlext.isAbandonTimelineWindowVisible = buildIsWindowVisibleFunction(windows.Abandon_Confirm_Title)
 
 local oldGetText = GetText
 function GetText(id, ...)
