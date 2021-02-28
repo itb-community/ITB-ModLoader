@@ -258,6 +258,7 @@ local function buildPaletteFrameContent(scroll)
 
 		if i < PALETTE_INDEX_FIRST_MOVABLE then
 			button.tooltip = button.tooltip .."\n\n".. GetText("PaletteArrange_RiftWalkers_Tooltip_Extra")
+			button.disabled = true
 			deco_button.hlcolor = deco_button.color
 			deco_button.borderhlcolor = deco_button.bordercolor
 		else

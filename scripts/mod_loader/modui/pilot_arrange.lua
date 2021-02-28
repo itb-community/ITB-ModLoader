@@ -350,6 +350,7 @@ local function createUi()
 				buildPilotArrangeButtons,
 				{
 					maxW = 0.8 * ScreenSizeX(),
+					minH = 350,
 					maxH = 0.8 * ScreenSizeY(),
 					compactW = true,
 					compactH = true
