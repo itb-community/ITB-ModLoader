@@ -61,8 +61,12 @@ local windows = {
 		event_hide = modApi.events.onProfileSelectionWindowHidden
 	},
 	New_Profile_Title = Window:new{
-		event_show = modApi.events.onProfileConfirmationWindowShown,
-		event_hide = modApi.events.onProfileConfirmationWindowHidden
+		event_show = modApi.events.onCreateProfileConfirmationWindowShown,
+		event_hide = modApi.events.onCreateProfileConfirmationWindowHidden
+	},
+	Delete_Confirm_Title = Window:new{
+		event_show = modApi.events.onDeleteProfileConfirmationWindowShown,
+		event_hide = modApi.events.onDeleteProfileConfirmationWindowHidden
 	},
 	Stats_Header = Window:new{
 		event_show = modApi.events.onStatisticsWindowShown,
@@ -86,7 +90,8 @@ sdlext.isOptionsWindowShown = buildIsWindowVisibleFunction(windows.Options_Title
 sdlext.isLanguageSelectionWindowShown = buildIsWindowVisibleFunction(windows.Language_Title)
 sdlext.isHotkeyConfigurationWindowShown = buildIsWindowVisibleFunction(windows.Hotkeys_Title)
 sdlext.isProfileSelectionWindowShown = buildIsWindowVisibleFunction(windows.Profile_Title)
-sdlext.isProfileConfirmationWindowShown = buildIsWindowVisibleFunction(windows.New_Profile_Title)
+sdlext.isCreateProfileConfirmationWindowShown = buildIsWindowVisibleFunction(windows.New_Profile_Title)
+sdlext.isDeleteProfileConfirmationWindowShown = buildIsWindowVisibleFunction(windows.Delete_Confirm_Title)
 sdlext.isStatisticsWindowShown = buildIsWindowVisibleFunction(windows.Stats_Header)
 sdlext.isNewGameWindowShown = buildIsWindowVisibleFunction(windows.NewGame_Confirm_Title)
 sdlext.isAbandonTimelineWindowShown = buildIsWindowVisibleFunction(windows.Abandon_Confirm_Title)
