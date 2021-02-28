@@ -196,6 +196,7 @@ local function buildPaletteFrameContent(scroll)
 		:hgap(-1)
 		:width(1)
 		:height(1)
+		:compact(true)
 		:addTo(scroll)
 	-- Prevent the element from correcting children's sizes when inserting them,
 	-- and their position is outside of the element's bounds.
@@ -354,9 +355,15 @@ local function showArrangePaletteUi()
 
 		local frame = sdlext.buildButtonDialog(
 			GetText("PaletteArrange_FrameTitle"),
-			0.6 * ScreenSizeX(), 0.8 * ScreenSizeY(),
 			buildPaletteFrameContent,
-			buildPaletteFrameButtons
+			buildPaletteFrameButtons,
+			{
+				maxW = 0.6 * ScreenSizeX(),
+				minH = 350,
+				maxH = 0.8 * ScreenSizeY(),
+				compactW = true,
+				compactH = true
+			}
 		)
 
 		frame:addTo(ui)
