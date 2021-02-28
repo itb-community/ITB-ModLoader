@@ -274,7 +274,6 @@ local function buildWeaponButton(weapon)
 	return button
 end
 
---- list of all weapon buttons in the UI
 local function buildContent(scroll)
 	local oldConfig
 	presets, oldConfig = loadConfig()
@@ -314,22 +313,17 @@ local function buildButtons(buttonLayout)
 	-- Forward declaration
 	local enableSaveLoadPresetButtonsFn
 
-	-- Hacky way to use a different parent button layout...
-	local buttonHolder = buttonLayout.parent
-	buttonLayout:detach()
-	buttonLayout = UiWeightLayout()
-		:width(1):height(1)
-		:addTo(buttonHolder)
-	buttonHolder.parent.buttonLayout = buttonLayout
+	local buttonHolder = UiWeightLayout()
+		:padding(18)
+		:width(1):heightpx(buttonLayout.parent.h)
 
 	local buttonLayoutLeft = UiBoxLayout()
-		:padding(20)
 		:hgap(20)
 		:height(1)
-		:addTo(buttonLayout)
+		:addTo(buttonHolder)
 
 	-- Space filler
-	Ui():width(1):addTo(buttonLayout):setTranslucent(true)
+	Ui():width(1):addTo(buttonHolder):setTranslucent(true)
 
 	-- Enable all button
 	sdlext.buildButton(
@@ -356,10 +350,9 @@ local function buildButtons(buttonLayout)
 	):addTo(buttonLayoutLeft)
 
 	local buttonLayoutRight = UiBoxLayout()
-		:padding(20)
 		:hgap(20)
 		:height(1)
-		:addTo(buttonLayout)
+		:addTo(buttonHolder)
 
 	local presetDropdown = sdlext.buildDropDownButton(
 		GetText("ConfigureWeaponDeck_Preset_Title"),
@@ -426,6 +419,10 @@ local function buildButtons(buttonLayout)
 	weaponButtonClicked:subscribe(function(weaponButton)
 		enableSaveLoadPresetButtonsFn(true)
 	end)
+
+	-- Return a parent-less ui element - doing so signals to the dialog builder function
+	-- that we want to use a custom layout.
+	return buttonHolder
 end
 
 --- Called on exit to save the weapon order
