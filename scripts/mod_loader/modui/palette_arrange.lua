@@ -197,6 +197,10 @@ local function buildPaletteFrameContent(scroll)
 		:width(1)
 		:height(1)
 		:addTo(scroll)
+	-- Prevent the element from correcting children's sizes when inserting them,
+	-- and their position is outside of the element's bounds.
+	content.nofitx = true
+	content.nofity = true
 
 	for i, paletteId in ipairs(currentPaletteOrder) do
 		local palette = modApi:getPalette(paletteId)
