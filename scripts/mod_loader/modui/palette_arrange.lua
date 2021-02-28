@@ -191,7 +191,7 @@ local function buildPaletteFrameContent(scroll)
 		:decorate({ })
 		:hide()
 
-	content = UiWeightLayout()
+	content = UiFlowLayout()
 		:vgap(-1)
 		:hgap(-1)
 		:width(1)
