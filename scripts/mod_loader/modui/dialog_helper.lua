@@ -293,10 +293,12 @@ function sdlext.buildButtonDialog(title, contentBuilderFn, buttonsBuilderFn, opt
 
 	frame:relayout()
 
-	local contentW = compactW and (contentHolder.innerWidth + contentHolder.padl + contentHolder.padr) or contentHolder.w
+	-- Inner area calculation already accounts for the element's padding, so no need to include it here.
+	-- Need to account for the scroll area's bar, however.
+	local contentW = compactW and (contentHolder.innerWidth + (contentHolder.scrollwidth or 0)) or contentHolder.w
 	local w = math.max(minW, contentW + frame.padl + frame.padr)
 	w = math.min(w, maxW)
-	local contentH = compactH and (contentHolder.innerHeight + contentHolder.padt + contentHolder.padb) or contentHolder.h
+	local contentH = compactH and contentHolder.innerHeight or contentHolder.h
 	local h = math.max(minH, contentH + frame.padt + frame.padb + buttonHolder.h + line.h)
 	h = math.min(h, maxH)
 
