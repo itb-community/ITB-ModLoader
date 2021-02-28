@@ -39,6 +39,17 @@ return {
 	["PilotArrange_Default_Tooltip"] = "Restore default pilot order.",
 	["PilotArrange_Random_Text"] = "Randomize",
 	["PilotArrange_Random_Tooltip"] = "Randomize pilot order.",
+  
+	["ModContent_Button_PaletteArrange"] = "Arrange Palettes",
+	["ModContent_ButtonTooltip_PaletteArrange"] = "Select which palettes will be available to pick.",
+	["PaletteArrange_RiftWalkers_Tooltip_Extra"] = "This palette is fixed to the first slot for technical reasons.",
+	["PaletteArrange_FrameTitle"] = "Arrange Palettes",
+	["PaletteArrange_Current_Title"] = "Current",
+	["PaletteArrange_Current_Tooltip"] = "Resets palettes to the current loaded order.",
+	["PaletteArrange_Default_Title"] = "Default",
+	["PaletteArrange_Default_Tooltip"] = "Resets palettes to their default order.",
+	["PaletteArrange_Random_Title"] = "Random",
+	["PaletteArrange_Random_Tooltip"] = "Randomizes palettes",
 
 	["ModContent_Button_ConfigureWeaponDeck"] = "Select Weapon Deck",
 	["ModContent_ButtonTooltip_ConfigureWeaponDeck"] = "Select which weapons are available in runs from the shop, time pods, and perfect island bonuses. Will not have any affect in existing save games.",
@@ -162,4 +173,14 @@ return {
 	["TestingConsole_RootTestsuite"] = "Root Testsuite",
 	["TestingConsole_FailSummary_FrameTitle"] = "Failure Summary",
 	["TestingConsole_FailSummary_Tooltip"] = "This test has failed. Click to bring up a detailed summary.",
+	
+	["Palette_Name_Rift_Walkers"] = "Rift Walkers Olive",
+	["Palette_Name_Rusting_Hulks"] = "Rusting Hulks Orange",
+	["Palette_Name_Zenith_Guard"] = "Zenith Guard Blue",
+	["Palette_Name_Blitzkrieg"] = "Blitzkrieg Yellow",
+	["Palette_Name_Steel_Judoka"] = "Steel Judoka Shivan",
+	["Palette_Name_Flame_Behemoths"] = "Flame Behemoths Red",
+	["Palette_Name_Frozen_Titans"] = "Frozen Titans Blue",
+	["Palette_Name_Hazardous_Mechs"] = "Hazardous Mechs Tan",
+	["Palette_Name_Secret_Squad"] = "Secret Squad Purple",
 }
