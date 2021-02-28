@@ -43,6 +43,8 @@ function UiWeightLayout:relayout()
 	local weightSumW = 0
 	local weightSumH = 0
 
+	-- Preprocess - count how much space we have to work with, and what the sum of weights is,
+	-- so that we can divide the space accordingly.
 	local visibleChildrenCount = 0
 	for i = 1, #self.children do
 		local child = self.children[i]
@@ -67,28 +69,6 @@ function UiWeightLayout:relayout()
 	remainingSpaceW = remainingSpaceW - (visibleChildrenCount - 1) * self.gapHorizontal
 	remainingSpaceH = remainingSpaceH - (visibleChildrenCount - 1) * self.gapVertical
 
-	for i = 1, #self.children do
-		local child = self.children[i]
-
-		if child.visible then
-			if self.horizontal then
-				if child.wPercent ~= nil then
-					child.w = remainingSpaceW * (child.wPercent / weightSumW)
-				end
-				if child.hPercent ~= nil then
-					child.h = (self.h - self.padt - self.padb) * child.hPercent
-				end
-			else
-				if child.wPercent ~= nil then
-					child.w = (self.w - self.padl - self.padr) * child.wPercent
-				end
-				if child.hPercent ~= nil then
-					child.h = remainingSpaceH * (child.hPercent / weightSumH)
-				end
-			end
-		end
-	end
-
 	local currentMaxSize = 0
 	-- positions of the next child
 	local nextX = 0
@@ -97,45 +77,39 @@ function UiWeightLayout:relayout()
 		local child = self.children[i]
 
 		if child.visible then
-			-- Handle wrapping
-			-- Offset each row (col) by the tallest (or widest) child
-			if self.horizontal then
-				if nextX + child.w > self.w then
-					nextX = 0
-					nextY = nextY + currentMaxSize + self.gapVertical
-					self.innerHeight = self.innerHeight + currentMaxSize + self.gapVertical
-					currentMaxSize = 0
-				end
-			else
-				if nextY + child.h > self.h then
-					nextY = 0
-					nextX = nextX + currentMaxSize + self.gapHorizontal
-					self.innerWidth = self.innerWidth + currentMaxSize + self.gapHorizontal
-					currentMaxSize = 0
-				end
-			end
-
 			child.x = nextX
 			child.y = nextY
 
 			if self.horizontal then
+				if child.wPercent ~= nil then
+					child.w = remainingSpaceW * (child.wPercent / weightSumW)
+				end
+				if child.hPercent ~= nil then
+					child.h = (self.h - self.padt - self.padb) * child.hPercent
+				end
+
 				nextX = nextX + child.w + self.gapHorizontal
 				currentMaxSize = math.max(currentMaxSize, child.h)
+
+				self.innerWidth = math.min(self.w, self.innerWidth + child.w + self.gapHorizontal)
 			else
+				if child.wPercent ~= nil then
+					child.w = (self.w - self.padl - self.padr) * child.wPercent
+				end
+				if child.hPercent ~= nil then
+					child.h = remainingSpaceH * (child.hPercent / weightSumH)
+				end
+
 				nextY = nextY + child.h + self.gapVertical
 				currentMaxSize = math.max(currentMaxSize, child.w)
+
+				self.innerHeight = math.min(self.h, self.innerHeight + child.h + self.gapVertical)
 			end
 
 			child.screenx = self.screenx + self.padl - self.dx + child.x
 			child.screeny = self.screeny + self.padt - self.dy + child.y
 
 			child:relayout()
-			
-			if self.horizontal then
-				self.innerWidth = math.min(self.w, self.innerWidth + child.w + self.gapHorizontal)
-			else
-				self.innerHeight = math.min(self.h, self.innerHeight + child.h + self.gapVertical)
-			end
 
 			child.rect.x = child.screenx
 			child.rect.y = child.screeny
