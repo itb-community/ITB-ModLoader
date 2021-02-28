@@ -274,6 +274,45 @@ local function buildWeaponButton(weapon)
 	return button
 end
 
+local function buildClassHolder(classHeaderText)
+	local entryBoxHolder = UiBoxLayout()
+		:vgap(5)
+		:width(1)
+
+	-- Add a collapse button for the class.
+	-- This is just a checkbox, but skinned differently.
+	local collapseButton = UiCheckbox()
+		:width(1):heightpx(41)
+		:decorate({
+			DecoButton(),
+			DecoCheckbox(
+				deco.surfaces.dropdownOpenRight,
+				deco.surfaces.dropdownClosed,
+				deco.surfaces.dropdownOpenRightHovered,
+				deco.surfaces.dropdownClosedHovered
+			),
+			DecoAlign(4, 2),
+			DecoText(classHeaderText)
+		})
+		:addTo(entryBoxHolder)
+
+	local weaponsHolder = UiFlowLayout()
+		:width(1)
+		:vgap(WEAPON_GAP):hgap(WEAPON_GAP)
+		:padding(PADDING)
+		:addTo(entryBoxHolder)
+	weaponsHolder.padl = 41
+
+	entryBoxHolder.weaponsHolder = weaponsHolder
+
+	sdlext.addButtonSoundHandlers(collapseButton, function()
+		weaponsHolder.visible = not collapseButton.checked
+		entryBoxHolder:relayout()
+	end)
+
+	return entryBoxHolder
+end
+
 local function buildContent(scroll)
 	local oldConfig
 	presets, oldConfig = loadConfig()
@@ -286,24 +325,12 @@ local function buildContent(scroll)
 		:addTo(scroll)
 
 	for _, class in ipairs(getClassList(oldConfig)) do
-		-- Header with a smaller font size
-		local classHeader = DecoFrameHeader()
-		classHeader.font = deco.uifont.default.font
-		classHeader.height = 20
-
-		-- local frame for each class, will automatically assign rows and columns
-		local classArea = UiFlowLayout()
-			:width(1)
-			:vgap(WEAPON_GAP):hgap(WEAPON_GAP)
-			:padding(PADDING)
-			:caption(class.name)
-			:decorate({ classHeader, DecoFrame() })
-			:addTo(classesHolder)
-		classArea.padb = classArea.padb + PADDING
+		local classHolder = buildClassHolder(class.name)
+		classHolder:addTo(classesHolder)
 
 		for _, weapon in pairs(class.weapons) do
 			local button = buildWeaponButton(weapon)
-			button:addTo(classArea)
+			button:addTo(classHolder.weaponsHolder)
 			table.insert(buttons, button)
 		end
 	end
