@@ -14,7 +14,7 @@ local function showGamepadWarning()
 	sdlext.showButtonDialog(
 		GetText("GamepadWarning_FrameTitle"),
 		GetText("GamepadWarning_FrameText"),
-		responseFn, nil, nil,
+		responseFn,
 		{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
 		{ "", GetText("ButtonTooltip_DisablePopup") }
 	)

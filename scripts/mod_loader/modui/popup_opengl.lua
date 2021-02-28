@@ -13,7 +13,7 @@ local function showOpenGLWarning()
 	sdlext.showButtonDialog(
 			GetText("OpenGL_FrameTitle"),
 			GetText("OpenGL_FrameText"),
-			responseFn, nil, nil,
+			responseFn,
 			{ GetText("OpenGL_Button_Quit"), GetText("OpenGL_Button_Stay") },
 			nil
 	)

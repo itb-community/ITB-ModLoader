@@ -539,7 +539,7 @@ local function showModConfig()
 			sdlext.showButtonDialog(
 				GetText("RestartRequired_FrameTitle"),
 				GetText("RestartRequired_FrameText"),
-				responseFn, nil, nil,
+				responseFn,
 				{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
 				{ "", GetText("ButtonTooltip_DisablePopup") }
 			)
@@ -551,9 +551,13 @@ local function showModConfig()
 
 		local frame = sdlext.buildButtonDialog(
 			GetText("ModConfig_FrameTitle"),
-			0.6 * ScreenSizeX(), 0.8 * ScreenSizeY(),
 			buildModConfigContent,
-			buildModConfigButtons
+			buildModConfigButtons,
+			{
+				maxW = 0.6 * ScreenSizeX(),
+				maxH = 0.8 * ScreenSizeY(),
+				compactH = false
+			}
 		)
 		
 		frame:addTo(ui)
