@@ -33,7 +33,6 @@ end
 local function buildTestUi(testEntry)
 	local entryHolder = UiWeightLayout()
 		:width(1):heightpx(41)
-		:addTo(entryBoxHolder)
 
 	local checkbox = UiCheckbox()
 		:width(1):heightpx(41)

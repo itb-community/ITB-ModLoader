@@ -37,7 +37,7 @@ end
 function Ui:add(child, index)
 	child:setroot(self.root)
 	if index then
-		assert(type(index) == "number")
+		Assert.Equals("number", type(index))
 		table.insert(self.children, index, child)
 	else
 		table.insert(self.children, child)
