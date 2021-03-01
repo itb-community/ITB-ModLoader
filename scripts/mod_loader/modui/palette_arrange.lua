@@ -143,13 +143,10 @@ local function uiSetDraggable(ui)
 		if self.parent ~= scrollarea then return end
 
 		for i = PALETTE_INDEX_FIRST_MOVABLE, #content.children do
-			local ui = content.children[i]
-			if rect_contains(ui.rect, mx, my) then
-				if ui ~= placeholder then
-					local placeholderIndex = list_indexof(content.children, placeholder)
-					table.remove(content.children, placeholderIndex)
-					table.insert(content.children, i, placeholder)
-					self:updateLockIcons(math.min(i, placeholderIndex), #content.children)
+			local hoveredButton = content.children[i]
+			if rect_contains(hoveredButton.rect, mx, my) then
+				if hoveredButton ~= placeholder then
+					self:hoverAtIndex(i)
 				end
 
 				return
@@ -158,23 +155,24 @@ local function uiSetDraggable(ui)
 
 		-- if we get this far, we are not hovering any of the buttons
 		if content.children[#content.children] ~= placeholder then
-			local placeholderIndex = list_indexof(content.children, placeholder)
-			table.remove(content.children, placeholderIndex)
-			table.insert(content.children, placeholder)
-
-			self:updateLockIcons(placeholderIndex, #content.children)
+			self:hoverAtIndex(#content.children)
 		end
 	end
 end
 
-local function updateLockIcons(self, from, to)
-	for i = from, to do
+local function hoverAtIndex(self, new_placeholderIndex)
+	local old_placeholderIndex = list_indexof(content.children, placeholder)
+	table.remove(content.children, old_placeholderIndex)
+	table.insert(content.children, new_placeholderIndex, placeholder)
+
+	local firstIndex = math.min(new_placeholderIndex, old_placeholderIndex)
+
+	for i = firstIndex, #content.children do
 		local lock = not unlockedSquads[i]
 		content.children[i]:displayPaletteLocked(lock)
 	end
 
-	local placeholderIndex = list_indexof(content.children, placeholder)
-	local lock = not unlockedSquads[placeholderIndex]
+	local lock = not unlockedSquads[new_placeholderIndex]
 	self:displayPaletteLocked(lock)
 end
 
@@ -268,7 +266,7 @@ local function buildPaletteFrameContent(scroll)
 		button.deco_fade = deco_fade
 		button.deco_lock = deco_lock
 		button.displayPaletteLocked = displayPaletteLocked
-		button.updateLockIcons = updateLockIcons
+		button.hoverAtIndex = hoverAtIndex
 
 		if not unlockedSquads[i] then
 			button:displayPaletteLocked(true)
