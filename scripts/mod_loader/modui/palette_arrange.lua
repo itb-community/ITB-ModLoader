@@ -26,7 +26,8 @@ local function getUnlockedSquads()
 	-- squad 9 and 10 are Random and Custom, while squad 11 is Secret Squad.
 	-- palette 9 is unlocked if Secret Squad is unlocked.
 	-- palette 10 is unlocked if any squad beyond Rift Walkers is unlocked.
-	-- one palette is hidden until Secret Squad is unlocked, so we keep palette 11 locked.
+	-- one palette is hidden while Secret Squad is locked,
+	-- so we keep palette 11 locked until it is unlocked.
 	unlockedSquads[9] = unlockedSquads[11]
 
 	return unlockedSquads
