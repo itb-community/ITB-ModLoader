@@ -18,7 +18,7 @@ modApi.events.onSettingsChanged:subscribe(function(old, new)
 			sdlext.showButtonDialog(
 				GetText("ProfileSettings_FrameTitle"),
 				GetText("ProfileSettings_FrameText"),
-				responseFn, nil, nil,
+				responseFn,
 				{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
 				{ "", GetText("ButtonTooltip_DisablePopup") }
 			)

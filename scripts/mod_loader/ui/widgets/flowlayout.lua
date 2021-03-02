@@ -15,6 +15,7 @@ function UiFlowLayout:new()
 	self.gapHorizontal = 5
 	self.gapVertical = 5
 	self.horizontal = true
+	self.isCompact = false
 end
 
 function UiFlowLayout:vgap(gap)
@@ -32,6 +33,11 @@ function UiFlowLayout:orientation(horizontal)
 	return self
 end
 
+function UiFlowLayout:compact(compact)
+	self.isCompact = compact
+	return self
+end
+
 function UiFlowLayout:relayout()
 	assert(type(self.horizontal) == "boolean")
 
@@ -44,11 +50,9 @@ function UiFlowLayout:relayout()
 		if child.visible then
 			if child.wPercent ~= nil then
 				child.w = (self.w - self.padl - self.padr) * child.wPercent
-				child.wPercent = nil
 			end
 			if child.hPercent ~= nil then
 				child.h = (self.h - self.padt - self.padb) * child.hPercent
-				child.hPercent = nil
 			end
 		end
 	end
@@ -68,14 +72,20 @@ function UiFlowLayout:relayout()
 				if nextX + child.w > self.w then
 					nextX = 0
 					nextY = nextY + currentMaxSize + self.gapVertical
-					self.innerHeight = self.innerHeight + currentMaxSize + self.gapVertical
+					if self.innerHeight > 0 then
+						self.innerHeight = self.innerHeight + self.gapVertical
+					end
+					self.innerHeight = self.innerHeight + currentMaxSize
 					currentMaxSize = 0
 				end
 			else
 				if nextY + child.h > self.h then
 					nextY = 0
 					nextX = nextX + currentMaxSize + self.gapHorizontal
-					self.innerWidth = self.innerWidth + currentMaxSize + self.gapHorizontal
+					if self.innerWidth > 0 then
+						self.innerWidth = self.innerWidth + self.gapHorizontal
+					end
+					self.innerWidth = self.innerWidth + currentMaxSize
 					currentMaxSize = 0
 				end
 			end
@@ -84,13 +94,23 @@ function UiFlowLayout:relayout()
 			child.y = nextY
 
 			if self.horizontal then
-				nextX = nextX + child.w + self.gapHorizontal
+				nextX = nextX + child.w
 				currentMaxSize = math.max(currentMaxSize, child.h)
-				self.innerWidth = math.min(self.w, self.innerWidth + child.w + self.gapHorizontal)
+
+				if nextX <= self.w then
+					self.innerWidth = math.max(self.innerWidth, nextX)
+				end
+
+				nextX = nextX + self.gapHorizontal
 			else
-				nextY = nextY + child.h + self.gapVertical
+				nextY = nextY + child.h
 				currentMaxSize = math.max(currentMaxSize, child.w)
-				self.innerHeight = math.min(self.h, self.innerHeight + child.h + self.gapVertical)
+
+				if nextY <= self.h then
+					self.innerHeight = math.max(self.innerHeight, nextY)
+				end
+
+				nextY = nextY + self.gapVertical
 			end
 
 			child.screenx = self.screenx + self.padl - self.dx + child.x
@@ -107,20 +127,26 @@ function UiFlowLayout:relayout()
 		end
 	end
 
-	if lastChild then
-		if self.horizontal then
-			self.h = lastChild.y + self.padt + self.padb + lastChild.h
-		else
-			self.w = lastChild.x + self.padl + self.padr + lastChild.w
-		end
-	else
-		self.w = self.horizontal and 0 or self.w
-		self.h = self.horizontal and self.h or 0
-	end
-
 	if self.horizontal then
 		self.innerHeight = self.innerHeight + currentMaxSize
 	else
 		self.innerWidth = self.innerWidth + currentMaxSize
+	end
+
+	if lastChild then
+		if self.horizontal then
+			self.h = lastChild.y + self.padt + self.padb + lastChild.h
+			if self.isCompact then
+				self.w = self.innerWidth
+			end
+		else
+			self.w = lastChild.x + self.padl + self.padr + lastChild.w
+			if self.isCompact then
+				self.h = self.innerHeight
+			end
+		end
+	else
+		self.w = self.horizontal and 0 or self.w
+		self.h = self.horizontal and self.h or 0
 	end
 end

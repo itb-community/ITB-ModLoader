@@ -3,7 +3,8 @@ local scripts = {
 	"modApi",
 	"event",
 	"asserts",
-	"achievement"
+	"achievement",
+	"dialog_helper"
 }
 
 local rootpath = GetParentPath(...)

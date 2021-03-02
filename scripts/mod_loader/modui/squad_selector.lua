@@ -249,9 +249,13 @@ local function createUi()
 
 		local frame = sdlext.buildButtonDialog(
 			GetText("SquadSelect_FrameTitle"),
-			0.6 * ScreenSizeX(), 0.6 * ScreenSizeY(),
 			buildContent,
-			buildButtons
+			buildButtons,
+			{
+				maxW = 0.6 * ScreenSizeX(),
+				maxH = 0.6 * ScreenSizeY(),
+				collapse = false
+			}
 		)
 
 		frame

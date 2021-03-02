@@ -2,6 +2,7 @@ local scripts = {
 	"root",
 	"dialog_helper",
 
+	"windows",
 	"mainmenu",
 	"hangar",
 	"version_string",
@@ -19,6 +20,7 @@ local scripts = {
 	
 	"mod_configuration",
 	"pilot_arrange",
+	"palette_arrange",
 	"squad_selector",
 	"weapon_deck_selector",
 	"modloader_configuration",
