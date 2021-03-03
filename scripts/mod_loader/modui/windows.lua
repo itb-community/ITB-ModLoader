@@ -6,12 +6,16 @@ local Window = {}
 CreateClass(Window)
 
 function Window:show(id)
+	if self.visible then return end
+
 	self.visible = true
 	visibleWindows[id] = self
 	self.event_show:dispatch()
 end
 
 function Window:hide(id)
+	if not self.visible then return end
+
 	self.visible = false
 	visibleWindows[id] = nil
 	self.event_hide:dispatch()
@@ -105,7 +109,7 @@ function GetText(id, ...)
 	return oldGetText(id, ...)
 end
 
-modApi.events.onFrameDrawn:subscribe(function()
+modApi.events.onFrameDrawStart:subscribe(function()
 
 	for id, window in pairs(visibleWindows) do
 		if not showWindows[id] then
@@ -115,9 +119,7 @@ modApi.events.onFrameDrawn:subscribe(function()
 
 	if next(showWindows) ~= nil then
 		for id, window in pairs(showWindows) do
-			if not window.visible then
-				window:show(id)
-			end
+			window:show(id)
 		end
 
 		showWindows = {}

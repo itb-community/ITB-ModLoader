@@ -309,6 +309,8 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 		modApi.events.onWindowVisible:dispatch(screen, wx, wy, ww, wh)
 	end
 
+	modApi.events.onFrameDrawStart:dispatch(screen)
+
 	uiRoot:draw(screen)
 
 	modApi.events.onFrameDrawn:dispatch(screen)

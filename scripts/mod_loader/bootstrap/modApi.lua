@@ -19,6 +19,7 @@ t.onUiRootCreating = Event()
 t.onUiRootCreated = Event()
 t.onGameWindowResized = Event()
 t.onConsoleToggled = Event()
+t.onFrameDrawStart = Event()
 t.onFrameDrawn = Event()
 t.onWindowVisible = Event()
 
