@@ -146,6 +146,11 @@ function startNewGame()
 		GAME.squadTitles["TipTitle_"..key] = GetText("TipTitle_"..key)
 	end
 
+	GAME.additionalSquadData = {
+		squad = HangarGetSelectedSquad(),
+		mechs = HangarGetSelectedMechs()
+	}
+
 	SetDifficulty(GetDifficulty())
 
 	-- Schedule execution to happen in 50ms
