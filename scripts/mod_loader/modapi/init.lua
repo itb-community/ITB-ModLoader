@@ -120,14 +120,25 @@ function modApi:resetModContent()
 	self.dictionary = {}
 
 	self.mod_squads = {
-		{ GetVanillaText("TipTitle_Archive_A"), "PunchMech", "TankMech", "ArtiMech" },
-		{ GetVanillaText("TipTitle_Rust_A"), "JetMech", "RocketMech",  "PulseMech" },
-		{ GetVanillaText("TipTitle_Pinnacle_A"), "LaserMech", "ChargeMech", "ScienceMech" },
-		{ GetVanillaText("TipTitle_Detritus_A"), "ElectricMech", "WallMech", "RockartMech" },
-		{ GetVanillaText("TipTitle_Archive_B"), "JudoMech", "DStrikeMech", "GravMech" },
-		{ GetVanillaText("TipTitle_Rust_B"), "FlameMech", "IgniteMech", "TeleMech" },
-		{ GetVanillaText("TipTitle_Pinnacle_B"), "GuardMech", "MirrorMech", "IceMech" },
-		{ GetVanillaText("TipTitle_Detritus_B"), "LeapMech", "UnstableTank", "NanoMech" },
+		{ GetVanillaText("TipTitle_Archive_A"), "PunchMech", "TankMech", "ArtiMech", id = "Archive_A" },
+		{ GetVanillaText("TipTitle_Rust_A"), "JetMech", "RocketMech",  "PulseMech", id = "Rust_A" },
+		{ GetVanillaText("TipTitle_Pinnacle_A"), "LaserMech", "ChargeMech", "ScienceMech", id = "Pinnacle_A" },
+		{ GetVanillaText("TipTitle_Detritus_A"), "ElectricMech", "WallMech", "RockartMech", id = "Detritus_A" },
+		{ GetVanillaText("TipTitle_Archive_B"), "JudoMech", "DStrikeMech", "GravMech", id = "Archive_B" },
+		{ GetVanillaText("TipTitle_Rust_B"), "FlameMech", "IgniteMech", "TeleMech", id = "Rust_B" },
+		{ GetVanillaText("TipTitle_Pinnacle_B"), "GuardMech", "MirrorMech", "IceMech", id = "Pinnacle_B" },
+		{ GetVanillaText("TipTitle_Detritus_B"), "LeapMech", "UnstableTank", "NanoMech", id = "Detritus_B" }
+	}
+	self.mod_squads_by_id = {
+		Archive_A = self.mod_squads[1],
+		Rust_A = self.mod_squads[2],
+		Pinnacle_A = self.mod_squads[3],
+		Detritus_A = self.mod_squads[4],
+		Archive_B = self.mod_squads[5],
+		Rust_B = self.mod_squads[6],
+		Pinnacle_B = self.mod_squads[7],
+		Detritus_B = self.mod_squads[8],
+		Secret = { GetVanillaText("TipTitle_Secret"), "BeetleMech", "HornetMech", "ScarabMech", id = "Secret" }
 	}
 	self.squad_text = {
 		GetVanillaText("TipTitle_Archive_A"),
