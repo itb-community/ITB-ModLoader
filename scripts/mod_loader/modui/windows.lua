@@ -6,6 +6,8 @@ local Window = {}
 CreateClass(Window)
 
 function Window:show(id)
+	showWindows[id] = true
+
 	if self.visible then return end
 
 	self.visible = true
@@ -102,8 +104,9 @@ sdlext.isAbandonTimelineWindowVisible = buildIsWindowVisibleFunction(windows.Aba
 
 local oldGetText = GetText
 function GetText(id, ...)
-	if windows[id] ~= nil then
-		showWindows[id] = windows[id]
+	local window = windows[id]
+	if window ~= nil then
+		window:show(id)
 	end
 
 	return oldGetText(id, ...)
@@ -118,10 +121,6 @@ modApi.events.onFrameDrawStart:subscribe(function()
 	end
 
 	if next(showWindows) ~= nil then
-		for id, window in pairs(showWindows) do
-			window:show(id)
-		end
-
 		showWindows = {}
 	end
 end)
