@@ -35,6 +35,8 @@ t.onNewGameClicked = Event()
 t.onContinueClicked = Event()
 t.onSettingsChanged = Event()
 
+t.onHangarUiShown = Event()
+t.onHangarUiHidden = Event()
 t.onEscapeMenuWindowShown = Event()
 t.onEscapeMenuWindowHidden = Event()
 t.onSquadSelectionWindowShown = Event()

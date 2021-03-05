@@ -38,6 +38,10 @@ local windows = {
 		event_show = modApi.events.onEscapeMenuWindowShown,
 		event_hide = modApi.events.onEscapeMenuWindowHidden
 	},
+	Button_Hangar_Start = Window:new{
+		event_show = modApi.events.onHangarUiShown,
+		event_hide = modApi.events.onHangarUiHidden
+	},
 	Hangar_Select = Window:new{
 		event_show = modApi.events.onSquadSelectionWindowShown,
 		event_hide = modApi.events.onSquadSelectionWindowHidden
@@ -93,6 +97,7 @@ local windows = {
 }
 
 sdlext.isEscapeMenuWindowVisible = buildIsWindowVisibleFunction(windows.Escape_Title)
+sdlext.isHangarUiVisible = buildIsWindowVisibleFunction(windows.Button_Hangar_Start)
 sdlext.isSquadSelectionWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Select)
 sdlext.isCustomizeSquadWindowVisible = buildIsWindowVisibleFunction(windows.Customize_Instructions)
 sdlext.isAchievementsWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Achievements_Title)
