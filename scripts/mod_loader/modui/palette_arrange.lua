@@ -13,10 +13,25 @@ local BUTTON_HEIGHT = 66 + 8 + 5*2
 
 local currentPaletteOrder
 local colorMapBase
+local unlockedSquads
 
 local scrollarea
 local content
 local placeholder
+
+local function getUnlockedSquads()
+	local profile = modApi:loadProfile() or {}
+	local unlockedSquads = shallow_copy(profile.squads or {})
+
+	-- squad 9 and 10 are Random and Custom, while squad 11 is Secret Squad.
+	-- palette 9 is unlocked if Secret Squad is unlocked.
+	-- palette 10 is unlocked if any squad beyond Rift Walkers is unlocked.
+	-- one palette is hidden while Secret Squad is locked,
+	-- so we keep palette 11 locked until it is unlocked.
+	unlockedSquads[9] = unlockedSquads[11]
+
+	return unlockedSquads
+end
 
 local function savePaletteOrder()
 	local modcontent = modApi:getCurrentModcontentPath()
@@ -128,22 +143,10 @@ local function uiSetDraggable(ui)
 		if self.parent ~= scrollarea then return end
 
 		for i = PALETTE_INDEX_FIRST_MOVABLE, #content.children do
-			local ui = content.children[i]
-			if rect_contains(ui.rect, mx, my) then
-				if ui ~= placeholder then
-					table.remove(content.children, list_indexof(content.children, placeholder))
-					table.insert(content.children, i, placeholder)
-				end
-
-				if #content.children > PALETTE_COUNT_HANGAR_MAX then
-					content.children[PALETTE_COUNT_HANGAR_MAX]:displayPaletteLocked(false)
-					content.children[PALETTE_COUNT_HANGAR_MAX + 1]:displayPaletteLocked(true)
-
-					if i > PALETTE_COUNT_HANGAR_MAX then
-						self:displayPaletteLocked(true)
-					else
-						self:displayPaletteLocked(false)
-					end
+			local hoveredButton = content.children[i]
+			if rect_contains(hoveredButton.rect, mx, my) then
+				if hoveredButton ~= placeholder then
+					self:hoverAtIndex(i)
 				end
 
 				return
@@ -152,15 +155,27 @@ local function uiSetDraggable(ui)
 
 		-- if we get this far, we are not hovering any of the buttons
 		if content.children[#content.children] ~= placeholder then
-			table.remove(content.children, list_indexof(content.children, placeholder))
-			table.insert(content.children, placeholder)
-
-			if #content.children > PALETTE_COUNT_HANGAR_MAX then
-				content.children[PALETTE_COUNT_HANGAR_MAX]:displayPaletteLocked(false)
-				self:displayPaletteLocked(true)
-			end
+			self:hoverAtIndex(#content.children)
 		end
 	end
+end
+
+local function hoverAtIndex(self, new_placeholderIndex)
+	local old_placeholderIndex = list_indexof(content.children, placeholder)
+	table.remove(content.children, old_placeholderIndex)
+	table.insert(content.children, new_placeholderIndex, placeholder)
+
+	local firstIndex = math.min(new_placeholderIndex, old_placeholderIndex)
+
+	for i = firstIndex, #content.children do
+		local lock = not unlockedSquads[i]
+		content.children[i]:displayPaletteLocked(lock)
+	end
+
+	local lock = not unlockedSquads[new_placeholderIndex]
+	self:displayPaletteLocked(lock)
+
+	content:relayout()
 end
 
 local function displayPaletteLocked(self, displayLocked)
@@ -182,6 +197,8 @@ local function buildPaletteFrameContent(scroll)
 		currentPaletteOrder = modApi:getCurrentPaletteOrder()
 		buildSdlColorMapBase()
 	end
+
+	unlockedSquads = getUnlockedSquads()
 
 	scrollarea = scroll
 
@@ -251,8 +268,9 @@ local function buildPaletteFrameContent(scroll)
 		button.deco_fade = deco_fade
 		button.deco_lock = deco_lock
 		button.displayPaletteLocked = displayPaletteLocked
+		button.hoverAtIndex = hoverAtIndex
 
-		if i > PALETTE_COUNT_HANGAR_MAX then
+		if not unlockedSquads[i] then
 			button:displayPaletteLocked(true)
 		end
 
@@ -286,12 +304,9 @@ local function buildPaletteFrameButtons(buttonLayout)
 		for i, paletteId in ipairs(paletteOrder) do
 			local ui = uis[paletteId]
 			table.insert(content.children, ui)
-			
-			if i > PALETTE_COUNT_HANGAR_MAX then
-				ui:displayPaletteLocked(true)
-			else
-				ui:displayPaletteLocked(false)
-			end
+
+			local lock = not unlockedSquads[i]
+			ui:displayPaletteLocked(lock)
 		end
 
 		table.insert(content.children, placeholder)
@@ -345,6 +360,7 @@ end
 local function onExit()
 	savePaletteOrder()
 
+	unlockedSquads = nil
 	scrollarea = nil
 	content = nil
 	placeholder = nil
