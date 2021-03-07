@@ -48,6 +48,7 @@ function deco.reloadFonts()
 	deco.fonts = {}
 	deco.fonts.justin12 = sdlext.font("fonts/JustinFont12Bold.ttf", 12)
 	deco.fonts.menufont = sdlext.font("fonts/JustinFont11Bold.ttf", 24)
+	deco.fonts.labelfont = sdlext.font("fonts/JustinFont11Bold.ttf", 12)
 	deco.fonts.tooltipTitle = sdlext.font("fonts/NunitoSans_Bold.ttf", 14)
 	deco.fonts.tooltipTitleLarge = sdlext.font("fonts/NunitoSans_Bold.ttf", 16)
 	deco.fonts.tooltipText = sdlext.font("fonts/NunitoSans_Regular.ttf", 12)
