@@ -1,10 +1,19 @@
 
 local NO_ICON = "img/achievements/No_Icon.png"
-local ICON_COUNT_PER_ROW = 8
 local ICON_SIZE = 64
-local ICON_PADDING = 6
-local CONTENT_GAP = 5
-local FRAME_PADDING = 25
+local ICON_PAD_TOP = 9
+local ICON_PAD_BOTTOM = 9
+local ICON_PAD_LEFT = 8
+local ICON_PAD_RIGHT = 4
+local CONTENT_GAP = 8
+local FRAME_PAD_TOP = 28
+local FRAME_PAD_LEFT = 33
+local FRAME_WIDTH = 1010
+local FRAME_HEIGHT = 643
+local SQUAD_WINDOW_W = 559
+local SQUAD_BOX_W = 228
+local GLOBAL_WINDOW_W = 445
+local GLOBAL_BOX_W = 369
 
 local achievementFrames
 
@@ -79,23 +88,23 @@ local function buildAchievementFrame(achievement)
 	return frame
 end
 
-local function buildModContent(mod, modAchievements)
+local function buildModContent(name, widthpx, modAchievements)
 
 	local container = UiBoxLayout()
-		:width(1)
+		:widthpx(widthpx)
 		:vgap(5)
-		:padding(ICON_PADDING)
 		:decorate({
 			DecoFrame(deco.colors.button)
 		})
+	container.padt = ICON_PAD_TOP
+	container.padb = ICON_PAD_BOTTOM
+	container.padl = ICON_PAD_LEFT
+	container.padr = ICON_PAD_RIGHT
 
 	local header = Ui()
 		:width(1)
-		:heightpx(20)
-		:decorate({
-			DecoAlign(0, 2),
-			DecoAlignedText(mod.name, nil, nil, "center", "top")
-		})
+		:heightpx(16)
+		:decorate({ DecoAlignedText(name, deco.fonts.labelfont, nil, "center", "top") })
 		:addTo(container)
 
 	local content = UiFlowLayout()
@@ -115,27 +124,112 @@ end
 
 local function buildAchievementsFrameContent(scroll)
 	local allAchievements = modApi.achievements:get()
-
-	local content = UiBoxLayout()
-		:width(1)
-		:vgap(5)
-		:padding(FRAME_PADDING)
-		:addTo(scroll)
+	local allSquadAchievements = {}
+	local allGlobalAchievements = {}
 
 	for mod_id, modAchievements in pairs(allAchievements) do
-		local mod = mod_loader.mods[mod_id]
-		buildModContent(mod, modAchievements)
-			:addTo(content)
+		for _, achievement in ipairs(modAchievements) do
+			local squad_id = achievement.squad
+			if squad_id then
+				allSquadAchievements[squad_id] = allSquadAchievements[squad_id] or {}
+				table.insert(allSquadAchievements[squad_id], achievement)
+			else
+				allGlobalAchievements[mod_id] = allGlobalAchievements[mod_id] or {}
+				table.insert(allGlobalAchievements[mod_id], achievement)
+			end
+		end
 	end
-end
 
-local function buildAchievementsFrameButtons()
+	scroll.padt = 0
+	scroll.padb = 0
+	scroll.padl = 0
+	scroll.padr = 0
 
+	local holder = UiBoxLayout()
+		:height(1)
+		:hgap(0)
+		:addTo(scroll)
+
+	-- Squad based achievements
+	local ui_squads = Ui()
+		:widthpx(SQUAD_WINDOW_W)
+		:height(1)
+		:addTo(holder)
+
+	local label_squads = Ui()
+		:width(1):height(1)
+		:setTranslucent(true)
+		:decorate({
+			DecoLabel("Squad Based", {
+				extraWidth = 4,
+				textOffsetX = 3
+			})
+		})
+		:addTo(ui_squads)
+
+	local scroll_squads = UiScrollArea()
+		:width(1):height(1)
+		:addTo(ui_squads)
+
+	local content_squads = UiFlowLayout()
+		:width(1)
+		--:height(1)
+		:hgap(40)
+		:vgap(5)
+		:addTo(scroll_squads)
+	content_squads.padt = FRAME_PAD_TOP
+	content_squads.padl = FRAME_PAD_LEFT
+
+	for squad_id, squadAchievements in pairs(allSquadAchievements) do
+		-- TODO: link squad_id to squad name
+		buildModContent(squad_id, SQUAD_BOX_W, squadAchievements)
+			:addTo(content_squads)
+	end
+
+	local line = Ui()
+		:widthpx(scroll.parent.decorations[1].bordersize)
+		:height(1)
+		:decorate({ DecoSolid(scroll.parent.decorations[1].bordercolor) })
+		:addTo(holder)
+
+	-- Global achievements
+	local ui_global = Ui()
+		:widthpx(GLOBAL_WINDOW_W)
+		:height(1)
+		:addTo(holder)
+
+	local label_global = Ui()
+		:width(1):height(1)
+		:setTranslucent(true)
+		:decorate({
+			DecoLabel("Global", {
+				extraWidth = 7,
+				textOffsetX = 4
+			})
+		})
+		:addTo(ui_global)
+
+	local scroll_global = UiScrollArea()
+		:width(1):height(1)
+		:addTo(ui_global)
+
+	local content_global = UiFlowLayout()
+		:width(1)
+		:vgap(5)
+		:addTo(scroll_global)
+	content_global.padt = FRAME_PAD_TOP
+	content_global.padl = FRAME_PAD_LEFT
+
+	for mod_id, modAchievements in pairs(allGlobalAchievements) do
+		local mod = mod_loader.mods[mod_id]
+		buildModContent(mod.name, GLOBAL_BOX_W, modAchievements)
+			:addTo(content_global)
+	end
 end
 
 local function onExit()
 	sdlext.config(
-		"modcontent.lua",
+		modApi:getCurrentProfilePath().."modcontent.lua",
 		function(obj)
 			obj.achievements = obj.achievements or {}
 			for _, frame in ipairs(achievementFrames) do
@@ -156,7 +250,7 @@ local function onExit()
 				end
 			end
 
-			modApi.achievements.cachedSavedata = obj.achievements
+			modApi.achievements.cachedProfileData = obj.achievements
 		end
 	)
 
@@ -169,15 +263,20 @@ local function showAchievementUi()
 	sdlext.showDialog(function(ui, quit)
 		ui.onDialogExit = onExit
 
-		local frame = sdlext.buildButtonDialog(
+		local frame = sdlext.buildScrollDialog(
 			GetText("Achievements_FrameTitle"),
-			0.6 * ScreenSizeX(), 0.8 * ScreenSizeY(),
 			buildAchievementsFrameContent,
-			buildAchievementsFrameButtons
+			{
+				minW = FRAME_WIDTH,
+				maxW = FRAME_WIDTH,
+				minH = FRAME_HEIGHT,
+				maxH = FRAME_HEIGHT,
+				separateHeader = true
+			}
 		)
 
 		frame:addTo(ui)
-			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2)
+			:pospx((ui.w - frame.w) / 2, (ui.h - frame.h) / 2 - 6)
 	end)
 end
 

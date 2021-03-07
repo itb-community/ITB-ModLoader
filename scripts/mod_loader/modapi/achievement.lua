@@ -1,14 +1,12 @@
 
 local canAddAchievements = true
 
-local function initData()
-	if modApi.achievements.cachedSavedata ~= nil then return end
-
+local function updateCachedProfileData()
 	sdlext.config(
-		"modcontent.lua",
+		modApi:getCurrentProfilePath().."modcontent.lua",
 		function(obj)
 			obj.achievements = obj.achievements or {}
-			modApi.achievements.cachedSavedata = obj.achievements
+			modApi.achievements.cachedProfileData = obj.achievements
 		end
 	)
 end
@@ -18,14 +16,16 @@ local function writeData(mod_id, achievement_id, obj)
 	assert(type(mod_id) == 'string')
 	assert(type(achievement_id) == 'string')
 
-	initData()
+	if modApi.achievements.cachedProfileData == nil then
+		updateCachedProfileData()
+	end
 
 	sdlext.config(
-		"modcontent.lua",
+		modApi:getCurrentProfilePath().."modcontent.lua",
 		function(readObj)
 			readObj.achievements[mod_id] = readObj.achievements[mod_id] or {}
 			readObj.achievements[mod_id][achievement_id] = obj
-			modApi.achievements.cachedSavedata = readObj.achievements
+			modApi.achievements.cachedProfileData = readObj.achievements
 		end
 	)
 end
@@ -35,10 +35,12 @@ local function readData(mod_id, achievement_id)
 	assert(type(mod_id) == 'string')
 	assert(type(achievement_id) == 'string')
 
-	initData()
+	if modApi.achievements.cachedProfileData == nil then
+		updateCachedProfileData()
+	end
 
-	if modApi.achievements.cachedSavedata[mod_id] then
-		return modApi.achievements.cachedSavedata[mod_id][achievement_id]
+	if modApi.achievements.cachedProfileData[mod_id] then
+		return modApi.achievements.cachedProfileData[mod_id][achievement_id]
 	end
 
 	return nil
@@ -442,6 +444,7 @@ local function addAchievement(self, achievement)
 	local objective = buildAchievementObjective(achievement.objective)
 	local addReward = achievement.addReward
 	local remReward = achievement.remReward
+	local squad = achievement.squad
 
 	Assert.Equals('string', type(mod_id), "mod_id of achievement")
 	Assert.Equals('string', type(id), "id of achievement")
@@ -450,6 +453,7 @@ local function addAchievement(self, achievement)
 	Assert.Equals({'number', 'boolean', 'string', 'table'}, type(objective), "objective of achievement")
 	Assert.Equals({'nil', 'function'}, type(addReward), "add reward function of achievement")
 	Assert.Equals({'nil', 'function'}, type(remReward), "rem reward function of achievement")
+	Assert.Equals({'nil', 'string'}, type(squad), "squad id of achievement")
 
 	local data = Achievement:new{
 		mod_id = mod_id,
@@ -460,6 +464,7 @@ local function addAchievement(self, achievement)
 		objective = objective,
 		addReward = addReward,
 		remReward = remReward,
+		squad = squad,
 	}
 
 	Assert.Equals('nil', type(AchievementDictionary:get(mod_id, id)), "Achievement for mod ".. mod_id .." with id ".. id .." already exists")
@@ -539,3 +544,29 @@ modApi.achievements = {
 modApi.events.onModInitialized:subscribe(detectAchievementLibrary)
 modApi.events.onModMetadataDone:subscribe(detectAchievementLibrary)
 modApi.events.onModsInitialized:subscribe(onModsInitialized)
+
+local function onProfileSelected()
+	updateCachedProfileData()
+
+	-- validate saved achievement data on profile
+	sdlext.config(
+		modApi:getCurrentProfilePath().."modcontent.lua",
+		function(readObj)
+			local allAchievements = modApi.achievements:get()
+
+			for mod_id, modAchievements in pairs(allAchievements) do
+				readObj.achievements[mod_id] = readObj.achievements[mod_id] or {}
+				for _, achievement in ipairs(modAchievements) do
+					local initialState = Objective:getInitialState(achievement.objective)
+					local newState = Objective:getMergedState(initialState, achievement:getProgress())
+					readObj.achievements[mod_id][achievement.id] = newState
+				end
+			end
+
+			modApi.achievements.cachedProfileData = readObj.achievements
+		end
+	)
+end
+
+modApi.events.onProfileSelectionWindowHidden:subscribe(onProfileSelected)
+modApi.events.onCreateProfileConfirmationWindowHidden:subscribe(onProfileSelected)
