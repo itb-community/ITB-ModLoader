@@ -51,45 +51,45 @@ function sdlext.isCtrlDown()
 	return isCtrlHeld
 end
 
-local wasOptionsWindow = false
-local isOptionsWindow = false
-modApi.events.onFrameDrawn:subscribe(function(screen)
-	if wasOptionsWindow and not isOptionsWindow then
-		-- Settings window was visible, but isn't anymore.
-		-- This also triggers when the player hovers over
-		-- an option in the options box, but this heuristic
-		-- is good enough (at least we're not reloading
-		-- the settings file every damn frame)
-		local oldSettings = Settings
-		Settings = modApi:loadSettings()
+local windows = {
+	delete_profile = "Delete_Confirm_Title",
+	create_profile = "New_Profile_Title"
+}
 
-		if not compare_tables(oldSettings, Settings) then
-			modApi.events.onSettingsChanged:dispatch(oldSettings, Settings)
+local function updateProfile(window)
+	local oldSettings = Settings
+	Settings = modApi:loadSettings()
+
+	if window == windows.delete_profile then
+		if Settings.last_profile == nil or Settings.last_profile == "" then
+			modApi.events.onProfileDeleted:dispatch(oldSettings.last_profile)
 		end
 	end
 
-	wasOptionsWindow = isOptionsWindow
-	isOptionsWindow = false
-end)
+	if oldSettings.last_profile ~= Settings.last_profile then
+		if window == windows.create_profile then
+			modApi.events.onProfileCreated:dispatch(Settings.last_profile)
+		end
 
-local optionsBox = Boxes.escape_options_box
-local profileBox = Boxes.profile_window
-local function adjustForGameVersion()
-	if modApi:isVersion("1.2.20", modApi:getGameVersion()) then
-		--
-	end
-	if modApi:isVersion("1.1.22", modApi:getGameVersion()) then
-		optionsBox = Rect2D(optionsBox)
-		optionsBox.w = optionsBox.w + 300
+		Hangar_lastProfileHadSecretPilots = IsSecretPilotsUnlocked()
+		Profile = modApi:loadProfile()
+
+		modApi.events.onProfileChanged:dispatch(oldSettings.last_profile, Settings.last_profile)
+		modApi.events.onSettingsChanged:dispatch(oldSettings, Settings)
+
 	end
 end
 
-modApi.events.onWindowVisible:subscribe(function(screen, x, y, w, h)
-	if
-		(w == optionsBox.w and h == optionsBox.h) or
-		(w == profileBox.w and h == profileBox.h)
-	then
-		isOptionsWindow = true
+modApi.events.onProfileSelectionWindowHidden:subscribe(updateProfile)
+modApi.events.onCreateProfileConfirmationWindowHidden:subscribe(updateProfile)
+modApi.events.onDeleteProfileConfirmationWindowHidden:subscribe(updateProfile)
+
+modApi.events.onOptionsWindowHidden:subscribe(function()
+	local oldSettings = Settings
+	Settings = modApi:loadSettings()
+
+	if not compare_tables(oldSettings, Settings) then
+		modApi.events.onSettingsChanged:dispatch(oldSettings, Settings)
 	end
 end)
 
@@ -111,6 +111,7 @@ modApi.events.onKeyPressing:subscribe(function(keycode)
 	end
 
 	if keycode == Settings.hotkeys[HOTKEY.TOGGLE_FULLSCREEN] then
+		local oldSettings = copy_table(Settings)
 		Settings.fullscreen = 1 - Settings.fullscreen
 
 		-- Game doesn't update settings.lua with new fullscreen status...
@@ -119,7 +120,7 @@ modApi.events.onKeyPressing:subscribe(function(keycode)
 			GetSavedataLocation() .. "settings.lua",
 			"Settings = " .. save_table(Settings)
 		)
-		isOptionsWindow = true
+		modApi.events.onSettingsChanged:dispatch(oldSettings, Settings)
 	end
 
 	return false
@@ -145,19 +146,6 @@ modApi.events.onKeyReleasing:subscribe(function(keycode)
 	return false
 end)
 
-modApi.events.onSettingsChanged:subscribe(function(old, new)
-	-- When deleting the currently active profile, last_profile is nil
-	-- Just copy it over from the previous table, since it holds the correct value
-	if not new.last_profile or new.last_profile == "" then
-		new.last_profile = old.last_profile
-	end
-
-	if old.last_profile ~= new.last_profile then
-		Hangar_lastProfileHadSecretPilots = IsSecretPilotsUnlocked()
-		Profile = modApi:loadProfile()
-	end
-end)
-
 modApi.events.onGameWindowResized:subscribe(function(screen, oldSize)
 	sdlext.getUiRoot():widthpx(screen:w()):heightpx(screen:h())
 end)
@@ -171,8 +159,6 @@ end
 
 local srfBotLeft, srfTopRight
 local function buildUiRoot(screen)
-	adjustForGameVersion()
-
 	uiRoot = UiRoot():widthpx(screen:w()):heightpx(screen:h())
 
 	uiRoot.wheel = function(self, mx, my, scroll)
