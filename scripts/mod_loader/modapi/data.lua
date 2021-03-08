@@ -1,4 +1,8 @@
 
+function modApi:isProfilePath()
+	return Settings.last_profile ~= nil and Settings.last_profile ~= ""
+end
+
 --[[
 	Reloads the settings file to have access to selected settings
 	from in-game lua scripts.
@@ -22,6 +26,9 @@ end
 --]]
 function modApi:loadProfile()
 	Settings = self:loadSettings()
+	if not self.isProfilePath() then
+		return nil
+	end
 
 	local path = GetSavedataLocation() .. "profile_" ..
 	             Settings.last_profile ..
@@ -42,10 +49,18 @@ end
 
 function modApi:getCurrentProfilePath()
 	Settings = self:loadSettings()
+	if not self:isProfilePath() then
+		return nil
+	end
+
 	return "profile_"..Settings.last_profile.."/"
 end
 
 function modApi:writeProfileData(id, obj)
+	if not self:isProfilePath() then
+		return
+	end
+
 	sdlext.config(
 		self:getCurrentProfilePath().."modcontent.lua",
 		function(readObj)
@@ -56,6 +71,10 @@ end
 
 function modApi:readProfileData(id)
 	local result = nil
+
+	if not self:isProfilePath() then
+		return result
+	end
 
 	sdlext.config(
 		self:getCurrentProfilePath().."modcontent.lua",
