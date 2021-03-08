@@ -10,7 +10,7 @@ local function responseFn(btnIndex)
 	end
 end
 
-modApi.events.onSettingsChanged:subscribe(function(old, new)
+local function onProfileChanged()
 	if
 		modApi.showProfileSettingsFrame and modApi.profileConfig
 	then
@@ -24,4 +24,21 @@ modApi.events.onSettingsChanged:subscribe(function(old, new)
 			)
 		end)
 	end
+end
+
+local profile
+modApi.events.onProfileSelectionWindowShown:subscribe(function()
+	profile = Settings.last_profile
 end)
+
+local function onProfileSelected()
+	local newProfile = Settings.last_profile
+	if newProfile ~= nil and newProfile ~= "" and newProfile ~= profile then
+		onProfileChanged()
+	end
+
+	profile = newProfile
+end
+
+modApi.events.onCreateProfileConfirmationWindowHidden:subscribe(onProfileSelected)
+modApi.events.onProfileSelectionWindowHidden:subscribe(onProfileSelected)
