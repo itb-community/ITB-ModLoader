@@ -123,8 +123,7 @@ end
 
 local oldStartNewGame = startNewGame
 function startNewGame()
-	Settings = modApi:loadSettings()
-	
+
 	GameData = nil
 	RegionData = nil
 	SquadData = nil
@@ -168,8 +167,6 @@ end
 
 local oldLoadGame = LoadGame
 function LoadGame()
-	Settings = modApi:loadSettings()
-
 	GAME.modOptions = GAME.modOptions or mod_loader:getModConfig()
 	GAME.modLoadOrder = GAME.modLoadOrder or mod_loader:getSavedModOrder()
 
@@ -212,7 +209,6 @@ function SaveGame()
 		-- But only do that if we already have those vars
 		-- defined, to prevent grabbing stale data.
 		modApi:scheduleHook(50, function()
-			Settings = modApi:loadSettings()
 			RestoreGameVariables(Settings)
 			overrideNextPhase()
 		end)
