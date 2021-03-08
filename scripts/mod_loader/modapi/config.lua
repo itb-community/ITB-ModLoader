@@ -23,20 +23,22 @@ end
 
 function SaveModLoaderConfig(data)
 	if data.profileConfig then
-		sdlext.config(
-			modApi:getCurrentProfilePath().."modcontent.lua",
-			function(obj)
-				obj.modLoaderConfig = data
-			end
-		)
+		if modApi:isProfilePath() then
+			sdlext.config(
+				modApi:getCurrentProfilePath().."modcontent.lua",
+				function(obj)
+					obj.modLoaderConfig = data
+				end
+			)
 
-		-- Need to update shared modcontent.lua with profile config setting
-		sdlext.config(
-			"modcontent.lua", 
-			function(obj)
-				obj.modLoaderConfig.profileConfig = true
-			end
-		)
+			-- Need to update shared modcontent.lua with profile config setting
+			sdlext.config(
+				"modcontent.lua", 
+				function(obj)
+					obj.modLoaderConfig.profileConfig = true
+				end
+			)
+		end
 	else
 		sdlext.config(
 			"modcontent.lua", 
@@ -88,7 +90,7 @@ function LoadModLoaderConfig(overrideLoadProfileConfig)
 		loadProfile = overrideLoadProfileConfig
 	end
 
-	if loadProfile then
+	if loadProfile and modApi:isProfilePath() then
 		sdlext.config(modApi:getCurrentProfilePath().."modcontent.lua", readConfigFn)
 	end
 
