@@ -5,64 +5,28 @@
 
 local arrLeft = nil
 local arrRight = nil
-local diffText = nil
-
---Closest match to the vanilla font; one pixel too wide.
-local justinFont = nil
-local diffTextset = deco.textset(deco.colors.white, nil, nil, false)
-
 
 local function changeDifficulty(newDiff)
 	SetDifficulty(newDiff)
 
 	arrLeft.disabled = newDiff <= 0
 	arrRight.disabled = newDiff >= (#DifficultyLevels - 1)
-
-	diffText.decorations[2]:setsurface(GetDifficultyFaceName(newDiff):upper())
 end
 
 local function createUi(root)
-	justinFont = sdlext.font("fonts/Justin15.ttf", 14)
 
-	local pane = Ui()
-		:width(1):height(1)
-		:addTo(root)
-	pane.translucent = true
-	-- Hack. Having buttons return false in their mousemove causes
-	-- UI's highlighting system to break, and fail to unhighlight
-	-- the UI elements.
-	-- Fix this by having their parent mark them as hovered.
-	pane.mousemove = function(self, x, y)
+	local function arrowMousemove(self, x, y)
 		Ui.mousemove(self, x, y)
-
-		arrLeft.hovered = arrLeft.containsMouse
-		arrRight.hovered = arrRight.containsMouse
-
 		return false
 	end
 
-	local mask = Ui()
-		:widthpx(156):heightpx(35)
-		:decorate({ DecoSolid(deco.colors.transparent) })
-		:addTo(pane)
-	mask.translucent = true
-
-	local hangarBg = sdl.rgb(9, 7, 8)
-	mask.animations.fadeIn = UiAnim(mask, 750, function(anim, widget, percent)
-		widget.decorations[1].color = InterpolateColor(
-			deco.colors.transparent,
-			hangarBg,
-			percent
-		)
-	end)
+	local pane = Ui()
+		:width(1):height(1)
+		:setTranslucent(true)
+		:addTo(root)
 
 	arrLeft = Ui()
 		:widthpx(28):heightpx(44)
-		:decorate({ DecoSurfaceButton(
-			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_left_on.png" }),
-			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_left_select.png" }),
-			sdlext.getSurface({ path = "img/ui/hangar/small_arrow_left_off.png" })
-		) })
 		:addTo(pane)
 
 	-- Need to override mousedown handler, since onclicked()
@@ -83,13 +47,6 @@ local function createUi(root)
 			return not IsVanillaDifficultyLevel(prevDiff)
 		end
 
-		return false
-	end
-	-- Need to override mousemove handler as well, since the
-	-- game's buttons don't respond to clicks if they're not
-	-- being hovered.
-	arrLeft.mousemove = function(self, x, y)
-		Ui.mousemove(self, x, y)
 		return false
 	end
 
@@ -120,66 +77,62 @@ local function createUi(root)
 
 		return false
 	end
-	arrRight.mousemove = function(self, x, y)
-		Ui.mousemove(self, x, y)
-		return false
-	end
 
-	diffText = Ui()
-		:widthpx(156):heightpx(30)
-		:decorate({
-			DecoSolid(deco.colors.framebg),
-			DecoCAlignedText(nil, justinFont, diffTextset)
-		})
-		:addTo(pane)
-	diffText.translucent = true
+	-- Need to override mousemove handler as well, since the
+	-- game's buttons don't respond to clicks if they're not
+	-- being hovered.
+	arrLeft.mousemove = arrowMousemove
+	arrRight.mousemove = arrowMousemove
 
-	local leaving = false
-
-	pane.draw = function(self, screen)
-		-- Only draw the difficulty UI while in the hangar
-		self.visible = sdlext.isHangar()
+	function pane:relayout()
+		-- Only draw the difficulty UI while the hangar ui is visible
+		self.visible = sdlext.isHangarUiVisible() and IsHangarWindowlessState()
 
 		if self.visible then
 			local origin = GetHangarOrigin()
 			local rect = GetBackButtonRect()
 			local diffArrowLeft = GetDifficultyRect()
 
+			-- Hack. Having buttons return false in their mousemove causes
+			-- UI's highlighting system to break, and fail to unhighlight
+			-- the UI elements.
+			-- Fix this by having their parent mark them as hovered.
+			arrLeft.hovered = arrLeft.containsMouse
+			arrRight.hovered = arrRight.containsMouse
+
 			origin.x = origin.x + rect.x + rect.w
 			origin.y = origin.y + 30
 			arrLeft:pospx(origin.x + diffArrowLeft, origin.y + 4)
 			arrRight:pospx(origin.x + diffArrowLeft + 130, origin.y + 4)
-			diffText:pospx(origin.x + diffArrowLeft, origin.y + 13)
-			mask:pospx(origin.x + diffArrowLeft, origin.y + 11)
 
-			local hideDifficultyUi = IsHangarWindowState() or
-				(leaving and not mask.animations.fadeIn:isStarted())
-			arrLeft.visible =  not hideDifficultyUi
-			arrRight.visible = not hideDifficultyUi
-			diffText.visible = not hideDifficultyUi
-			mask.visible =     not hideDifficultyUi
+			-- The left/right arrows for changing difficulty gets enabled
+			-- at some point after transitioning from the main menu to the
+			-- hangar. Marking the exact time they get enabled is not easy.
+			-- Rather than activating our custom arrow keys after a certain
+			-- amount of time, we instead catch all clicks, and correct the
+			-- displayed difficulty if a mismatch is detected.
+			-- Relayout comes before the buttons gets redrawn, so it should
+			-- be inperceptible for the user.
+			local customDifficulty = GetDifficulty()
+			local realDifficulty = GetRealDifficulty()
+			if customDifficulty <= DIFF_HARD and realDifficulty ~= customDifficulty then
+				changeDifficulty(realDifficulty)
+			end
 		end
 
-		Ui.draw(self, screen)
+		Ui.relayout(self)
 	end
 
-	modApi.events.onHangarEntered:subscribe(function(screen)
-		-- Apply the difficulty we're starting with
+	modApi.events.onHangarUiShown:subscribe(function()
+		arrLeft.visible = true
+		arrRight.visible = true
+
 		changeDifficulty(GetDifficulty())
 	end)
-
-	modApi.events.onHangarLeaving:subscribe(function(startGame)
-		leaving = true
-
-		if startGame then
-			mask.animations.fadeIn:start()
-		end
-	end)
-
-	modApi.events.onHangarExited:subscribe(function(screen)
-		leaving = false
-		mask.animations.fadeIn:stop()
-		mask.decorations[1].color = deco.colors.transparent
+	
+	modApi.events.onHangarLeaving:subscribe(function()
+		arrLeft.visible = false
+		arrRight.visible = false
 	end)
 
 	modApi.events.onGameWindowResized:subscribe(function(screen)

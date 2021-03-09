@@ -6,12 +6,18 @@ local Window = {}
 CreateClass(Window)
 
 function Window:show(id)
+	showWindows[id] = true
+
+	if self.visible then return end
+
 	self.visible = true
 	visibleWindows[id] = self
 	self.event_show:dispatch()
 end
 
 function Window:hide(id)
+	if not self.visible then return end
+
 	self.visible = false
 	visibleWindows[id] = nil
 	self.event_hide:dispatch()
@@ -32,9 +38,17 @@ local windows = {
 		event_show = modApi.events.onEscapeMenuWindowShown,
 		event_hide = modApi.events.onEscapeMenuWindowHidden
 	},
+	Button_Hangar_Start = Window:new{
+		event_show = modApi.events.onHangarUiShown,
+		event_hide = modApi.events.onHangarUiHidden
+	},
 	Hangar_Select = Window:new{
 		event_show = modApi.events.onSquadSelectionWindowShown,
 		event_hide = modApi.events.onSquadSelectionWindowHidden
+	},
+	Customize_Instructions = Window:new{
+		event_show = modApi.events.onCustomizeSquadWindowShown,
+		event_hide = modApi.events.onCustomizeSquadWindowHidden
 	},
 	Hangar_Achievements_Title = Window:new{
 		event_show = modApi.events.onAchievementsWindowShown,
@@ -83,7 +97,9 @@ local windows = {
 }
 
 sdlext.isEscapeMenuWindowVisible = buildIsWindowVisibleFunction(windows.Escape_Title)
+sdlext.isHangarUiVisible = buildIsWindowVisibleFunction(windows.Button_Hangar_Start)
 sdlext.isSquadSelectionWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Select)
+sdlext.isCustomizeSquadWindowVisible = buildIsWindowVisibleFunction(windows.Customize_Instructions)
 sdlext.isAchievementsWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Achievements_Title)
 sdlext.isPilotSelectionWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Pilot)
 sdlext.isOptionsWindowVisible = buildIsWindowVisibleFunction(windows.Options_Title)
@@ -98,14 +114,15 @@ sdlext.isAbandonTimelineWindowVisible = buildIsWindowVisibleFunction(windows.Aba
 
 local oldGetText = GetText
 function GetText(id, ...)
-	if windows[id] ~= nil then
-		showWindows[id] = windows[id]
+	local window = windows[id]
+	if window ~= nil then
+		window:show(id)
 	end
 
 	return oldGetText(id, ...)
 end
 
-modApi.events.onFrameDrawn:subscribe(function()
+modApi.events.onFrameDrawStart:subscribe(function()
 
 	for id, window in pairs(visibleWindows) do
 		if not showWindows[id] then
@@ -114,12 +131,6 @@ modApi.events.onFrameDrawn:subscribe(function()
 	end
 
 	if next(showWindows) ~= nil then
-		for id, window in pairs(showWindows) do
-			if not window.visible then
-				window:show(id)
-			end
-		end
-
 		showWindows = {}
 	end
 end)
