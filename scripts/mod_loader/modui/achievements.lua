@@ -173,7 +173,6 @@ local function buildAchievementsFrameContent(scroll)
 
 	local content_squads = UiFlowLayout()
 		:width(1)
-		--:height(1)
 		:hgap(40)
 		:vgap(5)
 		:addTo(scroll_squads)
@@ -181,8 +180,10 @@ local function buildAchievementsFrameContent(scroll)
 	content_squads.padl = FRAME_PAD_LEFT
 
 	for squad_id, squadAchievements in pairs(allSquadAchievements) do
-		-- TODO: link squad_id to squad name
-		buildModContent(squad_id, SQUAD_BOX_W, squadAchievements)
+		local squad = modApi.mod_squads_by_id[squad_id]
+		Assert.NotEquals(nil, squad, "Squad with id "..squad_id.." not found")
+
+		buildModContent(squad[1], SQUAD_BOX_W, squadAchievements)
 			:addTo(content_squads)
 	end
 
