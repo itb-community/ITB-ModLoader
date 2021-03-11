@@ -92,7 +92,7 @@ local oldGetImages = {}
 local pawns = {}
 
 local function clearFetchedMechs()
-	for i, _ in ipairs(fetchedMechs) do
+	for i = #fetchedMechs, 1, -1 do
 		fetchedMechs[i] = nil
 	end
 end
@@ -102,7 +102,7 @@ local function clearSelectedMechs()
 	local clearedMechs = copy_table(selectedMechs)
 
 	selectedSquad = nil
-	for i, _ in ipairs(selectedMechs) do
+	for i = #selectedMechs, 1, -1 do
 		selectedMechs[i] = nil
 	end
 
