@@ -125,6 +125,12 @@ function mod_loader:loadAdditionalSprites()
 	
 	ANIMS.placeholder_mech = ANIMS.SingleImage:new{Image = "units/placeholder_mech.png"}
 	ANIMS.placeholder_enemy = ANIMS.SingleImage:new{Image = "units/placeholder_enemy.png"}
+
+	-- Duplicate victory medal pngs for use by the mod loader
+	-- so its ui won't trigger wasDrawn for vanilla medals.
+	modApi:copyAsset("img/ui/hangar/victory_2.png", "img/ui/hangar/ml_victory_2.png")
+	modApi:copyAsset("img/ui/hangar/victory_3.png", "img/ui/hangar/ml_victory_3.png")
+	modApi:copyAsset("img/ui/hangar/victory_4.png", "img/ui/hangar/ml_victory_4.png")
 end
 
 function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)

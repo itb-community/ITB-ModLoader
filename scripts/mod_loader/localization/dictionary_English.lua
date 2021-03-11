@@ -69,6 +69,11 @@ return {
 	["ModContent_ButtonTooltip_Achievements"] = "Display achievements",
 	["Achievements_FrameTitle"] = "Achievements",
 	["Achievements_ToastTitle"] = "Achievement!",
+	["Achievements_Medal_Island_Victory"] = "Island Victory: ",
+	["Achievements_Medal_Island_Victory_None"] = "None",
+	["Achievements_Medal_Island_Victory_Easy"] = "Easy",
+	["Achievements_Medal_Island_Victory_Normal"] = "Normal",
+	["Achievements_Medal_Island_Victory_Hard"] = "Hard",
 
 	["ModContent_Button_ModLoaderConfig"] = "Configure Mod Loader",
 	["ModContent_ButtonTooltip_ModLoaderConfig"] = "Configure some features of the mod loader.",
