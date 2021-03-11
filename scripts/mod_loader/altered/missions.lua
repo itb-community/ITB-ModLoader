@@ -290,6 +290,12 @@ function Mission_Test:MissionEnd()
 	modApi.current_mission = nil
 end
 
+local oldMissionEnd = Mission_Final_Cave.MissionEnd
+function Mission_Final_Cave:MissionEnd()
+	oldMissionEnd()
+	modApi.events.onGameVictory:dispatch(difficulty, islandsSecured, squad)
+end
+
 modApi.events.onGameExited:subscribe(function()
 	modApi.current_mission = nil
 end)

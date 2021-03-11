@@ -70,6 +70,8 @@ t.onNewGameWindowHidden = Event()
 t.onAbandonTimelineWindowShown = Event()
 t.onAbandonTimelineWindowHidden = Event()
 
+t.onGameVictory = Event()
+
 t.onShiftToggled = Event()
 t.onAltToggled = Event()
 t.onCtrlToggled = Event()
