@@ -90,7 +90,7 @@ local function buildGetTipDamageOverride(skill)
 	end
 end
 
-modApi.events.onFrameDrawn:subscribe(function()
+modApi.events.onFrameDrawStart:subscribe(function()
 	if tipSkillLast and tipSkillCurrent ~= tipSkillLast then
 		modApi:fireTipImageHiddenHooks(tipSkillLast)
 	end
@@ -149,7 +149,7 @@ local function buildGetIsPortraitOverride(pawn)
 	end
 end
 
-modApi.events.onFrameDrawn:subscribe(function()
+modApi.events.onFrameDrawStart:subscribe(function()
 	local selectedPawnIdCurrent = Board and Board:GetSelectedPawnId() or nil
 
 	if focusedPawnCurrent ~= focusedPawnLast or selectedPawnIdCurrent ~= selectedPawnIdLast then
