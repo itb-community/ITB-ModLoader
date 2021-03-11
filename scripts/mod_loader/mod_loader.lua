@@ -95,6 +95,9 @@ function mod_loader:init()
 
 	modApi:finalize()
 
+	modApi.events.onFtldatFinalized:dispatch()
+	modApi.events.onFtldatFinalized:unsubscribeAll()
+
 	self:loadPilotList()
 	modApi:affirmProfileData()
 
