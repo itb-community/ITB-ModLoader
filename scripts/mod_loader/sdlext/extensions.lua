@@ -288,3 +288,92 @@ function rect_set(...)
 		a[1].h = a[5] or 0
 	end
 end
+
+--[[
+	draws a Ui element with the draw function of `ui`.
+	Keeps the current set clipping rectangle, while 
+	occluding anything intersecting with the
+	occlusion rectangle `occlusionRect`.
+--]]
+function sdlext.occlude_draw(ui, widget, screen, occlusionRect)
+	if not temprect then temprect = sdl.rect(0,0,0,0) end
+	Assert.True(Ui:isSuperclassOf(ui))
+
+	-- Hack. modApi.msDeltaTime is set
+	-- to 0 on subsequent draws, to
+	-- ensure animations don't advance
+	-- faster than they should.
+	local tmp = modApi.msDeltaTime
+	local wasDrawn = false
+	local ox = occlusionRect.x
+	local oy = occlusionRect.y
+	local ow = occlusionRect.w
+	local oh = occlusionRect.h
+
+	local currentClipRect = screen:getClipRect()
+	local x, y, w, h
+	if currentClipRect then
+		x = currentClipRect.x
+		y = currentClipRect.y
+		w = currentClipRect.w
+		h = currentClipRect.h
+	else
+		x = 0
+		y = 0
+		w = screen:w()
+		h = screen:h()
+	end
+
+	for dir = DIR_START, DIR_END do
+		if dir == DIR_LEFT then
+			temprect.x = x
+			temprect.y = y
+			temprect.w = math.min(w, ox - x)
+			temprect.h = h
+		elseif dir == DIR_RIGHT then
+			temprect.x = math.max(x, ox + ow)
+			temprect.y = y
+			temprect.w = x + w - temprect.x
+			temprect.h = h
+		elseif dir == DIR_UP then
+			temprect.x = math.max(x, ox)
+			temprect.y = y
+			temprect.w = math.min(ox + ow, x + w) - temprect.x
+			temprect.h = math.min(h, oy - y)
+		elseif dir == DIR_DOWN then
+			temprect.x = math.max(x, ox)
+			temprect.y = math.max(y, oy + oh)
+			temprect.w = math.min(ox + ow, x + w) - temprect.x
+			temprect.h = y + h - temprect.y
+		end
+
+		if temprect.w > 0 and temprect.h > 0 then
+			if wasDrawn then
+				modApi.msDeltaTime = 0
+			else
+				wasDrawn = true
+			end
+
+			screen:clip(temprect)
+			ui.draw(widget, screen)
+			screen:unclip()
+		end
+	end
+
+	if wasDrawn then
+		modApi.msDeltaTime = tmp
+	else
+		temprect.x = 0
+		temprect.y = 0
+		temprect.w = 0
+		temprect.h = 0
+
+		-- call draw at least once, in case
+		-- the ui element relies on draw being
+		-- called for other functionality;
+		-- like advancing an animation.
+		screen:clip(temprect)
+		ui.draw(widget, screen)
+		screen:unclip()
+	end
+end
