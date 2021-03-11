@@ -48,13 +48,22 @@ end
 
 local AchievementDictionary = {
 	_mods = {},
+	_squads = {},
 	add = function(self, mod_id, achievement)
 		assert(type(mod_id) == 'string')
 		assert(type(achievement) == 'table')
 		assert(type(achievement.id) == 'string')
 
-		self._mods[mod_id] = self._mods[mod_id] or {}
-		table.insert(self._mods[mod_id], achievement)
+		local modAchievements = self._mods[mod_id] or {}
+		self._mods[mod_id] = modAchievements
+		table.insert(modAchievements, achievement)
+
+		local squad_id = achievement.squad
+		if squad_id ~= nil then
+			local squadAchievements = self._squads[squad_id] or {}
+			self._squads[squad_id] = squadAchievements
+			table.insert(squadAchievements, achievement)
+		end
 	end,
 
 	get = function(self, mod_id, achievement_id_or_index)
@@ -489,6 +498,15 @@ local function getAchievement(self, mod_id, achievement_id)
 	return AchievementDictionary._mods
 end
 
+local function getSquadAchievements(self, squad_id)
+	if squad_id then
+		Assert.Equals('string', type(squad_id), "Argument #1")
+		return AchievementDictionary._squads[squad_id]
+	end
+
+	return AchievementDictionary._squads
+end
+
 local function resetAchievement(self, mod_id, achievement_id)
 	assertIsAchievement(mod_id, achievement_id)
 	local achievement = AchievementDictionary:get(mod_id, achievement_id)
@@ -532,6 +550,7 @@ end
 modApi.achievements = {
 	add = addAchievement,
 	get = getAchievement,
+	getSquadAchievements = getSquadAchievements,
 	reset = resetAchievement,
 	trigger = triggerAchievement,
 	addProgress = addAchievementProgress,
