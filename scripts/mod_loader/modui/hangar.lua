@@ -320,12 +320,23 @@ end
 modApi.events.onSquadSelectionWindowHidden:subscribe(onMechSelectionHidden)
 modApi.events.onCustomizeSquadWindowHidden:subscribe(onMechSelectionHidden)
 
+local old_screen_y = nil
 local platform_height = nil
 local isLeavingHangar = false
 local function trackPlatformMovement()
 	if isLeavingHangar then return end
 
 	if SURFACE_PLATFORM:wasDrawn() then
+		-- Resizing the screen can make it appear
+		-- the platform is moving, since the
+		-- whole ui is being repositioned to fit
+		-- within the new extents.
+		local new_screen_y = ScreenSizeY()
+		if old_screen_y ~= new_screen_y then
+			old_screen_y = new_screen_y
+			platform_height = SURFACE_PLATFORM.y
+		end
+
 		if platform_height == nil then
 			platform_height = SURFACE_PLATFORM.y
 		elseif SURFACE_PLATFORM.y > platform_height then
