@@ -13,6 +13,7 @@ UiBoxLayout = Class.inherit(Ui)
 function UiBoxLayout:new()
 	Ui.new(self)
 
+	self.isDynamic = true
 	self.gapHorizontal = nil
 	self.gapVertical = nil
 end
@@ -43,6 +44,11 @@ end
 
 function UiBoxLayout:isVBox()
 	return self.gapVertical and not self.gapHorizontal
+end
+
+function UiBoxLayout:dynamicResize(isDynamic)
+	self.isDynamic = isDynamic ~= false
+	return self
 end
 
 function UiBoxLayout:maxChildSize(dim)
@@ -131,16 +137,18 @@ function UiBoxLayout:relayout()
 		end
 	end
 
-	if lastChild then
-		if self:isHBox() then
-			self.w = lastChild.x + self.padl + self.padr + lastChild.w
+	if self.isDynamic then
+		if lastChild then
+			if self:isHBox() then
+				self.w = lastChild.x + self.padl + self.padr + lastChild.w
+			end
+			if self:isVBox() then
+				self.h = lastChild.y + self.padt + self.padb + lastChild.h
+			end
+		else
+			self.w = self:isHBox() and 0 or self.w
+			self.h = self:isVBox() and 0 or self.h
 		end
-		if self:isVBox() then
-			self.h = lastChild.y + self.padt + self.padb + lastChild.h
-		end
-	else
-		self.w = self:isHBox() and 0 or self.w
-		self.h = self:isVBox() and 0 or self.h
 	end
 
 	self.innerWidth = self.w

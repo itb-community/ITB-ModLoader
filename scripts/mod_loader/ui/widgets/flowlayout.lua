@@ -16,6 +16,7 @@ function UiFlowLayout:new()
 	self.gapVertical = 5
 	self.horizontal = true
 	self.isCompact = false
+	self.isDynamic = true
 end
 
 function UiFlowLayout:vgap(gap)
@@ -35,6 +36,11 @@ end
 
 function UiFlowLayout:compact(compact)
 	self.isCompact = compact
+	return self
+end
+
+function UiFlowLayout:dynamicResize(isDynamic)
+	self.isDynamic = isDynamic ~= false
 	return self
 end
 
@@ -133,20 +139,22 @@ function UiFlowLayout:relayout()
 		self.innerWidth = self.innerWidth + currentMaxSize
 	end
 
-	if lastChild then
-		if self.horizontal then
-			self.h = lastChild.y + self.padt + self.padb + lastChild.h
-			if self.isCompact then
-				self.w = self.innerWidth
+	if self.isDynamic then
+		if lastChild then
+			if self.horizontal then
+				self.h = lastChild.y + self.padt + self.padb + lastChild.h
+				if self.isCompact then
+					self.w = self.innerWidth
+				end
+			else
+				self.w = lastChild.x + self.padl + self.padr + lastChild.w
+				if self.isCompact then
+					self.h = self.innerHeight
+				end
 			end
 		else
-			self.w = lastChild.x + self.padl + self.padr + lastChild.w
-			if self.isCompact then
-				self.h = self.innerHeight
-			end
+			self.w = self.horizontal and 0 or self.w
+			self.h = self.horizontal and self.h or 0
 		end
-	else
-		self.w = self.horizontal and 0 or self.w
-		self.h = self.horizontal and self.h or 0
 	end
 end
