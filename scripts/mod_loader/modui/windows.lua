@@ -12,7 +12,7 @@ function Window:show(id)
 
 	self.visible = true
 	visibleWindows[id] = self
-	self.event_show:dispatch()
+	self.event_show:dispatch(id)
 end
 
 function Window:hide(id)
@@ -20,7 +20,7 @@ function Window:hide(id)
 
 	self.visible = false
 	visibleWindows[id] = nil
-	self.event_hide:dispatch()
+	self.event_hide:dispatch(id)
 end
 
 function Window:isVisible()

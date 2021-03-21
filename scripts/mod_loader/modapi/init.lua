@@ -196,7 +196,7 @@ function modApi:setCurrentMod(mod)
 end
 
 function modApi:getCurrentModcontentPath()
-	if modApi.profileConfig then
+	if modApi.profileConfig and modApi:isProfilePath() then
 		return modApi:getCurrentProfilePath().."modcontent.lua"
 	else
 		return "modcontent.lua"

@@ -1,4 +1,8 @@
 
+function modApi:isProfilePath()
+	return Settings.last_profile ~= nil and Settings.last_profile ~= ""
+end
+
 --[[
 	Reloads the settings file to have access to selected settings
 	from in-game lua scripts.
@@ -8,8 +12,11 @@ function modApi:loadSettings()
 	if self:fileExists(path) then
 		local result = self:loadIntoEnv(path).Settings
 
-		result.screenwidth = ScreenSizeX()
-		result.screenheight = ScreenSizeY()
+		-- This value changes from 0 to 1 during
+		-- game init, and changes from 1 to 0 after
+		-- closing the options menu. Ignore it
+		-- to avoid triggering settings changed event.
+		result.launch_failed = 0
 
 		return result
 	end
@@ -21,7 +28,9 @@ end
 	Reloads profile data of the currently selected profile.
 --]]
 function modApi:loadProfile()
-	Settings = self:loadSettings()
+	if not self.isProfilePath() then
+		return nil
+	end
 
 	local path = GetSavedataLocation() .. "profile_" ..
 	             Settings.last_profile ..
@@ -41,11 +50,18 @@ function modApi:loadProfile()
 end
 
 function modApi:getCurrentProfilePath()
-	Settings = self:loadSettings()
+	if not self:isProfilePath() then
+		return nil
+	end
+
 	return "profile_"..Settings.last_profile.."/"
 end
 
 function modApi:writeProfileData(id, obj)
+	if not self:isProfilePath() then
+		return
+	end
+
 	sdlext.config(
 		self:getCurrentProfilePath().."modcontent.lua",
 		function(readObj)
@@ -56,6 +72,10 @@ end
 
 function modApi:readProfileData(id)
 	local result = nil
+
+	if not self:isProfilePath() then
+		return result
+	end
 
 	sdlext.config(
 		self:getCurrentProfilePath().."modcontent.lua",

@@ -28,6 +28,10 @@ end
 function IsSecretPilotsUnlocked(profile)
 	profile = profile or Profile
 
+	if profile == nil then
+		return false
+	end
+
 	for i, v in ipairs(secretPilots) do
 		if list_contains(Profile.pilots, v) then
 			return true

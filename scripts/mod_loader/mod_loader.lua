@@ -435,7 +435,7 @@ function mod_loader:getModConfig()
 	-- Read from profile-specific config, if enabled
 	-- For newly created profiles, this will not change the options in any way,
 	-- effectively "copying" current settings.
-	if modApi.profileConfig then
+	if modApi.profileConfig and modApi:isProfilePath() then
 		sdlext.config(modApi:getCurrentProfilePath().."modcontent.lua", readConfigFn)
 	end
 	
