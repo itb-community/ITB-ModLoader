@@ -1,11 +1,5 @@
 
 local NO_ICON = "img/achievements/No_Icon.png"
-local MEDAL_OFFSETS_X = {
-	EASY = -29,
-	NORMAL = -54,
-	HARD = -79,
-	NONE = -4
-}
 local TRANSFORMATION_MEDAL_2X = {
 	{ scale = 2 },
 	{ outline = { border = 2, color = deco.colors.buttonborder } }
@@ -55,6 +49,109 @@ modApi.events.onFtldatFinalized:subscribe(function()
 	}
 end)
 
+local MEDAL_OFFSETS_X = {
+	EASY = -29,
+	NORMAL = -54,
+	HARD = -79,
+	NONE = -4
+}
+
+-- UI measurements
+local UI = {
+	MEDAL = {
+		SMALL = {
+			WIDTH = 15,
+			HEIGHT = 24
+		},
+		LARGE = {
+			WIDTH = 34,
+			HEIGHT = 52
+		}
+	},
+	COIN = {
+		SMALL = {
+			WIDTH = 20,
+			HEIGHT = 20
+		},
+		LARGE = {
+			WIDTH = 22,
+			HEIGHT = 22,
+			X = 44,
+			Y = 47
+		}
+	},
+	ACHIEVEMENT = {
+		WIDTH = 64,
+		HEIGHT = 64
+	},
+	HANGAR = {
+		WIDTH = 367,
+		HEIGHT = 67,
+		X_OFFSET = 541,
+		Y_OFFSET = 209,
+		MEDAL_HOLDER = {
+			WIDTH = 135,
+			HEIGHT = 60,
+			Y = 5,
+			HORIZONTAL_GAP = 11,
+			PADDING_ALL = 3
+		},
+		ACHIEVEMENT_HOLDER = {
+			WIDTH = 212,
+			HEIGHT = 64,
+			X = 155,
+			HORIZONTAL_GAP = 10
+		}
+	},
+	SQUAD_SELECT = {
+		WIDTH = 635,
+		HEIGHT = 303,
+		HORIZONTAL_GAP = 315,
+		VERTICAL_GAP = {
+			CUSTOM_LOCKED = 76,
+			CUSTOM_UNLOCKED = 69
+		},
+		X_OFFSET = 285,
+		Y_OFFSET = {
+			CUSTOM_LOCKED = 95,
+			CUSTOM_UNLOCKED = 60
+		},
+		PROGRESS = {
+			WIDTH = 160,
+			HEIGHT = 24,
+			MEDAL_HOLDER = {
+				HORIZONTAL_GAP = 8,
+				PADDING_LEFT = 9
+			},
+			COIN_HOLDER = {
+				HEIGHT = 20,
+				HORIZONTAL_GAP = 5
+			}
+		}
+	},
+	ESCAPE_MENU = {
+		WIDTH = 208,
+		HEIGHT = 135,
+		X_OFFSET = 354,
+		Y_OFFSET = 60,
+		MEDAL_HOLDER = {
+			HEIGHT = 52,
+			Y = 83,
+			HORIZONTAL_GAP = 21,
+			PADDING_LEFT = 33,
+		},
+		ACHIEVEMENT_HOLDER = {
+			HEIGHT = 74,
+			HORIZONTAL_GAP = 3,
+			PADDING_ALL = 5
+		},
+		MOUSE_DETECTION_BOX = {
+			HEIGHT = 25,
+			Y = 95
+		}
+	}
+}
+
 local function medal_deco_draw(self, screen, widget)
 	if widget.parent.medalhovered then
 		self.surface = self.surface_hl
@@ -74,11 +171,11 @@ local function buildMedalUi(surface_bucket, squad_id, islandsSecured)
 	local medalData = modApi.medals:readData(squad_id)
 	local difficulty = medalData[islandsSecured.."islands"]
 	local offset_x = MEDAL_OFFSETS_X[difficulty]
-	local w, h = 15, 24
+	local w, h = UI.MEDAL.SMALL.WIDTH, UI.MEDAL.SMALL.HEIGHT
 
 	if surface_bucket == "MEDALS_LARGE" then
 		offset_x = offset_x * 2
-		w, h = 34, 52
+		w, h = UI.MEDAL.LARGE.WIDTH, UI.MEDAL.LARGE.HEIGHT
 	end
 
 	local medal = Ui()
@@ -100,6 +197,8 @@ local function buildMedal2xUi(squad_id, islandsSecured)
 end
 
 local function clipped_draw(self, screen)
+	if not self.visible then return end
+
 	if modApi:isTipImage() then
 		sdlext.occlude_draw(Ui, self, screen, sdlext.CurrentWindowRect)
 	else
@@ -109,10 +208,10 @@ end
 
 local function buildCoinUi(surface_bucket, achievement)
 	local surface = achievement:isComplete() and SURFACES[surface_bucket].ON or SURFACES[surface_bucket].OFF
-	local w, h = 20, 20
+	local w, h = UI.COIN.SMALL.WIDTH, UI.COIN.SMALL.HEIGHT
 
 	if surface_bucket == "COIN_LARGE" then
-		w, h = 22, 22
+		w, h = UI.COIN.LARGE.WIDTH, UI.COIN.LARGE.HEIGHT
 	end
 
 	local coin = Ui()
@@ -142,8 +241,8 @@ local function buildAchievementUi(achievement, drawCoin)
 	}
 
 	local ui = Ui()
-		:widthpx(64)
-		:heightpx(64)
+		:widthpx(UI.ACHIEVEMENT.WIDTH)
+		:heightpx(UI.ACHIEVEMENT.HEIGHT)
 		:decorate({
 			DecoSurface(surface, "center", "center"),
 			DecoAnchor(),
@@ -157,7 +256,7 @@ local function buildAchievementUi(achievement, drawCoin)
 
 	if drawCoin then
 		buildLargeCoinUi(achievement)
-			:pospx(44, 47)
+			:pospx(UI.COIN.LARGE.X, UI.COIN.LARGE.Y)
 			:addTo(ui)
 	end
 
@@ -248,13 +347,13 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 
 	local root = sdlext.getUiRoot()
 	hangarMedalUi = Ui()
-		:widthpx(367)
-		:heightpx(67)
+		:widthpx(UI.HANGAR.WIDTH)
+		:heightpx(UI.HANGAR.HEIGHT)
 		:addTo(root)
 
 	function hangarMedalUi:relayout()
 		local hangarOrigin = GetHangarOrigin()
-		self:pospx(hangarOrigin.x + 541, hangarOrigin.y + 209)
+		self:pospx(hangarOrigin.x + UI.HANGAR.X_OFFSET, hangarOrigin.y + UI.HANGAR.Y_OFFSET)
 		self.visible = sdlext.isHangar() and IsHangarWindowlessState()
 		Ui.relayout(self)
 	end
@@ -263,20 +362,20 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 	hangarMedalUi:relayout()
 
 	medalHolder = UiBoxLayout()
-		:widthpx(135)
-		:heightpx(60)
-		:setypx(5)
-		:hgap(11)
+		:widthpx(UI.HANGAR.MEDAL_HOLDER.WIDTH)
+		:heightpx(UI.HANGAR.MEDAL_HOLDER.HEIGHT)
+		:setypx(UI.HANGAR.MEDAL_HOLDER.Y)
+		:hgap(UI.HANGAR.MEDAL_HOLDER.HORIZONTAL_GAP)
 		:dynamicResize(false)
-		:padding(3)
+		:padding(UI.HANGAR.MEDAL_HOLDER.PADDING_ALL)
 		:addTo(hangarMedalUi)
 	medalHolder.translucent = true
 
 	achievementHolder = UiBoxLayout()
-		:widthpx(212)
-		:heightpx(64)
-		:setxpx(155)
-		:hgap(10)
+		:widthpx(UI.HANGAR.ACHIEVEMENT_HOLDER.WIDTH)
+		:heightpx(UI.HANGAR.ACHIEVEMENT_HOLDER.HEIGHT)
+		:setxpx(UI.HANGAR.ACHIEVEMENT_HOLDER.X)
+		:hgap(UI.HANGAR.ACHIEVEMENT_HOLDER.HORIZONTAL_GAP)
 		:dynamicResize(false)
 		:addTo(hangarMedalUi)
 	achievementHolder.translucent = true
@@ -322,21 +421,39 @@ local function destroySquadSelectionMedalUi()
 	end
 end
 
+local function draw_if_squad_unlocked(self)
+	self.visible = Profile.squads[self.squadIndex]
+
+	if self.visible then
+		UiBoxLayout.draw(self)
+	end
+end
+
 modApi.events.onSquadSelectionWindowShown:subscribe(function()
 	destroySquadSelectionMedalUi()
 	loadSquadSelection()
 
+	local vgap
+	local yOffset
+	if Profile.squads[11] then
+		vgap = UI.SQUAD_SELECT.VERTICAL_GAP.CUSTOM_UNLOCKED
+		yOffset = UI.SQUAD_SELECT.Y_OFFSET.CUSTOM_UNLOCKED
+	else
+		vgap = UI.SQUAD_SELECT.VERTICAL_GAP.CUSTOM_LOCKED
+		yOffset = UI.SQUAD_SELECT.Y_OFFSET.CUSTOM_LOCKED
+	end
+
 	local root = sdlext.getUiRoot()
 	squadSelectionMedalUi = UiFlowLayout()
-		:widthpx(635)
-		:heightpx(303)
-		:hgap(315)
-		:vgap(69)
+		:widthpx(UI.SQUAD_SELECT.WIDTH)
+		:heightpx(UI.SQUAD_SELECT.HEIGHT)
+		:hgap(UI.SQUAD_SELECT.HORIZONTAL_GAP)
+		:vgap(vgap)
 		:dynamicResize(false)
 		:addTo(root)
 
 	function squadSelectionMedalUi:relayout()
-		self:pospx(Boxes.hangar_select_big.x + 285, Boxes.hangar_select_big.y + 60)
+		self:pospx(Boxes.hangar_select_big.x + UI.SQUAD_SELECT.X_OFFSET, Boxes.hangar_select_big.y + yOffset)
 		self.visible = not sdlext.isAchievementsWindowVisible()
 		UiFlowLayout.relayout(self)
 	end
@@ -349,8 +466,8 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 		local squad_id = modApi.mod_squads[squad_index].id
 
 		local squadProgressUi = Ui()
-			:widthpx(160)
-			:heightpx(24)
+			:widthpx(UI.SQUAD_SELECT.PROGRESS.WIDTH)
+			:heightpx(UI.SQUAD_SELECT.PROGRESS.HEIGHT)
 			:addTo(squadSelectionMedalUi)
 
 		if modApi:isModdedSquad(squad_id) then
@@ -358,18 +475,22 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 			local medalHolder = UiBoxLayout()
 				:width(0.5)
 				:height(1)
-				:hgap(8)
+				:hgap(UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.HORIZONTAL_GAP)
 				:dynamicResize(false)
 				:addTo(squadProgressUi)
-			medalHolder.padl = 10
+			medalHolder.padl = UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.PADDING_LEFT
+			medalHolder.squadIndex = squadIndex
+			medalHolder.draw = draw_if_squad_unlocked
 
 			local coinHolder = UiBoxLayout()
 				:width(0.5)
-				:heightpx(20)
+				:heightpx(UI.SQUAD_SELECT.PROGRESS.COIN_HOLDER.HEIGHT)
 				:pos(0.5, 0)
-				:hgap(5)
+				:hgap(UI.SQUAD_SELECT.PROGRESS.COIN_HOLDER.HORIZONTAL_GAP)
 				:dynamicResize(false)
 				:addTo(squadProgressUi)
+			coinHolder.squadIndex = squadIndex
+			coinHolder.draw = draw_if_squad_unlocked
 
 			for islandsSecured = 2, 4 do
 				buildMedal1xUi(squad_id, islandsSecured)
@@ -417,12 +538,12 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 
 	local root = sdlext.getUiRoot()
 	escapeMenuMedalUi = Ui()
-		:widthpx(208)
-		:heightpx(135)
+		:widthpx(UI.ESCAPE_MENU.WIDTH)
+		:heightpx(UI.ESCAPE_MENU.HEIGHT)
 		:addTo(root)
 
 	function escapeMenuMedalUi:relayout()
-		self:pospx(Boxes.escape_box.x + 354, Boxes.escape_box.y + 60)
+		self:pospx(Boxes.escape_box.x + UI.ESCAPE_MENU.X_OFFSET, Boxes.escape_box.y + UI.ESCAPE_MENU.Y_OFFSET)
 		self.visible = not sdlext.isAchievementsWindowVisible()    and
 		               not sdlext.isAbandonTimelineWindowVisible()
 		Ui.relayout(self)
@@ -433,27 +554,27 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 
 	local achievementHolder = UiBoxLayout()
 		:width(1)
-		:heightpx(74)
-		:hgap(3)
-		:padding(5)
+		:heightpx(UI.ESCAPE_MENU.ACHIEVEMENT_HOLDER.HEIGHT)
+		:hgap(UI.ESCAPE_MENU.ACHIEVEMENT_HOLDER.HORIZONTAL_GAP)
+		:padding(UI.ESCAPE_MENU.ACHIEVEMENT_HOLDER.PADDING_ALL)
 		:dynamicResize(false)
 		:addTo(escapeMenuMedalUi)
 	achievementHolder.translucent = true
 
 	local medalHolder = UiBoxLayout()
 		:width(1)
-		:heightpx(52)
-		:setypx(83)
-		:hgap(21)
+		:heightpx(UI.ESCAPE_MENU.MEDAL_HOLDER.HEIGHT)
+		:setypx(UI.ESCAPE_MENU.MEDAL_HOLDER.Y)
+		:hgap(UI.ESCAPE_MENU.MEDAL_HOLDER.HORIZONTAL_GAP)
 		:dynamicResize(false)
 		:addTo(escapeMenuMedalUi)
-	medalHolder.padl = 33
+	medalHolder.padl = UI.ESCAPE_MENU.MEDAL_HOLDER.PADDING_LEFT
 	medalHolder.ignoreMouse = true
 
 	local mouseDetectionBox = Ui()
 		:width(1)
-		:heightpx(25)
-		:setypx(95)
+		:heightpx(UI.ESCAPE_MENU.MOUSE_DETECTION_BOX.HEIGHT)
+		:setypx(UI.ESCAPE_MENU.MOUSE_DETECTION_BOX.Y)
 		:addTo(escapeMenuMedalUi)
 	mouseDetectionBox.translucent = true
 
