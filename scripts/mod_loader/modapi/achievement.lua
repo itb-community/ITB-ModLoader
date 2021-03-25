@@ -320,13 +320,13 @@ end
 
 function Achievement:isComplete(objective_id)
 	Assert.Equals({'nil', 'string'}, type(objective_id), "Argument #1")
-	assertIsCompatibleObjectiveType(measure, target)
+	assertIsCompatibleObjectiveType(self:getProgress(), self.objective)
 	return Objective:isProgress(self:getProgress(), self.objective, objective_id)
 end
 
 function Achievement:isProgress(progress, objective_id)
 	Assert.Equals({'nil', 'string'}, type(objective_id), "Argument #2")
-	assertIsCompatibleObjectiveType(measure, target)
+	assertIsCompatibleObjectiveType(progress, self:getProgress())
 	return Objective:isProgress(progress, self:getProgress(), objective_id)
 end
 
@@ -381,7 +381,7 @@ local function migrateAchievements()
 			local achievement = modApi.achievements:add(data)
 
 			function achievement:TriggerChievo(progress) self:trigger(progress) end
-			function achievement:GeTStatus() return self:getProgress() end
+			function achievement:GetStatus() return self:getProgress() end
 			function achievement:GetTip() return self:getTooltip() end
 		end
 	end
