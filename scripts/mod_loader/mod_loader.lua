@@ -71,7 +71,6 @@ function mod_loader:init()
 		i = i + 1
 		modApi.events.onModMetadataDone:dispatch(id)
 	end
-	modApi.events.onModMetadataDone:unsubscribeAll()
 
 	modApi.events.onModMetadataDone:unsubscribeAll()
 
