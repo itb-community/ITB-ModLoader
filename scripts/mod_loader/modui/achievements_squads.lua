@@ -108,13 +108,13 @@ local UI = {
 		HEIGHT = 303,
 		HORIZONTAL_GAP = 315,
 		VERTICAL_GAP = {
-			CUSTOM_LOCKED = 76,
-			CUSTOM_UNLOCKED = 69
+			SMALL_UI = 76,
+			LARGE_UI = 69
 		},
 		X_OFFSET = 285,
 		Y_OFFSET = {
-			CUSTOM_LOCKED = 95,
-			CUSTOM_UNLOCKED = 60
+			SMALL_UI = 95,
+			LARGE_UI = 60
 		},
 		PROGRESS = {
 			WIDTH = 160,
@@ -413,9 +413,24 @@ end)
 
 -- Squad Selection Medal Ui
 -- ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+local function detectConsoleCommand(keycode)
+	if sdlext.isConsoleOpen() then
+		if keycode == SDLKeycodes.RETURN or keycode == SDLKeycodes.KP_ENTER then
+			modApi:scheduleHook(50, function()
+				-- reload profile when pressing enter with the console open,
+				-- in case a console commands was used to expand the mech hangar.
+				Profile = modApi:loadProfile()
+			end)
+		end
+	end
+end
+
 local squadSelectionMedalUi
 local function destroySquadSelectionMedalUi()
 	if squadSelectionMedalUi ~= nil then
+		local unsubscribe_successful = modApi.events.onKeyPressed:unsubscribe(detectConsoleCommand)
+		Assert.True(unsubscribe_successful, "Unsubscribe detectConsoleCommand")
+
 		squadSelectionMedalUi:detach()
 		squadSelectionMedalUi = nil
 	end
@@ -433,33 +448,56 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 	destroySquadSelectionMedalUi()
 	loadSquadSelection()
 
-	local vgap
-	local yOffset
-	if Profile.squads[11] then
-		vgap = UI.SQUAD_SELECT.VERTICAL_GAP.CUSTOM_UNLOCKED
-		yOffset = UI.SQUAD_SELECT.Y_OFFSET.CUSTOM_UNLOCKED
-	else
-		vgap = UI.SQUAD_SELECT.VERTICAL_GAP.CUSTOM_LOCKED
-		yOffset = UI.SQUAD_SELECT.Y_OFFSET.CUSTOM_LOCKED
+	local root = sdlext.getUiRoot()
+
+	squadSelectionMedalUi = Ui()
+		:width(1)
+		:height(1)
+		:addTo(root)
+		:setTranslucent(true)
+
+	function squadSelectionMedalUi:mousedown(mx, my, button)
+		if button == 1 then
+			modApi:scheduleHook(50, function()
+				-- reload profile when pressing the left mouse button,
+				-- in case a new squad has been unlocked.
+				Profile = modApi:loadProfile()
+			end)
+		end
+
+		return Ui.mousedown(self, mx, my, button)
 	end
 
-	local root = sdlext.getUiRoot()
-	squadSelectionMedalUi = UiFlowLayout()
+	local flow = UiFlowLayout()
 		:widthpx(UI.SQUAD_SELECT.WIDTH)
 		:heightpx(UI.SQUAD_SELECT.HEIGHT)
 		:hgap(UI.SQUAD_SELECT.HORIZONTAL_GAP)
-		:vgap(vgap)
 		:dynamicResize(false)
-		:addTo(root)
+		:addTo(squadSelectionMedalUi)
 
-	function squadSelectionMedalUi:relayout()
+	function flow:relayout()
+		local vgap
+		local yOffset
+
+		if modApi:isSecretSquadAvailable() then
+			vgap = UI.SQUAD_SELECT.VERTICAL_GAP.LARGE_UI
+			yOffset = UI.SQUAD_SELECT.Y_OFFSET.LARGE_UI
+		else
+			vgap = UI.SQUAD_SELECT.VERTICAL_GAP.SMALL_UI
+			yOffset = UI.SQUAD_SELECT.Y_OFFSET.SMALL_UI
+		end
+
+		if self.gapVertical ~= vgap then
+			self:vgap(vgap)
+		end
+
 		self:pospx(Boxes.hangar_select_big.x + UI.SQUAD_SELECT.X_OFFSET, Boxes.hangar_select_big.y + yOffset)
 		self.visible = not sdlext.isAchievementsWindowVisible()
 		UiFlowLayout.relayout(self)
 	end
 
-	squadSelectionMedalUi.ignoreMouse = true
-	squadSelectionMedalUi:relayout()
+	flow.ignoreMouse = true
+	flow:relayout()
 
 	for squadIndex = 1, 8 do
 		local squad_index = modApi.squadIndices[squadIndex]
@@ -468,7 +506,7 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 		local squadProgressUi = Ui()
 			:widthpx(UI.SQUAD_SELECT.PROGRESS.WIDTH)
 			:heightpx(UI.SQUAD_SELECT.PROGRESS.HEIGHT)
-			:addTo(squadSelectionMedalUi)
+			:addTo(flow)
 
 		if modApi:isModdedSquad(squad_id) then
 
@@ -509,6 +547,8 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 			end
 		end
 	end
+
+	modApi.events.onKeyPressed:subscribe(detectConsoleCommand)
 end)
 
 modApi.events.onSquadSelectionWindowHidden:subscribe(function()
