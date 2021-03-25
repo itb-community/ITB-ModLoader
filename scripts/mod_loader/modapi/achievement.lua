@@ -285,6 +285,7 @@ function Achievement:setProgress(newState)
 
 	local wasComplete = self:isComplete()
 
+	newState = Objective:getMergedState(self:getObjectiveInitialState(), newState)
 	writeData(self.mod_id, self.id, newState)
 
 	local isComplete = self:isComplete()
