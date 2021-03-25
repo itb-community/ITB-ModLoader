@@ -13,6 +13,18 @@ local secretPilots = {
 
 Hangar_lastProfileHadSecretPilots = false
 
+function modApi:isSecretSquadAvailable()
+	if not Profile then return false end
+
+	for i = 1, 8 do
+		if Profile.squads[i] == false then
+			return false
+		end
+	end
+
+	return true
+end
+
 function HangarIsSecretSquadUnlocked()
 	return isSecretSquadUnlocked
 end
