@@ -421,11 +421,11 @@ local function destroySquadSelectionMedalUi()
 	end
 end
 
-local function draw_if_squad_unlocked(self)
+local function draw_if_squad_unlocked(self, screen)
 	self.visible = Profile.squads[self.squadIndex]
 
 	if self.visible then
-		UiBoxLayout.draw(self)
+		UiBoxLayout.draw(self, screen)
 	end
 end
 
