@@ -2,6 +2,8 @@
 local canAddAchievements = true
 
 local function updateCachedProfileData()
+	if not modApi:isProfilePath() then return end
+
 	sdlext.config(
 		modApi:getCurrentProfilePath().."modcontent.lua",
 		function(obj)
@@ -13,6 +15,8 @@ end
 
 -- writes achievement data.
 local function writeData(mod_id, achievement_id, obj)
+	if not modApi:isProfilePath() then return end
+
 	assert(type(mod_id) == 'string')
 	assert(type(achievement_id) == 'string')
 
@@ -32,6 +36,8 @@ end
 
 -- reads achievement data.
 local function readData(mod_id, achievement_id)
+	if not modApi:isProfilePath() then return nil end
+
 	assert(type(mod_id) == 'string')
 	assert(type(achievement_id) == 'string')
 
@@ -241,6 +247,8 @@ function Achievement:addReward() end
 function Achievement:remReward() end
 
 function Achievement:validateSavedData()
+	if not modApi:isProfilePath() then return end
+
 	local initialState = Objective:getInitialState(self.objective)
 	local newState = Objective:getMergedState(initialState, self:getProgress())
 	writeData(self.mod_id, self.id, newState)
@@ -265,6 +273,10 @@ function Achievement:resetProgress()
 end
 
 function Achievement:getProgress()
+	if modApi.achievements.cachedProfileData == nil then
+		return self:getObjectiveInitialState()
+	end
+
 	return readData(self.mod_id, self.id)
 end
 
@@ -564,7 +576,13 @@ modApi.events.onModInitialized:subscribe(detectAchievementLibrary)
 modApi.events.onModMetadataDone:subscribe(detectAchievementLibrary)
 modApi.events.onModsInitialized:subscribe(onModsInitialized)
 
-local function onProfileSelected()
+local function onProfileChanged(lastProfile, currentProfile)
+	modApi.achievements.cachedProfileData = nil
+
+	if currentProfile == nil or currentProfile == "" then
+		return
+	end
+
 	updateCachedProfileData()
 
 	-- validate saved achievement data on profile
@@ -587,5 +605,4 @@ local function onProfileSelected()
 	)
 end
 
-modApi.events.onProfileSelectionWindowHidden:subscribe(onProfileSelected)
-modApi.events.onCreateProfileConfirmationWindowHidden:subscribe(onProfileSelected)
+modApi.events.onProfileChanged:subscribe(onProfileChanged)

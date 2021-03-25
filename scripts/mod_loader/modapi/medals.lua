@@ -103,7 +103,7 @@ end
 -- writes medal data to modcontent.lua
 local function writeMedalData(self, squad_id, difficulty, islandsSecured)
 	if
-		--not modApi:isProfilePath()         or
+		not modApi:isProfilePath()         or
 		not modApi:isModdedSquad(squad_id) or
 		islandsSecured < 2                 or
 		difficulty < 0                     or
@@ -143,7 +143,7 @@ end
 -- reads medal data.
 local function readMedalData(self, squad_id)
 	if
-		--not modApi:isProfilePath()         or
+		not modApi:isProfilePath()         or
 		not modApi:isModdedSquad(squad_id)
 	then
 		return nil
@@ -175,9 +175,9 @@ modApi.events.onGameVictory:subscribe(function()
 	modApi.medals:writeData(squad_id, difficulty, islandsSecured)
 end)
 
---[[modApi.events.onProfileChanged(function()
+modApi.events.onProfileChanged:subscribe(function()
 	modApi.medals.cachedData = nil
-end)]]
+end)
 
 modApi.medals = {
 	cachedData = nil,
