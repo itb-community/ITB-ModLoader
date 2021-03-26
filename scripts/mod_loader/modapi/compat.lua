@@ -23,6 +23,7 @@ local textsMetatable = {
 		return GetText(key)
 	end,
 	__newindex = function(self, key, value)
+		value = GetText(value)
 		modApi:setText(key, value)
 	end
 }
@@ -30,6 +31,7 @@ modApi.texts = setmetatable({}, textsMetatable)
 
 local globalTextsMetatable = {
 	__newindex = function(self, key, value)
+		value = GetText(value)
 		rawset(self, key, value)
 
 		modApi:setText(key, value)
@@ -37,30 +39,16 @@ local globalTextsMetatable = {
 }
 Global_Texts = setmetatable(Global_Texts, globalTextsMetatable)
 
-local tilesMetatable = {
-	__newindex = function(self, key, value)
-		assert(type(value) == "table", "Value assigned to TILE_TOOLTIPS table must be a table.")
-		rawset(self, key, value)
+function GetStatusTooltip(id)
+	local title_text = "Status_"..id.."_Title"
 
-		local titleKey = string.format("Tile_%s_Title", key)
-		local textKey = string.format("Tile_%s_Text", key)
-
-		modApi:setText(titleKey, value[1])
-		modApi:setText(textKey, value[2])
+	if IsText(title_text) then
+		return {title_text, "Status_"..id.."_Text"}
 	end
-}
-TILE_TOOLTIPS = setmetatable(TILE_TOOLTIPS, tilesMetatable)
 
-local statusMetatable = {
-	__newindex = function(self, key, value)
-		assert(type(value) == "table", "Value assigned to STATUS_TOOLTIPS table must be a table.")
-		rawset(self, key, value)
-
-		local titleKey = string.format("Status_%s_Title", key)
-		local textKey = string.format("Status_%s_Text", key)
-
-		modApi:setText(titleKey, value[1])
-		modApi:setText(textKey, value[2])
+	if STATUS_TOOLTIPS[id] ~= nil then
+		return STATUS_TOOLTIPS[id]
+	else
+		return { id, "NOT FOUND"}
 	end
-}
-STATUS_TOOLTIPS = setmetatable(STATUS_TOOLTIPS, statusMetatable)
+end
