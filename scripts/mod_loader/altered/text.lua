@@ -51,6 +51,16 @@ function IsText(id)
 		return true
 	elseif modApi.modLoaderDictionary and modApi.modLoaderDictionary[id] then
 		return true
+	elseif Global_Texts[id] then
+		return true
+	elseif Weapon_Texts[id] then
+		return true
+	elseif Achievement_Texts[id] then
+		return true
+	elseif Mission_Texts[id] then
+		return true
+	elseif Pawn_Texts[id] then
+		return true
 	else
 		return IsVanillaText(id)
 	end
