@@ -156,10 +156,7 @@ function UiDropDown:keydown(keycode)
 
 			return true
 		else
-			if
-				keycode == SDLKeycodes.RETURN  or
-				keycode == SDLKeycodes.RETURN2
-			then
+			if SDLKeycodes.isEnter(keycode) then
 				self:createDropDown()
 				return true
 			end
@@ -173,8 +170,7 @@ function UiDropDown:keyup(keycode)
 	if
 		self.open and self.focused and (
 			keycode == SDLKeycodes.ESCAPE  or
-			keycode == SDLKeycodes.RETURN  or
-			keycode == SDLKeycodes.RETURN2
+			SDLKeycodes.isEnter(keycode)
 		)
 	then
 		return true
