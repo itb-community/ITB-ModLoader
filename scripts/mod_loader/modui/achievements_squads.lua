@@ -415,7 +415,7 @@ end)
 -- ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 local function detectConsoleCommand(keycode)
 	if sdlext.isConsoleOpen() then
-		if keycode == SDLKeycodes.RETURN or keycode == SDLKeycodes.KP_ENTER then
+		if SDLKeycodes.isEnter(keycode) then
 			modApi:scheduleHook(50, function()
 				-- reload profile when pressing enter with the console open,
 				-- in case a console commands was used to expand the mech hangar.
