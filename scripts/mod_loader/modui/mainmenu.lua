@@ -63,7 +63,7 @@ local function createUi(root)
 	modApi.events.onKeyPressing:subscribe(function(keycode)
 		if
 			holder.visible and
-			(keycode == SDLKeycodes.RETURN or keycode == SDLKeycodes.RETURN2) and
+			SDLKeycodes.isEnter(keycode) and
 			not sdlext.isConsoleOpen()
 		then
 			if pendingConfirm then

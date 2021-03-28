@@ -311,4 +311,10 @@ t.KBDILLUMUP = 0x40000118
 t.EJECT = 0x40000119
 t.SLEEP = 0x4000011A
 
+t.isEnter = function(keycode)
+	return keycode == t.RETURN or
+	       keycode == t.RETURN2 or
+	       keycode == t.KP_ENTER
+end
+
 SDLKeycodes = t

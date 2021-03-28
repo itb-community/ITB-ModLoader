@@ -307,7 +307,7 @@ local function evaluateConsoleToggled(keycode)
 		consoleOpen = not consoleOpen
 
 		modApi.events.onConsoleToggled:dispatch(consoleOpen)
-	elseif consoleOpen and sdlext.isShiftDown() and (keycode == SDLKeycodes.RETURN or keycode == SDLKeycodes.RETURN2) then
+	elseif consoleOpen and sdlext.isShiftDown() and SDLKeycodes.isEnter(keycode) then
 		consoleOpen = false
 
 		modApi.events.onConsoleToggled:dispatch(consoleOpen)
