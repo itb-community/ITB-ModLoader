@@ -94,6 +94,10 @@ local windows = {
 		event_show = modApi.events.onAbandonTimelineWindowShown,
 		event_hide = modApi.events.onAbandonTimelineWindowHidden
 	},
+	Unit_Status_Title = Window:new{
+		event_show = modApi.events.onStatusTooltipWindowShown,
+		event_hide = modApi.events.onStatusTooltipWindowHidden,
+	},
 }
 
 sdlext.isEscapeMenuWindowVisible = buildIsWindowVisibleFunction(windows.Escape_Title)
@@ -111,6 +115,7 @@ sdlext.isDeleteProfileConfirmationWindowVisible = buildIsWindowVisibleFunction(w
 sdlext.isStatisticsWindowVisible = buildIsWindowVisibleFunction(windows.Stats_Header)
 sdlext.isNewGameWindowVisible = buildIsWindowVisibleFunction(windows.NewGame_Confirm_Title)
 sdlext.isAbandonTimelineWindowVisible = buildIsWindowVisibleFunction(windows.Abandon_Confirm_Title)
+sdlext.isStatusTooltipWindowVisible = buildIsWindowVisibleFunction(windows.Unit_Status_Title)
 
 local oldGetText = GetText
 function GetText(id, ...)
