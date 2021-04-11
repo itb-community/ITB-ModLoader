@@ -181,6 +181,8 @@ function modApi:resetModContent()
 	self.scheduledHooks = {}
 	self:ResetHooks()
 
+	modApi.events.onModContentReset:dispatch()
+
 	self:conditionalHook(
 		function()
 			return Game ~= nil and modApi.delayedInit ~= nil

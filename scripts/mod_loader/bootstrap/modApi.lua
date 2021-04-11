@@ -15,6 +15,7 @@ t.onModsLoaded = Event()
 t.onModsFirstLoaded = Event()
 t.onInitialLoadingFinished = Event()
 t.onFtldatFinalized = Event()
+t.onModContentReset = Event()
 
 t.onUiRootCreating = Event()
 t.onUiRootCreated = Event()
