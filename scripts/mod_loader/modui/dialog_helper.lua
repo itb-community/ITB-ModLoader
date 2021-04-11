@@ -146,14 +146,22 @@ function sdlext.buildSimpleDialog(title, options)
 
 	local maxW = options.maxW or 0.5 * ScreenSizeX()
 	local maxH = options.maxH or 0.5 * ScreenSizeY()
+	local decorations = { DecoFrameHeader(), DecoFrame() }
 
 	local frame = UiWeightLayout()
 		:widthpx(maxW):heightpx(maxH)
 		:vgap(0)
 		:orientation(false)
-		:decorate({ DecoFrameHeader(), DecoFrame() })
 		:caption(title)
 
+	frame.headerH = decorations[1].height - decorations[1].bordersize
+
+	if options.separateHeader then
+		table.insert(decorations, 2, DecoAlign(0, 10))
+		frame.padt = frame.padt + 10
+	end
+
+	frame:decorate(decorations)
 	frame.scroll = UiScrollArea()
 		:width(1):height(1)
 		:padding(10)

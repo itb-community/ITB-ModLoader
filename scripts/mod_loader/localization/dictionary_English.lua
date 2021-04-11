@@ -65,6 +65,16 @@ return {
 	["ConfigureWeaponDeck_PresetSave_Title"] = "Save",
 	["ConfigureWeaponDeck_PresetSave_Tooltip"] = "Saves the current weapons to the selected preset. If nothing is checked, deletes the current preset.",
 
+	["ModContent_Button_Achievements"] = "Achievements",
+	["ModContent_ButtonTooltip_Achievements"] = "Display achievements",
+	["Achievements_FrameTitle"] = "Achievements",
+	["Achievements_ToastTitle"] = "Achievement!",
+	["Achievements_Medal_Island_Victory"] = "Island Victory: ",
+	["Achievements_Medal_Island_Victory_None"] = "None",
+	["Achievements_Medal_Island_Victory_Easy"] = "Easy",
+	["Achievements_Medal_Island_Victory_Normal"] = "Normal",
+	["Achievements_Medal_Island_Victory_Hard"] = "Hard",
+
 	["ModContent_Button_ModLoaderConfig"] = "Configure Mod Loader",
 	["ModContent_ButtonTooltip_ModLoaderConfig"] = "Configure some features of the mod loader.",
 	["ModLoaderConfig_FrameTitle"] = "Mod Loader Configuration",

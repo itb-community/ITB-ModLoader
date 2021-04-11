@@ -3,6 +3,7 @@ local scripts = {
 	"modApi",
 	"event",
 	"asserts",
+	"achievement",
 	"dialog_helper"
 }
 

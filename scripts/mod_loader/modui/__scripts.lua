@@ -24,6 +24,9 @@ local scripts = {
 	"squad_selector",
 	"weapon_deck_selector",
 	"modloader_configuration",
+	"achievements",
+	"achievements_squads",
+	"toast",
 
 	"modcontent_entries",
 }

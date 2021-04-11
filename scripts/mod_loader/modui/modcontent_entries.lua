@@ -30,6 +30,12 @@ function sdlext.executeAddModContent()
 	)
 
 	sdlext.addModContent(
+		GetText("ModContent_Button_Achievements"),
+		DisplayAchievements,
+		GetText("ModContent_ButtonTooltip_Achievements")
+	)
+
+	sdlext.addModContent(
 		GetText("ModContent_Button_ModLoaderConfig"),
 		ConfigureModLoader,
 		GetText("ModContent_ButtonTooltip_ModLoaderConfig")

@@ -17,6 +17,7 @@ deco.colors.buttonborder =                  sdl.rgb(73, 92, 121)
 deco.colors.buttonborderhl =                sdl.rgb(217, 235, 200)
 deco.colors.buttonborderdisabled =          sdl.rgb(43, 53, 72)
 deco.colors.achievementborder =             sdl.rgb(217, 199, 136)
+deco.colors.tooltipbg =                     sdl.rgba(24, 28, 41, 240)
 
 deco.colors.mainMenuButton =                sdl.rgba(7  ,  10,  18, 187)
 deco.colors.mainMenuButtonHighlight =       sdl.rgba(24 ,  26,  34, 255)
@@ -47,7 +48,9 @@ function deco.reloadFonts()
 	deco.fonts = {}
 	deco.fonts.justin12 = sdlext.font("fonts/JustinFont12Bold.ttf", 12)
 	deco.fonts.menufont = sdlext.font("fonts/JustinFont11Bold.ttf", 24)
+	deco.fonts.labelfont = sdlext.font("fonts/JustinFont11Bold.ttf", 12)
 	deco.fonts.tooltipTitle = sdlext.font("fonts/NunitoSans_Bold.ttf", 14)
+	deco.fonts.tooltipTitleLarge = sdlext.font("fonts/NunitoSans_Bold.ttf", 16)
 	deco.fonts.tooltipText = sdlext.font("fonts/NunitoSans_Regular.ttf", 12)
 	deco.fonts.tooltipTextLarge = sdlext.font("fonts/NunitoSans_Regular.ttf", 14)
 
@@ -62,6 +65,10 @@ function deco.reloadFonts()
 		},
 		tooltipTitle = {
 			font = deco.fonts.tooltipTitle,
+			set = deco.textset(deco.colors.white, nil, nil, true)
+		},
+		tooltipTitleLarge = {
+			font = deco.fonts.tooltipTextLarge,
 			set = deco.textset(deco.colors.white, nil, nil, true)
 		},
 		tooltipText = {

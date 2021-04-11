@@ -127,6 +127,10 @@ function UiScrollArea:wheel(mx, my, y)
 
 	local offset = self:computeOffset(y)
 
+	self.root.tooltip_static = false
+	self.root.tooltip_title = ""
+	self.root.tooltip = ""
+
 	-- Call back to mousemove to update hover and tooltip statuses of the area's
 	-- child elements.
 	Ui.mousemove(self, mx, my + offset)
@@ -277,6 +281,10 @@ function UiScrollAreaH:wheel(mx, my, y)
 	self:relayout()
 
 	local offset = self:computeOffset(y)
+
+	self.root.tooltip_static = false
+	self.root.tooltip_title = ""
+	self.root.tooltip = ""
 
 	-- Call back to mousemove to update hover and tooltip statuses of the area's
 	-- child elements.
