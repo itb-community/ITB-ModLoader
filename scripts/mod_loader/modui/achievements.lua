@@ -180,10 +180,16 @@ local function buildAchievementsFrameContent(scroll)
 	content_squads.padl = FRAME_PAD_LEFT
 
 	for squad_id, squadAchievements in pairs(allSquadAchievements) do
+		local mod_id = squadAchievements[1].mod_id
+		local mod = mod_loader.mods[mod_id]
+		local name = mod.name
 		local squad = modApi.mod_squads_by_id[squad_id]
-		Assert.NotEquals(nil, squad, "Squad with id "..squad_id.." not found")
 
-		buildModContent(squad[1], SQUAD_BOX_W, squadAchievements)
+		if squad then
+			name = squad[1]
+		end
+
+		buildModContent(name, SQUAD_BOX_W, squadAchievements)
 			:addTo(content_squads)
 	end
 
