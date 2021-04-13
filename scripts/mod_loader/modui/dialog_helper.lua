@@ -216,7 +216,13 @@ function sdlext.buildScrollDialog(title, contentBuilderFn, options)
 	local frame = sdlext.buildSimpleDialog(title, options)
 	local scroll = frame.scroll
 
-	contentBuilderFn(scroll)
+	local retHolder = contentBuilderFn(scroll)
+	if type(retHolder) == "table" and not retHolder.parent then
+		scroll:detach()
+		retHolder:addTo(frame, 1)
+		scroll = retHolder
+		frame.scroll = scroll
+	end
 
 	frame:relayout()
 
