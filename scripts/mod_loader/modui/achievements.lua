@@ -123,6 +123,11 @@ local function buildModContent(name, widthpx, modAchievements)
 end
 
 local function buildAchievementsFrameContent(scroll)
+	local bordersize = scroll.parent.decorations[1].bordersize
+	local bordercolor = scroll.parent.decorations[1].bordercolor
+	local container = Ui()
+		:width(1):height(1)
+
 	local allAchievements = modApi.achievements:get()
 	local allSquadAchievements = {}
 	local allGlobalAchievements = {}
@@ -140,15 +145,10 @@ local function buildAchievementsFrameContent(scroll)
 		end
 	end
 
-	scroll.padt = 0
-	scroll.padb = 0
-	scroll.padl = 0
-	scroll.padr = 0
-
 	local holder = UiBoxLayout()
 		:height(1)
 		:hgap(0)
-		:addTo(scroll)
+		:addTo(container)
 
 	-- Squad based achievements
 	local ui_squads = Ui()
@@ -194,9 +194,9 @@ local function buildAchievementsFrameContent(scroll)
 	end
 
 	local line = Ui()
-		:widthpx(scroll.parent.decorations[1].bordersize)
+		:widthpx(bordersize)
 		:height(1)
-		:decorate({ DecoSolid(scroll.parent.decorations[1].bordercolor) })
+		:decorate({ DecoSolid(bordercolor) })
 		:addTo(holder)
 
 	-- Global achievements
@@ -232,6 +232,8 @@ local function buildAchievementsFrameContent(scroll)
 		buildModContent(mod.name, GLOBAL_BOX_W, modAchievements)
 			:addTo(content_global)
 	end
+
+	return container
 end
 
 local function onExit()
