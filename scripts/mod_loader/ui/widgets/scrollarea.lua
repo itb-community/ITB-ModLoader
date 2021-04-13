@@ -12,6 +12,10 @@ function UiScrollArea:new()
 	
 	self.padr = self.padr + self.scrollwidth
 	self.nofity = true
+	self.dyTarget = 0
+	self.scrollSpeed = 100
+	self.scrollOvershoot = 0
+	self.scrollChangefactor = 0.4 -- <0.0, 1.0]
 
 	self.scrollPressed = false
 	self.scrollHovered = false
@@ -48,15 +52,23 @@ end
 function UiScrollArea:relayout()
 	Ui.relayout(self)
 	
+	local doUpdate = false
+	
+	if self.dy ~= self.dyTarget then
+		self.dy = math.floor(self.dy * (1 - self.scrollChangefactor) + self.dyTarget * self.scrollChangefactor)
+		doUpdate = true
+	end
+	
 	self.scrollrect.x = self.screenx + self.w - self.scrollwidth
 	self.scrollrect.y = self.screeny
 	self.scrollrect.w = self.scrollwidth
 	self.scrollrect.h = self.h
 
-	if self.innerHeight > self.h and self.dy + self.h > self.innerHeight then
-		self.dy = self.innerHeight - self.h
-	elseif self.innerHeight <= self.h and self.dy > 0 then
-		self.dy = 0
+	local upperlimit = math.max(0, self.innerHeight - self.h)
+	if self.dy > upperlimit then
+		self.dyTarget = upperlimit
+	elseif self.dy < 0 then
+		self.dyTarget = 0
 	end
 	
 	local ratio = self.h / self.innerHeight
@@ -73,6 +85,10 @@ function UiScrollArea:relayout()
 	self.clipRect.y = self.screeny
 	self.clipRect.w = self.w
 	self.clipRect.h = self.h
+	
+	if doUpdate then
+		Ui.mousemove(self, sdl.mouse.x(), sdl.mouse.y())
+	end
 end
 
 function UiScrollArea:mousedown(x, y, button)
@@ -89,7 +105,7 @@ function UiScrollArea:mousedown(x, y, button)
 			if ratio < 0 then ratio = 0 end
 			if ratio > 1 then ratio = 1 end
 
-			self.dy = ratio * (self.innerHeight - self.h)
+			self.dyTarget = ratio * (self.innerHeight - self.h)
 
 			self.scrollPressed = true
 			return true
@@ -105,35 +121,9 @@ function UiScrollArea:mouseup(x, y, button)
 	return Ui.mouseup(self, x, y, button)
 end
 
-function UiScrollArea:computeOffset(scrollAmount)
-	local startdy = self.dy
-
-	-- Have the scrolling speed scale with the height of the inner area,
-	-- but capped by the height of the viewport.
-	local d = math.max(20, self.innerHeight * 0.1)
-	d = math.min(d, self.h * 0.8)
-	d = d * scrollAmount
-
-	self.dy = self.dy - d
-	if self.dy < 0 then self.dy = 0 end
-	if self.dy + self.h > self.innerHeight then self.dy = self.innerHeight - self.h end
-	if self.h > self.innerHeight then self.dy = 0 end
-
-	return self.dy - startdy
-end
-
 function UiScrollArea:wheel(mx, my, y)
-	self:relayout()
-
-	local offset = self:computeOffset(y)
-
-	self.root.tooltip_static = false
-	self.root.tooltip_title = ""
-	self.root.tooltip = ""
-
-	-- Call back to mousemove to update hover and tooltip statuses of the area's
-	-- child elements.
-	Ui.mousemove(self, mx, my + offset)
+	local upperlimit = math.max(0, self.innerHeight - self.h)
+	self.dyTarget = math.max(-self.scrollOvershoot, math.min(upperlimit + self.scrollOvershoot, self.dyTarget - y * self.scrollSpeed))
 
 	return Ui.wheel(self, mx, my, y)
 end
@@ -148,7 +138,7 @@ function UiScrollArea:mousemove(x, y)
 		if ratio < 0 then ratio = 0 end
 		if ratio > 1 then ratio = 1 end
 		
-		self.dy = ratio * (self.innerHeight - self.h)
+		self.dyTarget = ratio * (self.innerHeight - self.h)
 
 		return true
 	end
@@ -173,6 +163,10 @@ function UiScrollAreaH:new()
 	
 	self.padb = self.padb + self.scrollheight
 	self.nofitx = true
+	self.dxTarget = 0
+	self.scrollSpeed = 100
+	self.scrollOvershoot = 0
+	self.scrollChangefactor = 0.35 -- <0.0, 1.0]
 
 	self.scrollPressed = false
 	self.scrollHovered = false
@@ -209,15 +203,23 @@ end
 function UiScrollAreaH:relayout()
 	Ui.relayout(self)
 	
+	local doUpdate = false
+	
+	if self.dx ~= self.dx_target then
+		self.dx = math.floor(self.dx * (1 - self.scrollChangefactor) + self.dxTarget * self.scrollChangefactor)
+		doUpdate = true
+	end
+	
 	self.scrollrect.x = self.screenx
 	self.scrollrect.y = self.screeny + self.h - self.scrollheight
 	self.scrollrect.w = self.w
 	self.scrollrect.h = self.scrollheight
 
-	if self.innerWidth > self.w and self.dx + self.w > self.innerWidth then
-		self.dx = self.innerWidth - self.w
-	elseif self.innerWidth <= self.w and self.dx > 0 then
-		self.dx = 0
+	local upperlimit = math.max(0, self.innerWidth - self.w)
+	if self.dx > upperlimit then
+		self.dxTarget = upperlimit
+	elseif self.dx < 0 then
+		self.dxTarget = 0
 	end
 	
 	local ratio = self.w / self.innerWidth
@@ -234,6 +236,10 @@ function UiScrollAreaH:relayout()
 	self.clipRect.y = self.screeny
 	self.clipRect.w = self.w
 	self.clipRect.h = self.h
+	
+	if doUpdate then
+		Ui.mousemove(self, sdl.mouse.x(), sdl.mouse.y())
+	end
 end
 
 function UiScrollAreaH:mousedown(x, y, button)
@@ -250,7 +256,7 @@ function UiScrollAreaH:mousedown(x, y, button)
 			if ratio < 0 then ratio = 0 end
 			if ratio > 1 then ratio = 1 end
 
-			self.dx = ratio * (self.innerWidth - self.w)
+			self.dxTarget = ratio * (self.innerWidth - self.w)
 
 			self.scrollPressed = true
 			return true
@@ -260,35 +266,9 @@ function UiScrollAreaH:mousedown(x, y, button)
 	return Ui.mousedown(self, x, y, button)
 end
 
-function UiScrollAreaH:computeOffset(scrollAmount)
-	local startdx = self.dx
-
-	-- Have the scrolling speed scale with the width of the inner area,
-	-- but capped by the width of the viewport.
-	local d = math.max(20, self.innerWidth * 0.1)
-	d = math.min(d, self.w * 0.8)
-	d = d * scrollAmount
-
-	self.dx = self.dx - d
-	if self.dx < 0 then self.dx = 0 end
-	if self.dx + self.w > self.innerWidth then self.dx = self.innerWidth - self.w end
-	if self.w > self.innerWidth then self.dw = 0 end
-
-	return self.dx - startdx
-end
-
 function UiScrollAreaH:wheel(mx, my, y)
-	self:relayout()
-
-	local offset = self:computeOffset(y)
-
-	self.root.tooltip_static = false
-	self.root.tooltip_title = ""
-	self.root.tooltip = ""
-
-	-- Call back to mousemove to update hover and tooltip statuses of the area's
-	-- child elements.
-	Ui.mousemove(self, mx + offset, my)
+	local upperlimit = math.max(0, self.innerWidth - self.w)
+	self.dxTarget = math.max(-self.scrollOvershoot, math.min(upperlimit + self.scrollOvershoot, self.dxTarget - y * self.scrollSpeed))
 
 	return Ui.wheel(self, mx, my, y)
 end
@@ -303,7 +283,7 @@ function UiScrollAreaH:mousemove(x, y)
 		if ratio < 0 then ratio = 0 end
 		if ratio > 1 then ratio = 1 end
 		
-		self.dx = ratio * (self.innerWidth - self.w)
+		self.dxTarget = ratio * (self.innerWidth - self.w)
 
 		return true
 	end
