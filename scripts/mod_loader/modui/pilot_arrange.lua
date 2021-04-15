@@ -181,9 +181,8 @@ local function buildPilotButton(pilotId, placeholder)
 	end
 
 	button.dragWheel = function(self, mx, my, y)
-		local offset = pilotsLayout.parent:computeOffset(y)
-
 		pilotsLayout.parent:wheel(mx, my, y)
+		local offset = pilotsLayout.parent.dyTarget - pilotsLayout.parent.dy
 
 		self:processDropTargets(mx, my + offset)
 
