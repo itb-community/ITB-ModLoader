@@ -107,40 +107,30 @@ end
 
 local function uiSetDraggable(ui)
 	ui:registerDragMove()
+	ui:registerDragPlaceholder(placeholder)
 
-	ui.startDrag = function(self, mx, my, btn)
-		UiDraggable.startDrag(self, mx, my, btn)
-		if self.parent ~= content then return end
-
-		local draggableIndex = list_indexof(content.children, self)
-		self:detach()
-		self:addTo(scrollarea, 1)
-
-		table.remove(content.children, list_indexof(content.children, placeholder))
-		table.insert(content.children, draggableIndex, placeholder)
-
-		placeholder:show()
-		content:relayout()
+	-- Called each time we hover over an element that's been registered as valid drop target
+	ui.onDraggableEntered = function(self, draggable, target)
+		if self == draggable then
+			local targetIndex = list_indexof(content.children, target)
+			placeholder:detach()
+			content:add(placeholder, targetIndex)
+		end
 	end
 
-	ui.stopDrag = function(self, mx, my, btn)
-		UiDraggable.stopDrag(self, mx, my, btn)
-		if self.parent ~= scrollarea then return end
-
-		local placeholderIndex = list_indexof(content.children, placeholder)
-		table.remove(content.children, placeholderIndex)
-
-		self:detach()
-		self:addTo(content, placeholderIndex)
-
-		table.insert(content.children, placeholder)
-
-		placeholder:hide()
+	ui.getDropTargets = function(self)
+		if self.dropTargets == nil then
+			self.dropTargets = {}
+			for _, target in ipairs(content.children) do
+				table.insert(self.dropTargets, target)
+			end
+		end
+		return self.dropTargets
 	end
 
 	ui.dragMove = function(self, mx, my)
+		if self.parent ~= self.root.draggableUi then return end
 		UiDraggable.dragMove(self, mx, my)
-		if self.parent ~= scrollarea then return end
 
 		for i = PALETTE_INDEX_FIRST_MOVABLE, #content.children do
 			local hoveredButton = content.children[i]
@@ -188,6 +178,10 @@ local function displayPaletteLocked(self, displayLocked)
 		self.deco_fade.color = deco.colors.halfblack
 		self.deco_lock.surface = SURFACE_LOCK
 	end
+end
+
+local function updateTooltipState(self)
+	self.root:settooltip(self.tooltip, nil, self.pressed)
 end
 
 local function buildPaletteFrameContent(scroll)
@@ -269,6 +263,7 @@ local function buildPaletteFrameContent(scroll)
 		button.deco_lock = deco_lock
 		button.displayPaletteLocked = displayPaletteLocked
 		button.hoverAtIndex = hoverAtIndex
+		button.updateTooltipState = updateTooltipState
 
 		if not unlockedSquads[i] then
 			button:displayPaletteLocked(true)

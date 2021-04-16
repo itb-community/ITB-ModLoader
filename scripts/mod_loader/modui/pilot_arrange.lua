@@ -68,6 +68,10 @@ local function getOrCreatePilotSurface(pilotId)
 	end
 end
 
+local function updateTooltipState(self)
+	self.root:settooltip(self.tooltip, GetText(self.tooltip_title), self.pressed)
+end
+
 local hangarDecorations = nil
 local portraitSize = 122 + 8
 local function buildHangarBackdrop()
@@ -106,6 +110,7 @@ local function buildPilotButton(pilotId, placeholder)
 		:widthpx(portraitSize):heightpx(portraitSize)
 		:decorate(decorations)
 	button.pilotId = pilotId
+	button.updateTooltipState = updateTooltipState
 
 	-- only show tooltip text if the pilot is unlocked
 	if unlocked then
@@ -114,86 +119,29 @@ local function buildPilotButton(pilotId, placeholder)
 		if not desc or desc == "" then
 			desc = "Hangar_NoAbility"
 		end
-		button:settooltip(string.format("%s\n\n%s", GetText(pilot.Name), GetText(desc)))
+		button:settooltip(GetText(desc), GetText(pilot.Name))
 	end
 
 	button:registerDragMove()
+	button:registerDragPlaceholder(placeholder)
 
 	-- Called each time we hover over an element that's been registered as valid drop target
 	button.onDraggableEntered = function(self, draggable, target)
-		-- The target elements get shifted around when dragged over, so they quickly flash
-		-- on and off due to being hovered. Prevent that.
-		target.hovered = false
-
 		if self == draggable then
 			local targetIndex = list_indexof(pilotsLayout.children, target)
 			placeholder:detach()
 			pilotsLayout:add(placeholder, targetIndex)
-
-			pilotsLayout:relayout()
 		end
 	end
 
-	button.startDrag = function(self, mx, my, btn)
-		if btn ~= 1 then
-			return
+	button.getDropTargets = function(self)
+		if self.dropTargets == nil then
+			self.dropTargets = {}
+			for _, target in ipairs(pilotsLayout.children) do
+				table.insert(self.dropTargets, target)
+			end
 		end
-
-		UiDraggable.startDrag(self, mx, my, btn)
-
-		-- Put the dragged pilot button in the root UI element, so that we can move it freely
-		-- without affecting the other buttons' layout.
-		-- Correct position, since when moving an element between parents, its position is not
-		-- automatically translated.
-		local index = list_indexof(pilotsLayout.children, self)
-		self:detach()
-		pilotsLayout:add(placeholder, index)
-
-		self:addTo(sdlext.getUiRoot())
-		self.x = self.screenx
-		self.y = self.screeny
-		self:bringToTop()
-
-		for _, child in ipairs(pilotsLayout.children) do
-			button:registerDropTarget(child)
-		end
-
-		pilotsLayout:relayout()
-	end
-
-	button.stopDrag = function(self, mx, my, btn)
-		if btn ~= 1 or not self.dragMoving then
-			return
-		end
-
-		UiDraggable.stopDrag(self, mx, my, btn)
-
-		-- Put the dragged pilot back into the layout. No need to correct position here,
-		-- since the layout's logic will do that automatically
-		local index = list_indexof(pilotsLayout.children, placeholder)
-		self:detach()
-		placeholder:detach()
-		pilotsLayout:add(self, index)
-
-		self:clearDropTargets()
-
-		pilotsLayout:relayout()
-	end
-
-	button.dragWheel = function(self, mx, my, y)
-		pilotsLayout.parent:wheel(mx, my, y)
-		local offset = pilotsLayout.parent.dyTarget - pilotsLayout.parent.dy
-
-		self:processDropTargets(mx, my + offset)
-
-		-- Scrollarea's wheel() function calls back to children's mousemove(), which
-		-- updates hovered states. We need to correct that here.
-		if self.root.hoveredchild ~= nil then
-			self.root.hoveredchild.hovered = false
-		end
-
-		self.root.hoveredchild = self
-		self.hovered = true
+		return self.dropTargets
 	end
 
 	return button
