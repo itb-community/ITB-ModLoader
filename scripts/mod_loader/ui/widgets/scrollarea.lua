@@ -50,14 +50,15 @@ function UiScrollArea:draw(screen)
 end
 
 function UiScrollArea:relayout()
-	Ui.relayout(self)
-	
-	local doUpdate = false
-	
 	if self.dy ~= self.dyTarget then
-		self.dy = math.floor(self.dy * (1 - self.scrollChangefactor) + self.dyTarget * self.scrollChangefactor)
-		doUpdate = true
+		if math.abs(self.dy - self.dyTarget) > 1 then
+			self.dy = self.dy * (1 - self.scrollChangefactor) + self.dyTarget * self.scrollChangefactor
+		else
+			self.dy = self.dyTarget
+		end
 	end
+
+	Ui.relayout(self)
 	
 	self.scrollrect.x = self.screenx + self.w - self.scrollwidth
 	self.scrollrect.y = self.screeny
@@ -85,10 +86,6 @@ function UiScrollArea:relayout()
 	self.clipRect.y = self.screeny
 	self.clipRect.w = self.w
 	self.clipRect.h = self.h
-	
-	if doUpdate then
-		Ui.mousemove(self, sdl.mouse.x(), sdl.mouse.y())
-	end
 end
 
 function UiScrollArea:mousedown(x, y, button)
@@ -132,8 +129,6 @@ function UiScrollArea:mousemove(x, y)
 	self.scrollHovered = x >= self.scrollrect.x
 
 	if self.scrollPressed then
-		self:relayout()
-
 		local ratio = (y - self.screeny - self.buttonheight/2) / (self.h-self.buttonheight)
 		if ratio < 0 then ratio = 0 end
 		if ratio > 1 then ratio = 1 end
@@ -166,7 +161,7 @@ function UiScrollAreaH:new()
 	self.dxTarget = 0
 	self.scrollSpeed = 100
 	self.scrollOvershoot = 0
-	self.scrollChangefactor = 0.35 -- <0.0, 1.0]
+	self.scrollChangefactor = 0.4 -- <0.0, 1.0]
 
 	self.scrollPressed = false
 	self.scrollHovered = false
@@ -201,14 +196,15 @@ function UiScrollAreaH:draw(screen)
 end
 
 function UiScrollAreaH:relayout()
-	Ui.relayout(self)
-	
-	local doUpdate = false
-	
-	if self.dx ~= self.dx_target then
-		self.dx = math.floor(self.dx * (1 - self.scrollChangefactor) + self.dxTarget * self.scrollChangefactor)
-		doUpdate = true
+	if self.dx ~= self.dxTarget then
+		if math.abs(self.dx - self.dxTarget) > 1 then
+			self.dx = self.dx * (1 - self.scrollChangefactor) + self.dxTarget * self.scrollChangefactor
+		else
+			self.dx = self.dxTarget
+		end
 	end
+
+	Ui.relayout(self)
 	
 	self.scrollrect.x = self.screenx
 	self.scrollrect.y = self.screeny + self.h - self.scrollheight
@@ -236,10 +232,6 @@ function UiScrollAreaH:relayout()
 	self.clipRect.y = self.screeny
 	self.clipRect.w = self.w
 	self.clipRect.h = self.h
-	
-	if doUpdate then
-		Ui.mousemove(self, sdl.mouse.x(), sdl.mouse.y())
-	end
 end
 
 function UiScrollAreaH:mousedown(x, y, button)
@@ -277,8 +269,6 @@ function UiScrollAreaH:mousemove(x, y)
 	self.scrollHovered = y >= self.scrollrect.y
 
 	if self.scrollPressed then
-		self:relayout()
-
 		local ratio = (x - self.screenx - self.buttonwidth/2) / (self.w-self.buttonwidth)
 		if ratio < 0 then ratio = 0 end
 		if ratio > 1 then ratio = 1 end
