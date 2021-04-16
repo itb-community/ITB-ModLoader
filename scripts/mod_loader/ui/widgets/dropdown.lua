@@ -23,29 +23,6 @@ function UiDropDown:new(values,strings,value)
 	self.open = false
 
 	self.optionSelected = Event()
-end
-
-function UiDropDown:updateOptions(values, strings)
-	Assert.Equals("table", type(values))
-	Assert.Equals({"table", "nil"}, type(strings))
-
-	self.values = copy_table(values)
-	self.strings = strings ~= nil and copy_table(strings) or {}
-end
-
-function UiDropDown:destroyDropDown()
-	self.open = false
-	self.root.currentDropDown = nil
-	self.root.currentDropDownOwner = nil
-end
-
-function UiDropDown:createDropDown()
-	self:relayout()
-	if self.root.currentDropDown then
-		self.root.currentDropDownOwner:destroyDropDown()
-	end
-	
-	self.open = true
 	
 	local items = {}
 	
@@ -73,11 +50,9 @@ function UiDropDown:createDropDown()
 
 				self.choice = i
 				self.value = self.values[i]
-				
-				self:destroyDropDown()
-				self.hovered = false
 
 				self.optionSelected:dispatch(oldChoice, oldValue)
+				self:destroyDropDown()
 
 				return true
 			end
@@ -85,54 +60,103 @@ function UiDropDown:createDropDown()
 		end
 	end
 	
+	local function destroyDropDown()
+		self:destroyDropDown()
+	end
+	
+	local function mousedown(dropdown, mx, my, button)
+		
+		if
+			button == 1                      and
+			self.open                        and
+			not self.containsMouse           and
+			not dropdown.containsMouse
+		then
+			self:destroyDropDown()
+			
+		elseif button == 3 and self.open then
+			self:destroyDropDown()
+		end
+		
+		return Ui.mousedown(dropdown, mx, my, button)
+	end
+	
 	local ddw = math.max(max_w + 8, 210)
-	local dropDown = Ui()
+	self.dropdown = Ui()
 		:pospx(
 			self.rect.x + self.w - ddw,
-			self.rect.y + self.h + 2
-		)
+			self.rect.y + self.h + 2)
 		:widthpx(ddw)
 		:heightpx(math.min(2 + #self.values * 40, 210))
 		:decorate({ DecoFrame(nil, nil, 1) })
-
+	self.dropdown.owner = self
+	self.dropdown.destroyDropDown = destroyDropDown
+	self.dropdown.mousedown = mousedown
+	
 	local scrollarea = UiScrollArea()
 		:width(1):height(1)
-		:addTo(dropDown)
+		:addTo(self.dropdown)
 
 	local layout = UiBoxLayout()
+		:width(1):height(1)
 		:vgap(0)
-		:width(1)
+		:dynamicResize(false)
 		:addTo(scrollarea)
 	
 	for i, item in ipairs(items) do
 		layout:add(item)
 	end
-	
-	self.root.currentDropDownOwner = self
-	self.root.currentDropDown = dropDown
 end
 
-function UiDropDown:draw(screen)
-	if self.open then
-		-- keep the dropdown owner highlighted as long as
-		-- the dropdown is open for additional clarity
-		self.hovered = true
+function UiDropDown:updateOptions(values, strings)
+	Assert.Equals("table", type(values))
+	Assert.Equals({"table", "nil"}, type(strings))
 
-		local oldClip = self.root.clippingrect
-		self.root.clippingrect = nil
-		--We don't want our dropdown to be clipped
-		if oldClip then
-			screen:unclip()
+	self.values = copy_table(values)
+	self.strings = strings ~= nil and copy_table(strings) or {}
+end
+
+function UiDropDown:destroyDropDown()
+	self.open = false
+	self.dropdown.visible = false
+end
+
+function UiDropDown:createDropDown()
+	if self.root then
+		if self.dropdown.parent ~= self.root.dropDownUi then
+			self.dropdown:detach()
 		end
 		
-		Ui.draw(self, screen)
-		
-		if oldClip then
-			screen:clip(oldClip)
+		if self.dropdown.parent == nil then
+			self.dropdown:addTo(self.root.dropdownUi)
 		end
-	else
-		Ui.draw(self, screen)
+		
+		local max_w = 32
+		local ddw = math.max(max_w + 8, 210)
+		self.open = true
+		self.dropdown.visible = true
+		self.dropdown.x = self.rect.x + self.w - ddw
+		self.dropdown.y = self.rect.y + self.h + 2
+		
+		self.dropdown.parent:relayout()
 	end
+end
+
+function UiDropDown:mousedown(mx, my, button)
+	
+	if
+		button == 1                      and
+		self.open                        and
+		not self.containsMouse           and
+		not self.dropdown.containsMouse
+	then
+		self:destroyDropDown()
+		
+	elseif button == 3 and self.open then
+		self:destroyDropDown()
+	end
+	
+	return Ui.mousedown(self, mx, my, button)
 end
 
 function UiDropDown:clicked(button)

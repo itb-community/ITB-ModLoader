@@ -76,6 +76,22 @@ function UiDraggable:startDrag(mx, my, button)
 		self.__resizeDir = getResizeDirection(self, mx, my, self.__resizeHandle)
 	end
 
+	if self.dragPlaceholder ~= nil then
+		local root = sdlext.getUiRoot()
+		local owner = self.parent
+		local index = list_indexof(owner.children, self)
+		self:detach()
+		self.owner = owner
+		self.translucent = true
+
+		owner:add(self.dragPlaceholder, index)
+		self.dragPlaceholder:show()
+
+		self:addTo(root.draggableUi)
+		self.x = self.screenx
+		self.y = self.screeny
+	end
+
 	if self.parent then
 		self.parent:relayout()
 	end
@@ -86,6 +102,16 @@ function UiDraggable:stopDrag(mx, my, button)
 
 	if button ~= 1 then
 		return
+	end
+
+	if self.dragMoving and self.dragPlaceholder ~= nil then
+		local index = list_indexof(self.owner.children, self.dragPlaceholder)
+		self.dragPlaceholder:detach()
+		self.dragPlaceholder:hide()
+
+		self:detach()
+		self:addTo(self.owner, index)
+		self.translucent = self.dragPlaceholder.translucent
 	end
 
 	self.dragMoving   = false
@@ -110,14 +136,18 @@ function UiDraggable:stopDrag(mx, my, button)
 				self:onDraggableDropped(self, target)
 			end
 			
-			target.hovered = false
 			self.hoverTarget = nil
 		end
 	end
 end
 
+function UiDraggable:getDropTargets()
+	return self.dropTargets
+end
+
 function UiDraggable:processDropTargets(mx, my)
-	if not self.dropTargets then
+	local dropTargets = self:getDropTargets()
+	if not dropTargets then
 		return
 	end
 
@@ -127,7 +157,6 @@ function UiDraggable:processDropTargets(mx, my)
 	if target then
 		if not rect_contains(target.rect, mx, my) then
 			self.hoverTarget = nil
-			target.hovered = false
 
 			if target.onDraggableExited then
 				target:onDraggableExited(self, target)
@@ -136,11 +165,10 @@ function UiDraggable:processDropTargets(mx, my)
 		first = 2
 	end
 
-	for i = first, #self.dropTargets do
-		local target = self.dropTargets[i]
-		if rect_contains(target.rect, mx, my) then
+	for i = first, #dropTargets do
+		local target = dropTargets[i]
+		if self ~= target and rect_contains(target.rect, mx, my) then
 			self.hoverTarget = target
-			target.hovered = true
 
 			if target.onDraggableEntered then
 				target:onDraggableEntered(self, target)
@@ -151,7 +179,7 @@ function UiDraggable:processDropTargets(mx, my)
 			end
 
 			-- swap to front, to save iterations later
-			self.dropTargets[1], self.dropTargets[i] = self.dropTargets[i], self.dropTargets[1]
+			dropTargets[1], dropTargets[i] = dropTargets[i], dropTargets[1]
 
 			break
 		end
@@ -200,6 +228,8 @@ function UiDraggable:dragMove(mx, my)
 		self.y = self.y + my - self.dragY
 		self.dragX = mx
 		self.dragY = my
+		self.screenx = self.x
+		self.screeny = self.y
 
 		self:processDropTargets(mx, my)
 	else
@@ -213,6 +243,8 @@ function UiDraggable:dragWheel(mx, my, y)
 	else
 		self.__index.dragWheel(self, mx, my, y)
 	end
+
+	return false
 end
 
 function UiDraggable:mousemove(mx, my)
@@ -240,12 +272,17 @@ local function registerDragFunctions(self)
 	self.mousemove          = UiDraggable.mousemove
 	self.mouseExited        = UiDraggable.mouseExited
 	self.processDropTargets = UiDraggable.processDropTargets
+	self.getDropTargets     = UiDraggable.getDropTargets
 end
 
 function Ui:registerDragMove()
 	registerDragFunctions(self)
 	self.draggable   = true
 	self.dragMovable = true
+end
+
+function Ui:registerDragPlaceholder(placeholder)
+	self.dragPlaceholder = placeholder
 end
 
 function Ui:registerDragResize(resizeHandleSize, minSize)
@@ -257,7 +294,7 @@ function Ui:registerDragResize(resizeHandleSize, minSize)
 end
 
 function Ui:registerDropTarget(target)
-	self.dropTargets = self.dropTargets or {}
+	self.dropTargets = self:getDropTargets() or {}
 	table.insert(self.dropTargets, target)
 end
 

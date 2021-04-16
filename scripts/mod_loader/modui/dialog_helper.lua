@@ -402,13 +402,11 @@ function sdlext.buildDropDownButton(text, tooltip, choices, choiceHandler)
 				DecoDropDown()
 			})
 
-	btn.destroyDropDown = function(self)
-		UiDropDown.destroyDropDown(self)
-
+	btn.optionSelected:subscribe(function(self, oldChoice, oldValue)
 		if choiceHandler then
 			choiceHandler(self.value)
 		end
-	end
+	end)
 
 	if tooltip and tooltip ~= "" then
 		btn:settooltip(tooltip)

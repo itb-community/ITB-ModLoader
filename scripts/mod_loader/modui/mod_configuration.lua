@@ -263,10 +263,9 @@ local function buildOptionEntries(mod)
 					DecoDropDown()
 				})
 				
-			optionEntry.destroyDropDown = function(self)
-				UiDropDown.destroyDropDown(self)
+			optionEntry.optionSelected:subscribe(function(self, oldChoice, oldValue)
 				opt_editable.value = self.value
-			end
+			end)
 		end
 		
 		optionEntry
