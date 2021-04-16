@@ -263,8 +263,8 @@ local function buildOptionEntries(mod)
 					DecoDropDown()
 				})
 				
-			optionEntry.optionSelected:subscribe(function(self, oldChoice, oldValue)
-				opt_editable.value = self.value
+			optionEntry.optionSelected:subscribe(function(oldChoice, oldValue)
+				opt_editable.value = optionEntry.value
 			end)
 		end
 		

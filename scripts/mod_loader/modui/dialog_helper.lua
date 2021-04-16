@@ -402,9 +402,9 @@ function sdlext.buildDropDownButton(text, tooltip, choices, choiceHandler)
 				DecoDropDown()
 			})
 
-	btn.optionSelected:subscribe(function(self, oldChoice, oldValue)
+	btn.optionSelected:subscribe(function(oldChoice, oldValue)
 		if choiceHandler then
-			choiceHandler(self.value)
+			choiceHandler(btn.value)
 		end
 	end)
 
