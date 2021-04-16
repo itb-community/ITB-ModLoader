@@ -13,7 +13,9 @@ function UiTooltip:new()
 
 	self
 		:decorate({ DecoFrame(deco.colors.tooltipbg, deco.colors.white, 3) })
-		:padding(10)
+		-- set even combined padding (3+9=12)
+		-- to avoid fraction when divided by 2
+		:padding(9)
 		:vgap(5)
 	self.title = nil
 	self.text = nil
