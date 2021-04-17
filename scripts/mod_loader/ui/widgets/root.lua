@@ -193,7 +193,9 @@ function UiRoot:event(eventloop)
 				consumeEvent = true
 			end
 
-			return consumeEvent
+			if consumeEvent then
+				return true
+			end
 		end
 
 		return self:wheel(mx, my, wheel)
