@@ -121,32 +121,12 @@ local function uiSetDraggable(ui)
 	ui.getDropTargets = function(self)
 		if self.dropTargets == nil then
 			self.dropTargets = {}
-			for _, target in ipairs(content.children) do
+			for i = 2, #content.children do
+				local target = content.children[i]
 				table.insert(self.dropTargets, target)
 			end
 		end
 		return self.dropTargets
-	end
-
-	ui.dragMove = function(self, mx, my)
-		if self.parent ~= self.root.draggableUi then return end
-		UiDraggable.dragMove(self, mx, my)
-
-		for i = PALETTE_INDEX_FIRST_MOVABLE, #content.children do
-			local hoveredButton = content.children[i]
-			if rect_contains(hoveredButton.rect, mx, my) then
-				if hoveredButton ~= placeholder then
-					self:hoverAtIndex(i)
-				end
-
-				return
-			end
-		end
-
-		-- if we get this far, we are not hovering any of the buttons
-		if content.children[#content.children] ~= placeholder then
-			self:hoverAtIndex(#content.children)
-		end
 	end
 end
 
