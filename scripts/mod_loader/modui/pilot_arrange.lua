@@ -69,7 +69,7 @@ local function getOrCreatePilotSurface(pilotId)
 end
 
 local function updateTooltipState(self)
-	self.root:settooltip(self.tooltip, GetText(self.tooltip_title), self.pressed)
+	self.root:settooltip(self.tooltip, self.tooltip_title, self.pressed)
 end
 
 local hangarDecorations = nil
