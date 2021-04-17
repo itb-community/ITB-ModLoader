@@ -122,8 +122,7 @@ local function buildPilotButton(pilotId, placeholder)
 		button:settooltip(GetText(desc), GetText(pilot.Name))
 	end
 
-	button:registerDragMove()
-	button:registerDragPlaceholder(placeholder)
+	button:registerDragDropList(placeholder)
 
 	-- Called each time we hover over an element that's been registered as valid drop target
 	button.onDraggableEntered = function(self, draggable, target)

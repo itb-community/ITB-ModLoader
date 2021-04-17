@@ -106,8 +106,7 @@ local function buildContractedDeco(marginx, marginy, uiDeco, ...)
 end
 
 local function uiSetDraggable(ui)
-	ui:registerDragMove()
-	ui:registerDragPlaceholder(placeholder)
+	ui:registerDragDropList(placeholder)
 
 	-- Called each time we hover over an element that's been registered as valid drop target
 	ui.onDraggableEntered = function(self, draggable, target)
@@ -121,7 +120,7 @@ local function uiSetDraggable(ui)
 	ui.getDropTargets = function(self)
 		if self.dropTargets == nil then
 			self.dropTargets = {}
-			for i = 2, #content.children do
+			for i = PALETTE_INDEX_FIRST_MOVABLE, #content.children do
 				local target = content.children[i]
 				table.insert(self.dropTargets, target)
 			end

@@ -75,22 +75,6 @@ function UiDraggable:startDrag(mx, my, button)
 		self.dragResizing = UiDraggable.isEdge(self, mx, my, self.__resizeHandle)
 		self.__resizeDir = getResizeDirection(self, mx, my, self.__resizeHandle)
 	end
-
-	if self.dragPlaceholder ~= nil then
-		local root = sdlext.getUiRoot()
-		local owner = self.parent
-		local index = list_indexof(owner.children, self)
-		self:detach()
-		self.owner = owner
-		self.translucent = true
-
-		owner:add(self.dragPlaceholder, index)
-		self.dragPlaceholder:show()
-
-		self:addTo(root.draggableUi)
-		self.x = self.screenx
-		self.y = self.screeny
-	end
 end
 
 function UiDraggable:stopDrag(mx, my, button)
@@ -98,16 +82,6 @@ function UiDraggable:stopDrag(mx, my, button)
 
 	if button ~= 1 then
 		return
-	end
-
-	if self.dragMoving and self.dragPlaceholder ~= nil then
-		local index = list_indexof(self.owner.children, self.dragPlaceholder)
-		self.dragPlaceholder:detach()
-		self.dragPlaceholder:hide()
-
-		self:detach()
-		self:addTo(self.owner, index)
-		self.translucent = self.dragPlaceholder.translucent
 	end
 
 	self.dragMoving   = false
@@ -275,10 +249,6 @@ function Ui:registerDragMove()
 	registerDragFunctions(self)
 	self.draggable   = true
 	self.dragMovable = true
-end
-
-function Ui:registerDragPlaceholder(placeholder)
-	self.dragPlaceholder = placeholder
 end
 
 function Ui:registerDragResize(resizeHandleSize, minSize)
