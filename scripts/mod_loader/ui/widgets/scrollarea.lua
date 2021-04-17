@@ -90,13 +90,6 @@ end
 
 function UiScrollArea:mousedown(x, y, button)
 	if x >= self.scrollrect.x then
-		if self.root.pressedchild ~= nil then
-			self.root.pressedchild.pressed = false
-		end
-
-		self.root.pressedchild = self
-		self.pressed = true
-
 		if self.innerHeight > self.h then
 			local ratio = (y - self.screeny - self.buttonheight/2) / (self.h - self.buttonheight)
 			if ratio < 0 then ratio = 0 end
@@ -114,13 +107,14 @@ end
 
 function UiScrollArea:mouseup(x, y, button)
 	self.scrollPressed = false
-
 	return Ui.mouseup(self, x, y, button)
 end
 
 function UiScrollArea:wheel(mx, my, y)
-	local upperlimit = math.max(0, self.innerHeight - self.h)
-	self.dyTarget = math.max(-self.scrollOvershoot, math.min(upperlimit + self.scrollOvershoot, self.dyTarget - y * self.scrollSpeed))
+	if not self.scrollPressed then
+		local upperlimit = math.max(0, self.innerHeight - self.h)
+		self.dyTarget = math.max(-self.scrollOvershoot, math.min(upperlimit + self.scrollOvershoot, self.dyTarget - y * self.scrollSpeed))
+	end
 
 	return Ui.wheel(self, mx, my, y)
 end
@@ -236,13 +230,6 @@ end
 
 function UiScrollAreaH:mousedown(x, y, button)
 	if y >= self.scrollrect.y then
-		if self.root.pressedchild ~= nil then
-			self.root.pressedchild.pressed = false
-		end
-
-		self.root.pressedchild = self
-		self.pressed = true
-
 		if self.innerWidth > self.w then
 			local ratio = (x - self.screenx - self.buttonwidth/2) / (self.w - self.buttonwidth)
 			if ratio < 0 then ratio = 0 end
@@ -259,8 +246,10 @@ function UiScrollAreaH:mousedown(x, y, button)
 end
 
 function UiScrollAreaH:wheel(mx, my, y)
-	local upperlimit = math.max(0, self.innerWidth - self.w)
-	self.dxTarget = math.max(-self.scrollOvershoot, math.min(upperlimit + self.scrollOvershoot, self.dxTarget - y * self.scrollSpeed))
+	if not self.scrollPressed then
+		local upperlimit = math.max(0, self.innerWidth - self.w)
+		self.dxTarget = math.max(-self.scrollOvershoot, math.min(upperlimit + self.scrollOvershoot, self.dxTarget - y * self.scrollSpeed))
+	end
 
 	return Ui.wheel(self, mx, my, y)
 end
