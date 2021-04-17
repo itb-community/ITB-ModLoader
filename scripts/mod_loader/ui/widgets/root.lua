@@ -177,14 +177,19 @@ function UiRoot:event(eventloop)
 	
 	if type == sdl.events.mousewheel then
 		local pressedchild = self.pressedchild
+		local wheel = eventloop:wheel()
 
-		if pressedchild ~= nil and pressedchild.dragged then
-			if pressedchild:dragWheel(mx, my, eventloop:wheel()) then
-				return true
+		if pressedchild ~= nil then
+			local consumeEvent = pressedchild:wheel(mx, my, wheel)
+
+			if pressedchild.dragged and pressedchild:dragWheel(mx, my, wheel) then
+				consumeEvent = true
 			end
+
+			return consumeEvent
 		end
 
-		return self:wheel(mx, my, eventloop:wheel())
+		return self:wheel(mx, my, wheel)
 	end
 
 	if type == sdl.events.mousebuttondown then
