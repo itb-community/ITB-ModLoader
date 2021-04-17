@@ -234,6 +234,10 @@ function UiRoot:event(eventloop)
 			end
 		end
 
+		if not consumeEvent then
+			consumeEvent = self:mousedown(mx, my, button)
+		end
+
 		self:cleanupDropdown()
 
 		return consumeEvent
