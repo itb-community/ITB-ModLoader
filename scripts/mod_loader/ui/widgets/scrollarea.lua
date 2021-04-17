@@ -13,9 +13,10 @@ function UiScrollArea:new()
 	self.padr = self.padr + self.scrollwidth
 	self.nofity = true
 	self.dyTarget = 0
-	self.scrollSpeed = 100
-	self.scrollOvershoot = 0
-	self.scrollChangefactor = 0.4 -- <0.0, 1.0]
+	self.scrollDistance = 100
+	self.scrollOvershoot = 6
+	self.scrollChangeFactor = 0.6 -- <0.0, 1.0]
+	self.scrollReboundFactor = 0.4 -- <0.0, 1.0]
 
 	self.scrollPressed = false
 	self.scrollHovered = false
@@ -50,12 +51,10 @@ function UiScrollArea:draw(screen)
 end
 
 function UiScrollArea:relayout()
-	if self.dy ~= self.dyTarget then
-		if math.abs(self.dy - self.dyTarget) > 1 then
-			self.dy = self.dy * (1 - self.scrollChangefactor) + self.dyTarget * self.scrollChangefactor
-		else
-			self.dy = self.dyTarget
-		end
+	if math.abs(self.dy - self.dyTarget) > 1 then
+		self.dy = self.dy * (1 - self.scrollChangeFactor)  + self.dyTarget * self.scrollChangeFactor
+	else
+		self.dy = self.dyTarget
 	end
 
 	Ui.relayout(self)
@@ -67,9 +66,17 @@ function UiScrollArea:relayout()
 
 	local upperlimit = math.max(0, self.innerHeight - self.h)
 	if self.dy > upperlimit then
-		self.dyTarget = upperlimit
+		if self.dy - upperlimit > 1 then
+			self.dyTarget = self.dy * (1 - self.scrollReboundFactor) + upperlimit * self.scrollReboundFactor
+		else
+			self.dyTarget = upperlimit
+		end
 	elseif self.dy < 0 then
-		self.dyTarget = 0
+		if self.dy < -1 then
+			self.dyTarget = self.dy * (1 - self.scrollReboundFactor)
+		else
+			self.dyTarget = 0
+		end
 	end
 	
 	local ratio = self.h / self.innerHeight
@@ -113,7 +120,7 @@ end
 function UiScrollArea:wheel(mx, my, y)
 	if not self.scrollPressed then
 		local upperlimit = math.max(0, self.innerHeight - self.h)
-		self.dyTarget = math.max(-self.scrollOvershoot, math.min(upperlimit + self.scrollOvershoot, self.dyTarget - y * self.scrollSpeed))
+		self.dyTarget = math.max(-self.scrollOvershoot, math.min(upperlimit + self.scrollOvershoot, self.dyTarget - y * self.scrollDistance))
 	end
 
 	return Ui.wheel(self, mx, my, y)
@@ -153,9 +160,10 @@ function UiScrollAreaH:new()
 	self.padb = self.padb + self.scrollheight
 	self.nofitx = true
 	self.dxTarget = 0
-	self.scrollSpeed = 100
-	self.scrollOvershoot = 0
-	self.scrollChangefactor = 0.4 -- <0.0, 1.0]
+	self.scrollDistance = 100
+	self.scrollOvershoot = 6
+	self.scrollChangeFactor = 0.6 -- <0.0, 1.0]
+	self.scrollReboundFactor = 0.4 -- <0.0, 1.0]
 
 	self.scrollPressed = false
 	self.scrollHovered = false
@@ -190,12 +198,10 @@ function UiScrollAreaH:draw(screen)
 end
 
 function UiScrollAreaH:relayout()
-	if self.dx ~= self.dxTarget then
-		if math.abs(self.dx - self.dxTarget) > 1 then
-			self.dx = self.dx * (1 - self.scrollChangefactor) + self.dxTarget * self.scrollChangefactor
-		else
-			self.dx = self.dxTarget
-		end
+	if math.abs(self.dx - self.dxTarget) > 1 then
+		self.dx = self.dx * (1 - self.scrollChangeFactor) + self.dxTarget * self.scrollChangeFactor
+	else
+		self.dx = self.dxTarget
 	end
 
 	Ui.relayout(self)
@@ -207,9 +213,17 @@ function UiScrollAreaH:relayout()
 
 	local upperlimit = math.max(0, self.innerWidth - self.w)
 	if self.dx > upperlimit then
-		self.dxTarget = upperlimit
+		if self.dx > 1 then
+			self.dxTarget = self.dx * (1 - self.scrollReboundFactor) + upperlimit * self.scrollReboundFactor
+		else
+			self.dxTarget = upperlimit
+		end
 	elseif self.dx < 0 then
-		self.dxTarget = 0
+		if self.dx < -1 then
+			self.dxTarget = self.dx * (1 - self.scrollReboundFactor)
+		else
+			self.dxTarget = 0
+		end
 	end
 	
 	local ratio = self.w / self.innerWidth
@@ -248,7 +262,7 @@ end
 function UiScrollAreaH:wheel(mx, my, y)
 	if not self.scrollPressed then
 		local upperlimit = math.max(0, self.innerWidth - self.w)
-		self.dxTarget = math.max(-self.scrollOvershoot, math.min(upperlimit + self.scrollOvershoot, self.dxTarget - y * self.scrollSpeed))
+		self.dxTarget = math.max(-self.scrollOvershoot, math.min(upperlimit + self.scrollOvershoot, self.dxTarget - y * self.scrollDistance))
 	end
 
 	return Ui.wheel(self, mx, my, y)
