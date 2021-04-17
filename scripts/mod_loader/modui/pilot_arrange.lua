@@ -213,8 +213,6 @@ local function btnDefaultHandlerFn()
 		return indexA < indexB
 	end)
 
-	pilotsLayout:relayout()
-
 	return true
 end
 
@@ -227,8 +225,6 @@ local function btnRandomHandlerFn()
 	table.sort(pilotsLayout.children, function(a, b)
 		return order[a] < order[b]
 	end)
-
-	pilotsLayout:relayout()
 
 	return true
 end

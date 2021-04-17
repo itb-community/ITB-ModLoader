@@ -137,8 +137,6 @@ function UiDropDown:createDropDown()
 		self.dropdown.visible = true
 		self.dropdown.x = self.rect.x + self.w - ddw
 		self.dropdown.y = self.rect.y + self.h + 2
-		
-		self.dropdown.parent:relayout()
 	end
 end
 

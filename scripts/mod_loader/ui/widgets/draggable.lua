@@ -91,10 +91,6 @@ function UiDraggable:startDrag(mx, my, button)
 		self.x = self.screenx
 		self.y = self.screeny
 	end
-
-	if self.parent then
-		self.parent:relayout()
-	end
 end
 
 function UiDraggable:stopDrag(mx, my, button)

@@ -164,8 +164,6 @@ local function hoverAtIndex(self, new_placeholderIndex)
 
 	local lock = not unlockedSquads[new_placeholderIndex]
 	self:displayPaletteLocked(lock)
-
-	content:relayout()
 end
 
 local function displayPaletteLocked(self, displayLocked)

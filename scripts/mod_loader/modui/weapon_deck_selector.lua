@@ -307,7 +307,6 @@ local function buildClassHolder(classHeaderText)
 
 	sdlext.addButtonSoundHandlers(collapseButton, function()
 		weaponsHolder.visible = not collapseButton.checked
-		entryBoxHolder:relayout()
 	end)
 
 	return entryBoxHolder

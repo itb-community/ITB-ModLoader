@@ -186,8 +186,6 @@ local function clickConfiguration(self, button)
 			closeDropdown(self)
 		end
 		
-		scrollContent.parent:relayout()
-		
 		return true
 	end
 	
