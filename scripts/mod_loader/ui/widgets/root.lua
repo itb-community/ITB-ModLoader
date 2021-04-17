@@ -1,8 +1,15 @@
 UiRoot = Class.inherit(Ui)
 
 local function PriorityUi()
-	return Ui():width(1):height(1):setTranslucent()
+	local ui = Ui()
+		:width(1):height(1)
+		:setTranslucent()
+	ui.nofitx = true
+	ui.nofity = true
+
+	return ui
 end
+
 function UiRoot:new()
 	Ui.new(self)
 	
