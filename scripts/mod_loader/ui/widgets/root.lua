@@ -154,8 +154,14 @@ function UiRoot:releasePressedchild(mx, my, button)
 		self.pressedchild.pressed = false
 		self.pressedchild = nil
 
-		if button == 1 and pressedchild.containsMouse then
-			return pressedchild:clicked(button)
+		if button == 1 then
+			local consumeEvent = pressedchild:mouseup(mx, my, button)
+
+			if pressedchild.containsMouse and pressedchild:clicked(button) then
+				consumeEvent = true
+			end
+
+			return consumeEvent
 		end
 	end
 
@@ -221,8 +227,14 @@ function UiRoot:event(eventloop)
 	if type == sdl.events.mousemotion then
 		local pressedchild = self.pressedchild
 
-		if pressedchild ~= nil and pressedchild.dragged then
-			if pressedchild:dragMove(mx, my) then
+		if pressedchild ~= nil then
+			local consumeEvent = pressedchild:mousemove(mx, my)
+
+			if pressedchild.dragged and pressedchild:dragMove(mx, my) then
+				consumeEvent = true
+			end
+
+			if consumeEvent then
 				return true
 			end
 		end
