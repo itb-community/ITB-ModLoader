@@ -49,15 +49,24 @@ local function computeAlignedPos(self, widget, horizontal)
 end
 
 function UiTooltip:updateText()
-	if self.title ~= self.root.title or self.text ~= self.root.tooltip then
+	local title = self.root.tooltip_title or ""
+	local text = self.root.tooltip or ""
+	local isTitle = title ~= ""
+	local isText = text ~= ""
+
+	if self.ui_title.text ~= title or self.ui_text.text ~= text then
 		self.w = 0
-		self.ui_title:setText(self.root.tooltip_title)
-		self.ui_text:setText(self.root.tooltip)
+
+		if self.ui_title.text ~= title then
+			self.ui_title:setText(title)
+		end
+
+		if self.ui_text.text ~= text then
+			self.ui_text:setText(text)
+		end
+
 		self.w = math.max(self.ui_title:maxChildSize("width"), self.ui_text:maxChildSize("width")) + self.padl + self.padr
 	end
-
-	local isTitle = self.ui_title.text and self.ui_title.text ~= ""
-	local isText = self.ui_text.text and self.ui_text.text ~= ""
 
 	self.ui_title.visible = isTitle
 	self.ui_text.visible = isText
@@ -65,9 +74,6 @@ function UiTooltip:updateText()
 end
 
 function UiTooltip:relayout()
-	-- build the tooltip with the whole screen available
-	self.w = ScreenSizeX()
-	self.h = ScreenSizeY()
 	self:updateText()
 	UiBoxLayout.relayout(self)
 

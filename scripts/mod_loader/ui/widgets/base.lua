@@ -374,7 +374,8 @@ function Ui:updateHoveredState()
 end
 
 function Ui:updateTooltipState()
-	self.root.tooltip = self.tooltip or ""
+	self.root.tooltip_title = self.tooltip_title
+	self.root.tooltip = self.tooltip
 end
 
 -- update is called for all element after everything has been

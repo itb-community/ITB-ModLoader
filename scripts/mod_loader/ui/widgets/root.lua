@@ -18,9 +18,9 @@ function UiRoot:new()
 	self.focuschild = self
 	self.translucent = true
 	self.priorityUi = PriorityUi():addTo(self)
-	self.tooltipUi = UiTooltip():addTo(self.priorityUi)
 	self.dropdownUi = PriorityUi():addTo(self.priorityUi)
 	self.draggableUi = PriorityUi():addTo(self.priorityUi)
+	self.tooltipUi = UiTooltip():addTo(self.priorityUi)
 end
 
 function UiRoot:draw(screen)
@@ -30,15 +30,28 @@ function UiRoot:draw(screen)
 
 	self.priorityUi.visible = true
 	self.priorityUi:bringToTop()
-	self.dropdownUi:relayout()
-	self.draggableUi:relayout()
+	self:relayoutDragDropPriorityUi()
 
 	self:updateStates()
 
 	-- update tooltip after everything else has been updated
-	self.tooltipUi:relayout()
+	self:relayoutTooltipUi()
 
 	Ui.draw(self, screen)
+end
+
+function UiRoot:relayoutDragDropPriorityUi()
+	self.tooltipUi.visible = false
+	self.priorityUi:relayout()
+	self.tooltipUi.visible = true
+end
+
+function UiRoot:relayoutTooltipUi()
+	self.dropdownUi.visible = false
+	self.draggableUi.visible = false
+	self.priorityUi:relayout()
+	self.dropdownUi.visible = true
+	self.draggableUi.visible = true
 end
 
 function UiRoot:setfocus(newfocus)
@@ -103,7 +116,7 @@ end
 
 function UiRoot:updateTooltipState()
 	self.tooltip_static = false
-	self.tooltip_title = false
+	self.tooltip_title = ""
 	self.tooltip = ""
 
 	if self.hoveredchild ~= nil and self.hoveredchild.hovered then
