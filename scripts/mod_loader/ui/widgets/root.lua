@@ -248,8 +248,6 @@ function UiRoot:event(eventloop)
 
 		if button == 1 and self.pressedchild ~= nil then
 			return self:releasePressedchild(mx, my, button)
-		elseif button == 3 and self.hoveredchild ~= nil then
-			return self.hoveredchild:mouseup(mx, my, button)
 		end
 
 		return self:mouseup(mx, my, button)
