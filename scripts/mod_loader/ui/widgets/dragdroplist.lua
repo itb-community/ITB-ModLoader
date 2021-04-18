@@ -47,7 +47,7 @@ function UiDragDropList:stopDrag(mx, my, button)
 end
 
 function Ui:registerDragDropList(placeholder)
-	Assert.NotEquals('nil', type(placeholder), "Argument #1")
+	Assert.True(Class.instanceOf(placeholder, Ui), "[Argument #1]:instanceOf(Ui)")
 	self:registerDragMove()
 	self.dragPlaceholder = placeholder
 	self.startDrag = UiDragDropList.startDrag
