@@ -86,6 +86,7 @@ t.onKeyPressing = Event({ [Event.SHORTCIRCUIT] = true })
 t.onKeyPressed = Event({ [Event.SHORTCIRCUIT] = true })
 t.onKeyReleasing = Event({ [Event.SHORTCIRCUIT] = true })
 t.onKeyReleased = Event({ [Event.SHORTCIRCUIT] = true })
+t.onTextInput = Event({ [Event.SHORTCIRCUIT] = true })
 
 -- //////////////////////////////////////////////////////////////////////////////
 -- Hooks

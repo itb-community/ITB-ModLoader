@@ -481,6 +481,16 @@ function Ui:keyup(keycode)
 	return false
 end
 
+function Ui:textinput(textinput)
+	if not self.visible then return false end
+
+	if self.parent then
+		return self.parent:textinput(textinput)
+	end
+
+	return false
+end
+
 function Ui:relayout()
 	local innerX = self.x
 	local innerY = self.y

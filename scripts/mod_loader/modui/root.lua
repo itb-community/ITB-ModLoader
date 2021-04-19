@@ -341,6 +341,10 @@ MOD_API_EVENT_HOOK = sdl.eventHook(function(event)
 			if modApi.events.onKeyReleased:dispatch(keycode) then
 				return true
 			end
+		elseif type == sdl.events.textinput then
+			if modApi.events.onTextInput:dispatch(event:textinput()) then
+				return true
+			end
 		end
 	end
 
