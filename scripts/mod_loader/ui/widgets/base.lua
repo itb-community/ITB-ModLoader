@@ -269,13 +269,11 @@ function Ui:setTranslucent(translucent, cascade)
 end
 
 local function handleMouseEvent(self, mx, my, func, ...)
-	if not self.visible or self.ignoreMouse or not self.containsMouse then
-		return false
-	end
-
 	for _, child in ipairs(self.children) do
-		if child[func](child, mx, my, ...) then
-			return true
+		if child.visible and child.containsMouse and not child.ignoreMouse then
+			if child[func](child, mx, my, ...) then
+				return true
+			end
 		end
 	end
 
