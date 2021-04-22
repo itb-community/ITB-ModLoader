@@ -155,7 +155,7 @@ end
 function drawtri_tl(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
-	for y = 0, rect.h do
+	for y = 0, rect.h - 1 do
 		temprect.x = rect.x
 		temprect.y = rect.y + y
 		temprect.w = rect.w * (1 - y / rect.h)
@@ -168,7 +168,7 @@ end
 function drawtri_tr(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
-	for y = 0, rect.h do
+	for y = 0, rect.h - 1 do
 		temprect.w = rect.w * (1 - y / rect.h)
 		temprect.x = rect.x + rect.w - temprect.w
 		temprect.y = rect.y + y
@@ -181,10 +181,10 @@ end
 function drawtri_bl(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
-	for y = 0, rect.h do
+	for y = 0, rect.h - 1 do
 		temprect.x = rect.x
 		temprect.y = rect.y + y
-		temprect.w = rect.w * (y / rect.h)
+		temprect.w = rect.w * (y + 1) / rect.h
 		temprect.h = 1
 
 		screen:drawrect(color, temprect)
@@ -194,8 +194,8 @@ end
 function drawtri_br(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
-	for y = 0, rect.h do
-		temprect.w = rect.w * (y / rect.h)
+	for y = 0, rect.h - 1 do
+		temprect.w = rect.w * (y + 1) / rect.h
 		temprect.x = rect.x + rect.w - temprect.w
 		temprect.y = rect.y + y
 		temprect.h = 1
