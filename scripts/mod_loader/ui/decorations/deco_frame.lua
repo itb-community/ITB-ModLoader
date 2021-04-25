@@ -103,9 +103,9 @@ end
 DecoBorder = Class.inherit(UiDeco)
 function DecoBorder:new(bordercolor, bordersize, borderhlcolor, borderhlsize)
     self.bordercolor = bordercolor or deco.colors.buttonborder
-    self.borderhlcolor = borderhlcolor or bordercolor
+    self.borderhlcolor = borderhlcolor or self.bordercolor
     self.bordersize = bordersize or 2
-    self.borderhlsize = borderhlsize or bordersize
+    self.borderhlsize = borderhlsize or self.bordersize
     self.rect =  sdl.rect(0, 0, 0, 0)
 end
 
