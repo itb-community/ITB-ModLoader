@@ -50,7 +50,7 @@ BoardClass.SetShield = function(self, loc, shield)
 	Assert.Equals("boolean", type(shield), "Argument #2")
 
 	local dmg = SpaceDamage(loc)
-	dmg.iShield = shield and EFFECT_CREATE or EFFECT_REMOVE
+	dmg.iShield = shield and EFFECT_CREATE or -1
 	self:DamageSpace(dmg)
 end
 
