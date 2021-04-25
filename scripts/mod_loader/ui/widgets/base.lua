@@ -568,10 +568,10 @@ function Ui:draw(screen)
 	local clip = self.clipped
 	
 	if clip then
-		clipRect.x = self.rect.x + self.padl
-		clipRect.y = self.rect.y + self.padt
-		clipRect.w = self.rect.w - self.padl - self.padr
-		clipRect.h = self.rect.h - self.padt - self.padb
+		clipRect.x = self.rect.x-- + self.padl
+		clipRect.y = self.rect.y-- + self.padt
+		clipRect.w = self.rect.w-- - self.padl - self.padr
+		clipRect.h = self.rect.h-- - self.padt - self.padb
 		
 		local currentClipRect = screen:getClipRect()
 		if currentClipRect then
