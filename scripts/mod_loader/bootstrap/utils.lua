@@ -69,3 +69,25 @@ function try(func)
 		end
 	}
 end
+
+-- Allow tables to define custom ipairs handlers.
+-- Lua doesn't natively support this in version 5.1.
+local __ipairs = ipairs
+ipairs = function(t, ...)
+	if t.__ipairs then
+		return t.__ipairs(t, ...)
+	end
+
+	return __ipairs(t, ...)
+end
+
+-- Allow tables to define custom pairs handlers.
+-- Lua doesn't natively support this in version 5.1.
+local __pairs = pairs
+pairs = function(t, ...)
+	if t.__pairs then
+		return t.__pairs(t, ...)
+	end
+
+	return __pairs(t, ...)
+end
