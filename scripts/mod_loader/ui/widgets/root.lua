@@ -139,7 +139,7 @@ function UiRoot:updateStates()
 	self:updateHoveredState()
 	self:updateDraggedState()
 	self:updateTooltipState()
-	self:update()
+	self:updateState()
 end
 
 function UiRoot:pressHoveredchild(mx, my, button)

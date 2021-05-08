@@ -379,9 +379,9 @@ end
 -- update is called for all element after everything has been
 -- relayed out, and every state has been updated.
 -- elements can override this function for additional updates.
-function Ui:update()
+function Ui:updateState()
 	for _, child in ipairs(self.children) do
-		child:update()
+		child:updateState()
 	end
 end
 
