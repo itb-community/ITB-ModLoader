@@ -62,7 +62,7 @@ end
 function Ui:remove(child)
 	if not child then return self end
 
-	if self.root.focuschild == child then
+	if self.root and self.root.focuschild == child then
 		-- pass self as arg for UiRoot override
 		self:setfocus(self)
 	end
