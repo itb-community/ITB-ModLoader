@@ -138,6 +138,7 @@ function UiRoot:updateStates()
 	self:updateContainsMouse(mx, my)
 	self:updateHoveredState()
 	self:updateDraggedState()
+	self:updateAnimations()
 	self:updateTooltipState()
 	self:updateState()
 end

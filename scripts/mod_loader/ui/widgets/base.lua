@@ -371,6 +371,22 @@ function Ui:updateHoveredState()
 	return self.hovered
 end
 
+function Ui:updateAnimations()
+	if not self.visible then
+		return
+	end
+
+	if self.animations then
+		for _, anim in pairs(self.animations) do
+			anim:update(modApi:deltaTime())
+		end
+	end
+
+	for _, child in ipairs(self.children) do
+		child:updateAnimations()
+	end
+end
+
 function Ui:updateTooltipState()
 	self.root.tooltip_title = self.tooltip_title
 	self.root.tooltip = self.tooltip
@@ -483,12 +499,6 @@ function Ui:draw(screen)
 		end
 		
 		screen:clip(clipRect)
-	end
-	
-	if self.animations then
-		for _, anim in pairs(self.animations) do
-			anim:update(modApi:deltaTime())
-		end
 	end
 	
 	self.decorationx = 0
