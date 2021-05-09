@@ -205,9 +205,9 @@ function drawtri_br(screen, color, rect)
 end
 
 local function rect_contains0(x, y, w, h, px, py)
-	return px > x     and
-	       px < x + w and
-	       py > y     and
+	return px >= x     and
+	       px < x + w  and
+	       py >= y     and
 	       py < y + h
 end
 
@@ -218,7 +218,7 @@ end
 --]]
 function rect_contains(...)
 	local a = {...}
-	assert(#a == 3 or #a == 6, "Invalid arguments")
+	Assert.True(#a == 3 or #a == 6, "Expected 3 or 6 arguments, but got " .. #a)
 
 	if #a == 3 then
 		return rect_contains0(
