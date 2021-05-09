@@ -129,7 +129,7 @@ function UiDraggable:processDropTargets(mx, my)
 	local target = self.hoverTarget
 
 	if target then
-		if not rect_contains(target.rect, mx, my) then
+		if not target.containsMouse then
 			self.hoverTarget = nil
 
 			if target.onDraggableExited then
@@ -141,7 +141,7 @@ function UiDraggable:processDropTargets(mx, my)
 
 	for i = first, #dropTargets do
 		local target = dropTargets[i]
-		if self ~= target and rect_contains(target.rect, mx, my) then
+		if self ~= target and target.containsMouse then
 			self.hoverTarget = target
 
 			if target.onDraggableEntered then
