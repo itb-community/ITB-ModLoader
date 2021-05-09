@@ -105,13 +105,13 @@ function UiRoot:updatePressedState(mx, my)
 end
 
 function UiRoot:updateHoveredState()
-	if self.hoveredchild ~= nil then
+	if self.hoveredchild then
 		self.hoveredchild.hovered = false
 	end
 	self.hoveredchild = nil
 
 	-- if there is a pressed element, keep it hovered.
-	if self.pressedchild ~= nil then
+	if self.pressedchild then
 		self.hoveredchild = self.pressedchild
 		self.hoveredchild.hovered = true
 		return false
@@ -126,17 +126,14 @@ function UiRoot:updateTooltipState()
 	self.tooltip_title = ""
 	self.tooltip = ""
 
-	if self.hoveredchild ~= nil and self.hoveredchild.hovered then
+	if self.hoveredchild then
 		self.hoveredchild:updateTooltipState()
 	end
 end
 
-function UiRoot:updateDraggedState()
-	if self.pressedchild ~= nil then
-		if self.pressedchild.dragged then
-			local mx, my = sdl.mouse.x(), sdl.mouse.y()
-			self.pressedchild:dragMove(mx, my)
-		end
+function UiRoot:updateDraggedState(mx, my)
+	if self.draggedchild then
+		self.draggedchild:dragMove(mx, my)
 	end
 end
 
@@ -145,7 +142,7 @@ function UiRoot:updateStates()
 	self:updateContainsMouse(mx, my)
 	self:updatePressedState(mx, my)
 	self:updateHoveredState()
-	self:updateDraggedState()
+	self:updateDraggedState(mx, my)
 	self:updateAnimations()
 	self:updateTooltipState()
 	self:updateState()
@@ -171,7 +168,7 @@ function UiRoot:releasePressedchild(mx, my, button)
 	local draggedchild = self.draggedchild
 	local pressedchild = self.pressedchild
 
-	if draggedchild ~= nil then
+	if draggedchild then
 		self.draggedchild.dragged = false
 		self.draggedchild = nil
 
@@ -179,7 +176,7 @@ function UiRoot:releasePressedchild(mx, my, button)
 		draggedchild:stopDrag(mx, my, 1)
 	end
 
-	if pressedchild ~= nil then
+	if pressedchild then
 		self.pressedchild.pressed = false
 		self.pressedchild = nil
 
@@ -208,7 +205,7 @@ function UiRoot:event(eventloop)
 		local pressedchild = self.pressedchild
 		local wheel = eventloop:wheel()
 
-		if pressedchild ~= nil then
+		if pressedchild then
 			local consumeEvent = pressedchild:wheel(mx, my, wheel)
 
 			if pressedchild.dragged and pressedchild:dragWheel(mx, my, wheel) then
@@ -255,7 +252,7 @@ function UiRoot:event(eventloop)
 	if type == sdl.events.mousebuttonup then
 		local button = eventloop:mousebutton()
 
-		if button == 1 and self.pressedchild ~= nil then
+		if button == 1 and self.pressedchild then
 			return self:releasePressedchild(mx, my, button)
 		end
 
@@ -265,7 +262,7 @@ function UiRoot:event(eventloop)
 	if type == sdl.events.mousemotion then
 		local pressedchild = self.pressedchild
 
-		if pressedchild ~= nil then
+		if pressedchild then
 			local consumeEvent = pressedchild:mousemove(mx, my)
 
 			if pressedchild.dragged and pressedchild:dragMove(mx, my) then
