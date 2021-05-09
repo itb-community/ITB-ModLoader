@@ -157,10 +157,6 @@ local function displayPaletteLocked(self, displayLocked)
 	end
 end
 
-local function updateTooltipState(self)
-	self.root:settooltip(self.tooltip, nil, self.pressed)
-end
-
 local function buildPaletteFrameContent(scroll)
 	local screen = sdl.screen()
 
@@ -240,7 +236,6 @@ local function buildPaletteFrameContent(scroll)
 		button.deco_lock = deco_lock
 		button.displayPaletteLocked = displayPaletteLocked
 		button.hoverAtIndex = hoverAtIndex
-		button.updateTooltipState = updateTooltipState
 
 		if not unlockedSquads[i] then
 			button:displayPaletteLocked(true)

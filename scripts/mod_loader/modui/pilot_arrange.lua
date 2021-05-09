@@ -68,10 +68,6 @@ local function getOrCreatePilotSurface(pilotId)
 	end
 end
 
-local function updateTooltipState(self)
-	self.root:settooltip(self.tooltip, self.tooltip_title, self.pressed)
-end
-
 local hangarDecorations = nil
 local portraitSize = 122 + 8
 local function buildHangarBackdrop()
@@ -110,7 +106,6 @@ local function buildPilotButton(pilotId, placeholder)
 		:widthpx(portraitSize):heightpx(portraitSize)
 		:decorate(decorations)
 	button.pilotId = pilotId
-	button.updateTooltipState = updateTooltipState
 
 	-- only show tooltip text if the pilot is unlocked
 	if unlocked then

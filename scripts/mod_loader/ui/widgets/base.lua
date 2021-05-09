@@ -390,6 +390,7 @@ end
 function Ui:updateTooltipState()
 	self.root.tooltip_title = self.tooltip_title
 	self.root.tooltip = self.tooltip
+	self.root.tooltip_static = self.draggable and self.dragged
 end
 
 -- update is called for all element after everything has been
