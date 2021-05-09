@@ -198,12 +198,14 @@ function UiDraggable:dragMove(mx, my)
 			self.h = math.max(self.dragH + my - self.dragY, minsize)
 		end
 	elseif self.dragMovable and self.dragMoving then
-		self.x = self.x + mx - self.dragX
-		self.y = self.y + my - self.dragY
+		local diffx = mx - self.dragX
+		local diffy = my - self.dragY
+		self.x = self.x + diffx
+		self.y = self.y + diffy
+		self.screenx = self.screenx + diffx
+		self.screeny = self.screeny + diffy
 		self.dragX = mx
 		self.dragY = my
-		self.screenx = self.x
-		self.screeny = self.y
 
 		self:processDropTargets(mx, my)
 	else
