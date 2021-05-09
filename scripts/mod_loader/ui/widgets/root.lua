@@ -97,6 +97,13 @@ function UiRoot:cleanupDropdown()
 	end
 end
 
+function UiRoot:updatePressedState(mx, my)
+	-- release the pressed element if it has become orphaned from root
+	if self.pressedchild and self.pressedchild.root ~= self then
+		self:releasePressedchild(mx, my, 1)
+	end
+end
+
 function UiRoot:updateHoveredState()
 	if self.hoveredchild ~= nil then
 		self.hoveredchild.hovered = false
@@ -136,6 +143,7 @@ end
 function UiRoot:updateStates()
 	local mx, my = sdl.mouse.x(), sdl.mouse.y()
 	self:updateContainsMouse(mx, my)
+	self:updatePressedState(mx, my)
 	self:updateHoveredState()
 	self:updateDraggedState()
 	self:updateAnimations()
