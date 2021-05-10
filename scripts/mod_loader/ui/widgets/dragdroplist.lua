@@ -25,6 +25,8 @@ function UiDragDropList:startDrag(mx, my, button)
 		self:addTo(root.draggableUi)
 		self.x = self.screenx
 		self.y = self.screeny
+
+		root:setfocus(self)
 	end
 end
 
@@ -46,10 +48,25 @@ function UiDragDropList:stopDrag(mx, my, button)
 	UiDraggable.stopDrag(self, mx, my, button)
 end
 
+function UiDragDropList:keydown(keycode)
+	if keycode == SDLKeycodes.ESCAPE then
+		self:stopDrag(sdl.mouse.x(), sdl.mouse.y(), 1)
+		self.root:setPressedChild(nil)
+		self.root:setDraggedChild(nil)
+	end
+	return true
+end
+
+function UiDragDropList:keyup(keycode)
+	return true
+end
+
 function Ui:registerDragDropList(placeholder)
 	Assert.True(Class.instanceOf(placeholder, Ui), "[Argument #1]:instanceOf(Ui)")
 	self:registerDragMove()
 	self.dragPlaceholder = placeholder
 	self.startDrag = UiDragDropList.startDrag
 	self.stopDrag = UiDragDropList.stopDrag
+	self.keydown = UiDragDropList.keydown
+	self.keyup = UiDragDropList.keyup
 end
