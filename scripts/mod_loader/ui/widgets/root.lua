@@ -141,15 +141,10 @@ function UiRoot:updatePressedState(mx, my)
 end
 
 function UiRoot:updateHoveredState()
-	if self.hoveredchild then
-		self.hoveredchild.hovered = false
-	end
-	self.hoveredchild = nil
-
 	-- if there is a pressed element, keep it hovered.
-	if self.pressedchild then
-		self.hoveredchild = self.pressedchild
-		self.hoveredchild.hovered = true
+	self:setHoveredChild(self.pressedchild)
+
+	if self.hoveredchild then
 		return false
 	end
 
@@ -188,12 +183,10 @@ function UiRoot:pressHoveredchild(mx, my, button)
 	local pressedchild = self.hoveredchild
 	if pressedchild == nil then return end
 
-	self.pressedchild = pressedchild
-	pressedchild.pressed = true
+	self:setPressedChild(pressedchild)
 
 	if pressedchild.draggable then
-		self.draggedchild = pressedchild
-		pressedchild.dragged = true
+		self:setDraggedChild(pressedchild)
 		pressedchild:startDrag(mx, my, button)
 	end
 
@@ -205,16 +198,14 @@ function UiRoot:releasePressedchild(mx, my, button)
 	local pressedchild = self.pressedchild
 
 	if draggedchild then
-		self.draggedchild.dragged = false
-		self.draggedchild = nil
+		self:setDraggedChild(nil)
 
 		-- Hack: always call stopDrag with argument button = 1
 		draggedchild:stopDrag(mx, my, 1)
 	end
 
 	if pressedchild then
-		self.pressedchild.pressed = false
-		self.pressedchild = nil
+		self:setPressedChild(nil)
 
 		if button == 1 then
 			local consumeEvent = pressedchild:mouseup(mx, my, button)
@@ -244,7 +235,7 @@ function UiRoot:event(eventloop)
 		if pressedchild then
 			local consumeEvent = pressedchild:wheel(mx, my, wheel)
 
-			if pressedchild.dragged and pressedchild:dragWheel(mx, my, wheel) then
+			if self.draggedchild and self.draggedchild:dragWheel(mx, my, wheel) then
 				consumeEvent = true
 			end
 
@@ -301,7 +292,7 @@ function UiRoot:event(eventloop)
 		if pressedchild then
 			local consumeEvent = pressedchild:mousemove(mx, my)
 
-			if pressedchild.dragged and pressedchild:dragMove(mx, my) then
+			if self.draggedchild and self.draggedchild:dragMove(mx, my) then
 				consumeEvent = true
 			end
 

@@ -354,12 +354,8 @@ function Ui:updateHoveredState()
 		return false
 	end
 
-	if not self.translucent then
-		if self.root.hoveredchild ~= nil then
-			self.root.hoveredchild.hovered = false
-		end
-		self.root.hoveredchild = self
-		self.hovered = true
+	if not self.translucent and self.root then
+		self.root:setHoveredChild(self)
 	end
 
 	for _, child in ipairs(self.children) do
