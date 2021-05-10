@@ -97,6 +97,42 @@ function UiRoot:cleanupDropdown()
 	end
 end
 
+function UiRoot:setHoveredChild(child)
+	if self.hoveredchild then
+		self.hoveredchild.hovered = false
+	end
+
+	self.hoveredchild = child
+
+	if child then
+		child.hovered = true
+	end
+end
+
+function UiRoot:setPressedChild(child)
+	if self.pressedchild then
+		self.pressedchild.pressed = false
+	end
+
+	self.pressedchild = child
+
+	if child then
+		child.pressed = true
+	end
+end
+
+function UiRoot:setDraggedChild(child)
+	if self.draggedchild then
+		self.draggedchild.dragged = false
+	end
+
+	self.draggedchild = child
+
+	if child then
+		child.dragged = true
+	end
+end
+
 function UiRoot:updatePressedState(mx, my)
 	-- release the pressed element if it has become orphaned from root
 	if self.pressedchild and self.pressedchild.root ~= self then
