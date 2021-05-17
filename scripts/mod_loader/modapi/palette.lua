@@ -292,8 +292,6 @@ local function migrateColorMaps()
 	local fromIndex = PaletteDictionary:size() + 1
 	local toIndex = GetColorCount()
 
-	if fromIndex > toIndex then return end
-
 	for i = fromIndex, toIndex do
 		local colorMap = GetColorMap(i)
 		local id = VANILLA_PALETTE_ID[i] or getFurlId(i) or buildPaletteId()
