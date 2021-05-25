@@ -67,6 +67,7 @@ end
 
 local oldBaseDeployment = Mission.BaseDeployment
 function Mission:BaseDeployment()
+	modApi:setMission(self)
 	oldBaseDeployment(self)
 	self.Board = Board
 
@@ -258,6 +259,7 @@ end
 
 function Mission_Test:BaseStart()
 	Board.isMission = true
+	modApi:setMission(self)
 	Mission.BaseStart(self, true)
 
 	modApi:fireTestMechEnteredHooks(self)
@@ -268,6 +270,7 @@ end
 function Mission_Test:MissionEnd()
 	-- DON'T call the default MissionEnd
 	-- Mission.MissionEnd(self)
+	modApi:setMission(nil)
 
 	modApi:fireTestMechExitedHooks(self)
 end

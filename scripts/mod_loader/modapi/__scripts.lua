@@ -18,6 +18,7 @@ local scripts = {
 	"drops",
 	"difficulty",
 	"map",
+	"mission",
 	"skills",
 	"savedata",
 	"hotkey",
