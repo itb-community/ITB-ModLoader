@@ -53,7 +53,13 @@ function GetCurrentMission()
 		return Mission_Test
 	end
 
-	return modApi.current_mission
+	local region = GetCurrentRegion()
+
+	if region then
+		return GAME:GetMission(region.mission)
+	end
+
+	return nil
 end
 
 Emitter_Blank = Emitter:new({
