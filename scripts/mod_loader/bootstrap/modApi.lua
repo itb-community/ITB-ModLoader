@@ -43,6 +43,7 @@ t.onSettingsChanged = Event()
 t.onProfileChanged = Event()
 t.onProfileCreated = Event()
 t.onProfileDeleted = Event()
+t.onSaveDataUpdated = Event()
 
 t.onHangarUiShown = Event()
 t.onHangarUiHidden = Event()
@@ -77,6 +78,7 @@ t.onAbandonTimelineWindowHidden = Event()
 t.onStatusTooltipWindowShown = Event()
 t.onStatusTooltipWindowHidden = Event()
 
+t.onMissionChanged = Event()
 t.onGameVictory = Event()
 
 t.onShiftToggled = Event()
