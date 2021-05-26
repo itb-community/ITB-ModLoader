@@ -105,7 +105,8 @@ local function overrideNextPhase()
 
 		if nxtId ~= "" then
 			-- Set the mission's id, since the game doesn't do it
-			local nextMission = _G[nxtId]
+			local id = self:GetMissionId(mission)
+			local nextMission = self.Missions[id]
 			nextMission.ID = nxtId
 
 			modApi:fireMissionNextPhaseCreatedHooks(prevMission, nextMission)
