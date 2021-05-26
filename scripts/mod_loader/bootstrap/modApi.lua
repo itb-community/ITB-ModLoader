@@ -43,7 +43,6 @@ t.onSettingsChanged = Event()
 t.onProfileChanged = Event()
 t.onProfileCreated = Event()
 t.onProfileDeleted = Event()
-t.onSaveDataUpdated = Event()
 
 t.onHangarUiShown = Event()
 t.onHangarUiHidden = Event()

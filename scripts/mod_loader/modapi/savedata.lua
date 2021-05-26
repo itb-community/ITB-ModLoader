@@ -168,7 +168,6 @@ local function restoreGameVariables(settings)
 		RegionData = env.RegionData
 		SquadData = env.SquadData
 		
-		modApi.events.onSaveDataUpdated:dispatch()
 		modApi:fireSaveDataUpdatedHooks()
 	end
 end
