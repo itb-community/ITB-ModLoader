@@ -29,6 +29,10 @@ modApi.events.onSaveDataUpdated:subscribe(function()
 	end
 end)
 
+modApi.events.onMissionNextPhaseCreated:subscribe(function(prevMission, nextMission)
+	modApi:setMission(nextMission)
+end)
+
 modApi.events.onGameExited:subscribe(function()
 	modApi:setMission(nil)
 end)
