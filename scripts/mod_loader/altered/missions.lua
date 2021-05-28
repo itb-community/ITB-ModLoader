@@ -270,6 +270,37 @@ function Mission:IsEnvironmentEffect()
 	return true
 end
 
+function Mission:GetSaveData()
+	if GAME == nil then
+		return nil
+	end
+
+	local mission_id
+
+	for id, mission in ipairs(GAME.Missions) do
+		if mission == self then
+			mission_id = id
+			break
+		end
+	end
+
+	if mission_id == nil then
+		return nil
+	end
+
+	local i = 0
+	repeat
+		local regionData = RegionData["region"..i]
+		i = i + 1
+
+		if regionData and GAME:GetMissionId(regionData.mission) == mission_id then
+			return regionData.player
+		end
+	until regionData == nil
+
+	return nil
+end
+
 -- ////////////////////////////////////////////////////////////////////
 
 function Mission_Test:BaseStart()
