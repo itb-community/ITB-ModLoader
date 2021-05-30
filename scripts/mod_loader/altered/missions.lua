@@ -53,7 +53,6 @@ end
 local oldBaseUpdate = Mission.BaseUpdate
 function Mission:BaseUpdate()
 	Board.isMission = true
-	modApi.current_mission = self
 	modApi:processRunLaterQueue(self)
 
 	oldBaseUpdate(self)
@@ -68,7 +67,7 @@ end
 
 local oldBaseDeployment = Mission.BaseDeployment
 function Mission:BaseDeployment()
-	modApi.current_mission = self
+	modApi:setMission(self)
 	oldBaseDeployment(self)
 	self.Board = Board
 
@@ -165,21 +164,7 @@ function Mission:MissionEnd()
 	
 	local fx = SkillEffect()
 	modApi:fireMissionEndHooks(self, fx)
-	fx:AddScript([[
-		modApi.runLaterQueue = {}
-		
-		modApi:conditionalHook(
-			BuildIsBoardBusyPredicate(modApi.current_mission.Board),
-			function()
-				-- BoardBusyPredicate defined above will yield true once we exit to main menu,
-				-- but when that happens, current_mission is reset to nil.
-				if modApi.current_mission then
-					modApi.current_mission.Board = nil
-					modApi.current_mission = nil
-				end
-			end
-		)
-	]])
+	fx:AddScript("modApi.runLaterQueue = {}")
 	Board:AddEffect(fx)
 end
 
@@ -274,6 +259,7 @@ end
 
 function Mission_Test:BaseStart()
 	Board.isMission = true
+	modApi:setMission(self)
 	Mission.BaseStart(self, true)
 
 	modApi:fireTestMechEnteredHooks(self)
@@ -284,10 +270,9 @@ end
 function Mission_Test:MissionEnd()
 	-- DON'T call the default MissionEnd
 	-- Mission.MissionEnd(self)
+	modApi:setMission(nil)
 
 	modApi:fireTestMechExitedHooks(self)
-	
-	modApi.current_mission = nil
 end
 
 local oldMissionEnd = Mission_Final_Cave.MissionEnd
@@ -295,7 +280,3 @@ function Mission_Final_Cave:MissionEnd()
 	oldMissionEnd()
 	modApi.events.onGameVictory:dispatch(difficulty, islandsSecured, squad)
 end
-
-modApi.events.onGameExited:subscribe(function()
-	modApi.current_mission = nil
-end)

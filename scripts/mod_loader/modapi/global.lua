@@ -34,9 +34,9 @@ end
 function IsTestMechScenario()
 	if not Game then return false end
 
-	local p0 = Game:GetPawn(0)
-	local p1 = Game:GetPawn(1)
-	local p2 = Game:GetPawn(2)
+	local p0 = Game:GetPawn(0) ~= nil
+	local p1 = Game:GetPawn(1) ~= nil
+	local p2 = Game:GetPawn(2) ~= nil
 
 	-- In test mech scenario, only one of the three
 	-- player mechs will not be nil.
