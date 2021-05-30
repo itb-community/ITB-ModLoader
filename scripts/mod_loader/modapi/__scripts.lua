@@ -10,6 +10,7 @@ local scripts = {
 	"hooks",
 	"data",
 	"text",
+	"personalities",
 	"personalities_csv",
 	"achievement",
 	"medals",
