@@ -62,7 +62,7 @@ end
 function Ui:remove(child)
 	if not child then return self end
 
-	if self.root.focuschild == child then
+	if self.root and self.root.focuschild == child then
 		-- pass self as arg for UiRoot override
 		self:setfocus(self)
 	end
@@ -268,29 +268,10 @@ function Ui:setTranslucent(translucent, cascade)
 	return self
 end
 
-function Ui:wheel(mx,my,y)
-	if not self.visible then return false end
-	if self.ignoreMouse then return false end
-
-	if self.dragged then
-		self:dragWheel(mx, my, y)
-		return true
-	end
-
-	for i=1,#self.children do
-		local child = self.children[i]
-		
-		if
-			child.visible      and
-			rect_contains(
-				child.screenx,
-				child.screeny,
-				child.w,
-				child.h,
-				mx, my
-			)
-		then
-			if child:wheel(mx,my,y) then
+local function handleMouseEvent(self, mx, my, func, ...)
+	for _, child in ipairs(self.children) do
+		if child.visible and child.containsMouse and not child.ignoreMouse then
+			if child[func](child, mx, my, ...) then
 				return true
 			end
 		end
@@ -298,167 +279,22 @@ function Ui:wheel(mx,my,y)
 
 	if self.translucent then return false end
 	return true
+end
+
+function Ui:wheel(mx,my,y)
+	return handleMouseEvent(self, mx, my, "wheel", y)
 end
 
 function Ui:mousedown(mx, my, button)
-	if not self.visible then return false end
-	if self.ignoreMouse then return false end
-
-	for i=1,#self.children do
-		local child = self.children[i]
-
-		if
-			child.visible      and
-			rect_contains(
-				child.screenx,
-				child.screeny,
-				child.w,
-				child.h,
-				mx, my
-			)
-		then
-			if child:mousedown(mx, my, button) then
-				return true
-			end
-		end
-	end
-
-	if self.root.pressedchild ~= nil then
-		self.root.pressedchild.pressed = false
-	end
-
-	self.root.pressedchild = self
-	-- pass self as arg for UiRoot override
-	self:setfocus(self)
-	self.pressed = true
-
-	if self.draggable and not self.disabled and button == 1 then
-		self.dragged = true
-		self:startDrag(mx, my, button)
-		return true
-	end
-
-	if self.translucent then return false end
-	return true
+	return handleMouseEvent(self, mx, my, "mousedown", button)
 end
 
 function Ui:mouseup(mx, my, button)
-	if not self.visible then return false end
-	if self.ignoreMouse then return false end
-
-	local contains = rect_contains(
-		self.screenx,
-		self.screeny,
-		self.w,
-		self.h,
-		mx, my
-	)
-
-	if not contains then
-		self.root.hoveredchild = nil
-		self.hovered = false
-		-- Cleanup the tooltip to prevent flickering when mouse is
-		-- first moved after the release
-		self.root.tooltip_static = false
-		self.root.tooltip_title = ""
-		self.root.tooltip = ""
-		self.root.tooltipUi:updateText()
-	end
-
-	if self.dragged and button == 1 then
-		self.dragged = false
-		self:stopDrag(mx, my, button)
-		return true
-	end
-
-	if
-		self.root.pressedchild == self and
-		self.pressed                   and
-		not self.disabled              and
-		contains
-	then
-		self.pressed = false
-		if self:clicked(button) then return true end
-	end
-
-	for i=1,#self.children do
-		local child = self.children[i]
-		
-		if
-			child ~= self.root.pressedchild and
-			child.visible                   and
-			rect_contains(
-				child.screenx,
-				child.screeny,
-				child.w,
-				child.h,
-				mx, my
-			)
-		then
-			if child:mouseup(mx, my, button) then
-				return true
-			end
-		end
-	end
-
-	if self.translucent then return false end
-	return true
+	return handleMouseEvent(self, mx, my, "mouseup", button)
 end
 
 function Ui:mousemove(mx, my)
-	if not self.visible then return false end
-	if self.ignoreMouse then return false end
-
-	if self.root.hoveredchild ~= nil then
-		self.root.hoveredchild.hovered = false
-	end
-
-	self.root.hoveredchild = self
-	self.hovered = true
-
-	table.insert(self.root.highlightedChildren, self)
-	self.highlighted = true
-
-	if self.dragged then
-		self:dragMove(mx, my)
-		return true
-	end
-
-	if self.tooltip then
-		self.root.tooltip_static = self.tooltip_static
-		self.root.tooltip_title = self.tooltip_title
-		self.root.tooltip = self.tooltip
-	end
-
-	for i=1,#self.children do
-		local child = self.children[i]
-		if
-			child ~= self.root.pressedchild and
-			child.visible                   and
-			rect_contains(
-				child.screenx,
-				child.screeny,
-				child.w,
-				child.h,
-				mx, my
-			)
-		then
-			if not child.containsMouse then
-				child.containsMouse = true
-				child:mouseEntered()
-			end
-
-			if child:mousemove(mx, my) then
-				return true
-			end
-		elseif child.containsMouse then
-			child.containsMouse = false
-			child:mouseExited()
-		end
-	end
-	
-	if self.translucent then return false end
-	return true
+	return handleMouseEvent(self, mx, my, "mousemove")
 end
 
 function Ui:keydown(keycode)
@@ -479,6 +315,87 @@ function Ui:keyup(keycode)
 	end
 
 	return false
+end
+
+-- calling this function will update containsMouse
+-- for this element and its children, and call
+-- mouseEntered and mouseExited when applicable.
+function Ui:updateContainsMouse(mx, my)
+	local curr_containsMouse
+	if not self.visible or self.ignoreMouse then
+		curr_containsMouse = false
+	else
+		curr_containsMouse = rect_contains(
+			self.screenx,
+			self.screeny,
+			self.w,
+			self.h,
+			mx, my
+		)
+	end
+
+	if curr_containsMouse ~= self.containsMouse then
+		if curr_containsMouse then
+			self:mouseEntered()
+		else
+			self:mouseExited()
+		end
+
+		self.containsMouse = curr_containsMouse
+	end
+
+	for _, child in ipairs(self.children) do
+		child:updateContainsMouse(mx, my)
+	end
+end
+
+function Ui:updateHoveredState()
+	if not self.visible or self.ignoreMouse or not self.containsMouse then
+		return false
+	end
+
+	if not self.translucent and self.root then
+		self.root:setHoveredChild(self)
+	end
+
+	for _, child in ipairs(self.children) do
+		if child:updateHoveredState() then
+			return true
+		end
+	end
+
+	return self.hovered
+end
+
+function Ui:updateAnimations()
+	if not self.visible then
+		return
+	end
+
+	if self.animations then
+		for _, anim in pairs(self.animations) do
+			anim:update(modApi:deltaTime())
+		end
+	end
+
+	for _, child in ipairs(self.children) do
+		child:updateAnimations()
+	end
+end
+
+function Ui:updateTooltipState()
+	self.root.tooltip_title = self.tooltip_title
+	self.root.tooltip = self.tooltip
+	self.root.tooltip_static = self.draggable and self.dragged
+end
+
+-- update is called for all element after everything has been
+-- relayed out, and every state has been updated.
+-- elements can override this function for additional updates.
+function Ui:updateState()
+	for _, child in ipairs(self.children) do
+		child:updateState()
+	end
 end
 
 function Ui:relayout()
@@ -581,12 +498,6 @@ function Ui:draw(screen)
 		screen:clip(clipRect)
 	end
 	
-	if self.animations then
-		for _, anim in pairs(self.animations) do
-			anim:update(modApi:deltaTime())
-		end
-	end
-	
 	self.decorationx = 0
 	self.decorationy = 0
 	for i=1,#self.decorations do
@@ -646,9 +557,11 @@ function Ui:stopDrag(mx, my, button)
 end
 
 function Ui:dragMove(mx, my)
+	return false
 end
 
 function Ui:dragWheel(mx, my, y)
+	return false
 end
 
 function Ui:startDrag(mx, my, button)

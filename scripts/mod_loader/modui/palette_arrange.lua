@@ -106,57 +106,26 @@ local function buildContractedDeco(marginx, marginy, uiDeco, ...)
 end
 
 local function uiSetDraggable(ui)
-	ui:registerDragMove()
+	ui:registerDragDropList(placeholder)
 
-	ui.startDrag = function(self, mx, my, btn)
-		UiDraggable.startDrag(self, mx, my, btn)
-		if self.parent ~= content then return end
-
-		local draggableIndex = list_indexof(content.children, self)
-		self:detach()
-		self:addTo(scrollarea, 1)
-
-		table.remove(content.children, list_indexof(content.children, placeholder))
-		table.insert(content.children, draggableIndex, placeholder)
-
-		placeholder:show()
-		content:relayout()
+	-- Called each time we hover over an element that's been registered as valid drop target
+	ui.onDraggableEntered = function(self, draggable, target)
+		if self == draggable then
+			local targetIndex = list_indexof(content.children, target)
+			placeholder:detach()
+			content:add(placeholder, targetIndex)
+		end
 	end
 
-	ui.stopDrag = function(self, mx, my, btn)
-		UiDraggable.stopDrag(self, mx, my, btn)
-		if self.parent ~= scrollarea then return end
-
-		local placeholderIndex = list_indexof(content.children, placeholder)
-		table.remove(content.children, placeholderIndex)
-
-		self:detach()
-		self:addTo(content, placeholderIndex)
-
-		table.insert(content.children, placeholder)
-
-		placeholder:hide()
-	end
-
-	ui.dragMove = function(self, mx, my)
-		UiDraggable.dragMove(self, mx, my)
-		if self.parent ~= scrollarea then return end
-
-		for i = PALETTE_INDEX_FIRST_MOVABLE, #content.children do
-			local hoveredButton = content.children[i]
-			if rect_contains(hoveredButton.rect, mx, my) then
-				if hoveredButton ~= placeholder then
-					self:hoverAtIndex(i)
-				end
-
-				return
+	ui.getDropTargets = function(self)
+		if self.dropTargets == nil then
+			self.dropTargets = {}
+			for i = PALETTE_INDEX_FIRST_MOVABLE, #content.children do
+				local target = content.children[i]
+				table.insert(self.dropTargets, target)
 			end
 		end
-
-		-- if we get this far, we are not hovering any of the buttons
-		if content.children[#content.children] ~= placeholder then
-			self:hoverAtIndex(#content.children)
-		end
+		return self.dropTargets
 	end
 end
 
@@ -174,8 +143,6 @@ local function hoverAtIndex(self, new_placeholderIndex)
 
 	local lock = not unlockedSquads[new_placeholderIndex]
 	self:displayPaletteLocked(lock)
-
-	content:relayout()
 end
 
 local function displayPaletteLocked(self, displayLocked)

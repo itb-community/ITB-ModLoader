@@ -186,8 +186,6 @@ local function clickConfiguration(self, button)
 			closeDropdown(self)
 		end
 		
-		scrollContent.parent:relayout()
-		
 		return true
 	end
 	
@@ -263,10 +261,9 @@ local function buildOptionEntries(mod)
 					DecoDropDown()
 				})
 				
-			optionEntry.destroyDropDown = function(self)
-				UiDropDown.destroyDropDown(self)
-				opt_editable.value = self.value
-			end
+			optionEntry.optionSelected:subscribe(function(oldChoice, oldValue)
+				opt_editable.value = optionEntry.value
+			end)
 		end
 		
 		optionEntry

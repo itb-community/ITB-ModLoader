@@ -16,6 +16,7 @@ local scripts = {
 
 	"widgets/base",
 	"widgets/draggable",
+	"widgets/dragdroplist",
 	"widgets/boxlayout",
 	"widgets/flowlayout",
 	"widgets/weightlayout",
