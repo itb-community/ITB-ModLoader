@@ -1,11 +1,5 @@
 
-local PilotPersonality = nil
 function CreatePilotPersonality(label, name)
-	-- PilotPersonality is local to personality.lua
-	-- We can't access it directly, so we have to grab it via
-	-- the metatable of one of the existing PilotPersonality instances.
-	-- 'Artificial' happens to be the most generic one.
-	PilotPersonality = PilotPersonality or getmetatable(Personality["Artificial"])
 	local t = PilotPersonality:new()
 
 	-- Name of the pilot, leave nil for random name

@@ -49,6 +49,5 @@ local function addMissionDialogTable(missionId, dialogTable, overwrite)
 	end
 end
 
-local personality = getmetatable(Personality["Artificial"])
-personality.AddDialogTable = addDialogTable
-personality.AddMissionDialogTable = addMissionDialogTable
+PilotPersonality.AddDialogTable = addDialogTable
+PilotPersonality.AddMissionDialogTable = addMissionDialogTable
