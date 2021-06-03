@@ -28,7 +28,7 @@ local scripts = {
 	"widgets/checkbox",
 	"widgets/dropdown",
 	"widgets/mainmenubutton",
-	"widgets/input",
+	"widgets/textbox",
 }
 
 local rootpath = GetParentPath(...)
