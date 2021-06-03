@@ -133,7 +133,6 @@ local function createUi()
 		collapse.onclicked = function(self, button)
 			if button == 1 then
 				entryBoxHolder.content.visible = not self.checked
-				entryBoxHolder:relayout()
 			end
 
 			return true

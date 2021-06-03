@@ -18,7 +18,9 @@ function DecoButton:draw(screen, widget)
 
 	if widget.hovered then
 		basecolor = self.hlcolor
-		bordercolor = self.borderhlcolor
+		if widget.containsMouse or widget.dragMoving then
+			bordercolor = self.borderhlcolor
+		end
 	end
 	if widget.disabled then
 		basecolor = self.disabledcolor

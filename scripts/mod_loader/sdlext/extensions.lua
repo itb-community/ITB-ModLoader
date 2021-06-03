@@ -155,7 +155,7 @@ end
 function drawtri_tl(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
-	for y = 0, rect.h do
+	for y = 0, rect.h - 1 do
 		temprect.x = rect.x
 		temprect.y = rect.y + y
 		temprect.w = rect.w * (1 - y / rect.h)
@@ -168,7 +168,7 @@ end
 function drawtri_tr(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
-	for y = 0, rect.h do
+	for y = 0, rect.h - 1 do
 		temprect.w = rect.w * (1 - y / rect.h)
 		temprect.x = rect.x + rect.w - temprect.w
 		temprect.y = rect.y + y
@@ -181,10 +181,10 @@ end
 function drawtri_bl(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
-	for y = 0, rect.h do
+	for y = 0, rect.h - 1 do
 		temprect.x = rect.x
 		temprect.y = rect.y + y
-		temprect.w = rect.w * (y / rect.h)
+		temprect.w = rect.w * (y + 1) / rect.h
 		temprect.h = 1
 
 		screen:drawrect(color, temprect)
@@ -194,8 +194,8 @@ end
 function drawtri_br(screen, color, rect)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
 
-	for y = 0, rect.h do
-		temprect.w = rect.w * (y / rect.h)
+	for y = 0, rect.h - 1 do
+		temprect.w = rect.w * (y + 1) / rect.h
 		temprect.x = rect.x + rect.w - temprect.w
 		temprect.y = rect.y + y
 		temprect.h = 1
@@ -205,9 +205,9 @@ function drawtri_br(screen, color, rect)
 end
 
 local function rect_contains0(x, y, w, h, px, py)
-	return px > x     and
-	       px < x + w and
-	       py > y     and
+	return px >= x     and
+	       px < x + w  and
+	       py >= y     and
 	       py < y + h
 end
 
@@ -218,7 +218,7 @@ end
 --]]
 function rect_contains(...)
 	local a = {...}
-	assert(#a == 3 or #a == 6, "Invalid arguments")
+	Assert.True(#a == 3 or #a == 6, "Expected 3 or 6 arguments, but got " .. #a)
 
 	if #a == 3 then
 		return rect_contains0(
@@ -232,10 +232,10 @@ function rect_contains(...)
 end
 
 function rect_intersects(r1, r2)
-	return not (r2.x > r1.x + r1.w or
-	            r2.x + r2.w < r1.x or
-	            r2.y > r1.y + r1.h or
-	            r2.y + r2.h < r1.y)
+	return not (r2.x >= r1.x + r1.w or
+	            r2.x + r2.w <= r1.x or
+	            r2.y >= r1.y + r1.h or
+	            r2.y + r2.h <= r1.y)
 end
 
 --[[

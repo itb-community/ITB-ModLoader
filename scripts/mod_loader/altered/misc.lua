@@ -105,19 +105,12 @@ local function overrideNextPhase()
 
 		if nxtId ~= "" then
 			-- Set the mission's id, since the game doesn't do it
-			local nextMission = _G[nxtId]
+			local id = self:GetMissionId(mission)
+			local nextMission = self.Missions[id]
 			nextMission.ID = nxtId
 
 			modApi:fireMissionNextPhaseCreatedHooks(prevMission, nextMission)
 		end
-	end
-end
-
-local function updateCurrentMission()
-	local region = GetCurrentRegion()
-	
-	if region then
-		modApi.current_mission = GAME:GetMission(region.mission)
 	end
 end
 
@@ -186,7 +179,6 @@ function LoadGame()
 
 	RestoreGameVariables(Settings)
 	overrideNextPhase()
-	updateCurrentMission()
 
 	if GAME.CustomDifficulty then
 		SetDifficulty(GAME.CustomDifficulty)
