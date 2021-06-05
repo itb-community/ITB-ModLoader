@@ -13,7 +13,7 @@ local scripts = {
 	"decorations/deco_dropdown",
 	"decorations/deco_animsheet",
 	"decorations/deco_label",
-	"decorations/deco_input",
+	"decorations/deco_textbox",
 
 	"widgets/base",
 	"widgets/draggable",
