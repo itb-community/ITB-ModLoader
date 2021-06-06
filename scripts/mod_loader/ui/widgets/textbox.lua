@@ -22,43 +22,193 @@
 		self.root:setfocus(nil)
 	end
 --]]
-UiInput = Class.inherit(Ui)
-function UiInput:new()
+UiTextBox = Class.inherit(Ui)
+function UiTextBox:new()
 	Ui.new(self)
-	self.typedtext = ""
+	self:init()
 end
 
-function UiInput:setMaxLength(maxLength)
+function UiTextBox:init()
+	self.typedtext = ""
+	self.caret = 0
+	self.selection = nil
+end
+
+function UiTextBox:setMaxLength(maxLength)
 	self.maxLength = maxLength
 	return self
 end
 
-function UiInput:setAlphabet(alphabet)
+function UiTextBox:setAlphabet(alphabet)
 	self.alphabet = alphabet
 	return self
 end
 
-function UiInput:onEnter() end
+function UiTextBox:setCaret(newcaret)
+	self.caret = math.max(0, math.min(newcaret, self.typedtext:len()))
+end
 
-function UiInput:keydown(keycode)
+function UiTextBox:moveCaret(delta)
+	self:setCaret(self.caret + delta)
+end
+
+function UiTextBox:addText(input)
+	local lead = self.typedtext:sub(0, self.caret)
+	local trail = self.typedtext:sub(self.caret + 1, -1)
+
+	self.typedtext = lead..input..trail
+	self.caret = self.caret + input:len()
+end
+
+function UiTextBox:delete(count)
+	local lead = self.typedtext:sub(0, self.caret)
+	local trail = self.typedtext:sub(self.caret + 1 + count, -1)
+
+	self.typedtext = lead..trail
+end
+
+function UiTextBox:backspace(count)
+	local trail = self.typedtext:sub(self.caret + 1, -1)
+
+	self:setCaret(self.caret - count)
+	local lead = self.typedtext:sub(0, self.caret)
+
+	self.typedtext = lead..trail
+end
+
+function UiTextBox:newline()
+	local lead = self.typedtext:sub(0, self.caret)
+	local trail = self.typedtext:sub(self.caret + 1, -1)
+
+	self.typedtext = lead.."\n"..trail
+	self.caret = self.caret + 1
+end
+
+local function regex(char)
+	if char:match("%p") then
+		return "%p+%s*"
+	elseif char:match("%s") then
+		return "[^%p%s]*%s+"
+	elseif char:match("%P") then
+		return "[^%p%s]+%s*"
+	end
+
+	return ""
+end
+
+function UiTextBox:onEnter()
+	self:newline()
+end
+
+function UiTextBox:onDelete()
+	if sdlext.isCtrlDown() then
+		local char = self.typedtext:sub(self.caret + 1, self.caret + 1)
+		local trail = self.typedtext:sub(self.caret + 1, -1)
+		local match = "^"..regex(char)
+		local word = trail:match(match)
+		self:delete(word:len())
+	else
+		self:delete(1)
+	end
+end
+
+function UiTextBox:onBackspace()
+	if sdlext.isCtrlDown() then
+		local char = self.typedtext:sub(self.caret, self.caret)
+		local lead = self.typedtext:sub(0, self.caret)
+		local match = regex(char).."$"
+		local word = lead:match(match)
+		self:backspace(word:len())
+	else
+		self:backspace(1)
+	end
+end
+
+function UiTextBox:onArrowRight()
+	if sdlext.isCtrlDown() then
+		local char = self.typedtext:sub(self.caret + 1, self.caret + 1)
+		local trail = self.typedtext:sub(self.caret + 1, -1)
+		local match = "^"..regex(char)
+		local word = trail:match(match)
+		self:moveCaret(word:len())
+	else
+		self:moveCaret(1)
+	end
+end
+
+function UiTextBox:onArrowLeft()
+	if sdlext.isCtrlDown() then
+		local char = self.typedtext:sub(self.caret, self.caret)
+		local lead = self.typedtext:sub(0, self.caret)
+		local match = regex(char).."$"
+		local word = lead:match(match)
+		self:moveCaret(-word:len())
+	else
+		self:moveCaret(-1)
+	end
+end
+
+function UiTextBox:onArrowUp()
+	-- hard to define without knowing
+	-- character widths and word wrapping
+end
+
+function UiTextBox:onArrowDown()
+	-- hard to define without knowing
+	-- character widths and word wrapping
+end
+
+function UiTextBox:onHome()
+	self:setCaret(0)
+end
+
+function UiTextBox:onEnd()
+	self:setCaret(self.typedtext:len())
+end
+
+function UiTextBox:onPageUp()
+	-- hard to define
+end
+
+function UiTextBox:onPageDown()
+	-- hard to define
+end
+
+local eventkeyHandler = {
+	[SDLKeycodes.BACKSPACE] = "onBackspace",
+	[SDLKeycodes.DELETE] = "onDelete",
+	[SDLKeycodes.ARROW_RIGHT] = "onArrowRight",
+	[SDLKeycodes.ARROW_LEFT] = "onArrowLeft",
+	[SDLKeycodes.ARROW_UP] = "onArrowUp",
+	[SDLKeycodes.ARROW_DOWN] = "onArrowDown",
+	[SDLKeycodes.RETURN] = "onEnter",
+	[SDLKeycodes.RETURN2] = "onEnter",
+	[SDLKeycodes.KP_ENTER] = "onEnter",
+	[SDLKeycodes.HOME] = "onHome",
+	[SDLKeycodes.END] = "onEnd",
+	[SDLKeycodes.PAGEUP] = "onPageUp",
+	[SDLKeycodes.PAGEDOWN] = "onPageDown"
+}
+
+function UiTextBox:keydown(keycode)
 	if sdlext.isConsoleOpen() then return false end
 
-	if keycode == SDLKeycodes.BACKSPACE then
-		self.typedtext = self.typedtext:sub(1,-2)
-	elseif SDLKeycodes.isEnter(keycode) then
-		self:onEnter()
+	local eventKeyHandler = eventkeyHandler[keycode]
+
+	if eventKeyHandler then
+		self[eventKeyHandler](self)
 	end
 
 	-- disable keyboard while the input field is active
 	return true
 end
 
-function UiInput:textinput(textinput)
+function UiTextBox:textinput(textinput)
 	if sdlext.isConsoleOpen() then return false end
 
 	if not self.maxLength or self.typedtext:len() < self.maxLength then
 		if not self.alphabet or self.alphabet:find(textinput) then
-			self.typedtext = self.typedtext .. textinput
+			self:addText(textinput)
 		end
 	end
 
@@ -66,8 +216,18 @@ function UiInput:textinput(textinput)
 end
 
 function Ui:registerInput()
-	self.typedtext = self.typedtext or ""
-	self.onEnter   = self.onEnter or UiInput.onEnter
-	self.keydown   = self.keydown
-	self.textinput = self.textinput
+	UiTextBox.init(self)
+	self.keydown      = UiTextBox.keydown
+	self.textinput    = UiTextBox.textinput
+	self.onEnter      = self.onEnter or UiTextBox.onEnter
+	self.onDelete     = self.onDelete or UiTextBox.onDelete
+	self.onBackspace  = self.onBackspace or UiTextBox.onBackspace
+	self.onArrowLeft  = self.onArrowLeft or UiTextBox.onArrowLeft
+	self.onArrowRight = self.onArrowRight or UiTextBox.onArrowRight
+	self.onArrowUp    = self.onArrowUp or UiTextBox.onArrowUp
+	self.onArrowDown  = self.onArrowDown or UiTextBox.onArrowDown
+	self.onHome       = self.onHome or UiTextBox.onHome
+	self.onEnd        = self.onEnd or UiTextBox.onEnd
+	self.onPageUp     = self.onPageUp or UiTextBox.onPageUp
+	self.onPageDown   = self.onPageDown or UiTextBox.onPageDown
 end
