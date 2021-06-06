@@ -217,6 +217,14 @@ end
 
 function Ui:registerAsTextBox()
 	UiTextBox.init(self)
+	self.setMaxLength = UiTextBox.setMaxLength
+	self.setAlphabet  = UiTextBox.setAlphabet
+	self.setCaret     = UiTextBox.setCaret
+	self.moveCaret    = UiTextBox.moveCaret
+	self.addText      = UiTextBox.addText
+	self.delete       = UiTextBox.delete
+	self.backspace    = UiTextBox.backspace
+	self.newline      = UiTextBox.newline
 	self.keydown      = UiTextBox.keydown
 	self.textinput    = UiTextBox.textinput
 	self.onEnter      = self.onEnter or UiTextBox.onEnter
