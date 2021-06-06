@@ -78,6 +78,7 @@ function DecoTextBox:new(opt)
 	opt = opt or {}
 	self.font = opt.font or deco.uifont.default.font
 	self.textset = opt.textset or deco.uifont.default.set
+	self.selectionColor = opt.selectionColor or deco.colors.buttonborder
 	self.wrapText = opt.wrapText or false
 	self.splitWords = opt.splitWords or false
 	self.alignH = opt.alignH or "center"
@@ -113,6 +114,7 @@ function DecoTextBox:unapply(widget)
 end
 
 function DecoTextBox:onArrowUp(widget)
+	widget:tryStartSelection()
 	local x, y = self:caretToScreen(widget.caret)
 	y = y - (self.surfaceHeight - self.lineSpacing)
 	local caret = self:screenToCaret(x, y)
@@ -120,6 +122,7 @@ function DecoTextBox:onArrowUp(widget)
 end
 
 function DecoTextBox:onArrowDown(widget)
+	widget:tryStartSelection()
 	local x, y = self:caretToScreen(widget.caret)
 	y = y + (self.surfaceHeight - self.lineSpacing)
 	local caret = self:screenToCaret(x, y)
@@ -147,6 +150,10 @@ function DecoTextBox:setTextSettings(textset)
 		self.textset = textset
 		updateFont(self)
 	end
+end
+
+function DecoTextBox:setSelectionColor(color)
+	self.selectionColor = color or deco.colors.transparent
 end
 
 function DecoTextBox:setWrapText(wrapText)
@@ -253,6 +260,7 @@ function DecoTextBox:draw(screen, widget)
 	local isCaret = false
 	local focusChanged = focused ~= self.focused_prev
 	local caretChanged = caret ~= self.caret_prev
+	local selectFrom, selectTo = widget:getSelection()
 
 	if focused then
 		local time = os.clock() * 1000 % self.caretBlinkMs
@@ -322,6 +330,7 @@ function DecoTextBox:draw(screen, widget)
 		newline()
 	end
 
+	local index = 0
 	local x = widget.screenx + widget.decorationx + widget.dx
 	local y = widget.screeny + widget.decorationy + widget.dy
 	local textheight = #linebuffers * (self.surfaceHeight + self.lineSpacing) - self.lineSpacing
@@ -350,6 +359,16 @@ function DecoTextBox:draw(screen, widget)
 
 			for _, surf in ipairs(wordbuffer) do
 				local w = surf:w()
+
+				index = index + 1
+				if selectFrom < index and index <= selectTo then
+					self.rect.x = x
+					self.rect.y = y
+					self.rect.w = w + self.charSpacing
+					self.rect.h = self.surfaceHeight
+					screen:drawrect(self.selectionColor, self.rect)
+				end
+
 				if w > 0 then
 					screen:blit(surf, nil, x, y)
 					x = x + w + self.charSpacing
