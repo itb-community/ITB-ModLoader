@@ -216,7 +216,7 @@ function DecoTextBox:screenToCaret(x, y)
 		local linebuffer_best = self.coordsByLines[1]
 
 		-- find best line
-		for line = 2, #self.textByLines do
+		for line = 2, #self.coordsByLines do
 			local linebuffer = self.coordsByLines[line]
 			if linebuffer[1][2] > y then
 				break
