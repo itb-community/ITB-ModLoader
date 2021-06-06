@@ -101,6 +101,9 @@ local function regex(char)
 	return ""
 end
 
+function UiTextBox:onInput(text)
+	self:addText(text)
+end
 function UiTextBox:onEnter()
 	self:newline()
 end
@@ -213,7 +216,7 @@ function UiTextBox:textinput(textinput)
 
 	if not self.maxLength or self.typedtext:len() < self.maxLength then
 		if not self.alphabet or self.alphabet:find(textinput) then
-			self:addText(textinput)
+			self:onInput(textinput)
 		end
 	end
 
