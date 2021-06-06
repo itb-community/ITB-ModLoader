@@ -215,7 +215,7 @@ function UiTextBox:textinput(textinput)
 	return true
 end
 
-function Ui:registerInput()
+function Ui:registerAsTextBox()
 	UiTextBox.init(self)
 	self.keydown      = UiTextBox.keydown
 	self.textinput    = UiTextBox.textinput
