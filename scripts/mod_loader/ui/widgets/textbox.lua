@@ -29,6 +29,7 @@ function UiTextBox:new()
 end
 
 function UiTextBox:init()
+	self.editable = true
 	self.typedtext = ""
 	self.caret = 0
 	self.selection = nil
@@ -53,6 +54,7 @@ function UiTextBox:moveCaret(delta)
 end
 
 function UiTextBox:addText(input)
+	if not self.editable then return end
 	local lead = self.typedtext:sub(0, self.caret)
 	local trail = self.typedtext:sub(self.caret + 1, -1)
 
@@ -61,6 +63,7 @@ function UiTextBox:addText(input)
 end
 
 function UiTextBox:delete(count)
+	if not self.editable then return end
 	local lead = self.typedtext:sub(0, self.caret)
 	local trail = self.typedtext:sub(self.caret + 1 + count, -1)
 
@@ -68,6 +71,7 @@ function UiTextBox:delete(count)
 end
 
 function UiTextBox:backspace(count)
+	if not self.editable then return end
 	local trail = self.typedtext:sub(self.caret + 1, -1)
 
 	self:setCaret(self.caret - count)
@@ -77,6 +81,7 @@ function UiTextBox:backspace(count)
 end
 
 function UiTextBox:newline()
+	if not self.editable then return end
 	local lead = self.typedtext:sub(0, self.caret)
 	local trail = self.typedtext:sub(self.caret + 1, -1)
 
