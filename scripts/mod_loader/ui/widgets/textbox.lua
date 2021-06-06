@@ -119,16 +119,19 @@ function UiTextBox:newline()
 	self.caret = self.caret + 1
 end
 
-local function regex(char)
-	if char:match("%p") then
-		return "%p+%s*"
-	elseif char:match("%s") then
-		return "[^%p%s]*%s+"
-	elseif char:match("%P") then
-		return "[^%p%s]+%s*"
-	end
+local punctuationAndSpaces = "%p+%s*"
+local nonPunctuationAndSpaces = "[^%p%s]*%s*"
 
-	return ""
+local function getFirstWord(text)
+	return
+		text:match("^"..punctuationAndSpaces)    or
+		text:match("^"..nonPunctuationAndSpaces)
+end
+
+local function getLastWord(text)
+	return
+		text:match(punctuationAndSpaces.."$")    or
+		text:match(nonPunctuationAndSpaces.."$")
 end
 
 function UiTextBox:onInput(text)
@@ -149,10 +152,8 @@ function UiTextBox:onDelete()
 	if self.selection ~= nil and self.selection ~= self.caret then
 		self:deleteSelection()
 	elseif sdlext.isCtrlDown() then
-		local char = self.typedtext:sub(self.caret + 1, self.caret + 1)
 		local trail = self.typedtext:sub(self.caret + 1, -1)
-		local match = "^"..regex(char)
-		local word = trail:match(match)
+		local word = getFirstWord(trail)
 		self:delete(word:len())
 	else
 		self:delete(1)
@@ -163,10 +164,8 @@ function UiTextBox:onBackspace()
 	if self.selection ~= nil and self.selection ~= self.caret then
 		self:deleteSelection()
 	elseif sdlext.isCtrlDown() then
-		local char = self.typedtext:sub(self.caret, self.caret)
 		local lead = self.typedtext:sub(0, self.caret)
-		local match = regex(char).."$"
-		local word = lead:match(match)
+		local word = getLastWord(lead)
 		self:backspace(word:len())
 	else
 		self:backspace(1)
@@ -177,10 +176,8 @@ function UiTextBox:onArrowRight()
 	self:tryStartSelection()
 
 	if sdlext.isCtrlDown() then
-		local char = self.typedtext:sub(self.caret + 1, self.caret + 1)
 		local trail = self.typedtext:sub(self.caret + 1, -1)
-		local match = "^"..regex(char)
-		local word = trail:match(match)
+		local word = getFirstWord(trail)
 		self:moveCaret(word:len())
 	else
 		self:moveCaret(1)
@@ -191,10 +188,8 @@ function UiTextBox:onArrowLeft()
 	self:tryStartSelection()
 
 	if sdlext.isCtrlDown() then
-		local char = self.typedtext:sub(self.caret, self.caret)
 		local lead = self.typedtext:sub(0, self.caret)
-		local match = regex(char).."$"
-		local word = lead:match(match)
+		local word = getLastWord(lead)
 		self:moveCaret(-word:len())
 	else
 		self:moveCaret(-1)
