@@ -76,6 +76,7 @@ function UiTextBox:getSelection()
 end
 
 function UiTextBox:deleteSelection()
+	if not self.editable  or self.selection == nil then return end
 	local from, to = self:getSelection()
 
 	self:setCaret(from)
@@ -135,16 +136,12 @@ local function getLastWord(text)
 end
 
 function UiTextBox:onInput(text)
-	if self.selection then
-		self:deleteSelection()
-	end
+	self:deleteSelection()
 	self:addText(text)
 end
 
 function UiTextBox:onEnter()
-	if self.selection then
-		self:deleteSelection()
-	end
+	self:deleteSelection()
 	self:newline()
 end
 
