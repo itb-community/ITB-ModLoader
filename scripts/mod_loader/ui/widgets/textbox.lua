@@ -53,6 +53,36 @@ function UiTextBox:moveCaret(delta)
 	self:setCaret(self.caret + delta)
 end
 
+function UiTextBox:tryStartSelection()
+	if sdlext.isShiftDown() then
+		if self.selection == nil then
+			self.selection = self.caret
+		end
+	else
+		self.selection = nil
+	end
+end
+
+function UiTextBox:getSelection()
+	if self.selection == nil then return 0,0 end
+	local from = self.selection
+	local to = self.caret
+
+	if from < to then
+		return from, to
+	else
+		return to, from
+	end
+end
+
+function UiTextBox:deleteSelection()
+	local from, to = self:getSelection()
+
+	self:setCaret(from)
+	self:delete(to - from)
+	self.selection = nil
+end
+
 function UiTextBox:addText(input)
 	if not self.editable then return end
 	local lead = self.typedtext:sub(0, self.caret)
@@ -102,14 +132,23 @@ local function regex(char)
 end
 
 function UiTextBox:onInput(text)
+	if self.selection then
+		self:deleteSelection()
+	end
 	self:addText(text)
 end
+
 function UiTextBox:onEnter()
+	if self.selection then
+		self:deleteSelection()
+	end
 	self:newline()
 end
 
 function UiTextBox:onDelete()
-	if sdlext.isCtrlDown() then
+	if self.selection ~= nil and self.selection ~= self.caret then
+		self:deleteSelection()
+	elseif sdlext.isCtrlDown() then
 		local char = self.typedtext:sub(self.caret + 1, self.caret + 1)
 		local trail = self.typedtext:sub(self.caret + 1, -1)
 		local match = "^"..regex(char)
@@ -121,7 +160,9 @@ function UiTextBox:onDelete()
 end
 
 function UiTextBox:onBackspace()
-	if sdlext.isCtrlDown() then
+	if self.selection ~= nil and self.selection ~= self.caret then
+		self:deleteSelection()
+	elseif sdlext.isCtrlDown() then
 		local char = self.typedtext:sub(self.caret, self.caret)
 		local lead = self.typedtext:sub(0, self.caret)
 		local match = regex(char).."$"
@@ -133,6 +174,8 @@ function UiTextBox:onBackspace()
 end
 
 function UiTextBox:onArrowRight()
+	self:tryStartSelection()
+
 	if sdlext.isCtrlDown() then
 		local char = self.typedtext:sub(self.caret + 1, self.caret + 1)
 		local trail = self.typedtext:sub(self.caret + 1, -1)
@@ -145,6 +188,8 @@ function UiTextBox:onArrowRight()
 end
 
 function UiTextBox:onArrowLeft()
+	self:tryStartSelection()
+
 	if sdlext.isCtrlDown() then
 		local char = self.typedtext:sub(self.caret, self.caret)
 		local lead = self.typedtext:sub(0, self.caret)
@@ -167,10 +212,12 @@ function UiTextBox:onArrowDown()
 end
 
 function UiTextBox:onHome()
+	self:tryStartSelection()
 	self:setCaret(0)
 end
 
 function UiTextBox:onEnd()
+	self:tryStartSelection()
 	self:setCaret(self.typedtext:len())
 end
 
