@@ -103,6 +103,10 @@ function DecoTextBox:apply(widget)
 		self:mousedown(widget, mx, my, button)
 		return Ui.mousedown(widget, mx, my, button)
 	end
+	widget.mousemove = function(widget, mx, my)
+		self:mousemove(widget, mx, my)
+		return Ui.mousemove(widget, mx, my)
+	end
 end
 
 function DecoTextBox:unapply(widget)
@@ -132,6 +136,14 @@ end
 function DecoTextBox:mousedown(widget, mx, my, button)
 	local caret = self:screenToCaret(mx, my)
 	widget:setCaret(caret)
+	widget.selection = caret
+end
+
+function DecoTextBox:mousemove(widget, mx, my)
+	if widget.pressed then
+		local caret = self:screenToCaret(mx, my)
+		widget:setCaret(caret)
+	end
 end
 
 function DecoTextBox:setFont(font)
