@@ -86,6 +86,14 @@ end
 
 function UiTextBox:addText(input)
 	if not self.editable then return end
+
+	if self.maxLength then
+		local remainingLength = self.maxLength - self.typedtext:len()
+		if input:len() > remainingLength then
+			input = input:sub(0, remainingLength)
+		end
+	end
+
 	local lead = self.typedtext:sub(0, self.caret)
 	local trail = self.typedtext:sub(self.caret + 1, -1)
 
@@ -253,10 +261,8 @@ end
 function UiTextBox:textinput(textinput)
 	if sdlext.isConsoleOpen() then return false end
 
-	if not self.maxLength or self.typedtext:len() < self.maxLength then
-		if not self.alphabet or self.alphabet:find(textinput) then
-			self:onInput(textinput)
-		end
+	if not self.alphabet or self.alphabet:find(textinput) then
+		self:onInput(textinput)
 	end
 
 	return true
