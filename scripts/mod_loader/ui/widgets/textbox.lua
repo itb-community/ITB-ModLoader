@@ -143,6 +143,11 @@ local function getLastWord(text)
 		text:match(nonPunctuationAndSpaces.."$")
 end
 
+function UiTextBox:onSelectAll()
+	self.caret = 0
+	self.selection = self.typedtext:len()
+end
+
 function UiTextBox:onInput(text)
 	self:deleteSelection()
 	self:addText(text)
@@ -245,10 +250,19 @@ local eventkeyHandler = {
 	[SDLKeycodes.PAGEDOWN] = "onPageDown"
 }
 
+local eventkeyHandler_ctrl = {
+	[SDLKeycodes.a] = "onSelectAll",
+}
+
 function UiTextBox:keydown(keycode)
 	if sdlext.isConsoleOpen() then return false end
+	local eventKeyHandler
 
-	local eventKeyHandler = eventkeyHandler[keycode]
+	eventKeyHandler = eventkeyHandler[keycode]
+
+	if not eventKeyHandler and sdlext.isCtrlDown() then
+		eventKeyHandler = eventkeyHandler_ctrl[keycode]
+	end
 
 	if eventKeyHandler then
 		self[eventKeyHandler](self)
