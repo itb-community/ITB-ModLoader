@@ -75,6 +75,22 @@ function UiTextBox:getSelection()
 	end
 end
 
+function UiTextBox:copy()
+	local from, to = self:getSelection()
+	local text = self.typedtext:sub(from + 1, to)
+	if type(text) == 'string' then
+		sdl.clipboard.set(text)
+	end
+end
+
+function UiTextBox:paste()
+	if not self.editable then return end
+	local text = sdl.clipboard.get()
+	if type(text) == 'string' then
+		self:addText(text)
+	end
+end
+
 function UiTextBox:deleteSelection()
 	if not self.editable or self.selection == nil then return end
 	local from, to = self:getSelection()
@@ -146,6 +162,20 @@ end
 function UiTextBox:onSelectAll()
 	self.caret = 0
 	self.selection = self.typedtext:len()
+end
+
+function UiTextBox:onCopy()
+	self:copy()
+end
+
+function UiTextBox:onCut()
+	self:copy()
+	self:deleteSelection()
+end
+
+function UiTextBox:onPaste()
+	self:deleteSelection()
+	self:paste()
 end
 
 function UiTextBox:onInput(text)
@@ -252,6 +282,9 @@ local eventkeyHandler = {
 
 local eventkeyHandler_ctrl = {
 	[SDLKeycodes.a] = "onSelectAll",
+	[SDLKeycodes.x] = "onCut",
+	[SDLKeycodes.c] = "onCopy",
+	[SDLKeycodes.v] = "onPaste"
 }
 
 function UiTextBox:keydown(keycode)
