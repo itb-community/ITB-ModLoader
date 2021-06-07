@@ -76,7 +76,7 @@ function UiTextBox:getSelection()
 end
 
 function UiTextBox:deleteSelection()
-	if not self.editable  or self.selection == nil then return end
+	if not self.editable or self.selection == nil then return end
 	local from, to = self:getSelection()
 
 	self:setCaret(from)
