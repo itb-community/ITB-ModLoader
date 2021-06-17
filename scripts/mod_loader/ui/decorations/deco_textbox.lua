@@ -609,3 +609,49 @@ function DecoTextBox:draw(screen, widget)
 	self.lineCount = lineCount
 	self.drawbuffer = drawbuffer
 end
+
+-- TEST CODE:
+-- creates a text box at game init for testing functionality
+modApi.events.onUiRootCreated:subscribe(function(screen, root)
+	tdeco = DecoTextBox{
+		alignH = "left",
+		alignV = "top",
+		wrapText = true,
+		splitWords = false
+	}
+	tscroll = UiScrollArea()
+		:width(0.8):height(0.8)
+		:decorate{
+			DecoFrame(sdl.rgba(13, 15, 23, 128))
+		}
+		:addTo(root)
+	tbox = UiTextBox()
+		:width(1):height(1)
+		:decorate{
+			tdeco
+		}
+		:addTo(tscroll)
+
+	tscroll:pos(0.1, 0.1)
+
+	-- TODO:
+	-- Updating widget height after draw is not
+	-- optimal. It would be better if DecoTextBox
+	-- would update lineCount/words, etc when text
+	-- is added/deleted, so we can fetch an accurate
+	-- text height before the time of draw.
+
+	function tdeco:draw(screen, widget)
+		DecoTextBox.draw(self, screen, widget)
+
+		local surfaceHeight = self.surfaceHeight
+		local lineSpacing = self.lineSpacing
+		local lineCount = self.lineCount
+
+		widget.hPercent = nil
+		widget.h = math.max(
+			lineCount * (surfaceHeight + lineSpacing) - lineSpacing,
+			widget.parent.h
+		)
+	end
+end)
