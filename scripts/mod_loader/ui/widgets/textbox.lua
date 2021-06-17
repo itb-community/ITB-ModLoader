@@ -1,27 +1,15 @@
+local GapBuffer = require("scripts/mod_loader/datastructures/gap_buffer").string
 --[[
 	A UI element with a simple purpose. Whenever this element is focused
 	(and the console is closed), all keyboard input is overridden and fed
-	into its 'text' field. The entered text can for example be displayed
-	by decorating it with DecoInput.
+	into its 'textfield' object. The entered text can for example be displayed
+	by decorating it with DecoTextBox.
 
 	An alternate way of using the class is to call 'registerInput' for any
 	other Ui class instance. This method will then copy functions from this
 	class to the calling ui element.
-
-	The method 'onEnter' can be overridden to catch and process what should
-	happen when enter be pressed while the element is focused.
-
-	Examples:
-	-- line break:
-	function ui:onEnter()
-		self.typedtext = self.typedtext .. "\n"
-	end
-
-	-- unfocus the input box:
-	function ui:onEnter()
-		self.root:setfocus(nil)
-	end
 --]]
+
 UiTextBox = Class.inherit(Ui)
 function UiTextBox:new()
 	Ui.new(self)
@@ -30,9 +18,14 @@ end
 
 function UiTextBox:init()
 	self.editable = true
-	self.typedtext = ""
-	self.caret = 0
+
+	self.textfield = GapBuffer()
 	self.selection = nil
+
+	self.onTextAddedEvent = Event()
+	self.onTextRemovedBeforeEvent = Event()
+	self.onTextRemovedAfterEvent = Event()
+	self.onCaretMovedEvent = Event()
 end
 
 function UiTextBox:setMaxLength(maxLength)
@@ -46,27 +39,51 @@ function UiTextBox:setAlphabet(alphabet)
 end
 
 function UiTextBox:setCaret(newcaret)
-	self.caret = math.max(0, math.min(newcaret, self.typedtext:len()))
+	local textfield = self.textfield
+	local size = textfield:size()
+
+	if newcaret < 1 then
+		newcaret = 1
+	elseif newcaret > size + 1 then
+		newcaret = size + 1
+	end
+
+	self.textfield:move(newcaret)
+	self.onCaretMovedEvent:dispatch(newcaret)
 end
 
 function UiTextBox:moveCaret(delta)
-	self:setCaret(self.caret + delta)
+	local textfield = self.textfield
+	self:setCaret(textfield.gap_left + delta)
+end
+
+function UiTextBox:getCaret()
+	return self.textfield.gap_left
 end
 
 function UiTextBox:tryStartSelection()
 	if sdlext.isShiftDown() then
 		if self.selection == nil then
-			self.selection = self.caret
+			self.selection = self:getCaret()
 		end
 	else
 		self.selection = nil
 	end
 end
 
+function UiTextBox:deleteSelection()
+	if not self.editable or self.selection == nil then return end
+	local from, to = self:getSelection()
+
+	self:setCaret(from)
+	self:delete(to - from)
+	self.selection = nil
+end
+
 function UiTextBox:getSelection()
 	if self.selection == nil then return 0,0 end
 	local from = self.selection
-	local to = self.caret
+	local to = self:getCaret()
 
 	if from < to then
 		return from, to
@@ -75,9 +92,13 @@ function UiTextBox:getSelection()
 	end
 end
 
+function UiTextBox:getText(from, to)
+	return self.textfield:get(from, to - from + 1)
+end
+
 function UiTextBox:copy()
 	local from, to = self:getSelection()
-	local text = self.typedtext:sub(from + 1, to)
+	local text = self.textfield:get(from, to - from)
 	if type(text) == 'string' then
 		sdl.clipboard.set(text)
 	end
@@ -91,77 +112,89 @@ function UiTextBox:paste()
 	end
 end
 
-function UiTextBox:deleteSelection()
-	if not self.editable or self.selection == nil then return end
-	local from, to = self:getSelection()
+-- TODO:
+-- function UiTextBox:undo()
+-- end
 
-	self:setCaret(from)
-	self:delete(to - from)
-	self.selection = nil
-end
+-- TODO:
+-- function UiTextBox:redo()
+-- end
 
 function UiTextBox:addText(input)
 	if not self.editable then return end
 
+	local length = input:len()
+	local textfield = self.textfield
+	local caret = textfield.gap_left
 	if self.maxLength then
-		local remainingLength = self.maxLength - self.typedtext:len()
-		if input:len() > remainingLength then
+		local remainingLength = self.maxLength - textfield:size()
+		if length > remainingLength then
 			input = input:sub(0, remainingLength)
 		end
 	end
 
-	local lead = self.typedtext:sub(0, self.caret)
-	local trail = self.typedtext:sub(self.caret + 1, -1)
-
-	self.typedtext = lead..input..trail
-	self.caret = self.caret + input:len()
+	textfield:insert(caret, input)
+	self.onTextAddedEvent:dispatch(caret, input)
 end
 
-function UiTextBox:delete(count)
+function UiTextBox:delete(length)
 	if not self.editable then return end
-	local lead = self.typedtext:sub(0, self.caret)
-	local trail = self.typedtext:sub(self.caret + 1 + count, -1)
+	local textfield = self.textfield
+	local caret = textfield.gap_left
+	local size = textfield:size()
 
-	self.typedtext = lead..trail
+	if length > size + 1 - caret then
+		length = size + 1 - caret
+	end
+
+	textfield:deleteAfter(caret, length)
+	self.onTextRemovedAfterEvent:dispatch(caret, length)
 end
 
-function UiTextBox:backspace(count)
+function UiTextBox:backspace(length)
 	if not self.editable then return end
-	local trail = self.typedtext:sub(self.caret + 1, -1)
+	local textfield = self.textfield
+	local caret = textfield.gap_left
+	local size = textfield:size()
 
-	self:setCaret(self.caret - count)
-	local lead = self.typedtext:sub(0, self.caret)
+	if length > caret - 1 then
+		length = caret - 1
+	end
 
-	self.typedtext = lead..trail
+	textfield:deleteBefore(caret, length)
+	self.onTextRemovedBeforeEvent:dispatch(caret, length)
 end
 
 function UiTextBox:newline()
 	if not self.editable then return end
-	local lead = self.typedtext:sub(0, self.caret)
-	local trail = self.typedtext:sub(self.caret + 1, -1)
+	local textfield = self.textfield
+	local caret = textfield.gap_left
 
-	self.typedtext = lead.."\n"..trail
-	self.caret = self.caret + 1
+	textfield:insert(caret, "\n")
+	self.onTextAddedEvent:dispatch(caret, "\n")
 end
 
-local punctuationAndSpaces = "%p+%s*"
-local nonPunctuationAndSpaces = "[^%p%s]*%s*"
+-- TODO:
+-- find a way to scan and return complete words
 
-local function getFirstWord(text)
-	return
-		text:match("^"..punctuationAndSpaces)    or
-		text:match("^"..nonPunctuationAndSpaces)
-end
+-- local punctuationAndSpaces = "%p+%s*"
+-- local nonPunctuationAndSpaces = "[^%p%s]*%s*"
 
-local function getLastWord(text)
-	return
-		text:match(punctuationAndSpaces.."$")    or
-		text:match(nonPunctuationAndSpaces.."$")
-end
+-- local function getFirstWordIndices(text)
+	-- return
+		-- text:find("^"..punctuationAndSpaces)    or
+		-- text:find("^"..nonPunctuationAndSpaces)
+-- end
+
+-- local function getLastWordIndices(text)
+	-- return
+		-- text:find(punctuationAndSpaces.."$")    or
+		-- text:find(nonPunctuationAndSpaces.."$")
+-- end
 
 function UiTextBox:onSelectAll()
-	self.caret = 0
-	self.selection = self.typedtext:len()
+	self:setCaret(1)
+	self.selection = self.textfield:size() + 1
 end
 
 function UiTextBox:onCopy()
@@ -189,24 +222,30 @@ function UiTextBox:onEnter()
 end
 
 function UiTextBox:onDelete()
+	-- TODO: deleting one word at a time
+	-- is not implemented yet
+
 	if self.selection ~= nil and self.selection ~= self.caret then
 		self:deleteSelection()
-	elseif sdlext.isCtrlDown() then
-		local trail = self.typedtext:sub(self.caret + 1, -1)
-		local word = getFirstWord(trail)
-		self:delete(word:len())
+	-- elseif sdlext.isCtrlDown() then
+		-- local trail = self.typedtext:sub(self.caret + 1, -1)
+		-- local from, to = getFirstWordIndices(trail)
+		-- self:delete(to - from)
 	else
 		self:delete(1)
 	end
 end
 
 function UiTextBox:onBackspace()
+	-- TODO: deleting one word at a time
+	-- is not implemented yet
+
 	if self.selection ~= nil and self.selection ~= self.caret then
 		self:deleteSelection()
-	elseif sdlext.isCtrlDown() then
-		local lead = self.typedtext:sub(0, self.caret)
-		local word = getLastWord(lead)
-		self:backspace(word:len())
+	-- elseif sdlext.isCtrlDown() then
+		-- local lead = self.typedtext:sub(0, self.caret)
+		-- local from, to = getLastWordIndices(lead)
+		-- self:backspace(to - from)
 	else
 		self:backspace(1)
 	end
@@ -215,25 +254,31 @@ end
 function UiTextBox:onArrowRight()
 	self:tryStartSelection()
 
-	if sdlext.isCtrlDown() then
-		local trail = self.typedtext:sub(self.caret + 1, -1)
-		local word = getFirstWord(trail)
-		self:moveCaret(word:len())
-	else
+	-- TODO: moving the caret one word at a time
+	-- is not implemented yet
+
+	-- if sdlext.isCtrlDown() then
+		-- local trail = self.typedtext:sub(self.caret + 1, -1)
+		-- local from, to = getFirstWordIndices(trail)
+		-- self:moveCaret(to - from)
+	-- else
 		self:moveCaret(1)
-	end
+	-- end
 end
 
 function UiTextBox:onArrowLeft()
 	self:tryStartSelection()
 
-	if sdlext.isCtrlDown() then
-		local lead = self.typedtext:sub(0, self.caret)
-		local word = getLastWord(lead)
-		self:moveCaret(-word:len())
-	else
+	-- TODO: moving the caret one word at a time
+	-- is not implemented yet
+
+	-- if sdlext.isCtrlDown() then
+		-- local lead = self.typedtext:sub(0, self.caret)
+		-- local from, to = getLastWordIndices(lead)
+		-- self:moveCaret(from - to)
+	-- else
 		self:moveCaret(-1)
-	end
+	-- end
 end
 
 function UiTextBox:onArrowUp()
@@ -247,13 +292,25 @@ function UiTextBox:onArrowDown()
 end
 
 function UiTextBox:onHome()
+	-- TODO:
+	-- Home should preferably set the caret
+	-- to the start of the current line.
+	-- Ctrl+Home should send the caret to
+	-- the start of the document.
+
 	self:tryStartSelection()
 	self:setCaret(0)
 end
 
 function UiTextBox:onEnd()
+	-- TODO:
+	-- End should preferably set the caret
+	-- to the end of the current line.
+	-- Ctrl+End should send the caret to
+	-- the end of the document.
+
 	self:tryStartSelection()
-	self:setCaret(self.typedtext:len())
+	self:setCaret(self.textfield:size())
 end
 
 function UiTextBox:onPageUp()
@@ -278,6 +335,7 @@ local eventkeyHandler = {
 	[SDLKeycodes.END] = "onEnd",
 	[SDLKeycodes.PAGEUP] = "onPageUp",
 	[SDLKeycodes.PAGEDOWN] = "onPageDown"
+	-- TODO: add 'tab'
 }
 
 local eventkeyHandler_ctrl = {
@@ -317,25 +375,35 @@ end
 
 function Ui:registerAsTextBox()
 	UiTextBox.init(self)
-	self.setMaxLength = UiTextBox.setMaxLength
-	self.setAlphabet  = UiTextBox.setAlphabet
-	self.setCaret     = UiTextBox.setCaret
-	self.moveCaret    = UiTextBox.moveCaret
-	self.addText      = UiTextBox.addText
-	self.delete       = UiTextBox.delete
-	self.backspace    = UiTextBox.backspace
-	self.newline      = UiTextBox.newline
-	self.keydown      = UiTextBox.keydown
-	self.textinput    = UiTextBox.textinput
-	self.onEnter      = self.onEnter or UiTextBox.onEnter
-	self.onDelete     = self.onDelete or UiTextBox.onDelete
-	self.onBackspace  = self.onBackspace or UiTextBox.onBackspace
-	self.onArrowLeft  = self.onArrowLeft or UiTextBox.onArrowLeft
-	self.onArrowRight = self.onArrowRight or UiTextBox.onArrowRight
-	self.onArrowUp    = self.onArrowUp or UiTextBox.onArrowUp
-	self.onArrowDown  = self.onArrowDown or UiTextBox.onArrowDown
-	self.onHome       = self.onHome or UiTextBox.onHome
-	self.onEnd        = self.onEnd or UiTextBox.onEnd
-	self.onPageUp     = self.onPageUp or UiTextBox.onPageUp
-	self.onPageDown   = self.onPageDown or UiTextBox.onPageDown
+	self.setMaxLength      = UiTextBox.setMaxLength
+	self.setAlphabet       = UiTextBox.setAlphabet
+	self.setCaret          = UiTextBox.setCaret
+	self.moveCaret         = UiTextBox.moveCaret
+	self.tryStartSelection = UiTextBox.tryStartSelection
+	self.deleteSelection   = UiTextBox.deleteSelection
+	self.getSelection      = UiTextBox.getSelection
+	self.copy              = UiTextBox.copy
+	self.paste             = UiTextBox.paste
+	self.addText           = UiTextBox.addText
+	self.delete            = UiTextBox.delete
+	self.backspace         = UiTextBox.backspace
+	self.newline           = UiTextBox.newline
+	self.keydown           = UiTextBox.keydown
+	self.textinput         = UiTextBox.textinput
+	self.onInput           = self.onInput or UiTextBox.onInput
+	self.onEnter           = self.onEnter or UiTextBox.onEnter
+	self.onDelete          = self.onDelete or UiTextBox.onDelete
+	self.onBackspace       = self.onBackspace or UiTextBox.onBackspace
+	self.onArrowLeft       = self.onArrowLeft or UiTextBox.onArrowLeft
+	self.onArrowRight      = self.onArrowRight or UiTextBox.onArrowRight
+	self.onArrowUp         = self.onArrowUp or UiTextBox.onArrowUp
+	self.onArrowDown       = self.onArrowDown or UiTextBox.onArrowDown
+	self.onHome            = self.onHome or UiTextBox.onHome
+	self.onEnd             = self.onEnd or UiTextBox.onEnd
+	self.onPageUp          = self.onPageUp or UiTextBox.onPageUp
+	self.onPageDown        = self.onPageDown or UiTextBox.onPageDown
+	self.onCut             = self.onCut or UiTextBox.onCut
+	self.onCopy            = self.onCopy or UiTextBox.onCopy
+	self.onPaste           = self.onPaste or UiTextBox.onPaste
+	self.onSelectAll       = self.onSelectAll or UiTextBox.onSelectAll
 end
