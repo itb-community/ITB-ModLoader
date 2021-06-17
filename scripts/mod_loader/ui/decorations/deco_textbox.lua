@@ -1,24 +1,34 @@
+local BinarySearchMax = require("scripts/mod_loader/datastructures/binarySearch").max
+
 --[[
 	A decoration used to dynamically update and display
 	text contained in a widget.
 	Created mainly for the UiTextBox Class.
 --]]
-
+local nullsurface = sdl.surface("")
 local surfaceFonts = {}
 SurfaceFont = {
 	_surfaces = {},
 	font,
 	textset,
 	get = function(self, s)
-		Assert.Equals('string', type(s))
-		Assert.Equals(1, s:len())
-		s = s
+		-- omit for speed
+		--Assert.Equals('string', type(s))
+		--Assert.Equals(1, s:len())
 
-		if not self._surfaces[s] then
-			self._surfaces[s] = sdl.text(self.font, self.textset, s)
+		local surfaces = self._surfaces
+		if not surfaces[s] then
+			local surface
+			if s == "\n" then
+				surface = nullsurface
+			else
+				surface = sdl.text(self.font, self.textset, s)
+			end
+			surfaces[s] = surface
 		end
 
-		return self._surfaces[s]
+
+		return surfaces[s]
 	end,
 	__eq = function(a, b)
 		if not a.font ~= not b.font then
@@ -67,83 +77,167 @@ function SurfaceFont:getOrCreate(font, textset)
 	return surfaceFont
 end
 
-local function updateFont(self)
-	self.surfaceFont = SurfaceFont:getOrCreate(self.font, self.textset)
-	self.surfaceHeight = self.surfaceFont:get("|"):h()
-end
-
 DecoTextBox = Class.inherit(UiDeco)
 function DecoTextBox:new(opt)
 	UiDeco.new(self)
 	opt = opt or {}
+
 	self.font = opt.font or deco.uifont.default.font
 	self.textset = opt.textset or deco.uifont.default.set
-	self.selectionColor = opt.selectionColor or deco.colors.buttonborder
-	self.wrapText = opt.wrapText or false
+	self.alignH = opt.alignH or "left"
+	self.alignV = opt.alignV or "top"
+	self.wrapText = opt.wrapText or true
 	self.splitWords = opt.splitWords or false
-	self.alignH = opt.alignH or "center"
-	self.alignV = opt.alignV or "center"
-	self.prefix = opt.prefix or ""
-	self.suffix = opt.suffix or ""
-	self.charSpacing = opt.charSpacing or 1
 	self.lineSpacing = opt.lineSpacing or 0
+	self.charSpacing = opt.charSpacing or 1
 	self.caretBlinkMs = opt.caretBlinkMs or 600
+	self.selectionColor = opt.selectionColor or deco.colors.buttonborder
+
 	self.rect = sdl.rect(0,0,0,0)
-	updateFont(self)
+	self.drawbuffer = {}
+	self.offsetY = 0
+	self.lines = {0}
+	self.lineCount = 0
+
+	self:updateFont()
 end
 
 function DecoTextBox:apply(widget)
-	widget.onArrowUp = function(widget)
-		self:onArrowUp(widget)
-	end
-	widget.onArrowDown = function(widget)
-		self:onArrowDown(widget)
-	end
-	widget.mousedown = function(widget, mx, my, button)
-		self:mousedown(widget, mx, my, button)
-		return Ui.mousedown(widget, mx, my, button)
-	end
-	widget.mousemove = function(widget, mx, my)
-		self:mousemove(widget, mx, my)
-		return Ui.mousemove(widget, mx, my)
+	self.widget = widget
+
+	-- TODO:
+	-- checking instanceOf UiTextBox will not be sufficient
+	-- if UiTextBox.registerAsTextBox is used to set up the
+	-- text widget. (same in unapply)
+
+	if widget:instanceOf(UiTextBox) then
+		widget.onArrowUp = function(widget)
+			self:onArrowUp(widget)
+		end
+		widget.onArrowDown = function(widget)
+			self:onArrowDown(widget)
+		end
+		widget.mousedown = function(widget, mx, my, button)
+			self:mousedown(widget, mx, my, button)
+			return Ui.mousedown(widget, mx, my, button)
+		end
+		widget.mousemove = function(widget, mx, my)
+			self:mousemove(widget, mx, my)
+			return Ui.mousemove(widget, mx, my)
+		end
+		widget.wheel = function(widget, mx, my, y)
+			self:wheel(widget, mx, my, y)
+			return false
+		end
+		self.onTextAddedEventCallback = function(caret, text)
+			self:onTextAdded(caret, text)
+		end
+		self.onTextRemovedBeforeEventCallback = function(caret, length)
+			self:onTextRemovedBefore(caret, length)
+		end
+		self.onTextRemovedAfterEventCallback = function(caret, length)
+			self:onTextRemovedAfter(caret, length)
+		end
+		self.onCaretMovedEventCallback = function(caret)
+			self:onCaretMoved(caret)
+		end
+
+		widget.onTextAddedEvent:subscribe(self.onTextAddedEventCallback)
+		widget.onTextRemovedBeforeEvent:subscribe(self.onTextRemovedBeforeEventCallback)
+		widget.onTextRemovedAfterEvent:subscribe(self.onTextRemovedAfterEventCallback)
+		widget.onCaretMovedEvent:subscribe(self.onCaretMovedEventCallback)
 	end
 end
 
 function DecoTextBox:unapply(widget)
 	-- TODO: check if this tracks
-	local class = getmetatable(widget).__index
-	widget.onArrowUp = class.onArrowUp
-	widget.onArrowDown = class.onArrowDown
-	widget.mousedown = class.mousedown
+	if widget:instanceOf(UiTextBox) then
+		local class = getmetatable(widget).__index
+		widget.onArrowUp = class.onArrowUp
+		widget.onArrowDown = class.onArrowDown
+		widget.mousedown = class.mousedown
+		widget.mousemove = class.mousemove
+		widget.onTextAddedEvent:unsubscribe(self.onTextAddedEventCallback)
+		widget.onTextRemovedBeforeEvent:unsubscribe(self.onTextRemovedBeforeEventCallback)
+		widget.onTextRemovedAfterEvent:unsubscribe(self.onTextRemovedAfterEventCallback)
+		widget.onCaretMovedEvent:unsubscribe(self.onCaretMovedEventCallback)
+	end
+
+	self.widget = nil
 end
+
+function DecoTextBox:updateFont()
+	self.surfaceFont = SurfaceFont:getOrCreate(self.font, self.textset)
+	self.surfaceHeight = self.surfaceFont:get("|"):h()
+end
+
+-- TODO:
+-- When navigating with arrow keys, "preffered column"
+-- should be remembered.
+-- onArrowUp and onArrowDown should attempt to get
+-- back to the preferred column if possible.
+-- onArrowLeft and onArrowRight should update the
+-- preferred column to the x position of the caret
+-- at that character index.
 
 function DecoTextBox:onArrowUp(widget)
 	widget:tryStartSelection()
-	local x, y = self:caretToScreen(widget.caret)
+	local x, y = self:indexToScreen(widget:getCaret())
 	y = y - (self.surfaceHeight - self.lineSpacing)
-	local caret = self:screenToCaret(x, y)
+	local caret = self:screenToIndex(x, y)
 	widget:setCaret(caret)
 end
 
 function DecoTextBox:onArrowDown(widget)
 	widget:tryStartSelection()
-	local x, y = self:caretToScreen(widget.caret)
+	local x, y = self:indexToScreen(widget:getCaret())
 	y = y + (self.surfaceHeight - self.lineSpacing)
-	local caret = self:screenToCaret(x, y)
+	local caret = self:screenToIndex(x, y)
 	widget:setCaret(caret)
 end
 
 function DecoTextBox:mousedown(widget, mx, my, button)
-	local caret = self:screenToCaret(mx, my)
+	local caret = self:screenToIndex(mx, my)
 	widget:setCaret(caret)
 	widget.selection = caret
 end
 
 function DecoTextBox:mousemove(widget, mx, my)
 	if widget.pressed then
-		local caret = self:screenToCaret(mx, my)
+		local caret = self:screenToIndex(mx, my)
 		widget:setCaret(caret)
 	end
+end
+
+function DecoTextBox:wheel(widget, mx, my, y)
+	if widget.pressed then
+		-- TODO: do the necessary actions to adjust
+		-- the selected characters
+	end
+end
+
+function DecoTextBox:onCaretMoved(caret)
+	-- Potential performance gain:
+	-- store and update metadata about caret to
+	-- offload some computation from the draw method
+end
+
+function DecoTextBox:onTextAdded(caret, text)
+	-- Potential performance gain:
+	-- store and update metadata about text to
+	-- offload some computation from the draw method
+end
+
+function DecoTextBox:onTextRemovedAfter(caret, length)
+	-- Potential performance gain:
+	-- store and update metadata about text to
+	-- offload some computation from the draw method
+end
+
+function DecoTextBox:onTextRemovedBefore(caret, length)
+	-- Potential performance gain:
+	-- store and update metadata about text to
+	-- offload some computation from the draw method
 end
 
 function DecoTextBox:setFont(font)
@@ -184,222 +278,334 @@ function DecoTextBox:setSplitWords(splitWords)
 	self.splitWords = splitWords
 end
 
-function DecoTextBox:setPrefix(prefix)
-	self.prefix = prefix or ""
-end
+function DecoTextBox:screenToIndex(screenx, screeny)
+	local widget = self.widget
+	local textfield = widget.textfield
+	local textLength = textfield:size()
+	local drawbuffer = self.drawbuffer
+	local lines = self.lines
+	local lineCount = self.lineCount
 
-function DecoTextBox:setSuffix(suffix)
-	self.suffix = suffix or ""
-end
+	-- adjust for vertical alignment
+	screeny = screeny - self.offsetY
 
-local linebuffer
-local linewidth
-local wordbuffer
-local wordwidth
-local linebuffers
-local linewidths
-local nullsurface = sdl.surface("")
-
-local function newword()
-	linebuffer[#linebuffer+1] = wordbuffer
-	linewidth = linewidth + wordwidth
-	wordbuffer = {}
-	wordwidth = 0
-end
-
-local function newline()
-	linebuffers[#linebuffers+1] = linebuffer
-	linewidths[#linewidths+1] = linewidth
-	linebuffer = {}
-	linewidth = 0
-end
-
-function DecoTextBox:caretToScreen(caret)
-	local x, y = 0, 0
-
-	if self.coordsByChars then
-		local caretPosition = self.coordsByChars[caret]
-		if caretPosition then
-			x = caretPosition[1]
-			y = caretPosition[2]
-		end
+	if screeny < drawbuffer[2] then
+		return 1
+	elseif screeny > drawbuffer[textLength * 3 + 2] + self.surfaceHeight + self.charSpacing then
+		return textLength + 1
 	end
 
-	return x, y
-end
+	local line = BinarySearchMax(1, lineCount, screeny, function(i)
+		return drawbuffer[lines[i] + 2]
+	end)
 
-function DecoTextBox:screenToCaret(x, y)
-	local caret = 0
-
-	if self.coordsByLines and #self.coordsByLines > 0 then
-		local linebuffer_best = self.coordsByLines[1]
-
-		-- find best line
-		for line = 2, #self.coordsByLines do
-			local linebuffer = self.coordsByLines[line]
-			if linebuffer[1][2] > y then
-				break
-			end
-
-			linebuffer_best = linebuffer
-			caret = caret + #self.coordsByLines[line-1]
+	local charStart = lines[line] / 3 + 1
+	local charLimit
+	if line < lineCount then
+		charLimit = lines[line + 1] / 3
+		if textfield:get(charLimit) ~= "\n" then
+			charLimit = charLimit + 1
 		end
-
-		-- find best char
-		for char = 1, #linebuffer_best do
-			if linebuffer_best[char][1] > x then
-				break
-			end
-
-			caret = caret + 1
-		end
+	else
+		charLimit = textLength + 1
 	end
 
-	return caret
+	local character = BinarySearchMax(charStart, charLimit, screenx, function(i)
+		return drawbuffer[i * 3 - 2]
+	end)
+
+	return character
 end
 
-function DecoTextBox:drawCaret(screen, x, y)
-	self.rect.x = x
-	self.rect.y = y
-	self.rect.w = 1
-	self.rect.h = self.surfaceHeight
-	screen:drawrect(self.textset.color, self.rect)
+function DecoTextBox:indexToScreen(index)
+	local drawbuffer = self.drawbuffer
+	local bufferindex = index * 3 - 3
+	return
+		drawbuffer[bufferindex + 1],
+		drawbuffer[bufferindex + 2] + self.offsetY
 end
 
 function DecoTextBox:draw(screen, widget)
-	local focused = widget.focused
-	local caret = widget.caret
-	local isCaret = false
-	local focusChanged = focused ~= self.focused_prev
-	local caretChanged = caret ~= self.caret_prev
-	local selectFrom, selectTo = widget:getSelection()
+	local drawbuffer = self.drawbuffer
 
-	if focused then
-		local time = os.clock() * 1000 % self.caretBlinkMs
+	local widgetWidth = widget.w
+	local widgetHeight = widget.h
+	local widgetLeft = widget.screenx
+	local widgetTop = widget.screeny
+	local widgetRight = widgetLeft + widgetWidth
+	local widgetBottom = widgetTop + widgetHeight
+
+	local alignV = self.alignV
+	local alignH = self.alignH
+
+	local selectFrom, selectTo = widget:getSelection()
+	local selectionColor = self.selectionColor
+	local textfield = widget.textfield
+	local surfaceFont = self.surfaceFont
+	local charSpacing = self.charSpacing
+	local lineSpacing = self.lineSpacing
+	local surfaceHeight = self.surfaceHeight
+	local lineHeight = surfaceHeight + lineSpacing
+	local caretBlinkMs = self.caretBlinkMs
+	local textLength = textfield:size()
+	local bufferEnd = textLength * 3 - 3
+	local focused = widget.focused
+	local isCaret = false
+	local caret = widget:getCaret()
+	local rect = self.rect
+	rect.h = lineHeight
+
+	-- localize common functions
+	local getSurfaceWidth = nullsurface.w
+	local getCharacter = textfield.get
+	local getSurface = surfaceFont.get
+	local drawrect = screen.drawrect
+	local blit = screen.blit
+
+	local lines = self.lines
+	local wordWidth = 0
+	local lineWidth = 0
+	local lineIndex = 0
+	local lineCount = 0
+	local wrap = switch{}
+	local commit = wrap.case
+	local offsetX
+	local offsetY
+
+	if alignH == "center" then
+		offsetX = function()
+			return widgetLeft + (widgetWidth - lineWidth) / 2
+		end
+	elseif alignH == "right" then
+		offsetX = function()
+			return widgetRight - lineWidth
+		end
+	else
+		offsetX = function()
+			return widgetLeft
+		end
+	end
+
+	local x = offsetX()
+	local y = widgetTop
+
+	if widget.focused then
+		local focusChanged = focused ~= self.focused_prev
+		local caretChanged = caret ~= self.caret_prev
+		local time = os.clock() * 1000 % caretBlinkMs
 
 		if not self.focustime or focusChanged or caretChanged then
 			self.focustime = time
 		end
 
-		if (time - self.focustime) % self.caretBlinkMs * 2 < self.caretBlinkMs then
+		if (time - self.focustime) % caretBlinkMs * 2 < caretBlinkMs then
 			isCaret = true
 		end
 	end
 
-	self.focused_prev = focused
+	self.focused_prev = widget.focused
 	self.caret_prev = caret
 
-	linebuffer = {}
-	linewidth = 0
-	wordbuffer = {}
-	wordwidth = 0
-	linebuffers = {}
-	linewidths = {}
+	local function commitLine(lineEnd)
+		if lineEnd < lineIndex then return end
 
-	self.linebuffers = linebuffers
-	self.linewidths = linewidths
+		x = offsetX()
 
-	local text = self.prefix..widget.typedtext..self.suffix
-	local length = text:len()
-	for i = 1, length do
-		local char = text:sub(i,i)
+		while lineEnd >= lineIndex do
+			local surfaceWidth = getSurfaceWidth(drawbuffer[lineIndex]) + charSpacing
+			drawbuffer[lineIndex+1] = x
+			drawbuffer[lineIndex+2] = y
+			x = x + surfaceWidth
+			lineIndex = lineIndex + 3
+		end
 
-		if char == "\n" then
-			newword()
-			newline()
-			wordbuffer[#wordbuffer+1] = nullsurface
+		y = y + lineHeight
+		lineWidth = 0
+		lineCount = lineCount + 1
+		lines[lineCount + 1] = lineIndex
+	end
+
+	-- Potential performance gain:
+	-- add metadata like lines and words when adding/deleting
+	-- text, and refer to that metadata to determine wrapping
+	-- instead of calculating it on draw.
+
+	if self.wrapText then
+		if self.splitWords then
+			wrap["\n"] = function(index, char)
+				local bufferindex = index * 3 - 3
+
+				drawbuffer[bufferindex] = nullsurface
+				commitLine(bufferindex)
+			end
+			wrap.default = function(index, char)
+				local bufferindex = index * 3 - 3
+				local surface = getSurface(surfaceFont, char)
+				local surfaceWidth = getSurfaceWidth(surface) + charSpacing
+
+				drawbuffer[bufferindex] = surface
+				if lineWidth + surfaceWidth > widgetWidth then
+					commitLine(bufferindex-3)
+				end
+				lineWidth = lineWidth + surfaceWidth
+			end
 		else
-			local surf = self.surfaceFont:get(char)
-			local surfwidth = surf:w() + self.charSpacing
+			local lineEnd = 0
+			wrap["\n"] = function(index, char)
+				local bufferindex = index * 3 - 3
 
-			if self.wrapText then
-				if wordwidth + surfwidth >= widget.w then
-					newword()
-					newline()
-				end
+				drawbuffer[bufferindex] = nullsurface
+				lineWidth = lineWidth + wordWidth
+				wordWidth = 0
+				commitLine(bufferindex)
 			end
+			wrap[" "] = function(index, char)
+				local bufferindex = index * 3 - 3
+				local surface = getSurface(surfaceFont, char)
+				local surfaceWidth = getSurfaceWidth(surface) + charSpacing
 
-			wordbuffer[#wordbuffer+1] = surf
-			wordwidth = wordwidth + surfwidth
-
-			if self.wrapText and not self.splitWords then
-				if linewidth + wordwidth >= widget.w then
-					newline()
+				drawbuffer[bufferindex] = surface
+				if lineWidth + wordWidth + surfaceWidth > widgetWidth then
+					if lineWidth == 0 then
+						lineWidth = wordWidth
+						wordWidth = 0
+						lineEnd = bufferindex-3
+					end
+					commitLine(lineEnd)
 				end
-
-				if char == " " then
-					newword()
-				end
+				lineWidth = lineWidth + wordWidth + surfaceWidth
+				wordWidth = 0
+				lineEnd = bufferindex
 			end
+			wrap.default = function(index, char)
+				local bufferindex = index * 3 - 3
+				local surface = getSurface(surfaceFont, char)
+				local surfaceWidth = getSurfaceWidth(surface) + charSpacing
+
+				drawbuffer[bufferindex] = surface
+				if lineWidth + wordWidth + surfaceWidth > widgetWidth then
+					if lineWidth == 0 then
+						lineWidth = wordWidth
+						wordWidth = 0
+						lineEnd = bufferindex-3
+					end
+					commitLine(lineEnd)
+				end
+				wordWidth = wordWidth + surfaceWidth
+			end
+		end
+	else
+		wrap["\n"] = function(index, char)
+			local bufferindex = index * 3 - 3
+
+			drawbuffer[bufferindex] = nullsurface
+			commitLine(bufferindex)
+		end
+		wrap.default = function(index, char)
+			local bufferindex = index * 3 - 3
+			local surface = getSurface(surfaceFont, char)
+			local surfaceWidth = getSurfaceWidth(surface) + charSpacing
+
+			drawbuffer[bufferindex] = surface
+			lineWidth = lineWidth + surfaceWidth
 		end
 	end
 
-	if #wordbuffer > 0 then
-		newword()
+	-- Potential performance gain:
+	-- only calculate characters inside the widget. This is currently
+	-- very difficult, due to every character's position being
+	-- determined from start to end at drawtime
+	
+	-- fill drawbuffer
+	for i = 1, textLength do
+		local char = getCharacter(textfield, i, 1)
+		commit(wrap, char, i)
 	end
 
-	if #linebuffer > 0 then
-		newline()
+	-- commit any uncommited surfaces
+	lineWidth = lineWidth + wordWidth
+	commitLine(bufferEnd)
+
+	if getCharacter(textfield, textLength) == "\n" then
+		x = offsetX()
+	elseif textLength > 0 then
+		y = y - lineHeight
 	end
 
-	local index = 0
-	local x = widget.screenx + widget.decorationx + widget.dx
-	local y = widget.screeny + widget.decorationy + widget.dy
-	local textheight = #linebuffers * (self.surfaceHeight + self.lineSpacing) - self.lineSpacing
-	local coordsByLines = {}
-	local coordsByChars = { [0] = { x, y } }
+	-- add final entry to simplify
+	-- caret placement and lookup
+	drawbuffer[bufferEnd+4] = x
+	drawbuffer[bufferEnd+5] = y
 
-	if self.alignV == "bottom" then
-		y = y + widget.h - textheight
-	elseif self.alignV == "center" then
-		y = y + math.floor(widget.h / 2 - textheight / 2)
+	if alignV == "center" then
+		local textHeight = lineCount * lineHeight - lineSpacing
+		offsetY = (widgetHeight - textHeight) / 2
+	elseif alignV == "bottom" then
+		local textHeight = lineCount * lineHeight - lineSpacing
+		offsetY = widgetHeight - textHeight
+	else
+		offsetY = 0
 	end
 
-	for line = 1, #linebuffers do
-		local linebuffer = linebuffers[line]
-		local linewidth = linewidths[line]
-		coordsByLines[line] = {}
+	-- Potential performance gain:
+	-- Calculating and drawing the selections over a
+	-- string of characters will most likely be much
+	-- faster than drawing a selection box over each
+	-- character individually.
+	-- Alternatively, sending a batch of rectangles
+	-- to be drawn in one pass might be a good option
+	-- as well.
 
-		if self.alignH == "right" then
-			x = x + widget.w - linewidth
-		elseif self.alignH == "center" then
-			x = x + math.floor((widget.w - linewidth) / 2)
+	-- draw selection
+	if selectTo > selectFrom then
+		for i = selectFrom * 3 - 3, selectTo * 3 - 6, 3 do
+			local surface = drawbuffer[i]
+			rect.x = drawbuffer[i+1]
+			rect.y = drawbuffer[i+2] + offsetY
+			rect.w = getSurfaceWidth(surface) + charSpacing
+			drawrect(screen, selectionColor, rect)
 		end
+	end
 
-		for word = 1, #linebuffer do
-			local wordbuffer = linebuffer[word]
+	local parent = widget.parent
+	if parent:instanceOf(UiScrollArea) then
+		-- Performance increase for when the textbox is
+		-- the immediate child of a UiScrollArea widget.
+		-- This is not a general solution, but a specific
+		-- optimization to only draw characters inside
+		-- the UiScrollArea's dimensions.
 
-			for _, surf in ipairs(wordbuffer) do
-				local w = surf:w()
+		local parentTop = parent.screeny
+		local parentBottom = parentTop + parent.h
 
-				index = index + 1
-				if selectFrom < index and index <= selectTo then
-					self.rect.x = x
-					self.rect.y = y
-					self.rect.w = w + self.charSpacing
-					self.rect.h = self.surfaceHeight
-					screen:drawrect(self.selectionColor, self.rect)
-				end
-
-				if w > 0 then
-					screen:blit(surf, nil, x, y)
-					x = x + w + self.charSpacing
-				end
-
-				local coords = { x, y }
-				coordsByChars[#coordsByChars + 1] = coords
-				coordsByLines[line][#coordsByLines[line] + 1] = coords
+		-- draw text
+		for i = 0, bufferEnd, 3 do
+			local y = offsetY + drawbuffer[i+2]
+			if y + surfaceHeight > parentTop and y < parentBottom then
+				blit(screen, drawbuffer[i], nil, drawbuffer[i+1], y)
 			end
 		end
+	else
+		-- Potential performance gain:
+		-- use a C function that can draw a batch of sprites instead
+		-- of drawing each character one by one.
 
-		x = widget.screenx + widget.decorationx
-		y = y + self.surfaceHeight + self.lineSpacing
+		-- draw text
+		for i = 0, bufferEnd, 3 do
+			blit(screen, drawbuffer[i], nil, drawbuffer[i+1], offsetY + drawbuffer[i+2])
+		end
 	end
 
-	self.coordsByChars = coordsByChars
-	self.coordsByLines = coordsByLines
-
+	-- draw caret
 	if isCaret then
-		self:drawCaret(screen, self:caretToScreen(caret))
+		local i = caret * 3 - 3
+		rect.x = drawbuffer[i+1]
+		rect.y = drawbuffer[i+2] + offsetY
+		rect.w = 1
+		drawrect(screen, self.textset.color, rect)
 	end
+
+	self.offsetY = offsetY
+	self.lineCount = lineCount
+	self.drawbuffer = drawbuffer
 end
