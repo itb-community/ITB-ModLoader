@@ -69,3 +69,39 @@ function try(func)
 		end
 	}
 end
+
+--[[
+	A function construct to emulate switch blocks from regular programming languages.
+
+	Usage:
+		-- calling the function 'switch' on a table,
+		-- adds the function 'case' to the table,
+		-- and returns the same table.
+
+		local my_switch = switch{
+			-- functions to handle cases
+			[1] = function() LOG("case 1") end,
+			[2] = function() LOG("case 2") end,
+			-- function to handle the default case
+			default = function() LOG("default case") end,
+		}
+
+		my_switch:case(1)
+		-- result: LOG("case 1")
+		my_switch:case(2)
+		-- result: LOG("case 2")
+		my_switch:case(3)
+		-- result: LOG("default case")
+--]]
+function switch(t)
+	t.default = t.default or function() end
+	t.case = function(self, case, ...)
+		local f = self[case] or self.default
+		local args = {...}
+		-- pack case into return as the final parameter
+		args[#args+1] = case
+
+		return f(unpack(args))
+	end
+	return t
+end
