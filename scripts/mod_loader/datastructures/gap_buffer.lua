@@ -192,6 +192,19 @@ end
 
 local StringGapBuffer = Class.inherit(GapBuffer)
 
+function StringGapBuffer:getSingle(index)
+	local size = self:size()
+	if index < 1 or index > size then
+		return nil
+	end
+
+	if index >= self.gap_left then
+		index = index - size
+	end
+
+	return self[index]
+end
+
 function StringGapBuffer:get(index, length)
 	local size = self:size()
 	if index < 1 or index > size then
@@ -208,7 +221,6 @@ function StringGapBuffer:get(index, length)
 
 	local buffer = {}
 	local gap_left = self.gap_left
-	local size = self:size()
 	for i = 1, length do
 		if index >= gap_left then
 			index = index - size

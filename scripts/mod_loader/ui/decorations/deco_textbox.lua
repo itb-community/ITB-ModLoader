@@ -357,7 +357,7 @@ function DecoTextBox:draw(screen, widget)
 
 	-- localize common functions
 	local getSurfaceWidth = nullsurface.w
-	local getCharacter = textfield.get
+	local getCharacter = textfield.getSingle
 	local getSurface = surfaceFont.get
 	local drawrect = screen.drawrect
 	local blit = screen.blit
