@@ -14,6 +14,7 @@ end
 local function createUi()
 	local cboxScrollableLogger = nil
 	local ddLogLevel = nil
+	local cboxDebugLogs = nil
 	local cboxCaller = nil
 	local cboxDevelopmentMode = nil
 	local cboxFloatyTooltips = nil
@@ -30,6 +31,7 @@ local function createUi()
 		local data = {
 			scrollableLogger    = cboxScrollableLogger.checked,
 			logLevel            = ddLogLevel.value,
+			debugLogs           = cboxDebugLogs.checked,
 			printCallerInfo     = cboxCaller.checked,
 			developmentMode     = cboxDevelopmentMode.checked,
 			floatyTooltips      = cboxFloatyTooltips.checked,
@@ -54,6 +56,7 @@ local function createUi()
 		cboxScrollableLogger.checked     = config.scrollableLogger
 		ddLogLevel.value                 = config.logLevel
 		ddLogLevel.choice                = ddLogLevel.value + 1
+		cboxDebugLogs.checked            = config.debugLogs
 		cboxCaller.checked               = config.printCallerInfo
 		cboxDevelopmentMode.checked      = config.developmentMode
 		cboxFloatyTooltips.checked       = config.floatyTooltips
@@ -208,6 +211,13 @@ local function createUi()
 		})
 		:settooltip(GetText("ModLoaderConfig_Tooltip_LogLevel"))
 		:addTo(layout)
+
+		-- ////////////////////////////////////////////////////////////////////////
+		-- Debug logs
+		cboxDebugLogs = createCheckboxOption(
+				GetText("ModLoaderConfig_Text_DebugLogs"),
+				GetText("ModLoaderConfig_Tooltip_DebugLogs")
+		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Caller information

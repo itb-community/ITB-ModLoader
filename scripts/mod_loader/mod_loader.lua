@@ -27,6 +27,12 @@ function LOGF(...)
 	LOG(string.format(...))
 end
 
+function LOGD(...)
+	if modApi.debugLogs then
+		LOG(...)
+	end
+end
+
 function mod_loader:init()
 	self.mod_dirs = {}
 	self.mods = {}

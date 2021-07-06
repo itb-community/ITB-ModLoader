@@ -92,6 +92,9 @@ return {
 	["ModLoaderConfig_DD_LogLevel_1"] = "Only console",
 	["ModLoaderConfig_DD_LogLevel_2"] = "File and console",
 
+	["ModLoaderConfig_Text_DebugLogs"] = "Print Debug Logs",
+	["ModLoaderConfig_Tooltip_DebugLogs"] = "Show more fine-grained logging messages during mod loader startup for debugging.",
+
 	["ModLoaderConfig_Text_Caller"] = "Print Caller Information",
 	["ModLoaderConfig_Tooltip_Caller"] = "Include timestamp and stacktrace in LOG messages.",
 
