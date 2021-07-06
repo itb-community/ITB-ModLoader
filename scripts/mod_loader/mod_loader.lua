@@ -42,7 +42,9 @@ function mod_loader:init()
 	self.unmountedMods = {} -- mods which had malformed init.lua
 	self.firsterror = nil
 
+	LOGD("Enumerating mods...")
 	self:enumerateMods("mods/")
+	LOGD("Done!")
 
 	if MOD_API_DRAW_HOOK then
 		-- We used to have to replace the game's cursor with a dummy one drawn
@@ -59,7 +61,9 @@ function mod_loader:init()
 		modApi:appendAsset("img/mouse/pointer.png","resources/mods/ui/pointer.png")
 	end
 
+	LOGD("Loading additional sprites...")
 	self:loadAdditionalSprites()
+	LOGD("Done!")
 	
 	Assert.Traceback = false
 
@@ -69,6 +73,7 @@ function mod_loader:init()
 	-- By using a while loop, it will be possible for mods to add addtional mods
 	-- during metadata initialization, and have those mods have their metadata
 	-- inited as well.
+	LOGD("Processing mods metadata...")
 	local i = 1
 	while i <= #self.mod_list do
 		local id = self.mod_list[i].id
@@ -77,18 +82,21 @@ function mod_loader:init()
 		i = i + 1
 		modApi.events.onModMetadataDone:dispatch(id)
 	end
+	LOGD("Done!")
 
 	modApi.events.onModMetadataDone:unsubscribeAll()
 
 	modApi.events.onModsMetadataDone:dispatch()
 	modApi.events.onModsMetadataDone:unsubscribeAll()
 
+	LOGD("Initializing mods...")
 	local orderedMods = self:orderMods(self:getModConfig(), self:getSavedModOrder())
 	for i, id in ipairs(orderedMods) do
 		modApi:setCurrentMod(id)
 		self:initMod(id)
 		modApi.events.onModInitialized:dispatch(id)
 	end
+	LOGD("Done!")
 
 	modApi.events.onModInitialized:unsubscribeAll()
 
@@ -98,19 +106,28 @@ function mod_loader:init()
 	modApi.events.onModsInitialized:dispatch()
 	modApi.events.onModsInitialized:unsubscribeAll()
 
+	LOGD("Finalizing...")
 	modApi:finalize()
+	LOGD("Done!")
 
 	modApi.events.onFtldatFinalized:dispatch()
 	modApi.events.onFtldatFinalized:unsubscribeAll()
 
+	LOGD("Loading pilot list...")
 	self:loadPilotList()
+	LOGD("Done!")
+
+	LOGD("Verifying profile data...")
 	modApi:affirmProfileData()
+	LOGD("Done!")
 
 	modApi.events.onInitialLoadingFinished:subscribe(function()
 		self:loadModContent(self:getModConfig(), self:getSavedModOrder())
 
 		modApi.events.onModsFirstLoaded:dispatch()
 	end)
+
+	LOGD("Mod loader init success!")
 end
 
 function mod_loader:loadAdditionalSprites()

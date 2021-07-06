@@ -9,11 +9,13 @@ function modApi:init()
 
 	self.version = "2.6.0.dev"
 	LOG("MOD-API VERSION "..self.version)
+	LOGD("Parent directory:", parentDirectory)
 
 	if not self:fileExists("resources/resource.dat") then
 		if self:fileExists("resources/resource.dat.bak") then
-			LOG("Resource.dat was missing, restoring from backup.")
+			LOGD("Resource.dat was missing, restoring from backup...")
 			modApi:copyFileOS("resources/resource.dat.bak", "resources/resource.dat")
+			LOGD("Done!")
 			deco.reloadFonts()
 		else
 			-- Call error() inside of a sdl.drawHook - this way we get an actual message box that halts the game.
@@ -31,28 +33,32 @@ function modApi:init()
 		end
 	else
 		if not self:fileExists("resources/resource.dat.bak") then
-			LOG("Backing up resource.dat")
+			LOGD("Backing up resource.dat...")
 			modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
+			LOGD("Done!")
 		else
-			LOG("Reading resource.dat to check mod loader signature...")
+			LOGD("Reading resource.dat to check mod loader signature...")
 			local file = io.open("resources/resource.dat","rb")
+			LOGD("Done!")
 			local content = file:read("*all")
 			file:close()
 			local instance = FtlDat.FtlDat:from_string(content)
 
 			if not instance.signature then
-				LOG("resource.dat has been updated since last launch, re-acquiring backup")
+				LOGD("resource.dat has been updated since last launch, re-acquiring backup...")
 				modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
+				LOGD("Done!")
 			else
-				LOG("Restoring resource.dat")
+				LOGD("Restoring resource.dat...")
 				modApi:copyFileOS("resources/resource.dat.bak", "resources/resource.dat")
+				LOGD("Done!")
 			end
 		end
 	end
 
-	LOG("Building FTLDat...")
+	LOGD("Building FTLDat...")
 	self.resource = FtlDat.FtlDat:from_file("resources/resource.dat")
-	LOG("Done!")
+	LOGD("Done!")
 
 	self.squadKeys = {
 		"Archive_A",
@@ -65,21 +71,33 @@ function modApi:init()
 		"Detritus_B",
 	}
 
+	LOGD("Loading language...")
 	modApi:loadLanguage(modApi:getLanguageIndex())
+	LOGD("Done!")
 
+	LOGD("Loading default maps...")
 	self.defaultMaps = require(parentDirectory .. "default_maps")
+	LOGD("Done!")
+
+	LOGD("Deleting modded maps...")
 	self:deleteModdedMaps()
+	LOGD("Done!")
 
 	self.compareScheduledHooks = function(a, b)
 		return a.triggerTime < b.triggerTime
 	end
+	LOGD("Building timer...")
 	self.timer = sdl.timer()
+	LOGD("Done!")
 	self.msDeltaTime = 0
 	self.msLastElapsed = 0
 
 	self.conditionalHooks = {}
 	self.scheduledHooks = {}
+
+	LOGD("Resetting hooks...")
 	self:ResetHooks()
+	LOGD("Done!")
 
 	if MOD_API_DRAW_HOOK then
 		modApi.events.onFrameDrawn:subscribe(function(screen)
@@ -106,12 +124,15 @@ function modApi:init()
 
 	sdlext.executeAddModContent()
 	self.initialized = true
+
+	LOGD("modApi init success!")
 end
 
 function modApi:delayedInit()
 	InitializeBoardPawn()
 
 	modApi.delayedInit = nil
+	LOGD("modApi delayed init success!")
 end
 
 -- Maintain sanity
