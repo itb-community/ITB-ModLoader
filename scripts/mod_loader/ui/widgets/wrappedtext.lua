@@ -25,12 +25,12 @@ end
 function UiWrappedText:computeTextSize(text)
 	if type(text) == "string" then
 		local srf = sdl.text(self.font, self.textset, text)
-		local t = { w = srf:w(), h = srf:h() }
+		local t = { w = sdlext.totalWidth(srf), h = srf:h() }
 		srf = nil
 
 		return t
 	elseif type(text) == "userdata" then
-		return { w = text:w(), h = text:h() }
+		return { w = sdlet.totalWidth(text), h = text:h() }
 	end
 end
 
@@ -143,7 +143,7 @@ function UiWrappedText:relayout()
 			d.font = self.font
 			d.textset = self.textset
 			d.surface = sdl.text(d.font, d.textset, d.text)
-			child:widthpx(d.surface:w()):heightpx(d.surface:h())
+			child:widthpx(sdlext.totalWidth(d.surface)):heightpx(d.surface:h())
 		end
 	end
 

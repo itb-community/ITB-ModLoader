@@ -29,9 +29,10 @@ function UiDropDown:new(values,strings,value)
 	local max_w = 32
 	for i, v in ipairs(self.values) do
 		local txt = DecoRAlignedText(self.strings[i] or tostring(v))
-		
-		if txt.surface:w() > max_w then
-			max_w = txt.surface:w()
+
+		local w = sdlext.totalWidth(txt.surface)
+		if w > max_w then
+			max_w = w
 		end
 		
 		local item = Ui()

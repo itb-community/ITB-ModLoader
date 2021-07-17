@@ -357,16 +357,12 @@ end
 
 function sdlext.buildButton(text, tooltip, clickHandler)
 	local decoText = DecoCAlignedText(text)
-	-- JustinFont has some weird issues causing the sdl.surface to report
-	-- slightly bigger width than it should have. Correct for this.
-	-- Calculate the excess width (0.0375), and then halve it twice;
-	-- once to get the centering offset, twice to get the correction offset
-	local offset = math.floor(0.0375 * decoText.surface:w() / 4)
 
+	local w = sdlext.totalWidth(decoText.surface)
 	local btn = Ui()
-		:widthpx(math.max(95, decoText.surface:w() + 30))
+		:widthpx(math.max(95, w + 30))
 		:heightpx(40)
-		:decorate({ DecoButton(), DecoAlign(-6 + offset, 2), decoText })
+		:decorate({ DecoButton(), DecoAlign(-3, 2), decoText })
 
 	if tooltip and tooltip ~= "" then
 		btn:settooltip(tooltip)
@@ -386,12 +382,13 @@ function sdlext.buildDropDownButton(text, tooltip, choices, choiceHandler)
 		values[#values+1] = i
 
 		local decoChoice = DecoRAlignedText(choices[i])
-		maxChoiceWidth = math.max(maxChoiceWidth, decoChoice.surface:w())
+		maxChoiceWidth = math.max(maxChoiceWidth, sdlext.totalWidth(decoChoice.surface))
 	end
 
 	local spacing = 15
+	local w = sdlext.totalWidth(decoText.surface)
 	local btn = UiDropDown(values, choices, choices[1])
-			:widthpx(math.max(95, decoText.surface:w() + maxChoiceWidth + 33 + spacing))
+			:widthpx(math.max(95, w + maxChoiceWidth + 33 + spacing))
 			:heightpx(40)
 			:decorate({
 				DecoButton(),

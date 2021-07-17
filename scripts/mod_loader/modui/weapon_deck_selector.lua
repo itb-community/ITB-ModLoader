@@ -254,7 +254,7 @@ local function buildWeaponButton(weapon)
 			DecoSurface(getOrCreateWeaponSurface(weapon.id)),
 			DecoFixedCAlign(CHECKBOX, WEAPON_HEIGHT / 2),
 			DecoCheckbox(),
-			DecoFixedCAlign(decoName.surface:w(), (decoName.surface:h() - WEAPON_HEIGHT) / 2 + 4),
+			DecoFixedCAlign(sdlext.totalWidth(decoName.surface), (decoName.surface:h() - WEAPON_HEIGHT) / 2 + 4),
 			decoName,
 		})
 

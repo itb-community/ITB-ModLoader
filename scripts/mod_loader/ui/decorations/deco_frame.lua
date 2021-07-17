@@ -66,7 +66,7 @@ function DecoFrameHeader:draw(screen, widget)
 	drawborder(screen, self.bordercolor, self.rect, self.bordersize)
 
 	self.rect.y = r.y
-	self.rect.w = self.surface:w()
+	self.rect.w = sdlext.totalWidth(self.surface)
 	self.rect.h = self.height
 	screen:drawrect(self.bordercolor, self.rect)
 

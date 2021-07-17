@@ -1,3 +1,5 @@
+local totalWidth = sdlext.totalWidth
+
 DecoText = Class.inherit(DecoSurface)
 function DecoText:new(text, font, textset)
 	self.font = font or deco.uifont.default.font
@@ -31,12 +33,12 @@ function DecoText:draw(screen, widget)
 	if self.surface == nil then return end
 	local r = widget.rect
 
-	local x = math.floor(r.x + widget.decorationx)
+	local x = math.floor(r.x + widget.decorationx + self.surface:padl())
 	local y = math.floor(r.y + widget.decorationy + r.h / 2 - self.surface:h() / 2)
 
 	screen:blit(self.surface, nil, x, y)
 	
-	widget.decorationx = widget.decorationx + self.surface:w()
+	widget.decorationx = widget.decorationx + totalWidth(self.surface)
 end
 
 DecoRAlignedText = Class.inherit(DecoText)
@@ -49,7 +51,7 @@ function DecoRAlignedText:draw(screen, widget)
 	if self.surface == nil then return end
 	local r = widget.rect
 
-	local x = math.floor(r.x + r.w - self.rSpace - self.surface:w())
+	local x = math.floor(r.x + r.w - self.rSpace - (self.surface:w() + self.surface:padr()))
 	local y = math.floor(r.y + widget.decorationy + r.h / 2 - self.surface:h() / 2)
 
 	screen:blit(self.surface, nil, x, y)
@@ -66,13 +68,14 @@ end
 function DecoCAlignedText:draw(screen, widget)
 	if self.surface == nil then return end
 	local r = widget.rect
+	local w = totalWidth(self.surface)
 
-	local x = math.floor(r.x + widget.decorationx + r.w / 2 - self.surface:w() / 2)
-	local y = math.floor(r.y + widget.decorationy + r.h / 2 - self.surface:h() / 2)
+	local x = math.floor(r.x + widget.decorationx + (r.w - w) / 2)
+	local y = math.floor(r.y + widget.decorationy + (r.h - self.surface:h()) / 2)
 
 	screen:blit(self.surface, nil, x, y)
 
-	widget.decorationx = widget.decorationx + self.surface:w()
+	widget.decorationx = widget.decorationx + w
 end
 
 
@@ -88,22 +91,23 @@ function DecoAlignedText:draw(screen, widget)
 	if self.surface == nil then return end
 	local r = widget.rect
 	local x, y
+	local w = totalWidth(self.surface)
 	
 	if self.alignH == nil or self.alignH == "left" then
-		x = math.floor(r.x + widget.decorationx)
+		x = math.floor(r.x + widget.decorationx + self.surface:padl())
 		
 	elseif self.alignH == "center" then
-		x = math.floor(r.x + widget.decorationx + r.w / 2 - self.surface:w() / 2)
+		x = math.floor(r.x + widget.decorationx + (r.w - w) / 2)
 		
 	elseif self.alignH == "right" then
-		x = math.floor(r.x - widget.decorationx + r.w - self.surface:w())
+		x = math.floor(r.x - widget.decorationx + r.w - w + self.surface:padl())
 	end
 	
 	if self.alignV == nil or self.alignV == "top" then
 		y = math.floor(r.y + widget.decorationy)
 		
 	elseif self.alignV == "center" then
-		y = math.floor(r.y + widget.decorationy + r.h / 2 - self.surface:h() / 2)
+		y = math.floor(r.y + widget.decorationy + (r.h - self.surface:h()) / 2)
 		
 	elseif self.alignV == "bottom" then
 		y = math.floor(r.y - widget.decorationy + r.h - self.surface:h())
@@ -112,10 +116,10 @@ function DecoAlignedText:draw(screen, widget)
 	screen:blit(self.surface, nil, x, y)
 	
 	if self.alignH == nil or self.alignH == "left" or self.alignH == "center" then
-		widget.decorationx = widget.decorationx + self.surface:w()
+		widget.decorationx = widget.decorationx + w
 		
 	elseif self.alignH == "right" then
-		widget.decorationx = widget.decorationx - self.surface:w()
+		widget.decorationx = widget.decorationx - w
 	end
 end
 

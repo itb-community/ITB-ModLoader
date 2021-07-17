@@ -52,7 +52,7 @@ local function playToast(self)
 		:width(1):height(1)
 		:decorate({ deco_text })
 
-	local iconholderWidth = deco_text.surface:w() + icon.width + icon.gapr
+	local iconholderWidth = sdlext.totalWidth(deco_text.surface) + icon.width + icon.gapr
 
 	local main = {
 		gapt = 12,

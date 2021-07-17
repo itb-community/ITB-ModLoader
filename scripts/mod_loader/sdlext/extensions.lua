@@ -125,6 +125,11 @@ function sdlext.config(filename, func)
 	persistence.store(path..filename, obj)
 end
 
+function sdlext.totalWidth(textSurface)
+	Assert.Equals("function", type(textSurface.padl), "Not a text surface")
+	return textSurface:padl() + textSurface:w() + textSurface:padr()
+end
+
 local temprect = nil
 function drawborder(screen, color, rect, borderwidth)
 	if not temprect then temprect = sdl.rect(0,0,0,0) end
