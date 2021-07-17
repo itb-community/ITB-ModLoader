@@ -5,7 +5,7 @@ local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 
 function modApi:assetExists(resource)
 	Assert.ResourceDatIsOpen("assetExists")
-	assert(type(resource) == "string")
+	Assert.Equals("string", type(resource))
 	
 	for i, file in ipairs(self.resource._files) do
 		if file._meta._filename == resource then
@@ -26,8 +26,8 @@ end
 --]]
 function modApi:writeAsset(resource, content)
 	Assert.ResourceDatIsOpen("writeAsset")
-	assert(type(resource) == "string")
-	assert(type(content) == "string")
+	Assert.Equals("string", type(resource))
+	Assert.Equals("string", type(content))
 
 	for i, file in ipairs(self.resource._files) do
 		if file._meta._filename == resource then
@@ -64,7 +64,7 @@ end
 --]]
 function modApi:readAsset(resource)
 	Assert.ResourceDatIsOpen("readAsset")
-	assert(type(resource) == "string")
+	Assert.Equals("string", type(resource))
 
 	for i, file in ipairs(self.resource._files) do
 		if file._meta._filename == resource then
@@ -76,10 +76,10 @@ function modApi:readAsset(resource)
 end
 
 function modApi:appendAsset(resource, filePath)
-	assert(type(resource) == "string")
+	Assert.Equals("string", type(resource))
+	Assert.Equals("string", type(filePath))
 	local f = io.open(filePath,"rb")
-	assert(f, "File doesn't exist: ".. filePath)
-	
+	Assert.NotEquals(nil, f, "File doesn't exist: ".. filePath)
 	local content = f:read("*all")
 	f:close()
 
@@ -92,8 +92,8 @@ end
 	existing files.
 --]]
 function modApi:copyAsset(src, dst)
-	assert(type(src == "string"))
-	assert(type(dst == "string"))
+	Assert.Equals("string", type(src))
+	Assert.Equals("string", type(dst))
 
 	self:writeAsset(dst, self:readAsset(src))
 end
@@ -121,7 +121,7 @@ function modApi:appendDat(filePath)
 end
 
 function modApi:fileDirectoryToDat(path)
-	assert(type(path) == "string")
+	Assert.Equals("string", type(path))
 	local len = path:len()
 	assert(len > 0)
 	
