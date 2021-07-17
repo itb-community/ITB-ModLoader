@@ -37,14 +37,26 @@ function modApi:init()
 			modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
 			LOGD("Done!")
 		else
-			LOGD("Reading resource.dat to check mod loader signature...")
+			LOGD("Opening resource.dat to check mod loader signature...")
 			local file = io.open("resources/resource.dat","rb")
 			LOGD("Done!")
-			local content = file:read("*all")
-			file:close()
-			local instance = FtlDat.FtlDat:from_string(content)
 
-			if not instance.signature then
+			local instance = nil
+			try(function()
+				local content = file:read("*all")
+				file:close()
+
+				LOGD("Building FTLDat...")
+				Assert.NotEquals(nil, content, "Reading resource.dat")
+				Assert.NotEquals(0, string.len(content), "Size of content of resource.dat")
+				instance = FtlDat.FtlDat:from_string(content)
+				LOGD("Done!")
+			end)
+			:catch(function(err)
+				LOG("Failed to create FTLDat instance from resource.dat:", err)
+			end)
+
+			if instance and not instance.signature then
 				LOGD("resource.dat has been updated since last launch, re-acquiring backup...")
 				modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
 				LOGD("Done!")

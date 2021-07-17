@@ -170,24 +170,34 @@ function modApi:getSignature()
 end
 
 function modApi:finalize()
-	local f = io.open("resources/resource.dat","wb")
-	
-	if not self.resource.signature then
-		self.resource.signature = true
-		self.resource._numFiles = self.resource._numFiles + 1
-		local file = FtlDat.File(self.resource._io,self.resource,self.resource.m_root)
-		file._meta = FtlDat.Meta(file._io, file, file.m_root)
-		
-		file._meta._filename = self:getSignature()
-		file._meta._filenameSize = file._meta._filename:len()
-		file._meta.body = "OK"
-		file._meta._fileSize = file._meta.body:len()
-		table.insert(self.resource._files,file)
-	end
-	
-	local output = self.resource:_write()
-	f:write(output)
-	f:close()
-	
+	local f = nil
+	try(function()
+		f = io.open("resources/resource.dat","wb")
+
+		if not self.resource.signature then
+			self.resource.signature = true
+			self.resource._numFiles = self.resource._numFiles + 1
+			local file = FtlDat.File(self.resource._io,self.resource,self.resource.m_root)
+			file._meta = FtlDat.Meta(file._io, file, file.m_root)
+
+			file._meta._filename = self:getSignature()
+			file._meta._filenameSize = file._meta._filename:len()
+			file._meta.body = "OK"
+			file._meta._fileSize = file._meta.body:len()
+			table.insert(self.resource._files,file)
+		end
+
+		local output = self.resource:_write()
+		f:write(output)
+	end)
+	:catch(function(err)
+		LOG("Failed to finalize resource.dat: ", err)
+	end)
+	:finally(function()
+		if f then
+			f:close()
+		end
+	end)
+
 	self.resource = nil
 end

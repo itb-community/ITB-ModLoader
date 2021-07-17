@@ -345,15 +345,16 @@ function mod_loader:initMod(id)
 		mod.installed = false
 		mod.outOfDate = true
 
-		LOG(string.format(
+		LOGF(
 			"Could not initialize mod [%s] with id [%s], because it requires mod loader version %s or higher (installed: %s).",
 			mod.name, id, mod.modApiVersion, modApi.version
-		))
+		)
 		return
 	end
 
 	local ok, err = xpcall(
 		function()
+			LOGF("Initializing mod [%s] with id [%s]...", mod.name, id)
 			mod.init(mod)
 		end,
 		function(e)
@@ -366,11 +367,7 @@ function mod_loader:initMod(id)
 
 	if ok then
 		mod.initialized = true
-		LOG(string.format(
-			"Initialized mod [%s] with id [%s] successfully!",
-			mod.name,
-			id
-		))
+		LOGF("Initialized mod [%s] with id [%s] successfully!", mod.name, id)
 	else
 		mod.initialized = false
 		mod.installed = false
