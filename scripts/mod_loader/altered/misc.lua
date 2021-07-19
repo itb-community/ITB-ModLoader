@@ -269,3 +269,21 @@ GL_Color.GetLuaString = function(self)
 	return string.format("GL_Color(%s, %s, %s, %s)", self.r, self.g, self.b, self.a)
 end
 GL_Color.GetString = GL_Color.GetLuaString
+
+Rect2D.GetLuaString = function(self)
+	return string.format("Rect2D(%s, %s, %s, %s)", self.x, self.y, self.w, self.h)
+end
+Rect2D.GetString = Rect2D.GetLuaString
+
+Button.GetLuaString = function(self)
+	if self.image then
+		-- Image button
+		-- TODO: Unknown third parameter - boolean (?)
+		return string.format("Button(\"%s\", %s)", self.image, self.pos:GetString())
+	else
+		-- Text button
+		-- TODO: Unknown third parameter - integer (font size?)
+		return string.format("Button(%s, \"%s\")", self.hitstats:GetString(), self.label)
+	end
+end
+Button.GetString = Button.GetLuaString

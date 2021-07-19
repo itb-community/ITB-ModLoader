@@ -108,19 +108,38 @@ function BasicLoggerImpl:log(caller, ...)
 	self:output(message, caller)
 end
 
-function BasicLoggerImpl:preprocessInput(...)
-	for i = 1, #arg do
-		local a = arg[i]
-		
-		if type(a) == "userdata" or type(a) == "table" then
-			if type(a.GetLuaString) == "function" then
-				a = a:GetLuaString()
-			elseif type(a.GetString) == "function" then
-				a = a:GetString()
-			end
+local function safeGetString(a)
+	local t = type(a)
+	if t == "userdata" or t == "table" then
+		if type(a.GetLuaString) == "function" then
+			return string.format("%s (%s)", a:GetLuaString(), t)
+		elseif type(a.GetString) == "function" then
+			return string.format("%s (%s)", a:GetString(), t)
 		end
 
-		arg[i] = tostring(a)
+		if t == "userdata" then
+			local mttype = getmetatable(a).__type
+			if mttype then
+				if mttype == "rect" then
+					return string.format("sdl.rect(%s, %s, %s, %s)", a.x, a.y, a.w, a.h)
+				end
+			else
+				return "<userdata>"
+			end
+		end
+	end
+
+	return tostring(a)
+end
+
+function BasicLoggerImpl:preprocessInput(...)
+	for i = 1, #arg do
+		local ok, result = pcall(function() return safeGetString(arg[i]) end)
+		if ok then
+			arg[i] = result
+		else
+			arg[i] = "<userdata>"
+		end
 	end
 
 	local message = table.concat(arg, " ")
