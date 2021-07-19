@@ -76,6 +76,8 @@ t.onAbandonTimelineWindowShown = Event()
 t.onAbandonTimelineWindowHidden = Event()
 t.onStatusTooltipWindowShown = Event()
 t.onStatusTooltipWindowHidden = Event()
+t.onWindowShown = Event()
+t.onWindowHidden = Event()
 
 t.onMissionChanged = Event()
 t.onGameVictory = Event()

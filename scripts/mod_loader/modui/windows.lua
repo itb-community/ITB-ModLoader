@@ -10,6 +10,7 @@ function Window:show(id)
 
 	self.visible = true
 	self.rect = self:findRect()
+	modApi.events.onWindowShown:dispatch(id, self.rect)
 	self.event_show:dispatch(id, self.rect)
 end
 
@@ -18,6 +19,7 @@ function Window:hide(id)
 
 	self.visible = false
 	self.rect = nil
+	modApi.events.onWindowHidden:dispatch(id)
 	self.event_hide:dispatch(id)
 end
 
