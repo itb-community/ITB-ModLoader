@@ -203,6 +203,21 @@ local function buildUiRoot(screen)
 	srfTopRight = sdlext.getSurface({ path = "img/ui/tooltipshadow_4.png" })
 end
 
+sdlext.getShadowSurfaceRect = function()
+	if srfBotLeft:wasDrawn() and srfTopRight:wasDrawn() then
+		local wx, wy, ww, wh
+
+		wx = srfBotLeft.x
+		wy = srfTopRight.y - 4
+		ww = srfTopRight.x - wx
+		wh = srfBotLeft.y  - wy
+
+		return wx, wy, ww, wh
+	end
+
+	return nil
+end
+
 local isTestMech = false
 local lastScreenSize = { x = ScreenSizeX(), y = ScreenSizeY() }
 sdlext.CurrentWindowRect = sdl.rect(0, 0, 0, 0)
@@ -278,13 +293,7 @@ MOD_API_DRAW_HOOK = sdl.drawHook(function(screen)
 
 	-- ////////////////////////////////////////////////////////
 
-	local wx, wy, ww, wh
-	if srfBotLeft:wasDrawn() and srfTopRight:wasDrawn() then
-		wx = srfBotLeft.x
-		wy = srfTopRight.y - 4
-		ww = srfTopRight.x - wx
-		wh = srfBotLeft.y  - wy
-	end
+	local wx, wy, ww, wh = sdlext.getShadowSurfaceRect()
 
 	if not rect_equals(sdlext.CurrentWindowRect, wx, wy, ww, wh) then
 		rect_set(sdlext.LastWindowRect, sdlext.CurrentWindowRect)

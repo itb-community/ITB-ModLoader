@@ -9,18 +9,26 @@ function Window:show(id)
 	if self.visible then return end
 
 	self.visible = true
-	self.event_show:dispatch(id)
+	self.rect = self:findRect()
+	self.event_show:dispatch(id, self.rect)
 end
 
 function Window:hide(id)
 	if not self.visible then return end
 
 	self.visible = false
+	self.rect = nil
 	self.event_hide:dispatch(id)
 end
 
 function Window:isVisible()
 	return self.visible == true
+end
+
+function Window:findRect()
+	if not self.visible then return nil end
+
+	return self.find_rect and self.find_rect() or nil
 end
 
 local function buildIsWindowVisibleFunction(window)
@@ -29,70 +37,104 @@ local function buildIsWindowVisibleFunction(window)
 	end
 end
 
+local function getRectFromShadowSurfaces()
+	local wx, wy, ww, wh = sdlext.getShadowSurfaceRect()
+	if wx ~= nil then
+		return sdl.rect(wx, wy, ww, wh)
+	end
+end
+
+local function buildGetRectFromBox(box)
+	-- See images.lua for Boxes
+	return function()
+		if box == nil then return nil end
+
+		return sdl.rect(box.x, box.y, box.w, box.h)
+	end
+end
+
 local windows = {
 	Escape_Title = Window:new{
 		event_show = modApi.events.onEscapeMenuWindowShown,
-		event_hide = modApi.events.onEscapeMenuWindowHidden
+		event_hide = modApi.events.onEscapeMenuWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Button_Hangar_Start = Window:new{
 		event_show = modApi.events.onHangarUiShown,
-		event_hide = modApi.events.onHangarUiHidden
+		event_hide = modApi.events.onHangarUiHidden,
+		-- Not a window, but rather a screen.
+		-- Might want a separate Screens table?
+		find_rect = nil
 	},
 	Hangar_Select = Window:new{
 		event_show = modApi.events.onSquadSelectionWindowShown,
-		event_hide = modApi.events.onSquadSelectionWindowHidden
+		event_hide = modApi.events.onSquadSelectionWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Customize_Instructions = Window:new{
 		event_show = modApi.events.onCustomizeSquadWindowShown,
-		event_hide = modApi.events.onCustomizeSquadWindowHidden
+		event_hide = modApi.events.onCustomizeSquadWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Hangar_Achievements_Title = Window:new{
 		event_show = modApi.events.onAchievementsWindowShown,
-		event_hide = modApi.events.onAchievementsWindowHidden
+		event_hide = modApi.events.onAchievementsWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Hangar_Pilot = Window:new{
 		event_show = modApi.events.onPilotSelectionWindowShown,
-		event_hide = modApi.events.onPilotSelectionWindowHidden
+		event_hide = modApi.events.onPilotSelectionWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Options_Title = Window:new{
 		event_show = modApi.events.onOptionsWindowShown,
-		event_hide = modApi.events.onOptionsWindowHidden
+		event_hide = modApi.events.onOptionsWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Language_Title = Window:new{
 		event_show = modApi.events.onLanguageSelectionWindowShown,
-		event_hide = modApi.events.onLanguageSelectionWindowHidden
+		event_hide = modApi.events.onLanguageSelectionWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Hotkeys_Title = Window:new{
 		event_show = modApi.events.onHotkeyConfigurationWindowShown,
-		event_hide = modApi.events.onHotkeyConfigurationWindowHidden
+		event_hide = modApi.events.onHotkeyConfigurationWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Profile_Title = Window:new{
 		event_show = modApi.events.onProfileSelectionWindowShown,
-		event_hide = modApi.events.onProfileSelectionWindowHidden
+		event_hide = modApi.events.onProfileSelectionWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	New_Profile_Title = Window:new{
 		event_show = modApi.events.onCreateProfileConfirmationWindowShown,
-		event_hide = modApi.events.onCreateProfileConfirmationWindowHidden
+		event_hide = modApi.events.onCreateProfileConfirmationWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Delete_Confirm_Title = Window:new{
 		event_show = modApi.events.onDeleteProfileConfirmationWindowShown,
-		event_hide = modApi.events.onDeleteProfileConfirmationWindowHidden
+		event_hide = modApi.events.onDeleteProfileConfirmationWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Stats_Header = Window:new{
 		event_show = modApi.events.onStatisticsWindowShown,
-		event_hide = modApi.events.onStatisticsWindowHidden
+		event_hide = modApi.events.onStatisticsWindowHidden,
+		find_rect = buildGetRectFromBox(Boxes["stat_screen"])
 	},
 	NewGame_Confirm_Title = Window:new{
 		event_show = modApi.events.onNewGameWindowShown,
-		event_hide = modApi.events.onNewGameWindowHidden
+		event_hide = modApi.events.onNewGameWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Abandon_Confirm_Title = Window:new{
 		event_show = modApi.events.onAbandonTimelineWindowShown,
-		event_hide = modApi.events.onAbandonTimelineWindowHidden
+		event_hide = modApi.events.onAbandonTimelineWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 	Unit_Status_Title = Window:new{
 		event_show = modApi.events.onStatusTooltipWindowShown,
 		event_hide = modApi.events.onStatusTooltipWindowHidden,
+		find_rect = getRectFromShadowSurfaces
 	},
 }
 
