@@ -162,16 +162,7 @@ local function readMedalData(self, squad_id)
 	return self.cachedData[squad_id]
 end
 
-modApi.events.onGameVictory:subscribe(function()
-	local difficulty = GetRealDifficulty()
-	local squad_id = GAME.additionalSquadData.squad
-	local islandsSecured = 0
-	for i = 0, 3 do
-		if RegionData["island"..i].secured then
-			islandsSecured = islandsSecured + 1
-		end
-	end
-
+modApi.events.onGameVictory:subscribe(function(difficulty, islandsSecured, squad_id)
 	modApi.medals:writeData(squad_id, difficulty, islandsSecured)
 end)
 
