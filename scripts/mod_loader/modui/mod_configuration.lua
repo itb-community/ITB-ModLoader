@@ -35,7 +35,7 @@ local function buildLightModOptions()
 	local lightModOptions = {}
 	
 	for id, entry in pairs(mod_loader.mod_options) do
-		entry_current = config_current[id]
+		local entry_current = config_current[id]
 		local options = {}
 		lightModOptions[id] = {
 			enabled = entry_current.enabled,
@@ -45,7 +45,7 @@ local function buildLightModOptions()
 		
 		for i, opt in ipairs(entry.options) do
 			local opt_current = entry_current.options[opt.id]
-			if opt.check then
+			if opt.type == "checkbox" then
 				options[i] = { enabled = opt_current.enabled }
 			else
 				options[i] = { value = opt_current.value }
@@ -73,7 +73,7 @@ local function buildNewModContent()
 		if modContent[id].enabled then
 			for i, opt in ipairs(entry.options) do
 				local opt_editable = entry_editable.options[i]
-				if opt.check then
+				if opt.type == "checkbox" then
 					options[opt.id] = { enabled = opt_editable.enabled }
 				else
 					options[opt.id] = { value = opt_editable.value }
@@ -224,7 +224,7 @@ local function buildOptionEntries(mod)
 		local opt_editable = entry_editable.options[i]
 		local optionEntry
 		
-		if opt.check then
+		if opt.type == "checkbox" then
 			optionEntry = UiCheckbox()
 				:width(1):heightpx(41)
 				:settooltip(opt.tip)
@@ -238,18 +238,12 @@ local function buildOptionEntries(mod)
 				})
 			
 			optionEntry.checked = opt_editable.enabled
-			
-			optionEntry.onclicked = function(self, button)
-				if button == 1 then
-					opt_editable.enabled = self.checked
-					
-					return true
-				end
-				
-				return false
-			end
+
+			optionEntry.onToggled:subscribe(function(checked)
+				opt_editable.enabled = checked
+			end)
 		else
-			optionEntry = UiDropDown(opt.values, opt.strings, opt_editable.value)
+			optionEntry = UiDropDown(opt.values, opt.strings, opt_editable.value, opt.tooltips)
 				:width(1):heightpx(41)
 				:settooltip(opt.tip)
 				:decorate({
