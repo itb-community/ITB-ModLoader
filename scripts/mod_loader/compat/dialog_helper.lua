@@ -120,3 +120,13 @@ function sdlext.showConfirmDialog(title, text, responseFn, options, compatArg1)
 
 	return newShowConfirmDialog(title, text, responseFn, options)
 end
+
+local newBuildDropDownButton = sdlext.buildDropDownButton
+function sdlext.buildDropDownButton(text, tooltip, choices, choiceHandler)
+	if choices.choices == nil then
+		local t = choices
+		choices = { choices = t }
+	end
+
+	return newBuildDropDownButton(text, tooltip, choices, choiceHandler)
+end

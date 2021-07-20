@@ -373,21 +373,21 @@ function sdlext.buildButton(text, tooltip, clickHandler)
 	return btn
 end
 
-function sdlext.buildDropDownButton(text, tooltip, choices, choiceHandler)
+function sdlext.buildDropDownButton(text, tooltip, options, choiceHandler)
 	local decoText = DecoText(text)
 	local maxChoiceWidth = 0
 
 	local values = {}
-	for i = 1, #choices do
+	for i = 1, #options.choices do
 		values[#values+1] = i
 
-		local decoChoice = DecoRAlignedText(choices[i])
+		local decoChoice = DecoRAlignedText(options.choices[i])
 		maxChoiceWidth = math.max(maxChoiceWidth, sdlext.totalWidth(decoChoice.surface))
 	end
 
 	local spacing = 15
 	local w = sdlext.totalWidth(decoText.surface)
-	local btn = UiDropDown(values, choices, choices[1])
+	local btn = UiDropDown(values, options.choices, options.choices[1], options.tooltips)
 			:widthpx(math.max(95, w + maxChoiceWidth + 33 + spacing))
 			:heightpx(40)
 			:decorate({
