@@ -91,6 +91,9 @@ return {
 	["ModLoaderConfig_DD_LogLevel_0"] = "None",
 	["ModLoaderConfig_DD_LogLevel_1"] = "Only console",
 	["ModLoaderConfig_DD_LogLevel_2"] = "File and console",
+	["ModLoaderConfig_DD_Tip_LogLevel_0"] = "Don't print logs anywhere.",
+	["ModLoaderConfig_DD_Tip_LogLevel_1"] = "Print logs to the in-game console only.",
+	["ModLoaderConfig_DD_Tip_LogLevel_2"] = "Print logs to the in-game console, and modloader.log file in the game's directory.",
 
 	["ModLoaderConfig_Text_DebugLogs"] = "Print Debug Logs",
 	["ModLoaderConfig_Tooltip_DebugLogs"] = "Show more fine-grained logging messages during mod loader startup for debugging.",

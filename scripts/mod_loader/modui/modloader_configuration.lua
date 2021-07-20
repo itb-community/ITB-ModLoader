@@ -198,7 +198,12 @@ local function createUi()
 				GetText("ModLoaderConfig_DD_LogLevel_1"),
 				GetText("ModLoaderConfig_DD_LogLevel_2")
 			},
-			mod_loader.logger:getLoggingLevel()
+			mod_loader.logger:getLoggingLevel(),
+			{
+				GetText("ModLoaderConfig_DD_Tip_LogLevel_0"),
+				GetText("ModLoaderConfig_DD_Tip_LogLevel_1"),
+				GetText("ModLoaderConfig_DD_Tip_LogLevel_2")
+			}
 		)
 		:width(1):heightpx(41)
 		:decorate({
