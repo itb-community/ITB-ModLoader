@@ -384,6 +384,7 @@ function Ui:updateAnimations()
 end
 
 function Ui:updateTooltipState()
+	if self.root == nil then return end
 	self.root.tooltip_title = self.tooltip_title
 	self.root.tooltip = self.tooltip
 	self.root.tooltip_static = self.draggable and self.dragged
