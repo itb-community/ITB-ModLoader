@@ -57,7 +57,7 @@ function UiDropDown:new(values,strings,value,tooltips)
 				self.choice = i
 				self.value = self.values[i]
 
-				self.optionSelected:dispatch(oldChoice, oldValue)
+				self.optionSelected:dispatch(oldChoice, oldValue, self.choice, self.value)
 				self:destroyDropDown()
 
 				return true

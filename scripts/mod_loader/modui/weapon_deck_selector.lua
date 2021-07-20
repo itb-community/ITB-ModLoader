@@ -385,7 +385,7 @@ local function buildButtons(buttonLayout)
 		GetText("ConfigureWeaponDeck_Preset_Tooltip"),
 		presets
 	):addTo(buttonLayoutRight)
-	presetDropdown.optionSelected:subscribe(function(oldChoice, oldValue)
+	presetDropdown.optionSelected:subscribe(function()
 		enableSaveLoadPresetButtonsFn(true)
 	end)
 
