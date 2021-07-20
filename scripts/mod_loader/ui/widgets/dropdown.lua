@@ -1,6 +1,6 @@
 UiDropDown = Class.inherit(Ui)
 
-function UiDropDown:new(values,strings,value)
+function UiDropDown:new(values,strings,value,tooltips)
 	Ui.new(self)
 
 	self.tooltip = ""
@@ -42,6 +42,11 @@ function UiDropDown:new(values,strings,value)
 				DecoAlign(0, 2),
 				txt
 			})
+
+		if tooltips then
+			item:settooltip(tooltips[i] or nil)
+		end
+
 		table.insert(items, item)
 		
 		item.onclicked = function(btn, button)
