@@ -125,7 +125,14 @@ local function playToast(self)
 	Main:add(Frame)
 	Main:add(Shadow)
 
-	Main.animations.fadeOut = UiAnim(Main, 4000, function() end)
+	Main.animations.fadeOut = UiAnim(Main, 4000, function()
+		if Main.hovered then
+			-- Make sure the toast stays visible while the user is
+			-- reading the tooltip.
+			local anim = Main.animations.fadeOut
+			anim.msTimeCurrent = math.min(anim.msTimeCurrent, anim.msTimeTotal - 1)
+		end
+	end)
 	Main.animations.fadeOut.onFinished = function(self, widget)
 		local root = widget.root
 
