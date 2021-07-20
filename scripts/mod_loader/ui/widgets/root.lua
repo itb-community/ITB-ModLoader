@@ -18,9 +18,9 @@ function UiRoot:new()
 	self.focuschild = self
 	self.translucent = true
 	self.priorityUi = PriorityUi():addTo(self)
-	self.dropdownUi = PriorityUi():addTo(self.priorityUi)
-	self.draggableUi = PriorityUi():addTo(self.priorityUi)
 	self.tooltipUi = UiTooltip():addTo(self.priorityUi)
+	self.draggableUi = PriorityUi():addTo(self.priorityUi)
+	self.dropdownUi = PriorityUi():addTo(self.priorityUi)
 end
 
 function UiRoot:draw(screen)
