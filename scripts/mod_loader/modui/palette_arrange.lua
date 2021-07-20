@@ -111,9 +111,20 @@ local function uiSetDraggable(ui)
 	-- Called each time we hover over an element that's been registered as valid drop target
 	ui.onDraggableEntered = function(self, draggable, target)
 		if self == draggable then
+			local placeholderIndex = list_indexof(content.children, placeholder)
 			local targetIndex = list_indexof(content.children, target)
 			placeholder:detach()
 			content:add(placeholder, targetIndex)
+
+			local firstIndex = math.min(placeholderIndex, targetIndex)
+
+			for i = firstIndex, #content.children do
+				local lock = not unlockedSquads[i]
+				content.children[i]:displayPaletteLocked(lock)
+			end
+
+			local lock = not unlockedSquads[targetIndex]
+			self:displayPaletteLocked(lock)
 		end
 	end
 
@@ -127,22 +138,6 @@ local function uiSetDraggable(ui)
 		end
 		return self.dropTargets
 	end
-end
-
-local function hoverAtIndex(self, new_placeholderIndex)
-	local old_placeholderIndex = list_indexof(content.children, placeholder)
-	table.remove(content.children, old_placeholderIndex)
-	table.insert(content.children, new_placeholderIndex, placeholder)
-
-	local firstIndex = math.min(new_placeholderIndex, old_placeholderIndex)
-
-	for i = firstIndex, #content.children do
-		local lock = not unlockedSquads[i]
-		content.children[i]:displayPaletteLocked(lock)
-	end
-
-	local lock = not unlockedSquads[new_placeholderIndex]
-	self:displayPaletteLocked(lock)
 end
 
 local function displayPaletteLocked(self, displayLocked)
@@ -235,7 +230,6 @@ local function buildPaletteFrameContent(scroll)
 		button.deco_fade = deco_fade
 		button.deco_lock = deco_lock
 		button.displayPaletteLocked = displayPaletteLocked
-		button.hoverAtIndex = hoverAtIndex
 
 		if not unlockedSquads[i] then
 			button:displayPaletteLocked(true)
