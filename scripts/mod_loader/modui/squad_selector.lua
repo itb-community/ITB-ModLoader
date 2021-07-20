@@ -155,17 +155,18 @@ local function createUi()
 					surface = sdl.colormapped(surface, colorTable)
 				end
 
+				local squadName = modApi.squad_text[i * 2 - 1]
 				local checkbox = UiCheckbox()
 					:width(0.5)
 					:heightpx(41)
-					:settooltip(modApi.squad_text[i * 2])
+					:settooltip(modApi.squad_text[i * 2], squadName)
 					:decorate({
 						DecoButton(),
 						DecoCheckbox(),
 						DecoAlign(2, 0),
 						DecoSurfaceOutlined(surface),
 						DecoAlign(0, 2),
-						DecoText(modApi.squad_text[i * 2 - 1])
+						DecoText(squadName)
 					})
 
 				checkbox:addTo(getLayout(i - 1))

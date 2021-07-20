@@ -247,7 +247,7 @@ local function buildWeaponButton(weapon)
 
 	local button = UiCheckbox()
 		:widthpx(WEAPON_WIDTH):heightpx(WEAPON_HEIGHT)
-		:settooltip(getWeaponKey(id, "Description"))
+		:settooltip(getWeaponKey(id, "Description"),  getWeaponKey(id, "Name"))
 		:decorate({
 			DecoButton(nil, not modApi:isDefaultWeapon(id) and MOD_COLOR),
 			DecoAlign(-4, (TEXT_PADDING / 2)),
