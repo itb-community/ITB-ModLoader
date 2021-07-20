@@ -383,7 +383,13 @@ local function buildButtons(buttonLayout)
 	local presetDropdown = sdlext.buildDropDownButton(
 		GetText("ConfigureWeaponDeck_Preset_Title"),
 		GetText("ConfigureWeaponDeck_Preset_Tooltip"),
-		presets
+		{
+			choices = presets,
+			tooltips = {
+				GetText("ConfigureWeaponDeck_Preset_Tip_Default"),
+				GetText("ConfigureWeaponDeck_Preset_Tip_Random")
+			}
+		}
 	):addTo(buttonLayoutRight)
 	presetDropdown.optionSelected:subscribe(function()
 		enableSaveLoadPresetButtonsFn(true)

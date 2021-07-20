@@ -467,8 +467,14 @@ local function buildModConfigButtons(buttonLayout)
 		GetText("ModConfig_Button_Sort_Title"),
 		GetText("ModConfig_Button_Sort_Tooltip"),
 		{
-			GetText("ModConfig_Button_Sort_Choice_1"),
-			GetText("ModConfig_Button_Sort_Choice_2")
+			choices = {
+				GetText("ModConfig_Button_Sort_Choice_Name"),
+				GetText("ModConfig_Button_Sort_Choice_Id")
+			},
+			tooltips = {
+				GetText("ModConfig_Button_Sort_Choice_Tip_Name"),
+				GetText("ModConfig_Button_Sort_Choice_Tip_Id")
+			}
 		},
 		function(choice)
 			sortBy = choice
@@ -483,9 +489,16 @@ local function buildModConfigButtons(buttonLayout)
 		GetText("ModConfig_Button_Sort_Enabled_Mods_Title"),
 		GetText("ModConfig_Button_Sort_Enabled_Mods_Tooltip"),
 		{
-			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_1"),
-			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_2"),
-			GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_3")
+			choices = {
+				GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_First"),
+				GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_Last"),
+				GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_None")
+			},
+			tooltips = {
+				GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_Tip_First"),
+				GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_Tip_Last"),
+				GetText("ModConfig_Button_Sort_Enabled_Mods_Choice_Tip_None")
+			}
 		},
 		function(choice)
 			sortOrder = choice
