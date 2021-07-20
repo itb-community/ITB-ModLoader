@@ -74,6 +74,7 @@ local function playToast(self)
 
 	local Main = Ui()
 		:widthpx(main.width):heightpx(main.height)
+		:settooltip(tooltip)
 		:pospx(main.posx, main.posy)
 
 	-- construct shadow.
@@ -95,7 +96,6 @@ local function playToast(self)
 	local Frame = Ui()
 		:width(1):height(1)
 		:caption(title)
-		:settooltip(tooltip)
 		:decorate({ DecoFrameHeader(), DecoFrame() })
 
 	local Icon = Ui()
@@ -113,6 +113,7 @@ local function playToast(self)
 		:widthpx(iconholderWidth):heightpx(icon.height)
 		:pospx(icon.posX, icon.posY)
 
+	Frame.translucent = true
 	Shadow.translucent = true
 	IconHolder.translucent = true
 	Icon.translucent = true
@@ -125,7 +126,15 @@ local function playToast(self)
 	Main:add(Shadow)
 
 	Main.animations.fadeOut = UiAnim(Main, 4000, function() end)
-	Main.animations.fadeOut.onFinished = function(self) self.widget:detach() end
+	Main.animations.fadeOut.onFinished = function(self, widget)
+		local root = widget.root
+
+		widget:detach()
+
+		if root.hoveredchild == widget then
+			root:updateHoveredState()
+		end
+	end
 	Main.animations.fadeOut:start()
 	Main:addTo(root):bringToTop()
 
