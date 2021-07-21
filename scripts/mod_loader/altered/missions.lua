@@ -309,5 +309,15 @@ end
 local oldMissionEnd = Mission_Final_Cave.MissionEnd
 function Mission_Final_Cave:MissionEnd()
 	oldMissionEnd()
-	modApi.events.onGameVictory:dispatch(difficulty, islandsSecured, squad)
+
+	local difficulty = GetRealDifficulty()
+	local squad_id = GAME.additionalSquadData.squad
+	local islandsSecured = 0
+	for i = 0, 3 do
+		if RegionData["island"..i].secured then
+			islandsSecured = islandsSecured + 1
+		end
+	end
+
+	modApi.events.onGameVictory:dispatch(difficulty, islandsSecured, squad_id)
 end
