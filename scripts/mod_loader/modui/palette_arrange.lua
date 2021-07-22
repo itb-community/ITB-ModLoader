@@ -318,13 +318,32 @@ local function buildPaletteFrameButtons(buttonLayout)
 	:addTo(buttonLayout)
 end
 
+local function responseFn(btnIndex)
+	if btnIndex == 2 then
+		modApi.showPaletteRestartReminder = false
+		SaveModLoaderConfig(CurrentModLoaderConfig())
+	end
+end
+
 local function onExit()
+	local oldPaletteOrder = modApi:getCurrentPaletteOrder()
+
 	savePaletteOrder()
 
 	unlockedSquads = nil
 	scrollarea = nil
 	content = nil
 	placeholder = nil
+
+	if modApi.showPaletteRestartReminder and not compare_tables(oldPaletteOrder, currentPaletteOrder) then
+		sdlext.showButtonDialog(
+			GetText("PaletteRestartRequired_FrameTitle"),
+			GetText("PaletteRestartRequired_FrameText"),
+			responseFn,
+			{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
+			{ "", GetText("ButtonTooltip_DisablePopup") }
+		)
+	end
 end
 
 local function showArrangePaletteUi()

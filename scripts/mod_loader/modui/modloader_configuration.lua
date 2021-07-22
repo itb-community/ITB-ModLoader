@@ -25,6 +25,7 @@ local function createUi()
 	local cboxGamepadWarning = nil
 	local cboxRestartReminder = nil
 	local cboxPilotRestartReminder = nil
+	local cboxPaletteRestartReminder = nil
 	local cboxProfileFrame = nil
 
 	local onExit = function(self)
@@ -42,8 +43,9 @@ local function createUi()
 			showResourceWarning = cboxResourceError.checked,
 			showGamepadWarning  = cboxGamepadWarning.checked,
 			showRestartReminder = cboxRestartReminder.checked,
-			showPilotRestartReminder = cboxPilotRestartReminder.checked,
-			showProfileSettingsFrame = cboxProfileFrame.checked
+			showPilotRestartReminder   = cboxPilotRestartReminder.checked,
+			showPaletteRestartReminder = cboxPaletteRestartReminder.checked,
+			showProfileSettingsFrame   = cboxProfileFrame.checked
 		}
 
 		ApplyModLoaderConfig(data)
@@ -53,22 +55,23 @@ local function createUi()
 	end
 
 	local uiSetSettings = function(config)
-		cboxScrollableLogger.checked     = config.scrollableLogger
-		ddLogLevel.value                 = config.logLevel
-		ddLogLevel.choice                = ddLogLevel.value + 1
-		cboxDebugLogs.checked            = config.debugLogs
-		cboxCaller.checked               = config.printCallerInfo
-		cboxDevelopmentMode.checked      = config.developmentMode
-		cboxFloatyTooltips.checked       = config.floatyTooltips
-		cboxProfileConfig.checked        = config.profileConfig
+		cboxScrollableLogger.checked       = config.scrollableLogger
+		ddLogLevel.value                   = config.logLevel
+		ddLogLevel.choice                  = ddLogLevel.value + 1
+		cboxDebugLogs.checked              = config.debugLogs
+		cboxCaller.checked                 = config.printCallerInfo
+		cboxDevelopmentMode.checked        = config.developmentMode
+		cboxFloatyTooltips.checked         = config.floatyTooltips
+		cboxProfileConfig.checked          = config.profileConfig
 
-		cboxErrorFrame.checked           = config.showErrorFrame
-		cboxVersionFrame.checked         = config.showVersionFrame
-		cboxResourceError.checked        = config.showResourceWarning
-		cboxGamepadWarning.checked       = config.showGamepadWarning
-		cboxRestartReminder.checked      = config.showRestartReminder
-		cboxPilotRestartReminder.checked = config.showPilotRestartReminder
-		cboxProfileFrame.checked         = config.showProfileSettingsFrame
+		cboxErrorFrame.checked             = config.showErrorFrame
+		cboxVersionFrame.checked           = config.showVersionFrame
+		cboxResourceError.checked          = config.showResourceWarning
+		cboxGamepadWarning.checked         = config.showGamepadWarning
+		cboxRestartReminder.checked        = config.showRestartReminder
+		cboxPilotRestartReminder.checked   = config.showPilotRestartReminder
+		cboxPaletteRestartReminder.checked = config.showPaletteRestartReminder
+		cboxProfileFrame.checked           = config.showProfileSettingsFrame
 
 		local t = cboxFloatyTooltips.root.tooltip
 		modApi.floatyTooltips = config.floatyTooltips
@@ -309,6 +312,11 @@ local function createUi()
 		cboxPilotRestartReminder = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_PilotRestartReminder"),
 			GetText("ModLoaderConfig_Tooltip_PilotRestartReminder")
+		):addTo(popupsGroup.content)
+
+		cboxPaletteRestartReminder = createCheckboxOption(
+			GetText("ModLoaderConfig_Text_PaletteRestartReminder"),
+			GetText("ModLoaderConfig_Tooltip_PaletteRestartReminder")
 		):addTo(popupsGroup.content)
 
 		cboxProfileFrame = createCheckboxOption(
