@@ -440,7 +440,11 @@ local function draw_if_squad_unlocked(self, screen)
 	self.visible = Profile.squads[self.squadIndex]
 
 	if self.visible then
-		UiBoxLayout.draw(self, screen)
+		if Boxes.hangar_select_big.x == sdlext.CurrentWindowRect.x and Boxes.hangar_select_big.y == sdlext.CurrentWindowRect.y + 10 then
+			UiBoxLayout.draw(self, screen)
+		else
+			sdlext.occlude_draw(UiBoxLayout, self, screen, sdlext.CurrentWindowRect)
+		end
 	end
 end
 
