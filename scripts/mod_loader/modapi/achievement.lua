@@ -273,10 +273,6 @@ function Achievement:resetProgress()
 end
 
 function Achievement:getProgress()
-	if modApi.achievements.cachedProfileData == nil then
-		return self:getObjectiveInitialState()
-	end
-
 	return readData(self.mod_id, self.id)
 end
 
