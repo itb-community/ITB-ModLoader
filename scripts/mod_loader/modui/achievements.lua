@@ -17,7 +17,7 @@ local GLOBAL_BOX_W = 369
 
 local achievementFrames
 
-local function enableAchievementFrame(frame, isComplete)
+local function enableAchievementFrame(frame, isComplete, isSecret)
 	local data = frame.data
 	if isComplete then
 		data.deco_surface.surface = sdlext.getSurface({
@@ -26,6 +26,13 @@ local function enableAchievementFrame(frame, isComplete)
 									})
 		data.deco_halfblack.color = deco.colors.transparent
 		data.deco_border.bordercolor = deco.colors.achievementborder
+	elseif isSecret then
+		data.deco_surface.surface = sdlext.getSurface({
+										path = "resources/mods/ui/achv_secret.png"
+									})
+		data.deco_halfblack.color = deco.colors.transparent
+		data.deco_border.bordercolor = deco.colors.buttonborder
+		
 	else
 		data.deco_surface.surface = sdlext.getSurface({
 										path = data.image or NO_ICON,
@@ -40,8 +47,9 @@ local function onClickedAchievement(self, button)
 	if button == 1 then
 		local achievement = self.data.achievement
 		local isComplete = self.checked
+		local isSecret = achievement.secret or nil
 
-		enableAchievementFrame(self, isComplete)
+		enableAchievementFrame(self, isComplete, isSecret)
 		return true
 	end
 
@@ -53,6 +61,7 @@ local function buildAchievementFrame(achievement)
 	local deco_halfblack = DecoSolid(deco.colors.halfblack)
 	local deco_border = DecoBorder(deco.colors.buttonborder, 1, deco.colors.achievementborder, 4)
 	local isComplete = achievement:isComplete()
+	local isSecret = achievement.secret or nil
 
 	local frame
 	if modApi.developmentMode then
@@ -82,7 +91,7 @@ local function buildAchievementFrame(achievement)
 	}
 	frame.checked = isComplete
 
-	enableAchievementFrame(frame, isComplete)
+	enableAchievementFrame(frame, isComplete, isSecret)
 	table.insert(achievementFrames, frame)
 
 	return frame
@@ -135,7 +144,11 @@ local function buildAchievementsFrameContent(scroll)
 	for mod_id, modAchievements in pairs(allAchievements) do
 		for _, achievement in ipairs(modAchievements) do
 			local squad_id = achievement.squad
-			if squad_id then
+			local global_id = achievement.global
+			if global_id then
+				allGlobalAchievements[global_id] = allGlobalAchievements[global_id] or {}
+				table.insert(allGlobalAchievements[global_id], achievement)
+			elseif squad_id then
 				allSquadAchievements[squad_id] = allSquadAchievements[squad_id] or {}
 				table.insert(allSquadAchievements[squad_id], achievement)
 			else
@@ -228,7 +241,9 @@ local function buildAchievementsFrameContent(scroll)
 	content_global.padl = FRAME_PAD_LEFT
 
 	for mod_id, modAchievements in pairs(allGlobalAchievements) do
-		local mod = mod_loader.mods[mod_id]
+		local mod = mod_loader.mods[mod_id] or {}
+		if modAchievements[1].global then mod.name = modAchievements[1].global end
+		mod.name = mod.name or "Global"
 		buildModContent(mod.name, GLOBAL_BOX_W, modAchievements)
 			:addTo(content_global)
 	end
