@@ -47,7 +47,7 @@ local function onClickedAchievement(self, button)
 	if button == 1 then
 		local achievement = self.data.achievement
 		local isComplete = self.checked
-		local isSecret = achievement.secret or nil
+		local isSecret = achievement.secret or false
 
 		enableAchievementFrame(self, isComplete, isSecret)
 		return true
