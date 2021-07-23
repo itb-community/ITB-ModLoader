@@ -96,10 +96,12 @@ function mod_loader:init()
 	modApi.events.onModsMetadataDone:unsubscribeAll()
 
 	LOGD("Initializing mods...")
-	local orderedMods = self:orderMods(self:getModConfig(), self:getSavedModOrder())
+	local mod_options = self:getModConfig()
+	local orderedMods = self:orderMods(mod_options, self:getSavedModOrder())
+	self.currentModContent = mod_options
 	for i, id in ipairs(orderedMods) do
 		modApi:setCurrentMod(id)
-		self:initMod(id)
+		self:initMod(id, mod_options)
 		modApi.events.onModInitialized:dispatch(id)
 	end
 	LOGD("Done!")
@@ -335,7 +337,7 @@ function mod_loader:enumerateDirectoriesIn(dirPathRelativeToGameDir)
 	end
 end
 
-function mod_loader:initMod(id)
+function mod_loader:initMod(id, mod_options)
 	local mod = self.mods[id]
 
 	-- Process version in init, so that mods that are not enabled don't
@@ -355,7 +357,7 @@ function mod_loader:initMod(id)
 	local ok, err = xpcall(
 		function()
 			LOGF("Initializing mod [%s] with id [%s]...", mod.name, id)
-			mod.init(mod)
+			mod.init(mod, mod_options[id].options)
 		end,
 		function(e)
 			return string.format(
