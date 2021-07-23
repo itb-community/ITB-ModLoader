@@ -61,7 +61,7 @@ local function buildAchievementFrame(achievement)
 	local deco_halfblack = DecoSolid(deco.colors.halfblack)
 	local deco_border = DecoBorder(deco.colors.buttonborder, 1, deco.colors.achievementborder, 4)
 	local isComplete = achievement:isComplete()
-	local isSecret = achievement.secret or nil
+	local isSecret = achievement.secret or false
 
 	local frame
 	if modApi.developmentMode then
