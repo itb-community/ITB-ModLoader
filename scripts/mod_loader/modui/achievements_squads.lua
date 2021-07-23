@@ -237,40 +237,29 @@ local function buildAchievementUi(achievement, drawCoin)
 	local isComplete = achievement:isComplete()
 	local isSecret = achievement.secret or false
 	
-	local ui = Ui()
+	local solid = isComplete and deco.colors.transparent or deco.colors.halfblack
+	local surface = sdlext.getSurface{
+		path = achievement.image or NO_ICON,
+		transformations = { { grayscale = not isComplete } }
+	}
+	
 	if isSecret and not isComplete then
-		local surface = sdlext.getSurface{
+		surface = sdlext.getSurface{
 			path = "resources/mods/ui/achv_secret.png"
 		}
-
-		ui = Ui()
-			:widthpx(UI.ACHIEVEMENT.WIDTH)
-			:heightpx(UI.ACHIEVEMENT.HEIGHT)
-			:decorate({
-				DecoSurface(surface, "center", "center"),
-				DecoAnchor(),
-				DecoSolid(deco.colors.transparent),
-				DecoAnchor(),
-				DecoBorder(deco.colors.buttonborder, 1, deco.colors.achievementborder, 4)
-			})	
-	else
-		local surface = sdlext.getSurface{
-			path = achievement.image or NO_ICON,
-			transformations = { { grayscale = not isComplete } }
-		}
-
-		ui = Ui()
-			:widthpx(UI.ACHIEVEMENT.WIDTH)
-			:heightpx(UI.ACHIEVEMENT.HEIGHT)
-			:decorate({
-				DecoSurface(surface, "center", "center"),
-				DecoAnchor(),
-				DecoSolid(isComplete and deco.colors.transparent or deco.colors.halfblack),
-				DecoAnchor(),
-				DecoBorder(isComplete and deco.colors.achievementborder or deco.colors.buttonborder, 1, deco.colors.achievementborder, 4)
-			})
+		solid = deco.colors.transparent
 	end
-	
+
+	local ui = Ui()
+		:widthpx(UI.ACHIEVEMENT.WIDTH)
+		:heightpx(UI.ACHIEVEMENT.HEIGHT)
+		:decorate({
+			DecoSurface(surface, "center", "center"),
+			DecoAnchor(),
+			DecoSolid(solid),
+			DecoAnchor(),
+			DecoBorder(isComplete and deco.colors.achievementborder or deco.colors.buttonborder, 1, deco.colors.achievementborder, 4)
+		})
 	ui.translucent = true
 	ui.clipRect = sdl.rect(0,0,0,0)
 	ui.draw = clipped_draw
