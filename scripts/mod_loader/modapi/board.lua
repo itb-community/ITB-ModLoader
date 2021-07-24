@@ -118,3 +118,45 @@ BoardClass.GetSelectedPawnId = function(self)
 	
 	return nil
 end
+
+BoardClass.GetTile = function(self, predicateFn)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("function", type(predicateFn), "Argument #1")
+
+	for _, p in ipairs(self) do
+		if predicateFn(p) then
+			return p
+		end
+	end
+
+	return nil
+end
+
+BoardClass.GetTiles = function(self, predicateFn)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals({"nil", "function"}, type(predicateFn), "Argument #1")
+
+	local result = PointList()
+
+	for _, p in ipairs(self) do
+		if not predicateFn or (predicateFn and predicateFn(p)) then
+			result:push_back(p)
+		end
+	end
+
+	return result
+end
+
+BoardClass.__ipairs = function(self, ...)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	local index = 0
+	local size = self:GetSize()
+	return function()
+		if index < size.x * size.y then
+			local p = Point(index % size.x, math.floor(index / size.x))
+			index = index + 1
+			return index, p
+		end
+	end
+end
