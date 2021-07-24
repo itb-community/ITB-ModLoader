@@ -5,13 +5,9 @@
 function Mission:EnumerateSpawns()
 	local result = {}
 
-	local size = self.Board:GetSize()
-	for y = 0, size.y - 1 do
-		for x = 0, size.x - 1 do
-			local p = Point(x, y)
-			if self.Board:IsSpawning(p) then
-				table.insert(result, p)
-			end
+	for _, p in ipairs(self.Board) do
+		if self.Board:IsSpawning(p) then
+			table.insert(result, p)
 		end
 	end
 

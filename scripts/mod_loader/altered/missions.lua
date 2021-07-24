@@ -132,17 +132,13 @@ function Mission:MissionEndImpl()
 	modApi:firePreprocessVekRetreatHooks(self, ret)
 	
 	local retreated = 0
-	local board_size = Board:GetSize()
-	for x = 0, board_size.x - 1 do
-		for y = 0, board_size.y - 1  do
-			local p = Point(x, y)
-			if Board:IsPawnTeam(p,TEAM_ENEMY) then
-				modApi:fireProcessVekRetreatHooks(self, ret, Board:GetPawn(p))
+	for _, p in ipairs(Board) do
+		if Board:IsPawnTeam(p,TEAM_ENEMY) then
+			modApi:fireProcessVekRetreatHooks(self, ret, Board:GetPawn(p))
 
-				effect.loc = p
-				ret:AddDamage(effect)
-				retreated = retreated + 1
-			end
+			effect.loc = p
+			ret:AddDamage(effect)
+			retreated = retreated + 1
 		end
 	end
 
