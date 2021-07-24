@@ -21,6 +21,30 @@ function Move:GetSkillEffect(p1, p2)
 end
 
 -------------------------------------------------------------
+--- Override default Move:GetTargetArea to fix leap and
+--- teleport movement allowing non-flying pawns to move onto chasms
+-------------------------------------------------------------
+
+local function getReachableGroundTeleporter(board, p1, maxDistance, pathProf)
+	return board:GetTiles(function(p)
+		local distance = p:Manhattan(p1)
+		if distance <= maxDistance and not board:IsBlocked(p, pathProf) then
+			return true
+		end
+
+		return false
+	end)
+end
+
+function Move:GetTargetArea(p)
+	if not Pawn:IsFlying() and (Pawn:IsJumper() or Pawn:IsTeleporter()) then
+		return getReachableGroundTeleporter(Board, p, Pawn:GetMoveSpeed(), Pawn:GetPathProf())
+	end
+
+	return Board:GetReachable(p, Pawn:GetMoveSpeed(), Pawn:GetPathProf())
+end
+
+-------------------------------------------------------------
 --- Override default Move:GetSkillEffect to implement handling
 --- of pawn Move Skills
 -------------------------------------------------------------
