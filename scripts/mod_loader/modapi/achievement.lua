@@ -463,6 +463,8 @@ local function addAchievement(self, achievement)
 	local addReward = achievement.addReward
 	local remReward = achievement.remReward
 	local squad = achievement.squad
+	local global = achievement.global
+	local secret = achievement.secret
 
 	Assert.Equals('string', type(mod_id), "mod_id of achievement")
 	Assert.Equals('string', type(id), "id of achievement")
@@ -472,6 +474,8 @@ local function addAchievement(self, achievement)
 	Assert.Equals({'nil', 'function'}, type(addReward), "add reward function of achievement")
 	Assert.Equals({'nil', 'function'}, type(remReward), "rem reward function of achievement")
 	Assert.Equals({'nil', 'string'}, type(squad), "squad id of achievement")
+	Assert.Equals({'nil', 'string'}, type(global), "global id of achievement")
+	Assert.Equals({'nil', 'boolean'}, type(secret), "secret id of achievement")
 
 	local data = Achievement:new{
 		mod_id = mod_id,
@@ -483,6 +487,8 @@ local function addAchievement(self, achievement)
 		addReward = addReward,
 		remReward = remReward,
 		squad = squad,
+		global = global,
+		secret = secret,
 	}
 
 	Assert.Equals('nil', type(AchievementDictionary:get(mod_id, id)), "Achievement for mod ".. mod_id .." with id ".. id .." already exists")

@@ -235,10 +235,20 @@ end
 
 local function buildAchievementUi(achievement, drawCoin)
 	local isComplete = achievement:isComplete()
+	local isSecret = achievement.secret or false
+	
+	local solid = isComplete and deco.colors.transparent or deco.colors.halfblack
 	local surface = sdlext.getSurface{
 		path = achievement.image or NO_ICON,
 		transformations = { { grayscale = not isComplete } }
 	}
+	
+	if isSecret and not isComplete then
+		surface = sdlext.getSurface{
+			path = "resources/mods/ui/achv_secret.png"
+		}
+		solid = deco.colors.transparent
+	end
 
 	local ui = Ui()
 		:widthpx(UI.ACHIEVEMENT.WIDTH)
@@ -246,7 +256,7 @@ local function buildAchievementUi(achievement, drawCoin)
 		:decorate({
 			DecoSurface(surface, "center", "center"),
 			DecoAnchor(),
-			DecoSolid(isComplete and deco.colors.transparent or deco.colors.halfblack),
+			DecoSolid(solid),
 			DecoAnchor(),
 			DecoBorder(isComplete and deco.colors.achievementborder or deco.colors.buttonborder, 1, deco.colors.achievementborder, 4)
 		})
