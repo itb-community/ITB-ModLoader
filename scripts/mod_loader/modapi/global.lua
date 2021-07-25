@@ -95,20 +95,17 @@ end
 
 function getScreenRefs(scale)
 	scale = scale or GetBoardScale()
-	local uiScale = GetUiScale()
 
-	local tw = 28 * uiScale
-	local th = 21 * uiScale
+	local tw = 28
+	local th = 21
 
 	-- Top corner of the (0, 0) tile
 	local tile00 = {
-		x = ScreenSizeX() / 2,
-		y = ScreenSizeY() / 2 - 8 * th * scale
+		x = screen:w() / 2,
+		y = screen:h() / 2 - 8 * th * scale
 	}
 
-	if scale == 2 then
-		tile00.y = tile00.y + 5 * scale * uiScale + 0.5
-	end
+	tile00.y = tile00.y + (30 - 10 * scale)
 
 	local lineX = function(x) return x * th/tw end
 	local lineY = function(x) return -lineX(x) end
@@ -202,6 +199,9 @@ function screenPointToTile(sourcePointScreenSpace, findTileEdge)
 
 	return nil
 end
+
+--initializeMouseTile()
+--modApi.events.onModsLoaded:subscribe(initializeMouseTile)
 
 function isUserdataPoint(var)
 	return type(var) == 'userdata' and type(var.x) == 'number' and type(var.y) == 'number'
