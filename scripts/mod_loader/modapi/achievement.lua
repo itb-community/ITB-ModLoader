@@ -475,7 +475,7 @@ local function addAchievement(self, achievement)
 	Assert.Equals({'nil', 'function'}, type(remReward), "rem reward function of achievement")
 	Assert.Equals({'nil', 'string'}, type(squad), "squad id of achievement")
 	Assert.Equals({'nil', 'string'}, type(global), "global id of achievement")
-	Assert.Equals({'nil', 'boolean'}, type(secret), "secret id of achievement")
+	Assert.Equals({'nil', 'boolean'}, type(secret), "secret property of achievement")
 
 	local data = Achievement:new{
 		mod_id = mod_id,

@@ -237,17 +237,20 @@ local function buildAchievementUi(achievement, drawCoin)
 	local isComplete = achievement:isComplete()
 	local isSecret = achievement.secret or false
 	
-	local solid = isComplete and deco.colors.transparent or deco.colors.halfblack
-	local surface = sdlext.getSurface{
-		path = achievement.image or NO_ICON,
-		transformations = { { grayscale = not isComplete } }
-	}
+	local solid = nil
+	local surface = nil
 	
 	if isSecret and not isComplete then
 		surface = sdlext.getSurface{
 			path = "resources/mods/ui/achv_secret.png"
 		}
 		solid = deco.colors.transparent
+	else
+		surface = sdlext.getSurface{
+			path = achievement.image or NO_ICON,
+			transformations = { { grayscale = not isComplete } }
+		}
+		solid = isComplete and deco.colors.transparent or deco.colors.halfblack
 	end
 
 	local ui = Ui()
