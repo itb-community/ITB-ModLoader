@@ -153,8 +153,6 @@ local function displayPaletteLocked(self, displayLocked)
 end
 
 local function buildPaletteFrameContent(scroll)
-	local screen = sdl.screen()
-
 	if currentPaletteOrder == nil then
 		currentPaletteOrder = modApi:getCurrentPaletteOrder()
 		buildSdlColorMapBase()

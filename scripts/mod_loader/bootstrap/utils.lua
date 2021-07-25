@@ -1,3 +1,4 @@
+screen = sdl.screen()
 
 function list_indexof(list, value)
 	for k, v in ipairs(list) do

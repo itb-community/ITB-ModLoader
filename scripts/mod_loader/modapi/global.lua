@@ -60,7 +60,22 @@ Emitter_Blank = Emitter:new({
 ---------------------------------------------------------------
 -- Screenpoint to tile conversion
 
-GetUiScale = function() return 1 end
+GetUiScaleX = function()
+	if Settings.stretched == 1 and Settings.fullscreen == 1 then
+		return screen:w() / ScreenSizeX()
+	end
+
+	return 1
+end
+GetUiScale = GetUiScaleX
+
+GetUiScaleY = function()
+	if Settings.stretched == 1 and Settings.fullscreen == 1 then
+		return screen:h() / ScreenSizeY()
+	end
+
+	return 1
+end
 
 --[[
 	Returns currently highlighted board tile, or nil.
@@ -150,7 +165,6 @@ function screenPointToTile(sourcePointScreenSpace, findTileEdge)
 	if not Board then return nil end
 
 	local scale = GetBoardScale()
-	local uiScale = GetUiScale()
 
 	local tile00, lineX, lineY, tw, th = getScreenRefs(scale)
 
