@@ -216,7 +216,9 @@ local function buildPaletteImages(palette)
 end
 
 local function loadPaletteOrder()
-	sdlext.config("modcontent.lua", function(config)
+	local modcontent = modApi:getCurrentModcontentPath()
+
+	sdlext.config(modcontent, function(config)
 		local loadedPaletteOrder = config.paletteOrder or {}
 
 		-- fetch palette ids from modcontent.lua.
