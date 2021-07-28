@@ -18,6 +18,13 @@ end
 function Mission:UpdateQueuedSpawns()
 	local removed = {}
 
+	if not self.QueuedSpawns then
+		-- QueuedSpawns can be nil here.
+		-- One example of this happening is
+		-- when testing a map in mapedit.
+		self.QueuedSpawns = {}
+	end
+
 	for i = #self.QueuedSpawns, 1, -1 do
 		local spawn = self.QueuedSpawns[i]
 
