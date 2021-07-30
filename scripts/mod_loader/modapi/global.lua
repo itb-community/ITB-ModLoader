@@ -60,18 +60,14 @@ Emitter_Blank = Emitter:new({
 ---------------------------------------------------------------
 -- Screenpoint to tile conversion
 
-GetUiScaleX = function()
-	if Settings.stretched == 1 and Settings.fullscreen == 1 then
+GetUiScale = function()
+	-- ScreenSizeY() reports (window height + 1), which leads to a
+	-- slightly different Y scale than in reality. However, Y scale
+	-- always matches the X scale, even when the window is twice as
+	-- tall as it is wide, therefore we can just use X scale for
+	-- both axes.
+	if Settings.stretched == 1 then
 		return screen:w() / ScreenSizeX()
-	end
-
-	return 1
-end
-GetUiScale = GetUiScaleX
-
-GetUiScaleY = function()
-	if Settings.stretched == 1 and Settings.fullscreen == 1 then
-		return screen:h() / ScreenSizeY()
 	end
 
 	return 1
