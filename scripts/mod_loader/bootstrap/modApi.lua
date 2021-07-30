@@ -76,6 +76,8 @@ t.onAbandonTimelineWindowShown = Event()
 t.onAbandonTimelineWindowHidden = Event()
 t.onStatusTooltipWindowShown = Event()
 t.onStatusTooltipWindowHidden = Event()
+t.onMapEditorEntered = Event()
+t.onMapEditorExited = Event()
 t.onWindowShown = Event()
 t.onWindowHidden = Event()
 

@@ -138,6 +138,11 @@ local windows = {
 		event_hide = modApi.events.onStatusTooltipWindowHidden,
 		find_rect = getRectFromShadowSurfaces
 	},
+	Button_Editor_Exit = Window:new{
+		event_show = modApi.events.onMapEditorEntered,
+		event_hide = modApi.events.onMapEditorExited,
+		find_rect = nil
+	},
 }
 
 sdlext.isEscapeMenuWindowVisible = buildIsWindowVisibleFunction(windows.Escape_Title)
@@ -156,6 +161,7 @@ sdlext.isStatisticsWindowVisible = buildIsWindowVisibleFunction(windows.Stats_He
 sdlext.isNewGameWindowVisible = buildIsWindowVisibleFunction(windows.NewGame_Confirm_Title)
 sdlext.isAbandonTimelineWindowVisible = buildIsWindowVisibleFunction(windows.Abandon_Confirm_Title)
 sdlext.isStatusTooltipWindowVisible = buildIsWindowVisibleFunction(windows.Unit_Status_Title)
+sdlext.isMapEditor = buildIsWindowVisibleFunction(windows.Button_Editor_Exit)
 
 local oldGetText = GetText
 function GetText(id, ...)
