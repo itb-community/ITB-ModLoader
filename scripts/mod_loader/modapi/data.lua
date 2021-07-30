@@ -13,8 +13,6 @@ local function doLoadSettings(path)
 		-- to avoid triggering settings changed event.
 		result.launch_failed = 0
 
-		modApi.events.onSettingsInitialized:dispatch(result)
-
 		return result
 	end
 
@@ -31,8 +29,13 @@ function modApi:loadSettings()
 
 	if not settings then
 		modApi.events.onFrameDrawn:subscribe(function()
-			doLoadSettings(path)
+			settings = doLoadSettings(path)
+			if settings and not Settings then
+				modApi.events.onSettingsInitialized:dispatch(settings)
+			end
 		end):openUntil(modApi.events.onSettingsInitialized)
+	elseif not Settings then
+		modApi.events.onSettingsInitialized:dispatch(settings)
 	end
 
 	return settings
