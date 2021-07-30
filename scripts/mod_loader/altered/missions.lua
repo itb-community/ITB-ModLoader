@@ -291,6 +291,8 @@ end
 
 -- ////////////////////////////////////////////////////////////////////
 
+Mission_Test.ID = "Mission_Test"
+
 function Mission_Test:BaseStart()
 	Board.isMission = true
 	modApi:setMission(self)
