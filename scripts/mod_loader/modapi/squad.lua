@@ -9,6 +9,14 @@ function modApi:addSquadTrue(squad, name, desc, icon)
 	return self:addSquad(squad, name, desc, icon)
 end
 
+local validMechClasses = {
+	"Prime",
+	"Brute",
+	"Ranged",
+	"Science",
+	"TechoVek",
+}
+
 function modApi:addSquad(squad, name, desc, icon)
 	Assert.ModInitializingOrLoading()
 
@@ -20,6 +28,23 @@ function modApi:addSquad(squad, name, desc, icon)
 
 	squad.id = squad.id or buildSquadId(squad)
 	Assert.Equals(nil, modApi.mod_squads_by_id[squad.id], string.format("Squad with id %q already exists", squad.id))
+
+	-- Validate the squad
+	for i = 2, 4 do
+		local mechType = squad[i]
+		local ptable = _G[mechType]
+
+		Assert.Equals(
+				"table", type(ptable),
+				string.format("Squad %q - contains pawn with id %q, but no global pawn table with such identifier exists", squad.id, mechType)
+		)
+		Assert.Equals(
+				validMechClasses,
+				ptable.Class,
+				string.format("Squad %q - pawn with id %q has an invalid Class", squad.id, mechType)
+		)
+	end
+
 	modApi.mod_squads_by_id[squad.id] = squad
 
 	table.insert(self.mod_squads, squad)
