@@ -139,8 +139,8 @@ local windows = {
 		find_rect = getRectFromShadowSurfaces
 	},
 	Button_Editor_Exit = Window:new{
-		event_show = modApi.events.onMapEditorEntered,
-		event_hide = modApi.events.onMapEditorExited,
+		event_show = modApi.events.onMapEditorTestEntered,
+		event_hide = modApi.events.onMapEditorTestExited,
 		find_rect = nil
 	},
 }
