@@ -43,7 +43,7 @@ end
 	Returns the table instance of the current mission. Returns nil when not in a mission.
 --]]
 function GetCurrentMission()
-	if IsTestMechScenario() then
+	if IsTestMechScenario() or sdlext.isMapEditor() then
 		return Mission_Test
 	end
 
