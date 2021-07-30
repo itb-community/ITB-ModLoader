@@ -3,14 +3,9 @@ function modApi:isProfilePath()
 	return Settings.last_profile ~= nil and Settings.last_profile ~= ""
 end
 
---[[
-	Reloads the settings file to have access to selected settings
-	from in-game lua scripts.
---]]
-function modApi:loadSettings()
-	local path = GetSavedataLocation() .. "settings.lua"
-	if self:fileExists(path) then
-		local result = self:loadIntoEnv(path).Settings
+local function doLoadSettings(path)
+	if modApi:fileExists(path) then
+		local result = modApi:loadIntoEnv(path).Settings
 
 		-- This value changes from 0 to 1 during
 		-- game init, and changes from 1 to 0 after
@@ -18,10 +13,29 @@ function modApi:loadSettings()
 		-- to avoid triggering settings changed event.
 		result.launch_failed = 0
 
+		modApi.events.onSettingsInitialized:dispatch(result)
+
 		return result
 	end
 
 	return nil
+end
+
+--[[
+	Reloads the settings file to have access to selected settings
+	from in-game lua scripts.
+--]]
+function modApi:loadSettings()
+	local path = GetSavedataLocation() .. "settings.lua"
+	local settings = doLoadSettings(path)
+
+	if not settings then
+		modApi.events.onFrameDrawn:subscribe(function()
+			doLoadSettings(path)
+		end):openUntil(modApi.events.onSettingsInitialized)
+	end
+
+	return settings
 end
 
 --[[
