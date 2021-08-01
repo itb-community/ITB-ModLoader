@@ -3,11 +3,18 @@ local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 local parentDirectory = GetParentPath(...)
 
 modApi = modApi or {}
+
+modApi.events.onSettingsInitialized:subscribe(function(settings)
+	Settings = settings
+	LOG("Settings initialized!")
+end)
+
 function modApi:init()
 	Settings = self:loadSettings()
+
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
-	self.version = "2.6.1"
+	self.version = "2.6.2.dev"
 	LOG("MOD-API VERSION "..self.version)
 	LOGD("Parent directory:", parentDirectory)
 

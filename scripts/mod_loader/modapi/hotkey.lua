@@ -22,11 +22,10 @@ HOTKEY = {
 	TOGGLE_FULLSCREEN = 23
 }
 
-local settings = modApi:loadSettings()
 local keystatus = {}
 
 modApi.hotkey = {
-	keys = settings.hotkeys,
+	keys = {},
 	suppressed = {},
 	hooks_down = {},
 	hooks_up = {}
@@ -36,6 +35,11 @@ function modApi.hotkey:resetHooks()
 	self.hooks_down = {}
 	self.hooks_up = {}
 end
+
+modApi.events.onSettingsInitialized:subscribe(function(settings)
+	Assert.Equals("table", type(settings))
+	modApi.hotkey.keys = settings.hotkeys
+end)
 
 modApi.events.onSettingsChanged:subscribe(function(oldSettings, newSettings)
 	modApi.hotkey.keys = newSettings.hotkeys
