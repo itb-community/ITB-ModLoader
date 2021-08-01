@@ -14,7 +14,7 @@ local validMechClasses = {
 	"Brute",
 	"Ranged",
 	"Science",
-	"TechoVek",
+	"TechnoVek",
 }
 
 function modApi:addSquad(squad, name, desc, icon)
