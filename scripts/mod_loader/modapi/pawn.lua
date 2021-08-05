@@ -20,7 +20,7 @@ BoardPawn.GetPawnTable = function(self)
 	local region = GetCurrentRegion(RegionData)
 	
 	if region == nil then
-		return {}
+		return GetPawnTable(self:GetId()) or {}
 	end
 	
 	return GetPawnTable(self:GetId(), region.player.map_data) or {}
