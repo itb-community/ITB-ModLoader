@@ -123,12 +123,12 @@ BoardPawn.IsArmor = function(self)
 	local isArmoredPilotAbility = self:IsAbility("Armored")
 	local isArmoredPawn = pawnType:GetArmor()
 	local isArmoredMutation = self:IsMutation(LEADER_ARMOR)
-	local isEffectSource = pawnType:GetLeader() == LEADER_ARMOR
+	local isPsion = pawnType:GetLeader() ~= LEADER_NONE
 
 	-- TODO: Bug: killing an armor psion then respawning it via Board:AddPawn() causes this function to return false
 	-- Need to update the savefile after a new pawn appears on the board
 	
-	return isArmoredPilotAbility or isArmoredPawn or (isArmoredMutation and not isEffectSource)
+	return isArmoredPilotAbility or isArmoredPawn or (isArmoredMutation and not isPsion)
 end
 
 BoardPawn.IsIgnoreWeb = function(self)
