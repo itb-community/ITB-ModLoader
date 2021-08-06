@@ -176,6 +176,16 @@ end
 modApi.events.onFrameDrawStart:subscribe(function()
 	local selectedPawnIdCurrent = Board and Board:GetSelectedPawnId() or nil
 
+	if Game and selectedPawnIdCurrent ~= selectedPawnIdLast then
+		if selectedPawnIdLast then
+			modApi:firePawnDeselectedHooks(Game:GetPawn(selectedPawnIdLast))
+		end
+
+		if selectedPawnIdCurrent then
+			modApi:firePawnSelectedHooks(Game:GetPawn(selectedPawnIdCurrent))
+		end
+	end
+
 	if focusedPawnCurrent ~= focusedPawnLast or selectedPawnIdCurrent ~= selectedPawnIdLast then
 		if focusedPawnLast then
 			modApi:firePawnUnfocusedHooks(focusedPawnLast)

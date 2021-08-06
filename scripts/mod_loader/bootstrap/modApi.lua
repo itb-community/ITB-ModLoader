@@ -165,6 +165,8 @@ local hooks = {
 	"TipImageHidden",
 	"PawnFocused",
 	"PawnUnfocused",
+	"PawnSelected",
+	"PawnDeselected",
 }
 
 for _, name in ipairs(hooks) do
