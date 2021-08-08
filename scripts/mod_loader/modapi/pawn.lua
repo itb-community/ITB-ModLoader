@@ -241,6 +241,19 @@ BoardPawn.IsHighlighted = function(self)
 	return false
 end
 
+BoardPawn.GetAbility = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	local ptable = self:GetPawnTable()
+
+	if ptable.pilot == nil then
+		return ""
+	end
+
+	local pilot = _G[ptable.pilot.id]
+	return pilot.Skill
+end
+
 BoardPawn.GetLuaString = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	return string.format("BoardPawn [id = %s, space = %s, name = %s]", self:GetId(), self:GetSpace():GetLuaString(), self:GetMechName())
@@ -281,6 +294,9 @@ local function initializeBoardPawn()
 
 		setSavefileFieldsForPawn(self, { bPowered = powered })
 	end
+
+	BoardPawn.IsPilotSkill = pawn.IsAbility
+	BoardPawn.GetPilotSkill = pawn.GetAbility
 
 	pawn = nil
 	InitializeBoardPawn = nil
