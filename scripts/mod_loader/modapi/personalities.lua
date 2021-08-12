@@ -29,6 +29,7 @@ local function dialogEvent(event, texts, overwrite)
 end
 
 local function addDialogTable(self, dialogTable, overwrite)
+	Assert.Equals('table', type(self), "Argument #0")
 	Assert.Equals('table', type(dialogTable), "Argument #1")
 
 	for event, texts in pairs(dialogTable) do
@@ -38,6 +39,7 @@ local function addDialogTable(self, dialogTable, overwrite)
 end
 
 local function addMissionDialogTable(self, missionId, dialogTable, overwrite)
+	Assert.Equals('table', type(self), "Argument #0")
 	Assert.Equals('string', type(missionId), "Argument #1")
 	Assert.Equals('table', type(dialogTable), "Argument #2")
 
