@@ -37,7 +37,7 @@ local function addDialogTable(self, dialogTable, overwrite)
 	end
 end
 
-local function addMissionDialogTable(missionId, dialogTable, overwrite)
+local function addMissionDialogTable(self, missionId, dialogTable, overwrite)
 	Assert.Equals('string', type(missionId), "Argument #1")
 	Assert.Equals('table', type(dialogTable), "Argument #2")
 
