@@ -38,6 +38,11 @@ local function has_equal(expected, actual)
 	return expected == actual
 end
 
+function Assert.Error(msg)
+	msg = (msg and msg .. ": ") or ""
+	error(msg..traceback())
+end
+
 function Assert.Equals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
 	msg = msg .. string.format("Expected %s, but was '%s'%s", get_string(expected), tostring(actual), traceback())
