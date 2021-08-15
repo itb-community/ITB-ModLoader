@@ -209,13 +209,6 @@ function drawtri_br(screen, color, rect)
 	end
 end
 
-local function rect_contains0(x, y, w, h, px, py)
-	return px >= x     and
-	       px < x + w  and
-	       py >= y     and
-	       py < y + h
-end
-
 --[[
 	rect_contains(rect, px, py)
 	OR
@@ -223,24 +216,17 @@ end
 --]]
 function rect_contains(...)
 	local a = {...}
-	Assert.True(#a == 3 or #a == 6, "Expected 3 or 6 arguments, but got " .. #a)
-
 	if #a == 3 then
-		return rect_contains0(
-			a[1].x, a[1].y,
-			a[1].w, a[1].h,
-			a[2],   a[3]
-		)
-	else
-		return rect_contains0(...)
+		return a[1]:contains(a[2], a[3])
+	elseif #a == 6 then
+		return sdl.rect(a[1], a[2], a[3], a[4]):contains(a[5], a[6])
 	end
+
+	Assert.Error("Expected 3 or 6 arguments, but got " .. tostring(#a))
 end
 
 function rect_intersects(r1, r2)
-	return not (r2.x >= r1.x + r1.w or
-	            r2.x + r2.w <= r1.x or
-	            r2.y >= r1.y + r1.h or
-	            r2.y + r2.h <= r1.y)
+	return r1:intersects(r2)
 end
 
 --[[
