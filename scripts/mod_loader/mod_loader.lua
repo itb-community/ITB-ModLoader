@@ -152,6 +152,7 @@ function mod_loader:loadAdditionalSprites()
 	modApi:appendAsset("img/units/placeholder_mech.png",baseDir.."img/placeholders/mech.png")
 	modApi:appendAsset("img/weapons/placeholder_weapon.png",baseDir.."img/placeholders/weapon.png")
 	modApi:appendAsset("img/units/placeholder_enemy.png",baseDir.."img/placeholders/enemy.png")
+	modApi:appendAsset("img/empty.png",baseDir.."img/placeholders/empty.png")
 	
 	ANIMS.placeholder_mech = ANIMS.SingleImage:new{Image = "units/placeholder_mech.png"}
 	ANIMS.placeholder_enemy = ANIMS.SingleImage:new{Image = "units/placeholder_enemy.png"}
