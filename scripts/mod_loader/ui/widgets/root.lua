@@ -23,6 +23,15 @@ function UiRoot:new()
 	self.dropdownUi = PriorityUi():addTo(self.priorityUi)
 end
 
+function UiRoot:relayout()
+	self.rect.x = self.screenx
+	self.rect.y = self.screeny
+	self.rect.w = self.w
+	self.rect.h = self.h
+
+	Ui.relayout(self)
+end
+
 function UiRoot:draw(screen)
 	-- priorityUi is relayed out last, but drawn first
 	self.priorityUi.visible = false
