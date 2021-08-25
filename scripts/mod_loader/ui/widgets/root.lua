@@ -47,6 +47,7 @@ function UiRoot:draw(screen)
 	self:relayoutTooltipUi()
 
 	Ui.draw(self, screen)
+	screen:clearmask()
 end
 
 function UiRoot:relayoutDragDropPriorityUi()
