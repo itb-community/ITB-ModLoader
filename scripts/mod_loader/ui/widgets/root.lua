@@ -131,22 +131,39 @@ function UiRoot:setPressedChild(child)
 	end
 end
 
+-- Hack: always call startDrag and stopDrag
+-- with argument button = 1
 function UiRoot:setDraggedChild(child)
 	if self.draggedchild then
 		self.draggedchild.dragged = false
+		self.draggedchild:stopDrag(sdl.mouse.x(), sdl.mouse.y(), 1)
 	end
 
 	self.draggedchild = child
 
 	if child then
 		child.dragged = true
+		child:startDrag(sdl.mouse.x(), sdl.mouse.y(), 1)
 	end
 end
 
 function UiRoot:updatePressedState(mx, my)
+	local draggedchild = self.draggedchild
+	local pressedchild = self.pressedchild
+
 	-- release the pressed element if it has become orphaned from root
-	if self.pressedchild and self.pressedchild.root ~= self then
-		self:releasePressedchild(mx, my, 1)
+	if pressedchild and pressedchild.root ~= self then
+
+		if draggedchild then
+			self:setDraggedChild(nil)
+
+			-- Hack: always call stopDrag with argument button = 1
+			draggedchild:stopDrag(mx, my, 1)
+		end
+
+		self:setPressedChild(nil)
+
+		pressedchild:mouseup(mx, my, button)
 	end
 end
 
@@ -189,48 +206,6 @@ function UiRoot:updateStates()
 	self:updateState()
 end
 
-function UiRoot:pressHoveredchild(mx, my, button)
-	local pressedchild = self.hoveredchild
-	if pressedchild == nil then return end
-
-	self:setPressedChild(pressedchild)
-
-	if pressedchild.draggable then
-		self:setDraggedChild(pressedchild)
-		pressedchild:startDrag(mx, my, button)
-	end
-
-	return pressedchild:mousedown(mx, my, button)
-end
-
-function UiRoot:releasePressedchild(mx, my, button)
-	local draggedchild = self.draggedchild
-	local pressedchild = self.pressedchild
-
-	if draggedchild then
-		self:setDraggedChild(nil)
-
-		-- Hack: always call stopDrag with argument button = 1
-		draggedchild:stopDrag(mx, my, 1)
-	end
-
-	if pressedchild then
-		self:setPressedChild(nil)
-
-		if button == 1 then
-			local consumeEvent = pressedchild:mouseup(mx, my, button)
-
-			if pressedchild.containsMouse and pressedchild:clicked(button) then
-				consumeEvent = true
-			end
-
-			return consumeEvent
-		end
-	end
-
-	return false
-end
-
 function UiRoot:event(eventloop)
 	if not self.visible then return false end
 	
@@ -239,33 +214,46 @@ function UiRoot:event(eventloop)
 	local my = sdl.mouse.y()
 	
 	if type == sdl.events.mousewheel then
-		local pressedchild = self.pressedchild
 		local wheel = eventloop:wheel()
+		local consumeEvent = self:wheel(mx, my, wheel)
+		local pressedchild = self.pressedchild
+		local draggedchild = self.draggedchild
 
-		if pressedchild then
-			local consumeEvent = pressedchild:wheel(mx, my, wheel)
-
-			if self.draggedchild and self.draggedchild:dragWheel(mx, my, wheel) then
-				consumeEvent = true
-			end
-
-			if consumeEvent then
-				return true
-			end
+		-- pressedchild.wheel must have already been
+		-- called if this element contains the mouse.
+		if pressedchild and not pressedchild.containsMouse and pressedchild:wheel(mx, my, wheel) then
+			consumeEvent = true
 		end
 
-		return self:wheel(mx, my, wheel)
+		if draggedchild and draggedchild:dragWheel(mx, my, wheel) then
+			consumeEvent = true
+		end
+
+		return consumeEvent
 	end
 
 	if type == sdl.events.mousebuttondown then
 		local button = eventloop:mousebutton()
-		local consumeEvent = false
+		local draggedchild = self.draggedchild
+		local pressedchild = self.pressedchild
+		local hoveredchild = self.hoveredchild
+		local consumeEvent = self:mousedown(mx, my, button)
 
-		self:releasePressedchild(mx, my, button)
-		self:setfocus(self.hoveredchild)
+		self:setDraggedChild(nil)
 
-		if button == 1 then
-			consumeEvent = self:pressHoveredchild(mx, my, button)
+		if pressedchild then
+			self:setPressedChild(nil)
+			pressedchild:mouseup(mx, my, button)
+		end
+
+		self:setfocus(hoveredchild)
+
+		if button == 1 and hoveredchild then
+			self:setPressedChild(hoveredchild)
+
+			if hoveredchild.draggable then
+				self:setDraggedChild(hoveredchild)
+			end
 		end
 
 		-- inform open dropDownUi's of mouse down event,
@@ -277,10 +265,6 @@ function UiRoot:event(eventloop)
 			end
 		end
 
-		if not consumeEvent then
-			consumeEvent = self:mousedown(mx, my, button)
-		end
-
 		self:cleanupDropdown()
 
 		return consumeEvent
@@ -288,30 +272,48 @@ function UiRoot:event(eventloop)
 	
 	if type == sdl.events.mousebuttonup then
 		local button = eventloop:mousebutton()
+		local pressedchild = self.pressedchild
+		local draggedchild = self.draggedchild
+		local consumeEvent = self:mouseup(mx, my, button)
 
-		if button == 1 and self.pressedchild then
-			return self:releasePressedchild(mx, my, button)
+		if button == 1 and pressedchild then
+			self:setDraggedChild(nil)
+			self:setPressedChild(nil)
+
+			if pressedchild.containsMouse then
+				if pressedchild:clicked(button) then
+					consumeEvent = true
+				end
+			else
+				-- pressedchild.mouseup must have already been
+				-- called if this element contains the mouse.
+				if pressedchild:mouseup(mx, my, button) then
+					consumeEvent = true
+				end
+			end
 		end
 
-		return self:mouseup(mx, my, button)
+		return consumeEvent
 	end
 	
 	if type == sdl.events.mousemotion then
 		local pressedchild = self.pressedchild
+		local draggedchild = self.draggedchild
+		local consumeEvent = self:mousemove(mx, my)
 
 		if pressedchild then
-			local consumeEvent = pressedchild:mousemove(mx, my)
-
-			if self.draggedchild and self.draggedchild:dragMove(mx, my) then
+			if draggedchild and draggedchild:dragMove(mx, my) then
 				consumeEvent = true
 			end
 
-			if consumeEvent then
-				return true
+			-- pressedchild.mousemove must have already been
+			-- called if this element contains the mouse.
+			if not pressedchild.containsMouse and pressedchild:mousemove(mx, my) then
+				consumeEvent = true
 			end
 		end
 
-		return self:mousemove(mx, my)
+		return consumeEvent
 	end
 
 	if type == sdl.events.keydown then

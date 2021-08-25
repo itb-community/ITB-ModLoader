@@ -50,7 +50,6 @@ end
 
 function UiDragDropList:keydown(keycode)
 	if keycode == SDLKeycodes.ESCAPE then
-		self:stopDrag(sdl.mouse.x(), sdl.mouse.y(), 1)
 		self.root:setPressedChild(nil)
 		self.root:setDraggedChild(nil)
 	end
