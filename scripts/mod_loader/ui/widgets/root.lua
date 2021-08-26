@@ -65,12 +65,11 @@ function UiRoot:relayoutTooltipUi()
 end
 
 function UiRoot:setfocus(newfocus)
-	assert(
-		-- we permit the focus to be set to nil, ui elements with a parent,
-		-- or to the root itself
-		newfocus == nil or (newfocus.parent or newfocus.root == newfocus),
-		"Unable to set focus, because the UI element has no parent"
-	)
+	-- we permit the focus to be set to nil, ui elements with a parent,
+	-- or to the root itself
+	if newfocus and newfocus ~= self and newfocus.parent == nil then
+		newfocus = self
+	end
 
 	-- clear old focus
 	local p = self.focuschild
