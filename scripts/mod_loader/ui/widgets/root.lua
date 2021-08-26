@@ -215,9 +215,9 @@ function UiRoot:event(eventloop)
 	
 	if type == sdl.events.mousewheel then
 		local wheel = eventloop:wheel()
-		local consumeEvent = self:wheel(mx, my, wheel)
 		local pressedchild = self.pressedchild
 		local draggedchild = self.draggedchild
+		local consumeEvent = self:wheel(mx, my, wheel)
 
 		-- pressedchild.wheel must have already been
 		-- called if this element contains the mouse.
@@ -234,7 +234,6 @@ function UiRoot:event(eventloop)
 
 	if type == sdl.events.mousebuttondown then
 		local button = eventloop:mousebutton()
-		local draggedchild = self.draggedchild
 		local pressedchild = self.pressedchild
 		local hoveredchild = self.hoveredchild
 		local consumeEvent = self:mousedown(mx, my, button)
@@ -273,7 +272,6 @@ function UiRoot:event(eventloop)
 	if type == sdl.events.mousebuttonup then
 		local button = eventloop:mousebutton()
 		local pressedchild = self.pressedchild
-		local draggedchild = self.draggedchild
 		local consumeEvent = self:mouseup(mx, my, button)
 
 		if button == 1 and pressedchild then
