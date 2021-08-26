@@ -244,7 +244,9 @@ function UiRoot:event(eventloop)
 			pressedchild:mouseup(mx, my, button)
 		end
 
-		self:setfocus(hoveredchild)
+		if hoveredchild then
+			hoveredchild:setfocus()
+		end
 
 		if button == 1 and hoveredchild then
 			self:setPressedChild(hoveredchild)

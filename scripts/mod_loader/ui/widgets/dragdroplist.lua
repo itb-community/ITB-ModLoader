@@ -53,6 +53,10 @@ function UiDragDropList:stopDrag(mx, my, button)
 	UiDraggable.stopDrag(self, mx, my, button)
 end
 
+function UiDragDropList:setfocus()
+	return false
+end
+
 function UiDragDropList:keydown(keycode)
 	if keycode == SDLKeycodes.ESCAPE then
 		self.root:setPressedChild(nil)
@@ -71,6 +75,7 @@ function Ui:registerDragDropList(placeholder)
 	self.dragPlaceholder = placeholder
 	self.startDrag = UiDragDropList.startDrag
 	self.stopDrag = UiDragDropList.stopDrag
+	self.setfocus = UiDragDropList.setfocus
 	self.keydown = UiDragDropList.keydown
 	self.keyup = UiDragDropList.keyup
 end
