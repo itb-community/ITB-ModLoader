@@ -235,6 +235,11 @@ function UiRoot:event(eventloop)
 		local button = eventloop:mousebutton()
 		local pressedchild = self.pressedchild
 		local hoveredchild = self.hoveredchild
+
+		if hoveredchild then
+			hoveredchild:setfocus()
+		end
+
 		local consumeEvent = self:mousedown(mx, my, button)
 
 		self:setDraggedChild(nil)
@@ -242,10 +247,6 @@ function UiRoot:event(eventloop)
 		if pressedchild then
 			self:setPressedChild(nil)
 			pressedchild:mouseup(mx, my, button)
-		end
-
-		if hoveredchild then
-			hoveredchild:setfocus()
 		end
 
 		if button == 1 and hoveredchild then
