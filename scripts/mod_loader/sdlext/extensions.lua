@@ -219,7 +219,13 @@ function rect_contains(...)
 	if #a == 3 then
 		return a[1]:contains(a[2], a[3])
 	elseif #a == 6 then
-		return sdl.rect(a[1], a[2], a[3], a[4]):contains(a[5], a[6])
+		if not temprect then temprect = sdl.rect(0,0,0,0) end
+		temprect.x = a[1]
+		temprect.y = a[2]
+		temprect.w = a[3]
+		temprect.h = a[4]
+
+		return temprect:contains(a[5], a[6])
 	end
 
 	Assert.Error("Expected 3 or 6 arguments, but got " .. tostring(#a))
