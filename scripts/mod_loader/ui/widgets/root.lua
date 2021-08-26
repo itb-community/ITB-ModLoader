@@ -240,8 +240,6 @@ function UiRoot:event(eventloop)
 			hoveredchild:setfocus()
 		end
 
-		local consumeEvent = self:mousedown(mx, my, button)
-
 		self:setDraggedChild(nil)
 
 		if pressedchild then
@@ -256,6 +254,8 @@ function UiRoot:event(eventloop)
 				self:setDraggedChild(hoveredchild)
 			end
 		end
+
+		local consumeEvent = self:mousedown(mx, my, button)
 
 		-- inform open dropDownUi's of mouse down event,
 		-- even if the mouse click was outside of its area,
