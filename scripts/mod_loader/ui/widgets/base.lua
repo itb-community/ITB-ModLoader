@@ -325,13 +325,7 @@ function Ui:updateContainsMouse(mx, my)
 	if not self.visible or self.ignoreMouse then
 		curr_containsMouse = false
 	else
-		curr_containsMouse = rect_contains(
-			self.screenx,
-			self.screeny,
-			self.w,
-			self.h,
-			mx, my
-		)
+		curr_containsMouse = self.rect:contains(mx, my)
 	end
 
 	if curr_containsMouse ~= self.containsMouse then

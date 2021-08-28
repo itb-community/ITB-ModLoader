@@ -36,6 +36,7 @@ function UiDragDropList:stopDrag(mx, my, button)
 	end
 
 	if self.dragMoving and self.dragPlaceholder ~= nil then
+		local root = self.root
 		local index = list_indexof(self.owner.children, self.dragPlaceholder)
 		self.dragPlaceholder:detach()
 		self.dragPlaceholder:hide()
@@ -43,14 +44,21 @@ function UiDragDropList:stopDrag(mx, my, button)
 		self:detach()
 		self:addTo(self.owner, index)
 		self.translucent = self.dragPlaceholder.translucent
+
+		if root then
+			root:setfocus(self.owner)
+		end
 	end
 
 	UiDraggable.stopDrag(self, mx, my, button)
 end
 
+function UiDragDropList:setfocus()
+	return false
+end
+
 function UiDragDropList:keydown(keycode)
 	if keycode == SDLKeycodes.ESCAPE then
-		self:stopDrag(sdl.mouse.x(), sdl.mouse.y(), 1)
 		self.root:setPressedChild(nil)
 		self.root:setDraggedChild(nil)
 	end
@@ -67,6 +75,7 @@ function Ui:registerDragDropList(placeholder)
 	self.dragPlaceholder = placeholder
 	self.startDrag = UiDragDropList.startDrag
 	self.stopDrag = UiDragDropList.stopDrag
+	self.setfocus = UiDragDropList.setfocus
 	self.keydown = UiDragDropList.keydown
 	self.keyup = UiDragDropList.keyup
 end
