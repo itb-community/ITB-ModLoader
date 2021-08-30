@@ -215,6 +215,8 @@ function modApi:runInEnv(func, envTable)
 	local upvalues = getUpvaluesOfFunction(func)
 	upvalues.__func = func
 	table.insert(envTable.__upvalueStack, upvalues)
+
+	local realfenv = getfenv(func)
 	setfenv(func, envTable)
 	
 	-- Execute the function in sandboxed environment
@@ -246,6 +248,8 @@ function modApi:runInEnv(func, envTable)
 	_G = realG
 	envTable.__nil = nil
 	envTable.__upvalueStack = nil
+
+	setfenv(func, realfenv)
 
 	return envTable, ok, result
 end
