@@ -70,14 +70,12 @@ local function buildNewModContent()
 			version = entry.version
 		}
 		
-		if modContent[id].enabled then
-			for i, opt in ipairs(entry.options) do
-				local opt_editable = entry_editable.options[i]
-				if opt.type == "checkbox" then
-					options[opt.id] = { enabled = opt_editable.enabled }
-				else
-					options[opt.id] = { value = opt_editable.value }
-				end
+		for i, opt in ipairs(entry.options) do
+			local opt_editable = entry_editable.options[i]
+			if opt.type == "checkbox" then
+				options[opt.id] = { enabled = opt_editable.enabled }
+			else
+				options[opt.id] = { value = opt_editable.value }
 			end
 		end
 	end
