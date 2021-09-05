@@ -337,12 +337,11 @@ BoardPawn.GetPoweredWeapons = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 
 	local ptable = self:GetPawnTable()
-	local result = {}
 
-	result[#result+1] = getPoweredWeapon(ptable, "primary")
-	result[#result+1] = getPoweredWeapon(ptable, "secondary")
-
-	return result
+	return {
+		getPoweredWeapon(ptable, "primary"),
+		getPoweredWeapon(ptable, "secondary")
+	}
 end
 
 BoardPawn.IsWeaponEquipped = function(self, baseWeapon)
