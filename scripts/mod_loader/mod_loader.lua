@@ -264,7 +264,7 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 			
 			self.mod_options[data.id] = {
 				options = {},--For configurable mods
-				enabled = true,
+				enabled = data.enabled == nil and true or data.enabled,
 				version = data.version,
 			}
 			
@@ -412,7 +412,7 @@ function mod_loader:initMetadata(id)
 end
 
 function mod_loader:hasMod(id)
-	return self.mods[id] and self.mod_options[id].enabled
+	return self.mods[id]
 end
 
 function mod_loader:getModContentDefaults()
@@ -420,7 +420,7 @@ function mod_loader:getModContentDefaults()
 	
 	for id, mod in pairs(self.mod_options) do
 		if self:hasMod(id) then
-			local new = { enabled = true, version = mod.version, options = {} }
+			local new = { enabled = mod.enabled, version = mod.version, options = {} }
 			
 			--Convert from array (for order) to keyed (for save game)
 			for i, option in ipairs(mod.options) do
