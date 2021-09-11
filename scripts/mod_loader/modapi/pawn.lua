@@ -254,6 +254,166 @@ BoardPawn.GetAbility = function(self)
 	return pilot.Skill
 end
 
+
+local function isPowered(powerTable)
+	if powerTable == nil then
+		return false
+	end
+
+	return powerTable[1] ~= 0
+end
+
+local function getPoweredWeapon(ptable, weapon)
+	if not isPowered(ptable[weapon.."_power"] or {1}) then
+		return nil
+	end
+
+	local result = ptable[weapon]
+
+	if result == nil then
+		return nil
+	end
+
+	local upgrade = ""
+	if isPowered(ptable[weapon.."_mod1"]) then
+		upgrade = upgrade.."A"
+	end
+	if isPowered(ptable[weapon.."_mod2"]) then
+		upgrade = upgrade.."B"
+	end
+	if upgrade:len() > 0 then
+		result = result.."_"..upgrade
+	end
+
+	return result
+end
+
+local function weaponBase(weapon)
+	return weapon:match("^(.-)_?A?B?$")
+end
+
+local function weaponSuffix(weapon)
+	return weapon:match("_(A?B?)$")
+end
+
+-- returns true if `weapon` is the same
+-- or a lower version of `compareWeapon`
+local function isDescendantOfWeapon(weapon, compareWeapon)
+	if compareWeapon == nil then
+		return false
+	end
+
+	local baseWeapon = weaponBase(weapon)
+	local baseCompare = weaponBase(compareWeapon)
+
+	if baseWeapon ~= baseCompare then
+		return false
+	end
+
+	local suffixWeapon = weaponSuffix(weapon)
+	local suffixCompare = weaponSuffix(compareWeapon)
+
+	if suffixWeapon == nil then
+		return true
+	elseif suffixCompare == nil then
+		return false
+	end
+
+	return suffixCompare:find(suffixWeapon) and true or false
+end
+
+BoardPawn.GetEquippedWeapons = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	local ptable = self:GetPawnTable()
+
+	return {
+		ptable.primary,
+		ptable.secondary
+	}
+end
+
+BoardPawn.GetPoweredWeapons = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	local ptable = self:GetPawnTable()
+
+	return {
+		getPoweredWeapon(ptable, "primary"),
+		getPoweredWeapon(ptable, "secondary")
+	}
+end
+
+BoardPawn.IsWeaponEquipped = function(self, baseWeapon)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("string", type(baseWeapon), "Argument #1")
+
+	local ptable = self:GetPawnTable()
+
+	return
+		baseWeapon == ptable.primary or
+		baseWeapon == ptable.secondary
+end
+
+BoardPawn.IsWeaponPowered = function(self, weapon)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("string", type(weapon), "Argument #1")
+
+	local ptable = self:GetPawnTable()
+	local poweredWeapons = self:GetPoweredWeapons()
+
+	return
+		isDescendantOfWeapon(weapon, poweredWeapons[1]) or
+		isDescendantOfWeapon(weapon, poweredWeapons[2])
+end
+
+BoardPawn.GetArmedWeapon = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	local ptable = self:GetPawnTable()
+	local armedWeaponId = self:GetArmedWeaponId()
+
+	if armedWeaponId == 0 then
+		return "Move"
+	elseif armedWeaponId == 1 then
+		return getPoweredWeapon(ptable, "primary")
+	elseif armedWeaponId == 2 then
+		return getPoweredWeapon(ptable, "secondary")
+	elseif armedWeaponId == 50 then
+		return "Skill_Repair"
+	end
+
+	return nil
+end
+
+BoardPawn.GetQueuedWeaponId = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	local ptable = self:GetPawnTable()
+	local queued = self:GetQueued()
+
+	return queued and queued.iQueuedSkill or -1
+end
+
+BoardPawn.GetQueuedWeapon = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	local ptable = self:GetPawnTable()
+	local queuedWeaponId = self:GetQueuedWeaponId()
+
+	if queuedWeaponId == 0 then
+		return "Move"
+	elseif queuedWeaponId == 1 then
+		return getPoweredWeapon(ptable, "primary")
+	elseif queuedWeaponId == 2 then
+		return getPoweredWeapon(ptable, "secondary")
+	elseif queuedWeaponId == 50 then
+		return "Skill_Repair"
+	end
+
+	return nil
+end
+
 BoardPawn.GetLuaString = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	return string.format("BoardPawn [id = %s, space = %s, name = %s]", self:GetId(), self:GetSpace():GetLuaString(), self:GetMechName())
