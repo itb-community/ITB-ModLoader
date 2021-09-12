@@ -412,7 +412,7 @@ function mod_loader:initMetadata(id)
 end
 
 function mod_loader:hasMod(id)
-	return self.mods[id]
+	return self.mods[id] and true or false
 end
 
 function mod_loader:getModContentDefaults()
