@@ -71,3 +71,17 @@ function modApi:getCurrentMod()
 
 	return mod_loader.mods[self.currentMod]
 end
+
+function modApi:getModOptions(modId)
+	Assert.Equals({"string", "nil"}, type(modId), "Argument #1")
+
+	if modId == nil then
+		Assert.ModInitializingOrLoading("Argument #1 must be specified outside of init or load")
+		modId = mod_loader.currentMod
+	end
+
+	Assert.True(mod_loader:hasMod(modId), "Mod not found")
+
+	local modContent = mod_loader.currentModContent or mod_loader:getModConfig()
+	return modContent[modId].options
+end
