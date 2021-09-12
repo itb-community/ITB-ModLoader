@@ -65,3 +65,9 @@ function modApi:addGenerationOption(id, name, tip, data)
 
 	table.insert(mod_loader.mod_options[self.currentMod].options, option)
 end
+
+function modApi:getCurrentMod()
+	Assert.ModInitializingOrLoading("This function should only be called while mods are initializing or loading")
+
+	return mod_loader.mods[self.currentMod]
+end
