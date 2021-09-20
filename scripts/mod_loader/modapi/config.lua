@@ -37,6 +37,9 @@ function SaveModLoaderConfig(data)
 			sdlext.config(
 				"modcontent.lua", 
 				function(obj)
+					if not obj.modLoaderConfig then
+						obj.modLoaderConfig = {}
+					end
 					obj.modLoaderConfig.profileConfig = true
 				end
 			)
