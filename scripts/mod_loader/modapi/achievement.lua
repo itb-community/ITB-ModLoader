@@ -525,7 +525,7 @@ end
 local function resetAchievement(self, mod_id, achievement_id)
 	assertIsAchievement(mod_id, achievement_id)
 	local achievement = AchievementDictionary:get(mod_id, achievement_id)
-	achievement:reset()
+	achievement:resetProgress()
 end
 
 local function triggerAchievement(self, mod_id, achievement_id, status)
