@@ -38,7 +38,7 @@ local function playToast(self)
 	local root = sdlext.getUiRoot()
 	local title = toast.title or toast.unlockTitle or GetText("Achievements_ToastTitle")
 	local name = toast.name or "Unnamed Toast"
-	local tooltip = toast.tooltip or toast.tip or ""
+	local tooltip = toast.getTooltip and toast:getTooltip() or toast.tooltip or toast.tip or ""
 	local surface = sdlext.getSurface({ path = toast.image or toast.img or NO_ICON })
 
 	local icon = {
