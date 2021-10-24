@@ -79,6 +79,7 @@ function Mission:BaseDeployment()
 	self.Board = Board
 
 	modApi:fireMissionStartHooks(self)
+	self.Deployed = true
 end
 
 local function overrideMissionEnd(self)
@@ -95,6 +96,7 @@ local oldCreateMission = CreateMission
 function CreateMission(mission)
 	local mObject = oldCreateMission(mission)
 	mObject.Initialized = false
+	mObject.Deployed = false
 
 	overrideMissionEnd(mObject)
 
