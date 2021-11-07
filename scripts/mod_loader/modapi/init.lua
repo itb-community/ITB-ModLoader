@@ -14,7 +14,7 @@ function modApi:init()
 
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
-	self.version = "2.6.3.dev"
+	self.version = "2.6.4"
 	LOG("MOD-API VERSION "..self.version)
 	LOGD("Parent directory:", parentDirectory)
 
