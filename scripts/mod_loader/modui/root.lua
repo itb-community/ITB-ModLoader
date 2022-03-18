@@ -337,6 +337,10 @@ MOD_API_EVENT_HOOK = sdl.eventHook(function(event)
 		end
 	end
 
+    if not uiRoot then
+        return false
+    end
+
 	local result = uiRoot:event(event)
 
 	if not result then

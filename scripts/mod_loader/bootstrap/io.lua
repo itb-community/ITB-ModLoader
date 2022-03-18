@@ -11,6 +11,10 @@ function modApi:fileExists(name)
 			-- Permission denied, but it exists
 			return true
 		end
+        if code == 17 then
+            -- Error code says it exists
+            return true
+        end
 
 		-- make sure we always return a non-nil, boolean value
 		return false
