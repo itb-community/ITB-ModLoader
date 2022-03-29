@@ -139,7 +139,7 @@ end
 	element successfully obtained focus.
 --]]
 function Ui:setfocus()
-	if not self.visible then return false end
+	if not self.visible or self.root == nil then return false end
 
 	self.root:setfocus(self)
 end
