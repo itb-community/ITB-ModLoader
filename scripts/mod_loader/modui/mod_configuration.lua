@@ -432,10 +432,6 @@ end
 
 local function buildModConfigContent(scroll)
 	
-	if currentSelectedOptions == nil then
-		currentSelectedOptions = buildLightModOptions()
-	end
-	
 	openDropdowns = {}
 	
 	scrollContent = UiBoxLayout()
@@ -572,3 +568,14 @@ function ConfigureMods()
 	
 	showModConfig()
 end
+
+local function updateCurrentModConfiguration()
+	currentSelectedOptions = buildLightModOptions()
+end
+
+function modApi:getCurrentModConfiguration()
+	return currentSelectedOptions
+end
+
+modApi.events.onModsInitialized:subscribe(updateCurrentModConfiguration)
+modApi.events.onProfileChanged:subscribe(updateCurrentModConfiguration)

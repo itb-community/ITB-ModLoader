@@ -77,7 +77,7 @@ function modApi:getModOptions(modId)
 
 	if modId == nil then
 		Assert.ModInitializingOrLoading("Argument #1 must be specified outside of init or load")
-		modId = mod_loader.currentMod
+		modId = self.currentMod
 	end
 
 	Assert.True(mod_loader:hasMod(modId), "Mod not found")
