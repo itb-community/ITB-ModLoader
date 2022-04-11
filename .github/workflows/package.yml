@@ -16,11 +16,25 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Package mod loader into a zip archive
-        run: ./package.bat
+        run: |
+          IF EXIST release RMDIR /q /s release
+          MKDIR release
+
+          REM Copy required files into release directory...
+          COPY /V lua5.1.dll release\lua5.1.dll
+          COPY /V lua5.1-original.dll release\lua5.1-original.dll
+          COPY /V opengl32.dll release\opengl32.dll
+          COPY /V SDL2.dll release\SDL2.dll
+          COPY /V SDL2-original.dll release\SDL2-original.dll
+          COPY /V uninstall.bat release\uninstall.bat
+          XCOPY mods release\mods /s /e /i
+          XCOPY scripts release\scripts /s /e /i
+          XCOPY resources release\resources /s /e /i
 
       - name: Upload artifact 
         uses: actions/upload-artifact@v3
         with:
           name: ITB-ModLoader-${{ github.event.inputs.version }}.zip
-          path: ITB-ModLoader-#.#.#.zip
+          path: release/*
           retention-days: 7
+          if-no-files-found: error
