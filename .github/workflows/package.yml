@@ -1,0 +1,26 @@
+name: Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version of the new mod loader release
+        required: true
+        default: "2.x.y"
+
+jobs:
+  package:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Package mod loader into a zip archive
+        run: ./package.bat
+
+      - name: Upload artifact 
+        uses: actions/upload-artifact@v3
+        with:
+          name: ITB-ModLoader-%version%.zip
+          path: ITB-ModLoader-#.#.#.zip
+          retention-days: 7
