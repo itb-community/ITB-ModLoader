@@ -15,13 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Package mod loader into a zip archive
+      - name: Copy required files into release directory
         shell: cmd
         run: |
           IF EXIST release RMDIR /q /s release
           MKDIR release
-
-          REM Copy required files into release directory...
           COPY /V lua5.1.dll release\lua5.1.dll
           COPY /V lua5.1-original.dll release\lua5.1-original.dll
           COPY /V opengl32.dll release\opengl32.dll
