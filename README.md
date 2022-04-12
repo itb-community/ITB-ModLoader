@@ -11,6 +11,10 @@ Original tools created by:
 
 The mod loader **only works with Windows version of the game**. Gamepad input is not supported either.
 
+## Maintainers
+
+Notes for project maintainers are located in [MAINTAINERS.md](./MAINTAINERS.md)
+
 
 ## Download
 
