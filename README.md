@@ -1,24 +1,13 @@
 # Into the Breach Mod Loader
 
-A mod loader for the game [Into the Breach](https://www.subsetgames.com/itb.html), written in Lua, and with extension DLLs for some additional features. Originally created by Cyberboy2000, who has unfortunately been absent and unreachable for extended periods of time.
-
-- The mod loader's thread on Subset forums: [link](https://www.subsetgames.com/forum/viewtopic.php?f=26&t=33119)
-- Lua proxy DLLs, updated to work with post-1.2.20 version of the game: [link](https://github.com/kartoFlane/IntoTheBreachLua) 
-
-Original tools created by:
-- Lua mod loader created by *Cyberboy2000*: [link](https://www.subsetgames.com/forum/viewtopic.php?f=26&t=32833)
-- Lua proxy DLLs created by *AUTOMATIC*: [link](https://github.com/AUTOMATIC1111/IntoTheBreachLua)
+A mod loader for the game [Into the Breach](https://www.subsetgames.com/itb.html), written in Lua, and with extension DLLs for some additional features. For more information, see [the mod loader's thread on Subset forums](https://www.subsetgames.com/forum/viewtopic.php?f=26&t=33119).
 
 The mod loader **only works with Windows version of the game**. Gamepad input is not supported either.
-
-## Maintainers
-
-Notes for project maintainers are located in [MAINTAINERS.md](./MAINTAINERS.md)
 
 
 ## Download
 
-The mod loader can be downloaded from the [Releases](https://github.com/kartoFlane/ITB-ModLoader/releases) page above.
+The mod loader can be downloaded from the [Releases](https://github.com/itb-community/ITB-ModLoader/releases) page above.
 
 Since people unfamiliar with GitHub are often confused where to click:
 
@@ -41,3 +30,15 @@ To uninstall the mod loader, run `uninstall.bat`. This script will restore your 
 Keep in mind that savegames that used mods will be broken to a varying degree depending on which mods were enabled. Profiles used to play mods will most likely work for new games, but entering the statistics screen in main menu might cause the game to crash.
 
 If problems persist, try validating integrity of game cache (if on Steam), or reinstalling the game.
+
+
+## Maintainers
+
+Notes for project maintainers are located in [MAINTAINERS.md](./MAINTAINERS.md)
+
+
+## Attributions
+
+Original tools created by:
+- Lua mod loader created by *Cyberboy2000*: [link](https://www.subsetgames.com/forum/viewtopic.php?f=26&t=32833)
+- Lua proxy DLLs created by *AUTOMATIC*: [link](https://github.com/AUTOMATIC1111/IntoTheBreachLua)
