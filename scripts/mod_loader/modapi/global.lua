@@ -18,7 +18,7 @@ function CreatePilot(data)
 	-- Make sure we don't create duplicates if the PilotList
 	-- already contains entry for this pilot
 	if data.Rarity ~= 0 and not list_contains(PilotListExtended, data.Id) then
-		if #PilotList < 13 then
+		if #PilotList < modApi.constants.MAX_PILOTS then
 			PilotList[#PilotList + 1] = data.Id
 		end
 		PilotListExtended[#PilotListExtended + 1] = data.Id

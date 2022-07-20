@@ -4,13 +4,15 @@
 	for selection in the hangar.
 --]]
 
-local MAX_PILOTS = 13
+local MAX_PILOTS = modApi.constants.MAX_PILOTS
 local hangarBackdrop = nil
 local pilotLock = nil
 local updateImmediately = true
 -- copy of the list before we make any changes to it
 local PilotListDefault = shallow_copy(PilotList)
 local BLACK_MASK = sdl.rgb(0, 0, 0)
+-- TODO: is there a proper way to check if their portrait is in the new folder?
+local ADVANCED_PILOTS = {"Pilot_Arrogant", "Pilot_Caretaker", "Pilot_Chemical", "Pilot_Delusional"}
 
 --[[--
 	Checks if the advanced AI pilot was unlocked
@@ -52,14 +54,17 @@ end
 local function getOrCreatePilotSurface(pilotId)
 	-- unlocked calls directly
 	local unlocked = isPilotUnlocked(pilotId)
+	local advanced = list_contains(ADVANCED_PILOTS, pilotId)
+	local prefix = advanced and "img/advanced/portraits/pilots/" or "img/portraits/pilots/"
+	local path = prefix .. pilotId .. ".png"
 	if unlocked then
 		return sdlext.getSurface({
-			path = "img/portraits/pilots/"..pilotId..".png",
+			path = path,
 			scale = 2
 		})
 	else
 		return sdlext.getSurface({
-			path = "img/portraits/pilots/"..pilotId..".png",
+			path = path,
 			transformations = {
 				{ scale = 2 },
 				{ multiply = BLACK_MASK }
@@ -251,7 +256,9 @@ local function onExit()
 	-- update a local variable into config
 	local pilots = {}
 	for i = 1, MAX_PILOTS do
-		pilots[i] = pilotsLayout.children[i].pilotId
+		if pilotsLayout.children[i] then
+			pilots[i] = pilotsLayout.children[i].pilotId
+		end
 	end
 	pilotsLayout = nil
 

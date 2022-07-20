@@ -7,7 +7,7 @@ function initializeDecks()
 	PilotList = oldPilotList
 end
 
--- a pilot must be in PilotList to be unlocked, however we cannot have more than 13 pilots in the list for the UI
+-- a pilot must be in PilotList to be unlocked, however we cannot have more than 19 pilots in the list for the UI
 -- fix that by using PilotListExtended in game, and the smaller pilot list in the hangar
 local hangarPilotList = nil
 modApi.events.onGameEntered:subscribe(function()

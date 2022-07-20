@@ -615,9 +615,8 @@ end
 function mod_loader:loadPilotList()
 	loadPilotsOrder()
 	PilotList = {}
-	
-	local max_pilots = 13
-	for i = 1, max_pilots do
+
+	for i = 1, modApi.constants.MAX_PILOTS do
 		PilotList[i] = PilotListExtended[i]
 	end
 end
