@@ -126,7 +126,7 @@ function modApi:getHangarPaletteCount()
 	-- however, UI only has space for about 6 rows on default resolution, so limit the profile to that many
 	local max = self.constants.DEFAULT_MAX_PALETTES
 	if Profile and Profile.squads then
-	 	max = math.max(max, math.min(48, #Profile.squads))
+	 	max = math.max(max, math.min(48, #Profile.squads - 2))
 	end
 
 	-- don't return more than we have
@@ -136,13 +136,7 @@ end
 function modApi.getColorCount()
 	if sdlext.isHangar() then
 		local count = modApi:getHangarPaletteCount()
-		-- when secret squad is not unlocked, the displayed palette count is decreased by 1
-		-- this is a bug but one we can work around easily by returning 1 higher
-		-- TODO: remove this hack once Subset fixes the bug
-		if Profile and Profile.squads and not Profile.squads[11] then
-			count = count + 1
-		end
-		return count
+		return modApi:getHangarPaletteCount()
 	end
 
 	return PaletteDictionary:size()

@@ -9,7 +9,7 @@ modApi.constants = {
   VANILLA_SQUADS = 14,
 
   -- maximum number of palettes before they are force locked
-  DEFAULT_MAX_PALETTES = 16,
+  DEFAULT_MAX_PALETTES = 14,
   -- number of palettes used in vanilla
   VANILLA_PALETTES = 14,
 }
