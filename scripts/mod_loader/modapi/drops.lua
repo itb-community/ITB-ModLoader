@@ -34,7 +34,7 @@ end
 
 --- load in vanilla weapons before other mods override initializeDecks
 local oldGame = GAME
-GAME = {}
+GAME = GameObject:new{}
 initializeDecks()
 for _, id in ipairs(GAME.WeaponDeck) do
 	-- both add to library and mark as default weapon
@@ -47,7 +47,7 @@ GAME = oldGame
 modApi.events.onModsFirstLoaded:subscribe(function()
 	-- import weapons as second time to catch those added by overriding initializeDecks
 	local oldGame = GAME
-	GAME = {}
+	GAME = GameObject:new{}
 	initializeDecks()
 	for _, id in ipairs(GAME.WeaponDeck) do
 		modApi:addWeaponDrop(id)

@@ -3,7 +3,17 @@ modApi = modApi or {}
 -- //////////////////////////////////////////////////////////////////////////////
 -- Events
 
+eventCreationLog = {}
+
+local events_mt = {
+	__newindex = function(self, key, value)
+		local trace = debug.traceback()
+		eventCreationLog[key] = trace
+		rawset(self, key, value)
+	end
+}
 modApi.events = {}
+setmetatable(modApi.events, events_mt)
 
 local t = modApi.events
 t.onModMetadataDone = Event()
