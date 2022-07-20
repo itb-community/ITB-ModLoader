@@ -22,14 +22,9 @@ local function getUnlockedSquads()
 	local profile = modApi:loadProfile() or {}
 	local unlockedSquads = shallow_copy(profile.squads or {})
 
-	-- squad 9 and 10 are Random and Custom, while squad 11 is Secret Squad.
-	-- palette 9 is unlocked if Secret Squad is unlocked.
-	-- palette 10 is unlocked if any squad beyond Rift Walkers is unlocked.
-	-- one palette is hidden while Secret Squad is locked,
-	-- so we keep palette 11 locked until it is unlocked.
-	unlockedSquads[9] = unlockedSquads[11]
-
-	-- also note that AE palettes are currently unlocked by the wrong squad index
+	-- remove index 9 (random) and index 10 (custom) as neither of those unlock palettes
+	table.remove(unlockedSquads, 10)
+	table.remove(unlockedSquads, 9)
 
 	return unlockedSquads
 end
