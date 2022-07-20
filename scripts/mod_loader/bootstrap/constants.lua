@@ -4,4 +4,9 @@ modApi.constants = {
   MAX_SQUADS = 14,
   -- number of squads available in vanilla
   VANILLA_SQUADS = 14,
+
+  -- maximum number of palettes before they are force locked
+  MAX_PALETTES = 16,
+  -- number of palettes used in vanilla
+  VANILLA_PALETTES = 14,
 }

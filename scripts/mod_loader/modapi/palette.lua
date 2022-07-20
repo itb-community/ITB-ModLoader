@@ -1,7 +1,7 @@
 
 local PALETTE_INDEX_FIRST_MOVABLE = 2
-local PALETTE_COUNT_VANILLA = 9
-local PALETTE_COUNT_HANGAR_MAX = 11
+local PALETTE_COUNT_VANILLA = modApi.constants.VANILLA_PALETTES
+local PALETTE_COUNT_HANGAR_MAX = modApi.constants.MAX_PALETTES
 local VANILLA_PALETTE_ID = {
 	"Rift Walkers",
 	"Rusting Hulks",
@@ -11,7 +11,12 @@ local VANILLA_PALETTE_ID = {
 	"Flame Behemoths",
 	"Frozen Titans",
 	"Hazardous Mechs",
-	"Secret Squad"
+	"Secret Squad",
+	"Bombermechs",
+	"Arachnophiles",
+	"Mist Eaters",
+	"Heat Sinkers",
+	"Cataclysm"
 }
 
 local COLOR_NAME_2_INDEX = {
@@ -118,6 +123,7 @@ end
 function modApi.getColorCount()
 	local count = PaletteDictionary:size()
 
+	-- TODO: this could be ditched if we just set Profile.squads[i] to true for all squads above 14
 	if count > PALETTE_COUNT_HANGAR_MAX and sdlext.isHangar() then
 		return PALETTE_COUNT_HANGAR_MAX
 	end
@@ -134,7 +140,7 @@ local function isPlayerUnitType(pawnType)
 		type(ANIMS[pawnType.Image].Image) == 'string'
 	then
 		local image = ANIMS[pawnType.Image].Image
-		return modApi:stringStartsWith(image, "units/player")
+		return modApi:stringStartsWith(image, "units/player") or modApi:stringStartsWith(image, "advanced/units/player")
 	end
 
 	return false
@@ -223,7 +229,7 @@ local function loadPaletteOrder()
 
 		-- fetch palette ids from modcontent.lua.
 		-- ignore palette #1 because it is forced.
-		-- ignore palettes beyond 11 because they
+		-- ignore palettes beyond 16 because they
 		-- are not selectable in the hangar.
 		-- ignore palettes beyond our current
 		-- palette count.
