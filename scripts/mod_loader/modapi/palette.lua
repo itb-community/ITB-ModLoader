@@ -135,7 +135,14 @@ end
 
 function modApi.getColorCount()
 	if sdlext.isHangar() then
-		return modApi:getHangarPaletteCount()
+		local count = modApi:getHangarPaletteCount()
+		-- when secret squad is not unlocked, the displayed palette count is decreased by 1
+		-- this is a bug but one we can work around easily by returning 1 higher
+		-- TODO: remove this hack once Subset fixes the bug
+		if Profile and Profile.squads and not Profile.squads[11] then
+			count = count + 1
+		end
+		return count
 	end
 
 	return PaletteDictionary:size()
