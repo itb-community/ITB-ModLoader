@@ -17,7 +17,6 @@ local scripts = {
 	"palette",
 	"squad",
 	"drops",
-	"difficulty",
 	"map",
 	"mission",
 	"skills",

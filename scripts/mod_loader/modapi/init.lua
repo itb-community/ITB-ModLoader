@@ -137,16 +137,6 @@ function modApi:init()
 		end)
 	end
 
-	-- Execute deferred statements
-	AddDifficultyLevel(
-		"DIFF_VERY_HARD",
-		#DifficultyLevels -- adds as a new highest difficulty
-	)
-	AddDifficultyLevel(
-		"DIFF_IMPOSSIBLE",
-		#DifficultyLevels -- adds as a new highest difficulty
-	)
-
 	sdlext.executeAddModContent()
 	self.initialized = true
 

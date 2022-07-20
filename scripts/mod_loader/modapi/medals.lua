@@ -107,7 +107,7 @@ local function writeMedalData(self, squad_id, difficulty, islandsSecured)
 		not modApi:isModdedSquad(squad_id) or
 		islandsSecured < 2                 or
 		difficulty < 0                     or
-		difficulty > 2
+		difficulty > 2 -- TODO: update for Unfair difficulty
 	then
 		return
 	end

@@ -14,7 +14,6 @@ local scripts = {
 	"popup_gamepad-warning",
 
 	"modcontent",
-	"extra_difficulty",
 	"repair_icon_replace",
 	"tests_console",
 	

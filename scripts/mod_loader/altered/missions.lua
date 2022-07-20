@@ -317,7 +317,7 @@ local oldMissionEnd = Mission_Final_Cave.MissionEnd
 function Mission_Final_Cave:MissionEnd()
 	oldMissionEnd()
 
-	local difficulty = GetRealDifficulty()
+	local difficulty = GetDifficulty()
 	local squad_id = GAME.additionalSquadData.squad
 	local islandsSecured = 0
 	for i = 0, 3 do
