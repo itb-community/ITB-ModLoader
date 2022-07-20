@@ -1,7 +1,7 @@
 
 local PALETTE_INDEX_FIRST_MOVABLE = 2
 local PALETTE_COUNT_VANILLA = modApi.constants.VANILLA_PALETTES
-local PALETTE_COUNT_HANGAR_MAX = modApi.constants.MAX_PALETTES
+local PALETTE_COUNT_HANGAR_MAX = modApi.constants.DEFAULT_MAX_PALETTES
 local VANILLA_PALETTE_ID = {
 	"Rift Walkers",
 	"Rusting Hulks",
@@ -120,15 +120,25 @@ function modApi.getColorMap(paletteIndex)
 	return palette.colorMap
 end
 
-function modApi.getColorCount()
-	local count = PaletteDictionary:size()
-
-	-- TODO: this could be ditched if we just set Profile.squads[i] to true for all squads above 14
-	if count > PALETTE_COUNT_HANGAR_MAX and sdlext.isHangar() then
-		return PALETTE_COUNT_HANGAR_MAX
+-- gets the number of palettes to show in the hangar, will be less than or equal to the max palettes
+function modApi:getHangarPaletteCount()
+	-- if the profile has squad unlocked booleans set beyond the normal 16 squads, we can actually use palettes beyond 16
+	-- however, UI only has space for about 6 rows on default resolution, so limit the profile to that many
+	local max = self.constants.DEFAULT_MAX_PALETTES
+	if Profile and Profile.squads then
+	 	max = math.max(max, math.min(48, #Profile.squads))
 	end
 
-	return count
+	-- don't return more than we have
+	return math.min(max, PaletteDictionary:size())
+end
+
+function modApi.getColorCount()
+	if sdlext.isHangar() then
+		return modApi:getHangarPaletteCount()
+	end
+
+	return PaletteDictionary:size()
 end
 
 local function isPlayerUnitType(pawnType)
@@ -229,14 +239,15 @@ local function loadPaletteOrder()
 
 		-- fetch palette ids from modcontent.lua.
 		-- ignore palette #1 because it is forced.
-		-- ignore palettes beyond 16 because they
-		-- are not selectable in the hangar.
+		-- consider palettes beyond 16 as based on the profile (which will be loaded later) we can have more than 16
 		-- ignore palettes beyond our current
 		-- palette count.
-		for new_index = PALETTE_INDEX_FIRST_MOVABLE, math.min(PALETTE_COUNT_HANGAR_MAX, PaletteDictionary:size()) do
+		local max_save_index = 0 -- keep track of the largest index loaded in, so we don't delete the user's config
+		for new_index = PALETTE_INDEX_FIRST_MOVABLE, PaletteDictionary:size() do
 			local palette_id = loadedPaletteOrder[new_index]
 
 			if palette_id ~= nil and type(palette_id) == 'string' then
+				max_save_index = new_index
 				local palette = PaletteDictionary:get(palette_id)
 
 				if palette ~= nil then
@@ -284,7 +295,7 @@ local function loadPaletteOrder()
 
 		-- build new palette order to save to config
 		local new_paletteOrder = {}
-		for imageOffset = PALETTE_INDEX_FIRST_MOVABLE, PALETTE_COUNT_HANGAR_MAX do
+		for imageOffset = PALETTE_INDEX_FIRST_MOVABLE, math.max(max_save_index, PALETTE_COUNT_HANGAR_MAX) do
 			local palette = PaletteDictionary:get(imageOffset)
 
 			if palette ~= nil then
@@ -329,7 +340,7 @@ function finalizePalettes()
 			type(animation.Image) == 'string'
 		then
 			local isPlayerUnitAnimation = modApi:stringStartsWith(animation.Image, "units/player")
-			
+
 			if isPlayerUnitAnimation then
 				animation.Height = playerAnimationHeight
 			end

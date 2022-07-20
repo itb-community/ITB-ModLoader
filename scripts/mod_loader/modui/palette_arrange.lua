@@ -1,7 +1,6 @@
 
 local PALETTE_INDEX_BASE = 1
 local PALETTE_INDEX_FIRST_MOVABLE = 2
-local PALETTE_COUNT_HANGAR_MAX = modApi.constants.MAX_PALETTES
 local IMAGE_PUNCH_MECH = "img/units/player/mech_punch_ns.png"
 local FADE_RECT = sdl.rect(0,0,50,50)
 local SURFACE_LOCK = sdlext.getSurface({
@@ -28,8 +27,9 @@ local function getUnlockedSquads()
 	-- palette 10 is unlocked if any squad beyond Rift Walkers is unlocked.
 	-- one palette is hidden while Secret Squad is locked,
 	-- so we keep palette 11 locked until it is unlocked.
-	-- TODO: verify still true on Advanced Edition update
 	unlockedSquads[9] = unlockedSquads[11]
+
+	-- also note that AE palettes are currently unlocked by the wrong squad index
 
 	return unlockedSquads
 end
@@ -45,7 +45,7 @@ local function savePaletteOrder()
 	end
 
 	local new_paletteOrder = {}
-	for i = PALETTE_INDEX_FIRST_MOVABLE, PALETTE_COUNT_HANGAR_MAX do
+	for i = PALETTE_INDEX_FIRST_MOVABLE, modApi:getHangarPaletteCount() do
 		new_paletteOrder[i] = currentPaletteOrder[i]
 	end
 
