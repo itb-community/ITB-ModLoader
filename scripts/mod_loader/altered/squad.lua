@@ -6,7 +6,13 @@ function getStartingSquad(choice)
 		loadSquadSelection()
 	end
 
-	if choice >= 0 and choice <= 7 then
+	-- squads 0-7 are the first 8 vanilla squads
+	-- 8 and 9 are random and custom
+	-- squad 10 is secret, 11-16 are Advanced
+	if (choice >= 0 and choice <= 7) or (choice >= 10 and choice <= (modApi.constants.MAX_SQUADS + 2)) then
+		if choice >= 10 then
+			choice = choice - 2
+		end
 		local index = modApi.squadIndices[choice + 1]
 
 		modApi:setText(

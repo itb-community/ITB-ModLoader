@@ -88,6 +88,12 @@ function modApi:init()
 		"Rust_B",
 		"Pinnacle_B",
 		"Detritus_B",
+		"Secret",
+		"Squad_Bomber",
+		"Squad_Spiders",
+		"Squad_Mist",
+		"Squad_Heat",
+		"Squad_Cataclysm",
 	}
 
 	LOGD("Loading language...")
@@ -160,52 +166,37 @@ function modApi:resetModContent()
 	self.dictionary = {}
 
 	self.mod_squads = {
-		{ GetVanillaText("TipTitle_Archive_A"), "PunchMech", "TankMech", "ArtiMech", id = "Archive_A" },
-		{ GetVanillaText("TipTitle_Rust_A"), "JetMech", "RocketMech",  "PulseMech", id = "Rust_A" },
-		{ GetVanillaText("TipTitle_Pinnacle_A"), "LaserMech", "ChargeMech", "ScienceMech", id = "Pinnacle_A" },
-		{ GetVanillaText("TipTitle_Detritus_A"), "ElectricMech", "WallMech", "RockartMech", id = "Detritus_A" },
-		{ GetVanillaText("TipTitle_Archive_B"), "JudoMech", "DStrikeMech", "GravMech", id = "Archive_B" },
-		{ GetVanillaText("TipTitle_Rust_B"), "FlameMech", "IgniteMech", "TeleMech", id = "Rust_B" },
-		{ GetVanillaText("TipTitle_Pinnacle_B"), "GuardMech", "MirrorMech", "IceMech", id = "Pinnacle_B" },
-		{ GetVanillaText("TipTitle_Detritus_B"), "LeapMech", "UnstableTank", "NanoMech", id = "Detritus_B" }
+		-- normal
+		{ GetVanillaText("TipTitle_Archive_A"),  "PunchMech",    "TankMech",     "ArtiMech",    id = "Archive_A"  },
+		{ GetVanillaText("TipTitle_Rust_A"),     "JetMech",      "RocketMech",   "PulseMech",   id = "Rust_A"     },
+		{ GetVanillaText("TipTitle_Pinnacle_A"), "LaserMech",    "ChargeMech",   "ScienceMech", id = "Pinnacle_A" },
+		{ GetVanillaText("TipTitle_Detritus_A"), "ElectricMech", "WallMech",     "RockartMech", id = "Detritus_A" },
+		{ GetVanillaText("TipTitle_Archive_B"),  "JudoMech",     "DStrikeMech",  "GravMech",    id = "Archive_B"  },
+		{ GetVanillaText("TipTitle_Rust_B"),     "FlameMech",    "IgniteMech",   "TeleMech",    id = "Rust_B"     },
+		{ GetVanillaText("TipTitle_Pinnacle_B"), "GuardMech",    "MirrorMech",   "IceMech",     id = "Pinnacle_B" },
+		{ GetVanillaText("TipTitle_Detritus_B"), "LeapMech",     "UnstableTank", "NanoMech",    id = "Detritus_B" },
+
+		-- secret
+		{ GetVanillaText("TipTitle_Secret"), "BeetleMech", "HornetMech", "ScarabMech", id = "Secret" },
+
+		-- advanced
+		{ GetVanillaText("TipTitle_Squad_Bomber"),    "PierceMech",    "BomblingMech",   "ExchangeMech", id = "Squad_Bomber"    },
+		{ GetVanillaText("TipTitle_Squad_Spiders"),   "BulkMech",      "ScorpioMech",    "FourwayMech",  id = "Squad_Spiders"   },
+		{ GetVanillaText("TipTitle_Squad_Mist"),      "NeedleMech",    "SmokeMech",      "SupermanMech", id = "Squad_Mist"      },
+		{ GetVanillaText("TipTitle_Squad_Heat"),      "InfernoMech",   "DoubletankMech", "NapalmMech",   id = "Squad_Heat"      },
+		{ GetVanillaText("TipTitle_Squad_Cataclysm"), "BottlecapMech", "TrimissileMech", "HydrantMech",  id = "Squad_Cataclysm" },
 	}
-	self.mod_squads_by_id = {
-		Archive_A = self.mod_squads[1],
-		Rust_A = self.mod_squads[2],
-		Pinnacle_A = self.mod_squads[3],
-		Detritus_A = self.mod_squads[4],
-		Archive_B = self.mod_squads[5],
-		Rust_B = self.mod_squads[6],
-		Pinnacle_B = self.mod_squads[7],
-		Detritus_B = self.mod_squads[8],
-		Secret = { GetVanillaText("TipTitle_Secret"), "BeetleMech", "HornetMech", "ScarabMech", id = "Secret" }
-	}
-	self.squad_text = {
-		GetVanillaText("TipTitle_Archive_A"),
-		GetVanillaText("TipText_Archive_A"),
+	-- TODO: vanilla squad tables use ID in first spot instead of display name
+	self.mod_squads_by_id = {}
+	self.squad_text = {}
+	for i, squad in ipairs(self.mod_squads) do
+		self.mod_squads_by_id[squad.id] = squad
+		self.squad_text[i*2 - 1] = squad[1]
+		self.squad_text[i*2] = GetVanillaText("TipText_" .. squad.id)
+	end
 
-		GetVanillaText("TipTitle_Rust_A"),
-		GetVanillaText("TipText_Rust_A"),
-
-		GetVanillaText("TipTitle_Pinnacle_A"),
-		GetVanillaText("TipText_Pinnacle_A"),
-
-		GetVanillaText("TipTitle_Detritus_A"),
-		GetVanillaText("TipText_Detritus_A"),
-
-		GetVanillaText("TipTitle_Archive_B"),
-		GetVanillaText("TipText_Archive_B"),
-
-		GetVanillaText("TipTitle_Rust_B"),
-		GetVanillaText("TipText_Rust_B"),
-
-		GetVanillaText("TipTitle_Pinnacle_B"),
-		GetVanillaText("TipText_Pinnacle_B"),
-
-		GetVanillaText("TipTitle_Detritus_B"),
-		GetVanillaText("TipText_Detritus_B"),
-	}
 	self.squad_icon = {
+		-- normal
 		"img/units/player/mech_punch_ns.png",
 		"img/units/player/mech_jet_ns.png",
 		"img/units/player/mech_laser_ns.png",
@@ -214,6 +205,14 @@ function modApi:resetModContent()
 		"img/units/player/mech_flame_ns.png",
 		"img/units/player/mech_guard_ns.png",
 		"img/units/player/mech_leap_ns.png",
+		-- secret
+		"img/units/player/vek_beetle_ns.png",
+		-- advanced
+		"img/advanced/units/player/brute_pierce_ns.png",
+		"img/advanced/units/player/brute_bulk_ns.png",
+		"img/advanced/units/player/brute_needle_ns.png",
+		"img/advanced/units/player/prime_firefighter_ns.png",
+		"img/advanced/units/player/prime_bottlecap_ns.png",
 	}
 	self.resourceDat = sdl.resourceDat("resources/resource.dat")
 

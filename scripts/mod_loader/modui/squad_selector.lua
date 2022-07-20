@@ -3,7 +3,7 @@
 	which squads are available for selection in the hangar.
 --]]
 
-local maxselected = 8
+local maxselected = modApi.constants.MAX_SQUADS
 
 local function saveSquadSelection()
 	local selected = {}
@@ -145,7 +145,7 @@ local function createUi()
 			for i = 1, modSquadsCount do
 				local surface = sdlext.getSurface({ path = modApi.squad_icon[i] or "" })
 
-				if i > 1 and i <= 8 then
+				if i > 1 and i <= modApi.constants.VANILLA_SQUADS then
 					local colorTable = {}
 					for j = 1, #squadPalettes[1] do
 						colorTable[(j - 1) * 2 + 1] = squadPalettes[1][j]

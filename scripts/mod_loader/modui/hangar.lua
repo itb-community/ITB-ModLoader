@@ -1,4 +1,4 @@
-
+-- TODO: a lot of these are constants now, can cleanup code
 local SURFACE_PLATFORM = sdlext.getSurface({path = "img/strategy/hangar_platform_L.png"})
 local SURFACE_MEDAL = sdlext.getSurface({path = "img/ui/hangar/victory_2.png"})
 
