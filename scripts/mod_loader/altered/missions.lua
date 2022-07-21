@@ -133,7 +133,27 @@ function Mission:MissionEndImpl()
 	else
 		ret:AddScript("Board:StartPopEvent(\"Closing_Dead\")")
 	end
-	
+
+	local new_enemies = {}
+
+	for index, obj in ipairs(self.BonusObjs) do
+		if obj == BONUS_DEBRIS then
+			for i,id in ipairs(self.DebrisId) do
+				if Board:IsPawnAlive(id) then
+					local loc = Board:GetPawn(id):GetSpace()
+					ret:AddScript("Board:GetPawn("..id.."):Kill(false)")
+
+					local spawn = SpaceDamage(loc,0)
+					spawn.sPawn = random_element({"Scorpion1","Firefly1","Leaper1",})
+					spawn.fDelay = 0.5
+					ret:AddDamage(spawn)
+
+					new_enemies[#new_enemies+1] = loc
+				end
+			end
+		end
+	end
+
 	local effect = SpaceDamage()
 	effect.bEvacuate = true
 	effect.fDelay = 0.5
@@ -149,6 +169,12 @@ function Mission:MissionEndImpl()
 			ret:AddDamage(effect)
 			retreated = retreated + 1
 		end
+	end
+
+	for i,value in ipairs(new_enemies) do
+		effect.loc = value
+		ret:AddDamage(effect)
+		retreated = retreated + 1
 	end
 
 	modApi:firePostprocessVekRetreatHooks(self, ret)
@@ -201,13 +227,21 @@ function Mission:BaseStart(suppressHooks)
 	end
 	
 	self.LiveEnvironment = _G[self.Environment]:new()
+	-- TODO: is this still needed? without it we could directly call the old logic
+	-- what makes this different from SetupDiffMod?
 	self:SetupDifficulty()
 
 	self.LiveEnvironment:Start()
 	self:StartMission()
 	
 	self:SetupDiffMod()
-	
+
+	for index, obj in ipairs(self.BonusObjs) do
+		if obj == BONUS_DEBRIS then
+			self:AddDebris()
+		end
+	end
+
 	self:SpawnPawns(self:GetStartingPawns())
 	-- end oldBaseStart
 
