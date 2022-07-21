@@ -1,12 +1,3 @@
--- initializeDecks is called before the game entered hook, so we still need this override
-local oldInitializeDecks = initializeDecks
-function initializeDecks()
-	local oldPilotList = PilotList
-	PilotList = PilotListExtended
-	oldInitializeDecks()
-	PilotList = oldPilotList
-end
-
 -- a pilot must be in PilotList to be unlocked, however we cannot have more than 19 pilots in the list for the UI
 -- fix that by using PilotListExtended in game, and the smaller pilot list in the hangar
 local hangarPilotList = nil
@@ -27,7 +18,7 @@ end)
 
 -- returns all weapons
 function getWeaponList()
-	return modApi:getWeaponDeck()
+	return modApi:getFullWeaponDeck()
 end
 
 -- update the weapon deck when requested
@@ -53,16 +44,17 @@ function checkWeaponDeck()
 	end
 end
 
--- override get weapon drop to pull from our list during reshuffling
-local oldGetWeaponDrop = getWeaponDrop
-function getWeaponDrop(...)
-	-- catch an empty deck before vanilla does
-	if #GAME.WeaponDeck == 0 then
-		GAME.WeaponDeck = modApi:getWeaponDeck()
-		LOG("Reshuffling Weapon Deck!\n")
+-- replace default to use the full list instead of the partial one
+function checkPilotDeck()
+	if #GAME.PilotDeck == 0 then
+		GAME.PilotDeck = copy_table(PilotListExtended)
+		if not IsNewEquipment() then
+			LOG("Mod Loader: Removing new pilots!")
+			for i,pilot in ipairs(New_PilotList) do
+				remove_element(pilot,GAME.PilotDeck)
+			end
+		end
 	end
-	-- deck will never be empty, so call remainder of vanilla logic
-	return oldGetWeaponDrop(...)
 end
 
 -- Determines if a skill is available in the shop
