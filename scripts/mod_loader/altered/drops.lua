@@ -25,6 +25,34 @@ modApi.events.onGameExited:subscribe(function()
 	end
 end)
 
+-- returns all weapons
+function getWeaponList()
+	return modApi:getWeaponDeck()
+end
+
+-- update the weapon deck when requested
+function checkWeaponDeck()
+	if #GAME.WeaponDeck == 0 then
+		if IsNewEquipment() then
+			LOG("Mod Loader: Including advanced weapons!\n")
+			GAME.WeaponDeck = modApi:getWeaponDeck(true)
+		else
+			LOG("Mod Loader: Using normal weapons!\n")
+			GAME.WeaponDeck = modApi:getWeaponDeck(false)
+		end
+	end
+
+	if #GAME.PodWeaponDeck == 0 then
+		if IsNewEquipment() then
+			LOG("Mod Loader: Including advanced weapons!\n")
+			GAME.PodWeaponDeck = modApi:getPodWeaponDeck(true)
+		else
+			LOG("Mod Loader: Using normal weapons!\n")
+			GAME.PodWeaponDeck = modApi:getPodWeaponDeck(false)
+		end
+	end
+end
+
 -- override get weapon drop to pull from our list during reshuffling
 local oldGetWeaponDrop = getWeaponDrop
 function getWeaponDrop(...)
@@ -58,10 +86,9 @@ end
 -- add final override after mods have loaded, to ensure the import had time to run
 -- note this runs after the hook in drops.lua
 modApi.events.onModsFirstLoaded:subscribe(function()
-	-- override inititlize decks to pull from the mod api list
-	local oldInitializeDecks = initializeDecks
-	function initializeDecks(...)
-		oldInitializeDecks(...)
-		GAME.WeaponDeck = modApi:getWeaponDeck()
+	-- revert to vanilla behavior in case a shop lib overrode it
+	function initializeDecks()
+		checkWeaponDeck()
+		checkPilotDeck()
 	end
 end)

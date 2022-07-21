@@ -12,4 +12,12 @@ modApi.constants = {
   DEFAULT_MAX_PALETTES = 14,
   -- number of palettes used in vanilla
   VANILLA_PALETTES = 14,
+
+  -- weapon deck constants
+  WEAPON_CONFIG_NONE = 0,
+  WEAPON_CONFIG_SHOP_NORMAL = 1,
+  WEAPON_CONFIG_SHOP_ADVANCED = 2,
+  WEAPON_CONFIG_POD_NORMAL = 4,
+  WEAPON_CONFIG_POD_ADVANCED = 8,
+  WEAPON_CONFIG_ALL = 15,
 }

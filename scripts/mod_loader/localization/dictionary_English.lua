@@ -44,7 +44,7 @@ return {
 	["PilotArrange_Default_Tooltip"] = "Restore default pilot order.",
 	["PilotArrange_Random_Text"] = "Randomize",
 	["PilotArrange_Random_Tooltip"] = "Randomize pilot order.",
-  
+
 	["ModContent_Button_PaletteArrange"] = "Arrange Palettes",
 	["ModContent_ButtonTooltip_PaletteArrange"] = "Select which palettes will be available to pick.",
 	["PaletteArrange_RiftWalkers_Tooltip_Extra"] = "This palette is fixed to the first slot for technical reasons.",
@@ -56,21 +56,35 @@ return {
 	["PaletteArrange_Random_Title"] = "Random",
 	["PaletteArrange_Random_Tooltip"] = "Randomizes palettes",
 
+
 	["ModContent_Button_ConfigureWeaponDeck"] = "Select Weapon Deck",
 	["ModContent_ButtonTooltip_ConfigureWeaponDeck"] = "Select which weapons are available in runs from the shop, time pods, and perfect island bonuses. Will not have any affect in existing save games.",
+
 	["ConfigureWeaponDeck_FrameTitle"] = "Select Weapon Deck",
-	["ConfigureWeaponDeck_EnableAll_Title"] = "Enable All",
-	["ConfigureWeaponDeck_EnableAll_Tooltip"] = "Enables all available weapons.",
-	["ConfigureWeaponDeck_DisableAll_Title"] = "Disable All",
-	["ConfigureWeaponDeck_DisableAll_Tooltip"] = "Disables all available weapons.\n\nMust select at least one weapon on exit.",
-	["ConfigureWeaponDeck_Preset_Title"] = "Preset: ",
-	["ConfigureWeaponDeck_Preset_Tooltip"] = "Select weapons preset to replace currently selected weapons.",
-	["ConfigureWeaponDeck_Preset_Tip_Default"] = "Select only vanilla weapons.",
-	["ConfigureWeaponDeck_Preset_Tip_Random"] = "Select weapons randomly.",
 	["ConfigureWeaponDeck_PresetLoad_Title"] = "Load",
 	["ConfigureWeaponDeck_PresetLoad_Tooltip"] = "Loads the current preset, replacing the selected weapons",
 	["ConfigureWeaponDeck_PresetSave_Title"] = "Save",
 	["ConfigureWeaponDeck_PresetSave_Tooltip"] = "Saves the current weapons to the selected preset. If nothing is checked, deletes the current preset.",
+
+	["ConfigureWeaponDeck_Deck_Title"] = "Deck: ",
+	["ConfigureWeaponDeck_Deck_Tooltip"] = "Select which weapon deck to edit.",
+	["ConfigureWeaponDeck_Deck_Tip_All"] = "Edits weapons in both decks",
+	["ConfigureWeaponDeck_Deck_Tip_Shop"] = "Edits weapons available in stores at the end of each island",
+	["ConfigureWeaponDeck_Deck_Tip_Pod"] = "Edits weapons available in time pods and perfect island rewards",
+
+	["ConfigureWeaponDeck_Mode_Title"] = "Mode: ",
+	["ConfigureWeaponDeck_Mode_Tooltip"] = "Select which weapon deck to edit.",
+	["ConfigureWeaponDeck_Mode_Tip_All"] = "Edits weapons for all modes",
+	["ConfigureWeaponDeck_Mode_Tip_Normal"] = "Edits weapons for when advaced mode weapons are disabled",
+	["ConfigureWeaponDeck_Mode_Tip_Advanced"] = "Edits weapons for when advanced mode weapons are enabled",
+
+	["ConfigureWeaponDeck_Preset_Title"] = "Preset: ",
+	["ConfigureWeaponDeck_Preset_Tooltip"] = "Select weapons preset to replace currently selected weapons.",
+	["ConfigureWeaponDeck_Preset_Tip_Vanilla"] = "Select only vanilla weapons.",
+	["ConfigureWeaponDeck_Preset_Tip_Default"] = "Select weapons default weapons defined by mods.",
+	["ConfigureWeaponDeck_Preset_Tip_Random"] = "Select weapons randomly for the current mode.",
+	["ConfigureWeaponDeck_Preset_Tip_EnableAll"] = "Enables all available weapons for the current mode.",
+	["ConfigureWeaponDeck_Preset_Tip_DisableAll"] = "Disables all available weapons for the current mode.\n\nMust select at least one weapon on exit.",
 
 	["ModContent_Button_Achievements"] = "Achievements",
 	["ModContent_ButtonTooltip_Achievements"] = "Display achievements",
@@ -202,7 +216,7 @@ return {
 	["TestingConsole_RootTestsuite"] = "Root Testsuite",
 	["TestingConsole_FailSummary_FrameTitle"] = "Failure Summary",
 	["TestingConsole_FailSummary_Tooltip"] = "This test has failed. Click to bring up a detailed summary.",
-	
+
 	["Palette_Name_Rift_Walkers"] = "Rift Walkers Olive",
 	["Palette_Name_Rusting_Hulks"] = "Rusting Hulks Amber",
 	["Palette_Name_Zenith_Guard"] = "Zenith Guard Blue",
