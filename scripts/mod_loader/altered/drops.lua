@@ -1,12 +1,3 @@
--- initializeDecks is called before the game entered hook, so we still need this override
-local oldInitializeDecks = initializeDecks
-function initializeDecks()
-	local oldPilotList = PilotList
-	PilotList = PilotListExtended
-	oldInitializeDecks()
-	PilotList = oldPilotList
-end
-
 -- a pilot must be in PilotList to be unlocked, however we cannot have more than 19 pilots in the list for the UI
 -- fix that by using PilotListExtended in game, and the smaller pilot list in the hangar
 local hangarPilotList = nil
@@ -25,16 +16,45 @@ modApi.events.onGameExited:subscribe(function()
 	end
 end)
 
--- override get weapon drop to pull from our list during reshuffling
-local oldGetWeaponDrop = getWeaponDrop
-function getWeaponDrop(...)
-	-- catch an empty deck before vanilla does
+-- returns all weapons
+function getWeaponList()
+	return modApi:getFullWeaponDeck()
+end
+
+-- update the weapon deck when requested
+function checkWeaponDeck()
 	if #GAME.WeaponDeck == 0 then
-		GAME.WeaponDeck = modApi:getWeaponDeck()
-		LOG("Reshuffling Weapon Deck!\n")
+		if IsNewEquipment() then
+			LOG("Mod Loader: Including advanced weapons!\n")
+			GAME.WeaponDeck = modApi:getWeaponDeck(true)
+		else
+			LOG("Mod Loader: Using normal weapons!\n")
+			GAME.WeaponDeck = modApi:getWeaponDeck(false)
+		end
 	end
-	-- deck will never be empty, so call remainder of vanilla logic
-	return oldGetWeaponDrop(...)
+
+	if #GAME.PodWeaponDeck == 0 then
+		if IsNewEquipment() then
+			LOG("Mod Loader: Including advanced weapons!\n")
+			GAME.PodWeaponDeck = modApi:getPodWeaponDeck(true)
+		else
+			LOG("Mod Loader: Using normal weapons!\n")
+			GAME.PodWeaponDeck = modApi:getPodWeaponDeck(false)
+		end
+	end
+end
+
+-- replace default to use the full list instead of the partial one
+function checkPilotDeck()
+	if #GAME.PilotDeck == 0 then
+		GAME.PilotDeck = copy_table(PilotListExtended)
+		if not IsNewEquipment() then
+			LOG("Mod Loader: Removing new pilots!")
+			for i,pilot in ipairs(New_PilotList) do
+				remove_element(pilot,GAME.PilotDeck)
+			end
+		end
+	end
 end
 
 -- Determines if a skill is available in the shop
@@ -58,10 +78,9 @@ end
 -- add final override after mods have loaded, to ensure the import had time to run
 -- note this runs after the hook in drops.lua
 modApi.events.onModsFirstLoaded:subscribe(function()
-	-- override inititlize decks to pull from the mod api list
-	local oldInitializeDecks = initializeDecks
-	function initializeDecks(...)
-		oldInitializeDecks(...)
-		GAME.WeaponDeck = modApi:getWeaponDeck()
+	-- revert to vanilla behavior in case a shop lib overrode it
+	function initializeDecks()
+		checkWeaponDeck()
+		checkPilotDeck()
 	end
 end)

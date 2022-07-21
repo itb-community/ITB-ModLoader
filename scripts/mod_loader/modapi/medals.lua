@@ -22,7 +22,13 @@ local VANILLA_SQUADS = {
 	Rust_B = true,
 	Pinnacle_B = true,
 	Detritus_B = true,
-	Secret = true
+	Secret = true,
+	Secret = true,
+	Squad_Bomber = true,
+	Squad_Spiders = true,
+	Squad_Mist = true,
+	Squad_Heat = true,
+	Squad_Cataclysm = true,
 }
 
 function modApi:isVanillaSquad(squad_id)
