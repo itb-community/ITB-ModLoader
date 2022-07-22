@@ -1,6 +1,8 @@
 
 local showWindows = {}
 local visibleWindows = {}
+local lastSquadPage = nil
+sdlext.squadSelectionPage = nil
 
 local Window = {}
 CreateClass(Window)
@@ -156,12 +158,22 @@ local windows = {
 	},
 }
 
+-- fire the squad page change event when the squad select page opens, to simplify code
+function windows.Hangar_Select:show(id)
+	if self.visible then return end
+
+	Window.show(self, id)
+	modApi.events.onSquadSelectionPageChanged:dispatch(sdlext.squadSelectionPage, lastSquadPage, false)
+end
+
 sdlext.isEscapeMenuWindowVisible = buildIsWindowVisibleFunction(windows.Escape_Title)
 sdlext.isHangarUiVisible = buildIsWindowVisibleFunction(windows.Button_Hangar_Start)
 sdlext.isSquadSelectionWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Select)
 sdlext.isCustomizeSquadWindowVisible = buildIsWindowVisibleFunction(windows.Customize_Instructions)
 sdlext.isAchievementsWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Achievements_Title)
 sdlext.isPilotSelectionWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Pilot)
+sdlext.isDifficultySettingsWindowVisible = buildIsWindowVisibleFunction(windows.Toggle_NewEquipment)
+sdlext.isMechColorWindowVisible = buildIsWindowVisibleFunction(windows.Customize_Title)
 sdlext.isOptionsWindowVisible = buildIsWindowVisibleFunction(windows.Options_Title)
 sdlext.isLanguageSelectionWindowVisible = buildIsWindowVisibleFunction(windows.Language_Title)
 sdlext.isHotkeyConfigurationWindowVisible = buildIsWindowVisibleFunction(windows.Hotkeys_Title)
@@ -174,16 +186,29 @@ sdlext.isAbandonTimelineWindowVisible = buildIsWindowVisibleFunction(windows.Aba
 sdlext.isStatusTooltipWindowVisible = buildIsWindowVisibleFunction(windows.Unit_Status_Title)
 sdlext.isMapEditor = buildIsWindowVisibleFunction(windows.Button_Editor_Exit)
 
+-- gets the current page on the squad selection page, or nil if on none
+function sdlext.getSquadSelectionPage()
+	return sdlext.isSquadSelectionWindowVisible() and sdlext.squadSelectionPage or nil
+end
+
 local oldGetText = GetText
 -- TODO: should we be using GetLocalizedText instead?
-function GetText(id, ...)
+function GetText(id, r1, r2, ...)
 	local window = windows[id]
 	if window ~= nil then
 		showWindows[id] = true
 		visibleWindows[id] = window
 	end
 
-	return oldGetText(id, ...)
+	-- detect squad selection page
+	-- for some odd reason, on the squad selection page something is calling `GetText("Upgrade_Page", 10, 10)`, so we have to filter to "Page N of 2"
+	-- if subset ever adds more than 2 pages this will need an update
+	-- note, r1 and r2 are passed as strings
+	if id == "Upgrade_Page" and r2 == "2" then
+		sdlext.squadSelectionPage = tonumber(r1)
+	end
+
+	return oldGetText(id, r1, r2, ...)
 end
 
 modApi.events.onFrameDrawStart:subscribe(function()
@@ -195,6 +220,12 @@ modApi.events.onFrameDrawStart:subscribe(function()
 			visibleWindows[id] = nil
 			window:hide(id)
 		end
+	end
+
+	-- update page if it changes
+	if sdlext.squadSelectionPage ~= lastSquadPage then
+		modApi.events.onSquadSelectionPageChanged:dispatch(sdlext.squadSelectionPage, lastSquadPage, true)
+		lastSquadPage = sdlext.squadSelectionPage
 	end
 
 	if next(showWindows) ~= nil then

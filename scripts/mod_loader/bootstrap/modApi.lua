@@ -60,6 +60,8 @@ t.onHangarUiHidden = Event()
 t.onEscapeMenuWindowShown = Event()
 t.onEscapeMenuWindowHidden = Event()
 t.onSquadSelectionWindowShown = Event()
+-- arguments: newPage, lastPage, wasOpen
+t.onSquadSelectionPageChanged = Event()
 t.onSquadSelectionWindowHidden = Event()
 t.onCustomizeSquadWindowShown = Event()
 t.onCustomizeSquadWindowHidden = Event()

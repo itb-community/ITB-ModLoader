@@ -18,6 +18,14 @@ local SURFACES = {
 		OFF = sdlext.getSurface{ path = "resources/mods/ui/coin_off.png" },
 	}
 }
+
+local SQUAD_INDICES = {
+	-- page 1: shows random, custom, and 1-6
+	{ -1, -1, 1, 2, 3, 4, 5, 6 },
+	-- page 2: shows 7, 8, 12, 13, 14, 15, 16, and 11 (secret)
+	{ 7, 8, 12, 13, 14, 15, 16, 11 }
+}
+
 modApi.events.onFtldatFinalized:subscribe(function()
 	SURFACES.MEDALS_SMALL = {
 		[2] = {
@@ -453,7 +461,7 @@ local function draw_if_squad_unlocked(self, screen)
 	self.visible = Profile.squads[self.squadIndex]
 
 	if self.visible then
-		if Boxes.hangar_select_big.x == sdlext.CurrentWindowRect.x and Boxes.hangar_select_big.y == sdlext.CurrentWindowRect.y + 10 then
+		if Boxes.hangar_select_big.x == sdlext.CurrentWindowRect.x and Boxes.hangar_select_big.y == sdlext.CurrentWindowRect.y - 25 then
 			UiBoxLayout.draw(self, screen)
 		else
 			sdlext.occlude_draw(UiBoxLayout, self, screen, sdlext.CurrentWindowRect)
@@ -485,81 +493,89 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 		return Ui.mousedown(self, mx, my, button)
 	end
 
-	local flow = UiFlowLayout()
-		:widthpx(UI.SQUAD_SELECT.WIDTH)
-		:heightpx(UI.SQUAD_SELECT.HEIGHT)
-		:hgap(UI.SQUAD_SELECT.HORIZONTAL_GAP)
-		:dynamicResize(false)
-		:addTo(squadSelectionMedalUi)
+	for squadPage, indices in ipairs(SQUAD_INDICES) do
+		local flow = UiFlowLayout()
+			:widthpx(UI.SQUAD_SELECT.WIDTH)
+			:heightpx(UI.SQUAD_SELECT.HEIGHT)
+			:hgap(UI.SQUAD_SELECT.HORIZONTAL_GAP)
+			:dynamicResize(false)
+			:addTo(squadSelectionMedalUi)
 
-	function flow:relayout()
-		local vgap
-		local yOffset
+		function flow:relayout()
+			local vgap
+			local yOffset
 
-		if modApi:isSecretSquadAvailable() then
-			vgap = UI.SQUAD_SELECT.VERTICAL_GAP.LARGE_UI
-			yOffset = UI.SQUAD_SELECT.Y_OFFSET.LARGE_UI
-		else
+			-- if modApi:isSecretSquadAvailable() then
+			-- 	vgap = UI.SQUAD_SELECT.VERTICAL_GAP.LARGE_UI
+			-- 	yOffset = UI.SQUAD_SELECT.Y_OFFSET.LARGE_UI
+			-- else
 			vgap = UI.SQUAD_SELECT.VERTICAL_GAP.SMALL_UI
 			yOffset = UI.SQUAD_SELECT.Y_OFFSET.SMALL_UI
-		end
+			-- end
 
-		if self.gapVertical ~= vgap then
-			self:vgap(vgap)
-		end
-
-		self:pospx(Boxes.hangar_select_big.x + UI.SQUAD_SELECT.X_OFFSET, Boxes.hangar_select_big.y + yOffset)
-		self.visible = not sdlext.isAchievementsWindowVisible()
-		UiFlowLayout.relayout(self)
-	end
-
-	flow.ignoreMouse = true
-	flow:relayout()
-
-	for squadIndex = 1, 8 do
-		local squad_index = modApi.squadIndices[squadIndex]
-		local squad_id = modApi.mod_squads[squad_index].id
-
-		local squadProgressUi = Ui()
-			:widthpx(UI.SQUAD_SELECT.PROGRESS.WIDTH)
-			:heightpx(UI.SQUAD_SELECT.PROGRESS.HEIGHT)
-			:addTo(flow)
-
-		if modApi:isModdedSquad(squad_id) then
-
-			local medalHolder = UiBoxLayout()
-				:width(0.5)
-				:height(1)
-				:hgap(UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.HORIZONTAL_GAP)
-				:dynamicResize(false)
-				:addTo(squadProgressUi)
-			medalHolder.padl = UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.PADDING_LEFT
-			medalHolder.squadIndex = squadIndex
-			medalHolder.draw = draw_if_squad_unlocked
-
-			local coinHolder = UiBoxLayout()
-				:width(0.5)
-				:heightpx(UI.SQUAD_SELECT.PROGRESS.COIN_HOLDER.HEIGHT)
-				:pos(0.5, 0)
-				:hgap(UI.SQUAD_SELECT.PROGRESS.COIN_HOLDER.HORIZONTAL_GAP)
-				:dynamicResize(false)
-				:addTo(squadProgressUi)
-			coinHolder.squadIndex = squadIndex
-			coinHolder.draw = draw_if_squad_unlocked
-
-			for islandsSecured = 2, 4 do
-				buildMedal1xUi(squad_id, islandsSecured)
-					:addTo(medalHolder)
+			if self.gapVertical ~= vgap then
+				self:vgap(vgap)
 			end
 
-			local squadAchievements = modApi.achievements:getSquadAchievements(squad_id)
+			self:pospx(Boxes.hangar_select_big.x + UI.SQUAD_SELECT.X_OFFSET, Boxes.hangar_select_big.y + yOffset)
+			self.visible = not sdlext.isAchievementsWindowVisible() and squadPage == sdlext.getSquadSelectionPage()
+			UiFlowLayout.relayout(self)
+		end
 
-			if squadAchievements ~= nil then
-				for i, achievement in ipairs(squadAchievements) do
-					if i > 3 then break end
+		flow.ignoreMouse = true
+		flow:relayout()
 
-					buildSmallCoinUi(achievement)
-						:addTo(coinHolder)
+		for visualIndex, squadIndex in ipairs(indices) do
+			-- always added to ensure modded squads show in the right spot when vanilla squads exist
+			local squadProgressUi = Ui()
+				:widthpx(UI.SQUAD_SELECT.PROGRESS.WIDTH)
+				:heightpx(UI.SQUAD_SELECT.PROGRESS.HEIGHT)
+				:addTo(flow)
+
+			-- -1 means random or custom
+			if squadIndex ~= -1 then
+				-- mod loader squad index is 2 less than the true index for secret squad and above
+				local modSquadIndex = squadIndex > 10 and squadIndex - 2 or squadIndex
+				local trueSquadIndex = modApi.squadIndices[modSquadIndex]
+				local squad_id = modApi.mod_squads[trueSquadIndex].id
+
+				if modApi:isModdedSquad(squad_id) then
+
+					local medalHolder = UiBoxLayout()
+						:width(0.5)
+						:height(1)
+						:hgap(UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.HORIZONTAL_GAP)
+						:dynamicResize(false)
+						:addTo(squadProgressUi)
+					medalHolder.padl = UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.PADDING_LEFT
+					medalHolder.squadIndex = squadIndex
+					medalHolder.draw = draw_if_squad_unlocked
+
+					local coinHolder = UiBoxLayout()
+						:width(0.5)
+						:heightpx(UI.SQUAD_SELECT.PROGRESS.COIN_HOLDER.HEIGHT)
+						:pos(0.5, 0)
+						:hgap(UI.SQUAD_SELECT.PROGRESS.COIN_HOLDER.HORIZONTAL_GAP)
+						:dynamicResize(false)
+						:addTo(squadProgressUi)
+					coinHolder.squadIndex = squadIndex
+					coinHolder.draw = draw_if_squad_unlocked
+
+					for islandsSecured = 2, 4 do
+						buildMedal1xUi(squad_id, islandsSecured)
+							:addTo(medalHolder)
+					end
+
+					local squadAchievements = modApi.achievements:getSquadAchievements(squad_id)
+
+					if squadAchievements ~= nil then
+						for i, achievement in ipairs(squadAchievements) do
+							if i > 3 then break end
+
+							buildSmallCoinUi(achievement)
+								:addTo(coinHolder)
+						end
+					end
 				end
 			end
 		end
