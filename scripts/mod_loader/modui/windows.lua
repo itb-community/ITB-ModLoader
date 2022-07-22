@@ -88,6 +88,17 @@ local windows = {
 		event_hide = modApi.events.onPilotSelectionWindowHidden,
 		find_rect = getRectFromShadowSurfaces
 	},
+	-- for some reason, neither NewGame_Settings or NewGame_Advanced run through GetText, its possible GetLocalizedText would fix this
+	Toggle_NewEquipment = Window:new{
+		event_show = modApi.events.onDifficultySettingsWindowShown,
+		event_hide = modApi.events.onDifficultySettingsWindowHidden,
+		find_rect = getRectFromShadowSurfaces
+	},
+	Customize_Title = Window:new{
+		event_show = modApi.events.onMechColorWindowShown,
+		event_hide = modApi.events.onMechColorWindowHidden,
+		find_rect = getRectFromShadowSurfaces
+	},
 	Options_Title = Window:new{
 		event_show = modApi.events.onOptionsWindowShown,
 		event_hide = modApi.events.onOptionsWindowHidden,
@@ -164,6 +175,7 @@ sdlext.isStatusTooltipWindowVisible = buildIsWindowVisibleFunction(windows.Unit_
 sdlext.isMapEditor = buildIsWindowVisibleFunction(windows.Button_Editor_Exit)
 
 local oldGetText = GetText
+-- TODO: should we be using GetLocalizedText instead?
 function GetText(id, ...)
 	local window = windows[id]
 	if window ~= nil then

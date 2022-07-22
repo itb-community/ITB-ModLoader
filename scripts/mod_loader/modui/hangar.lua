@@ -56,7 +56,9 @@ end
 local function isWindowOpen()
 	return sdlext.isSquadSelectionWindowVisible() or
 	       sdlext.isCustomizeSquadWindowVisible() or
-	       sdlext.isPilotSelectionWindowVisible()
+	       sdlext.isPilotSelectionWindowVisible() or
+	       sdlext.isDifficultySettingsWindowVisible() or
+	       sdlext.isMechColorWindowVisible()
 end
 
 --[[
@@ -236,6 +238,7 @@ local languageRectsMap
 local function getLanguageRectsMap()
 	if not languageRectsMap then
 		languageRectsMap = {
+			-- TODO: these very much have moved
 			["btnBack"] = {
 				[Languages.English] = { x = 520, w = 103 },
 				[Languages.Chinese_Simplified] = { x = 520, w = 89 },
