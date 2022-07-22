@@ -198,16 +198,6 @@ return {
 
 	["VersionString"] = "Mod loader version: ",
 
-	["Difficulty_Custom_Note"] = "Note: this is a modded difficulty level. It won't change anything without mods providing content for this difficulty.",
-
-	["Difficulty_Name_VeryHard"] = "V. Hard",
-	["Difficulty_Title_VeryHard"] = "Very Hard Mode",
-	["Difficulty_Description_VeryHard"] = "Intended for veteran Commanders looking for a challenge.",
-
-	["Difficulty_Name_Impossible"] = "Imposs.",
-	["Difficulty_Title_Impossible"] = "Impossible Mode",
-	["Difficulty_Description_Impossible"] = "A punishing difficulty allowing no mistakes.",
-
 	["TestingConsole_ToggleButton_Text"] = "TESTING CONSOLE",
 	["TestingConsole_ToggleButton_Tooltip"] = "Opens a console for running mod loader integration tests.",
 	["TestingConsole_FrameTitle"] = "Testing Console",

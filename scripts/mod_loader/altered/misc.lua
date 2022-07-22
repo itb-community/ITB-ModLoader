@@ -143,8 +143,6 @@ function startNewGame()
 		mechs = HangarGetSelectedMechs()
 	}
 
-	SetDifficulty(GetDifficulty())
-
 	-- Schedule execution to happen in 50ms
 	-- After new game is started, the game saves game state twice,
 	-- but the first state saved is still the old one?
@@ -179,10 +177,6 @@ function LoadGame()
 
 	RestoreGameVariables(Settings)
 	overrideNextPhase()
-
-	if GAME.CustomDifficulty then
-		SetDifficulty(GAME.CustomDifficulty)
-	end
 
 	modApi:firePostLoadGameHooks()
 	

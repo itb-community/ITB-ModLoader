@@ -4,7 +4,8 @@ local scripts = {
 	"event",
 	"asserts",
 	"achievement",
-	"dialog_helper"
+	"dialog_helper",
+	"difficulty"
 }
 
 local rootpath = GetParentPath(...)

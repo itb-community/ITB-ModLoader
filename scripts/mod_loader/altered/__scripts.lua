@@ -1,5 +1,4 @@
 local scripts = {
-	"difficulty",
 	"misc",
 	"drops",
 	"missions",

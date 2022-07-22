@@ -260,18 +260,6 @@ local function getLanguageRectsMap()
 				[Languages.Spanish] = { x = 755, w = 165 },
 				[Languages.Japanese] = { x = 798, w = 122 },
 			},
-			["difficulty"] = {
-				[Languages.English] = 10,
-				[Languages.Chinese_Simplified] = 31,
-				[Languages.French] = 7,
-				[Languages.German] = 16,
-				[Languages.Italian] = 7,
-				[Languages.Polish] = 32,
-				[Languages.Portuguese_Brazil] = 7,
-				[Languages.Russian] = 7,
-				[Languages.Spanish] = 7,
-				[Languages.Japanese] = 7,
-			}
 		}
 	end
 
@@ -290,10 +278,6 @@ end
 
 function GetStartButtonRect(languageIndex)
 	return GetLanguageButton("btnStart", languageIndex)
-end
-
-function GetDifficultyRect(languageIndex)
-	return GetLanguageButton("difficulty", languageIndex)
 end
 
 modApi.events.onHangarEntered:subscribe(function()

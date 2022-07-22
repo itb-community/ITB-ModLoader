@@ -103,16 +103,4 @@ function modApi:setupVanillaTexts()
 		t["Squad_Name_" .. v] = GetVanillaText("TipTitle_" .. v)
 		t["Squad_Description_" .. v] = GetVanillaText("TipText_" .. v)
 	end
-
-	t["Difficulty_Name_Easy"] = GetVanillaText("Toggle_Easy")
-	t["Difficulty_Title_Easy"] = GetVanillaText("TipTitle_HangarEasy")
-	t["Difficulty_Description_Easy"] = GetVanillaText("TipText_HangarEasy")
-
-	t["Difficulty_Name_Normal"] = GetVanillaText("Toggle_Normal")
-	t["Difficulty_Title_Normal"] = GetVanillaText("TipTitle_HangarNormal")
-	t["Difficulty_Description_Normal"] = GetVanillaText("TipText_HangarNormal")
-
-	t["Difficulty_Name_Hard"] = GetVanillaText("Toggle_Hard")
-	t["Difficulty_Title_Hard"] = GetVanillaText("TipTitle_HangarHard")
-	t["Difficulty_Description_Hard"] = GetVanillaText("TipText_HangarHard")
 end
