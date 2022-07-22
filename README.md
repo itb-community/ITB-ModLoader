@@ -25,7 +25,7 @@ If you're upgrading from a previous version of the modloader and encounter issue
 
 ## Uninstallation
 
-To uninstall the mod loader, run `uninstall.bat`. This script will restore your Into the Breach installation to unmodded state. Profiles, savegames, and mods present in `mods` direcory will be left untouched.
+To uninstall the mod loader, run `uninstall_modloader.bat`. This script will restore your Into the Breach installation to unmodded state. Profiles, savegames, and mods present in `mods` direcory will be left untouched.
 
 Keep in mind that savegames that used mods will be broken to a varying degree depending on which mods were enabled. Profiles used to play mods will most likely work for new games, but entering the statistics screen in main menu might cause the game to crash.
 

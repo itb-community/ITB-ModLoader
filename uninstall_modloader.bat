@@ -3,6 +3,7 @@
 IF EXIST modloader.log DEL /q modloader.log
 IF EXIST error.txt DEL /q error.txt
 IF EXIST log.txt DEL /q log.txt
+IF EXIST MODLOADER_README.txt DEL /q MODLOADER_README.txt
 DEL /q lua5.1.dll
 DEL /q opengl32.dll
 DEL /q SDL2.dll
