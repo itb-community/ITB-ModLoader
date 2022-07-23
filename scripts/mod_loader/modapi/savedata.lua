@@ -64,12 +64,19 @@ getPawnTable = function(pawnId, sourceTable)
 			if type(v) == "table" and v.id and modApi:stringStartsWith(k, "pawn") then
 				if v.id == pawnId then return v end
 			end
-		end	
+		end
 	else
-		local region = getCurrentRegion()
-		local ptable = getPawnTable(pawnId, SquadData)
-		if not ptable and region then
-			ptable = getPawnTable(pawnId, region.player.map_data)
+		local ptable = nil
+		-- first, try the squad
+		if SquadData then
+			ptable = getPawnTable(pawnId, SquadData)
+		end
+		-- if that faild, try the region
+		if not ptable then
+			local region = getCurrentRegion()
+			if region then
+				ptable = getPawnTable(pawnId, region.player.map_data)
+			end
 		end
 
 		return ptable
