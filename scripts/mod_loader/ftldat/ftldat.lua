@@ -16,19 +16,20 @@ end
 
 function FtlDat:_init(p__io, p__parent, p__root)
 	KaitaiStruct._init(self,p__io)
-    self.m_parent = p__parent
-    self.m_root = p__root or self
+	self.m_parent = p__parent
+	self.m_root = p__root or self
 	self.signature = false
 end
 
 function FtlDat:_read()
-    self._numFiles = self._io:read_u4le()
-	
-    self._files = {}
-    for i = 1, self._numFiles do
+	self._numFiles = self._io:read_u4le()
+
+	self._files = {}
+	self._fileIndexes = {}
+	for i = 1, self._numFiles do
 		local file = File(self._io, self, self.m_root)
 		file:_read()
-        table.insert(self._files,file)
+		self:_insert_file(file)
 	end
 end
 
@@ -47,7 +48,7 @@ function FtlDat:_write()
 	for i, data in ipairs(meta) do
 		table.insert(ret,data)
 	end
-    return table.concat(ret)
+	return table.concat(ret)
 end
 
 --File
@@ -55,19 +56,19 @@ end
 function File:_init(p__io, p__parent, p__root)
 	KaitaiStruct._init(self,p__io)
 	self.m_parent = p__parent
-    self.m_root = p__root
+	self.m_root = p__root
 end
 
 function File:_read()
-    self._metaOfs = self._io:read_u4le()
-	
+	self._metaOfs = self._io:read_u4le()
+
 	if (self._metaOfs ~= 0) then
-        local _pos = self._io:pos()
-        self._io:seek(self._metaOfs)
-        self._meta = Meta(self._io, self, self.m_root)
+		local _pos = self._io:pos()
+		self._io:seek(self._metaOfs)
+		self._meta = Meta(self._io, self, self.m_root)
 		self._meta:_read()
-        self._io:seek(_pos)
-    end
+		self._io:seek(_pos)
+	end
 end
 
 function File:_write()
@@ -78,7 +79,7 @@ end
 
 function Meta:_init(p__io, p__parent, p__root)
 	KaitaiStruct._init(self,p__io)
-    self.m_parent = p__parent
+	self.m_parent = p__parent
 	self.m_root = p__root
 end
 
@@ -97,6 +98,49 @@ function Meta:_write()
 	local size = lua_struct.pack("<I",self._fileSize)
 	local nameSize = lua_struct.pack("<I",self._filenameSize)
 	return table.concat({size,nameSize,self._filename,self.body})
+end
+
+
+-- ITB mod loader added helpers
+
+function FtlDat:remove_all_files()
+	self._files = {}
+	self._fileIndexes = {}
+	self._numFiles = 0
+end
+
+-- internal - inserts without increasing file count
+function FtlDat:_insert_file(file)
+	local index = #self._files + 1
+	table.insert(self._files, file)
+	self._fileIndexes[file._meta._filename] = index
+end
+
+-- helper to add a file and store its index in the by name lookup
+-- ensures we do not lose ordering info
+function FtlDat:insert_file(file)
+	self:_insert_file(file)
+	self._numFiles = self._numFiles + 1
+end
+
+-- Helper to check if a file exists
+function FtlDat:file_exists(name)
+	return self._fileIndexes[name] ~= nil
+end
+
+-- helper to look up a file by name
+function FtlDat:find_existing_file(name)
+	-- must exist in our index lookup
+	local index = self._fileIndexes[name]
+	if index ~= nil then
+		-- must have a file at that index
+		local file = self._files[index]
+		if file ~= nil then
+			-- sanity check, that file should have a matching name
+			assert(name == file._meta._filename)
+			return file
+		end
+	end
 end
 
 return {
