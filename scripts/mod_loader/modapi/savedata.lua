@@ -132,6 +132,8 @@ local function update(fn, retryCounter)
 	
 		RestoreGameVariables(Settings)
 	else
+		-- if pcall returns faslse, the second return is a string error
+		LOG("An error occured while reading save data from " .. saveFilePath .. ":\n" .. saveTable)
 		-- We failed to read the save file, retry later
 		if retryCounter >= 3 then
 			error("Failed to update save file! Backed off after 3 attempts")
