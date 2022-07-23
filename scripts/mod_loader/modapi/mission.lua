@@ -25,6 +25,12 @@ modApi.events.onMissionChanged:subscribe(function(currentMission, oldCurrentMiss
 	)
 end)
 
+modApi.events.onMissionDismissed:subscribe(function(mission)
+	local id = mission and mission.ID or nil
+
+	LOGF("-> Current mission %s w/table [%s] was dismissed", tostring(id), tostring(mission))
+end)
+
 -- Test if GetCurrentMission() is equal to 'self' in every Mission method.
 for i, fn in pairs(Mission) do
 	if type(fn) == 'function' then
@@ -75,6 +81,10 @@ modApi.events.onMissionUpdate:subscribe(function(mission)
 	if currentMission ~= mission then
 		modApi:setMission(mission)
 	end
+end)
+
+modApi.events.onMissionDismissed:subscribe(function(mission)
+	modApi:setMission(nil)
 end)
 
 modApi.events.onGameExited:subscribe(function()
