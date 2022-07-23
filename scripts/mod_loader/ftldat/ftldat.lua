@@ -21,23 +21,23 @@ function FtlDat:_init(p__io, p__parent, p__root)
 	self.signature = false
 end
 
-function FtlDat:_read()
+function FtlDat:_read(signature_scan)
 	self._numFiles = self._io:read_u4le()
 
 	self._files = {}
 	self._filesByName = {}
 	for i = 1, self._numFiles do
 		local file = File(self._io, self, self.m_root)
-		file:_read()
+		file:_read(signature_scan)
 		self:_insert_file(file)
 	end
 end
 
 function FtlDat:_write()
 	local ret = {lua_struct.pack("<I",self._numFiles)}
-	
+
 	local meta = {}
-	
+
 	local metaOfs = 4 * (1 + self._numFiles)
 	for i = 1, self._numFiles do
 		local data = self._files[i]._meta:_write()
@@ -59,14 +59,14 @@ function File:_init(p__io, p__parent, p__root)
 	self.m_root = p__root
 end
 
-function File:_read()
+function File:_read(signature_scan)
 	self._metaOfs = self._io:read_u4le()
 
 	if (self._metaOfs ~= 0) then
 		local _pos = self._io:pos()
 		self._io:seek(self._metaOfs)
 		self._meta = Meta(self._io, self, self.m_root)
-		self._meta:_read()
+		self._meta:_read(signature_scan)
 		self._io:seek(_pos)
 	end
 end
@@ -83,12 +83,14 @@ function Meta:_init(p__io, p__parent, p__root)
 	self.m_root = p__root
 end
 
-function Meta:_read()
+function Meta:_read(signature_scan)
 	self._fileSize = self._io:read_u4le()
 	self._filenameSize = self._io:read_u4le()
 	self._filename = self._io:read_bytes(self._filenameSize)
-	self.body = self._io:read_bytes(self._fileSize)
-	
+	if not signature_scan then
+		self.body = self._io:read_bytes(self._fileSize)
+	end
+
 	if self._filename == modApi:getSignature() then
 		self.m_root.signature = true
 	end

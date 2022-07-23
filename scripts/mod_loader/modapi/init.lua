@@ -56,7 +56,7 @@ function modApi:init()
 				LOGD("Building FTLDat...")
 				Assert.NotEquals(0, stream:size(), "Size of content of resource.dat")
 				instance = FtlDat.FtlDat(stream)
-				instance:_read() -- TODO: we could simply do a signature scan instead of a full read
+				instance:_read(true)
 				instance._io:close()
 				LOGD("Done!")
 			end)
