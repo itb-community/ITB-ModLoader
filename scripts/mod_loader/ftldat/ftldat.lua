@@ -87,6 +87,8 @@ function Meta:_read(signature_scan)
 	self._fileSize = self._io:read_u4le()
 	self._filenameSize = self._io:read_u4le()
 	self._filename = self._io:read_bytes(self._filenameSize)
+	-- signature scan means we only want filenames to see if the signature is set
+	-- the position will be reset after reading this meta, so as long as we read everything before the filename, we do not have the read the body
 	if not signature_scan then
 		self.body = self._io:read_bytes(self._fileSize)
 	end
