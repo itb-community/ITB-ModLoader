@@ -25,7 +25,7 @@ function FtlDat:_read()
 	self._numFiles = self._io:read_u4le()
 
 	self._files = {}
-	self._fileIndexes = {}
+	self._filesByName = {}
 	for i = 1, self._numFiles do
 		local file = File(self._io, self, self.m_root)
 		file:_read()
@@ -105,15 +105,14 @@ end
 
 function FtlDat:remove_all_files()
 	self._files = {}
-	self._fileIndexes = {}
+	self._filesByName = {}
 	self._numFiles = 0
 end
 
 -- internal - inserts without increasing file count
 function FtlDat:_insert_file(file)
-	local index = #self._files + 1
 	table.insert(self._files, file)
-	self._fileIndexes[file._meta._filename] = index
+	self._filesByName[file._meta._filename] = file
 end
 
 -- helper to add a file and store its index in the by name lookup
@@ -125,22 +124,12 @@ end
 
 -- Helper to check if a file exists
 function FtlDat:file_exists(name)
-	return self._fileIndexes[name] ~= nil
+	return self._filesByName[name] ~= nil
 end
 
 -- helper to look up a file by name
 function FtlDat:find_existing_file(name)
-	-- must exist in our index lookup
-	local index = self._fileIndexes[name]
-	if index ~= nil then
-		-- must have a file at that index
-		local file = self._files[index]
-		if file ~= nil then
-			-- sanity check, that file should have a matching name
-			assert(name == file._meta._filename)
-			return file
-		end
-	end
+	return self._filesByName[name]
 end
 
 return {
