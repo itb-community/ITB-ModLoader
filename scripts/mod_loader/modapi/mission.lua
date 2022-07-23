@@ -1,4 +1,14 @@
 
+-- EVENTS
+---------
+
+modApi.events.onFrameDrawStart:subscribe(function()
+	if modApi.current_mission ~= nil and Board == nil then
+		modApi.events.onMissionDismissed:dispatch(modApi.current_mission)
+	end
+end)
+
+
 -- TESTS
 --------
 
@@ -56,7 +66,9 @@ modApi.events.onMissionNextPhaseCreated:subscribe(function(prevMission, nextMiss
 end)
 
 modApi.events.onMissionEnd:subscribe(function(mission)
-	modApi:setMission(nil)
+	-- When entering a saved game from the main menu,
+	-- this is the first function being called for the current mission
+	modApi:setMission(mission)
 end)
 
 modApi.events.onMissionUpdate:subscribe(function(mission)

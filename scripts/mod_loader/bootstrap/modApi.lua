@@ -99,6 +99,7 @@ t.onWindowShown = Event()
 t.onWindowHidden = Event()
 
 t.onMissionChanged = Event()
+t.onMissionDismissed = Event()
 t.onGameVictory = Event()
 
 t.onShiftToggled = Event()
