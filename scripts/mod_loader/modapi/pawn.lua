@@ -18,12 +18,19 @@ end
 
 BoardPawn.GetPawnTable = function(self)
 	local region = GetCurrentRegion(RegionData)
-	
-	if region == nil then
-		return GetPawnTable(self:GetId()) or {}
+	if region then
+		return GetPawnTable(self:GetId(), region.player.map_data) or {}
 	end
-	
-	return GetPawnTable(self:GetId(), region.player.map_data) or {}
+
+	-- the base logic for GetPawnTable will fallback to the region data if the squad data is missing
+  -- but we prioritize region data here instead, we don't need the fallback as we already checked
+	-- hence why we specifically pass and check SquadData
+	if SquadData then
+		return GetPawnTable(self:GetId(), SquadData) or {}
+	end
+
+	-- neither region nor squad data? got nothing then
+	return {}
 end
 
 BoardPawn.ClearUndoMove = function(self)
