@@ -16,6 +16,7 @@ modApi.events = {}
 setmetatable(modApi.events, events_mt)
 
 local t = modApi.events
+t.onModEnumerating = Event()
 t.onModMetadataDone = Event()
 t.onModsMetadataDone = Event()
 t.onModInitialized = Event()
