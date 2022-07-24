@@ -26,20 +26,34 @@ end
     end
 end)
 
+local function handleEnemy(mod, entry)
+end
+
+local function handleMech(mod, entry)
+end
+
+local function handleAnimation(mod, entry)
+end
+
+local function handleBase(mod, entry)
+end
+
+local function handleColor(mod, entry)
+end
+
 local function handleFURLCall(mod, table)
-    LOG("--- MOD LOADER FURL COMPAT ---")
     for i, entry in ipairs(table) do
         local type = entry.Type or "null"
         if type == "enemy" then
-            -- handle vek
+            handleEnemy(mod, entry)
         elseif type == "mech" then
-            -- handle mech
+            handleMech(mod, entry)
         elseif type == "anim" then
-            -- handle animation
+            handleAnimation(mod, entry)
         elseif type == "base" then
-            -- handle base
+            handleBase(mod, entry)
         elseif type == "color" then
-            -- handle color
+            handleColor(mod, entry)
         else
             LOG("Error: missing or invalid type value")
         end
