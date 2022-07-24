@@ -16,6 +16,24 @@ function Move:GetSkillEffect(p1, p2)
 	else
 		ret:AddMove(Board:GetPath(p1, p2, Pawn:GetPathProf()), FULL_DELAY)
 	end
+	
+	if Pawn:IsAbility("Web_Vek") then
+		for i = 0, 3 do
+			local curr = p2 + DIR_VECTORS[i]
+			if Board:IsPawnSpace(curr) and Board:GetPawn(curr):GetTeam() == TEAM_ENEMY then
+				ret:AddGrapple(p2, curr, "hold")
+			end
+		end
+	end
+
+	if Pawn:IsAbility("Adjacent_Heal") then
+		for i = 0, 3 do
+			local curr = p2 + DIR_VECTORS[i]
+			if Board:IsPawnSpace(curr) and Board:GetPawn(curr):GetTeam() == TEAM_PLAYER and Board:GetPawn(curr):GetId() ~= Pawn:GetId() then
+				ret:AddDamage(SpaceDamage(curr,-1))
+			end
+		end
+	end
 
 	return ret
 end
