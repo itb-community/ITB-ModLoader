@@ -12,7 +12,7 @@ end
 
 modApi.events.onModEnumerating:subscribe(function(modDir)
     local modScriptPath = modDir .. "scripts/"
-    if isFURLMod(modScriptPath) and not isModLoaderFURLCompatApplied(modScriptPath) then
+    if not isModLoaderFURLCompatApplied(modScriptPath) and isFURLMod(modScriptPath) then
         modApi:writeFile(
             modScriptPath .. "FURL.lua",
             [[
