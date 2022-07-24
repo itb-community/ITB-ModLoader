@@ -57,6 +57,7 @@ function mod_loader:init()
 
 	LOGD("Enumerating mods...")
 	self:enumerateMods("mods/")
+	modApi.events.onModEnumerating:unsubscribeAll()
 	LOGD("Done!")
 
 	if MOD_API_DRAW_HOOK then
@@ -197,6 +198,8 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 				initFilePath = modDirPath .. "scripts/init.lua"
 			end
 		end
+
+        modApi.events.onModEnumerating:dispatch(modDirPath)
 
 		local function fn()
 			return dofile(initFilePath)
