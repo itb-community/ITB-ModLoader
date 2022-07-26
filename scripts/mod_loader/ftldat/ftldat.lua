@@ -19,6 +19,14 @@ function FtlDat:_init(p__io, p__parent, p__root)
 	self.m_parent = p__parent
 	self.m_root = p__root or self
 	self.signature = false
+	-- initialize some fields to make sure they are never nil
+	self.remove_all_files()
+end
+
+function FtlDat:remove_all_files()
+	self._files = {}
+	self._filesByName = {}
+	self._numFiles = 0
 end
 
 function FtlDat:_read(signature_scan)
@@ -106,12 +114,6 @@ end
 
 
 -- ITB mod loader added helpers
-
-function FtlDat:remove_all_files()
-	self._files = {}
-	self._filesByName = {}
-	self._numFiles = 0
-end
 
 -- internal - inserts without increasing file count
 function FtlDat:_insert_file(file)
