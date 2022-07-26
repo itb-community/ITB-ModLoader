@@ -142,19 +142,19 @@ function modApi.getColorCount()
 	return PaletteDictionary:size()
 end
 
-local function isPlayerUnitType(pawnType)
-	if
-		type(pawnType) == 'table'                     and
-		type(pawnType.Image) == 'string'              and
-		type(pawnType.ImageOffset) == 'number'        and
-		type(ANIMS[pawnType.Image]) == 'table'        and
-		type(ANIMS[pawnType.Image].Image) == 'string'
-	then
-		local image = ANIMS[pawnType.Image].Image
-		return modApi:stringStartsWith(image, "units/player") or modApi:stringStartsWith(image, "advanced/units/player")
+local function isPlayerUnitAnimation(animation)
+	if type(animation) == 'table' and type(animation.Height) == 'number' then
+		local image = animation.Image
+		return type(image) == 'string' and (modApi:stringStartsWith(image, "units/player") or modApi:stringStartsWith(image, "advanced/units/player"))
 	end
-
 	return false
+end
+
+local function isPlayerUnitType(pawnType)
+	return type(pawnType) == 'table'
+	  and type(pawnType.Image) == 'string'
+		and type(pawnType.ImageOffset) == 'number'
+	  and isPlayerUnitAnimation(ANIMS[pawnType.Image])
 end
 
 local function getFurlId(paletteIndex)
@@ -335,16 +335,8 @@ function finalizePalettes()
 	local playerAnimationHeight = GetColorCount()
 
 	for anim_name, animation in pairs(ANIMS) do
-		if
-			type(animation) == 'table'         and
-			type(animation.Height) == 'number' and
-			type(animation.Image) == 'string'
-		then
-			local isPlayerUnitAnimation = modApi:stringStartsWith(animation.Image, "units/player")
-
-			if isPlayerUnitAnimation then
-				animation.Height = playerAnimationHeight
-			end
+		if isPlayerUnitAnimation(animation) then
+			animation.Height = playerAnimationHeight
 		end
 	end
 
