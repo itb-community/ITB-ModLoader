@@ -118,13 +118,13 @@ local function update(fn, retryCounter)
 	end
 
 	local saveFilePath = getPath(Settings)
-	local ok, saveTabie = pcall(function() return read(saveFilePath) end)
-	
+	local ok, saveTable = pcall(function() return read(saveFilePath) end)
+
 	if ok then
-		fn(saveTabie)
+		fn(saveTable)
 
 		local content = ""
-		for k, v in pairs(saveTabie) do
+		for k, v in pairs(saveTable) do
 			content = content .. string.format("%s = %s\n\n", k, save_table(v))
 		end
 	
