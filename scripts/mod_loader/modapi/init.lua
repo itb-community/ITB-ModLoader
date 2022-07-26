@@ -15,7 +15,8 @@ function modApi:init()
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
 	self.version = "2.7.0"
-	LOG("MOD-API VERSION "..self.version)
+	LOG("GAME VERSION", self:getGameVersion())
+	LOG("MOD-API VERSION", self.version)
 	LOGD("Parent directory:", parentDirectory)
 
 	if not self:fileExists("resources/resource.dat") then
@@ -235,13 +236,24 @@ function modApi:getCurrentModcontentPath()
 end
 
 function modApi:getGameVersion()
-	if type(IsLocalizedText) == "function" then
-		return "1.2.20"
-	elseif type(IsGamepad) == "function" then
-		return "1.1.22"
-	end
+    if modApi.gameVersion then
+        return modApi.gameVersion
+    end
 
-	return "1.0.22"
+    local logPath = GetSavedataLocation() .. "log.txt"
+    if modApi:fileExists(logPath) then
+        local file = assert(io.open(logPath, "r"), "Failed to open file: "..logPath)
+        local content = file:read(200)
+        file:close()
+
+        local version = string.match(content, "Into the Breach: (%d+.%d+.%d+)")
+        if version then
+            modApi.gameVersion = version
+            return modApi.gameVersion
+        end
+    end
+
+    LOG("WARNING: Unable to get game version!")
 end
 
 modApi.events.onSettingsChanged:subscribe(function(old, neu)
