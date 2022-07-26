@@ -20,7 +20,7 @@ function FtlDat:_init(p__io, p__parent, p__root)
 	self.m_root = p__root or self
 	self.signature = false
 	-- initialize some fields to make sure they are never nil
-	self.remove_all_files()
+	self:remove_all_files()
 end
 
 function FtlDat:remove_all_files()

@@ -7,7 +7,7 @@ function modApi:assetExists(resource)
 	Assert.ResourceDatIsOpen("assetExists")
 	Assert.Equals("string", type(resource))
 
-	return self.resource.file_exists(resource)
+	return self.resource:file_exists(resource)
 end
 
 --[[
