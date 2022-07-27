@@ -11,6 +11,7 @@ function BasicLoggerImpl:new()
 	self.logFileName = "modloader.log"
 	self.logFileHandle = nil
 	self.printCallerInfo = false
+	self.openFileMode = "a+"
 end
 
 local function getCurrentDate()
@@ -68,8 +69,18 @@ function BasicLoggerImpl:setPrintCallerInfo(printCallerInfo)
 	self.printCallerInfo = printCallerInfo
 end
 
+function BasicLoggerImpl:setClearLogFileOnStartup(clearLogFileOnStartup)
+	assert(type(clearLogFileOnStartup) == "boolean")
+
+	if clearLogFileOnStartup then
+		self.openFileMode = "w+"
+	else
+		self.openFileMode = "a+"
+	end
+end
+
 function BasicLoggerImpl:openLogFile(fileName)
-	local fileHandle = io.open(fileName, "a+")
+	local fileHandle = io.open(fileName, self.openFileMode)
 
 	local t = string.format("\n===== Logging started at: %s =====\n", getCurrentDate())
 

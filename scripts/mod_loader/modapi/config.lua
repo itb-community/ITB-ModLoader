@@ -60,6 +60,8 @@ function DefaultModLoaderConfig()
 		logLevel            = 1, -- log to console by default
 		debugLogs           = false,
 		printCallerInfo     = true,
+		clearLogFileOnStartup = true,
+
 		developmentMode     = false,
 
 		floatyTooltips      = true,
@@ -105,6 +107,13 @@ function LoadModLoaderConfig(overrideLoadProfileConfig)
 end
 
 local function updateLogger(config)
+	-- if we already started logging, copy the old file handle to restore it
+	-- prevents file handle leaks and prevents us from overwriting old data when in overwrite mode
+	local oldFileHandle = nil
+	if mod_loader.logger ~= nil and mod_loader.logger.logFileHandle ~= nil then
+		oldFileHandle = mod_loader.logger.logFileHandle
+	end
+
 	if mod_loader.scrollableLogger ~= config.scrollableLogger then
 		Logger = Logger or require("scripts/mod_loader/logger")
 		local ScrollableLogger = require("scripts/mod_loader/logger_scrollable")
@@ -118,14 +127,19 @@ local function updateLogger(config)
 		else
 			mod_loader.logger = Logger(BasicLoggerImpl())
 		end
+
+		mod_loader.logger.logFileHandle = oldFileHandle
 	end
 end
 
+-- must be called before we start logging for the config to fully apply
 function ApplyModLoaderConfig(config)
 	updateLogger(config)
 
 	mod_loader.logger:setLoggingLevel(config.logLevel)
 	mod_loader.logger:setPrintCallerInfo(config.printCallerInfo)
+	mod_loader.logger:setClearLogFileOnStartup(config.clearLogFileOnStartup)
+
 	modApi.debugLogs              = config.debugLogs
 	modApi.developmentMode        = config.developmentMode
 

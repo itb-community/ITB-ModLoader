@@ -40,6 +40,10 @@ function Logger:__init(loggerImpl)
 		loggerImpl:setPrintCallerInfo(printCallerInfo)
 	end
 
+	self.setClearLogFileOnStartup = function(self, clearLogFileOnStartup)
+		loggerImpl:setClearLogFileOnStartup(clearLogFileOnStartup)
+	end
+
 	self.log = function(self, ...)
 		loggerImpl:log(...)
 	end

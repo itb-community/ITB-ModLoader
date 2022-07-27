@@ -12,6 +12,8 @@ end)
 function modApi:init()
 	Settings = self:loadSettings()
 
+	-- safe to start logging after this like is run
+	-- if we start logging before we apply the config, we may not update the log file correctly
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
 	self.version = "2.7.0"

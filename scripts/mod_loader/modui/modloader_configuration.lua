@@ -16,6 +16,7 @@ local function createUi()
 	local ddLogLevel = nil
 	local cboxDebugLogs = nil
 	local cboxCaller = nil
+	local cboxClearLogs = nil
 	local cboxDevelopmentMode = nil
 	local cboxFloatyTooltips = nil
 	local cboxProfileConfig = nil
@@ -34,9 +35,10 @@ local function createUi()
 			logLevel            = ddLogLevel.value,
 			debugLogs           = cboxDebugLogs.checked,
 			printCallerInfo     = cboxCaller.checked,
-			developmentMode     = cboxDevelopmentMode.checked,
-			floatyTooltips      = cboxFloatyTooltips.checked,
-			profileConfig       = cboxProfileConfig.checked,
+			clearLogFileOnStartup = cboxClearLogs.checked,
+			developmentMode       = cboxDevelopmentMode.checked,
+			floatyTooltips        = cboxFloatyTooltips.checked,
+			profileConfig         = cboxProfileConfig.checked,
 
 			showErrorFrame      = cboxErrorFrame.checked,
 			showVersionFrame    = cboxVersionFrame.checked,
@@ -60,6 +62,7 @@ local function createUi()
 		ddLogLevel.choice                  = ddLogLevel.value + 1
 		cboxDebugLogs.checked              = config.debugLogs
 		cboxCaller.checked                 = config.printCallerInfo
+		cboxClearLogs.checked              = config.clearLogFileOnStartup
 		cboxDevelopmentMode.checked        = config.developmentMode
 		cboxFloatyTooltips.checked         = config.floatyTooltips
 		cboxProfileConfig.checked          = config.profileConfig
@@ -232,6 +235,12 @@ local function createUi()
 		cboxCaller = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_Caller"),
 			GetText("ModLoaderConfig_Tooltip_Caller")
+
+		-- ////////////////////////////////////////////////////////////////////////
+		-- Clear logs on startup
+		cboxClearLogs = createCheckboxOption(
+			GetText("ModLoaderConfig_Text_ClearLogs"),
+			GetText("ModLoaderConfig_Tooltip_ClearLogs")
 		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////

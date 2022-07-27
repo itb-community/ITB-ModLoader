@@ -107,6 +107,9 @@ return {
 	                                               "red by the game will be lost when scrolling.\n\n"..
 	                                               "Navigate using mouse scroll, or page up/down keys. Hold down shift to jump by more.",
 
+	["ModLoaderConfig_Text_ClearLogs"] = "Clear Logs on Startup",
+	["ModLoaderConfig_Tooltip_ClearLogs"] = "If checked, the log file is cleared every startup to prevent it from getting too large. Changing this option will require a restart..",
+
 	["ModLoaderConfig_Text_LogLevel"] = "Logging level",
 	["ModLoaderConfig_Tooltip_LogLevel"] = "Controls where the game's logging messages are printed.",
 	["ModLoaderConfig_DD_LogLevel_0"] = "None",
