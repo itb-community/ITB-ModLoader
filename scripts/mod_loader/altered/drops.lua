@@ -25,20 +25,20 @@ end
 function checkWeaponDeck()
 	if #GAME.WeaponDeck == 0 then
 		if IsNewEquipment() then
-			LOG("Mod Loader: Including advanced weapons!\n")
+			LOG("Mod Loader: Including advanced weapons!")
 			GAME.WeaponDeck = modApi:getWeaponDeck(true)
 		else
-			LOG("Mod Loader: Using normal weapons!\n")
+			LOG("Mod Loader: Using normal weapons!")
 			GAME.WeaponDeck = modApi:getWeaponDeck(false)
 		end
 	end
 
 	if #GAME.PodWeaponDeck == 0 then
 		if IsNewEquipment() then
-			LOG("Mod Loader: Including advanced weapons!\n")
+			LOG("Mod Loader: Including advanced weapons!")
 			GAME.PodWeaponDeck = modApi:getPodWeaponDeck(true)
 		else
-			LOG("Mod Loader: Using normal weapons!\n")
+			LOG("Mod Loader: Using normal weapons!")
 			GAME.PodWeaponDeck = modApi:getPodWeaponDeck(false)
 		end
 	end
