@@ -14,28 +14,35 @@ else
 end
 
 local oldLog = LOG
-function LOG(...)
+
+-- base logic for logging to let us set the caller as needed
+-- will be 2 for most functions (0 is baseLog, 1 is the function calling baseLog, 2 is the caller of that function)
+local function baseLog(caller, ...)
 	if mod_loader.logger then
-		local caller = mod_loader.logger:buildCallerMessage(1)
+		local caller = mod_loader.logger:buildCallerMessage(caller)
 		mod_loader.logger:log(caller, ...)
 	else
 		oldLog(...)
 	end
 end
 
+function LOG(...)
+	baseLog(2, ...)
+end
+
 function LOGF(...)
-	LOG(string.format(...))
+	baseLog(2, string.format(...))
 end
 
 function LOGD(...)
 	if modApi.debugLogs then
-		LOG(...)
+		baseLog(2, ...)
 	end
 end
 
 function LOGDF(...)
 	if modApi.debugLogs then
-		LOGF(...)
+		baseLog(2, string.format(...))
 	end
 end
 
