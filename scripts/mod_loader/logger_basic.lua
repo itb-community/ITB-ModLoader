@@ -64,9 +64,13 @@ function BasicLoggerImpl:getPrintCallerInfo()
 end
 
 function BasicLoggerImpl:setPrintCallerInfo(printCallerInfo)
-	assert(type(printCallerInfo) == "boolean")
-
-	self.printCallerInfo = printCallerInfo
+	local argType = type(printCallerInfo)
+	assert(argType == "boolean" or argType == "number")
+	if argType == "boolean" then
+		self.printCallerInfo = printCallerInfo and 1 or 0
+	else
+		self.printCallerInfo = printCallerInfo
+	end
 end
 
 function BasicLoggerImpl:setClearLogFileOnStartup(clearLogFileOnStartup)
@@ -106,7 +110,8 @@ function BasicLoggerImpl:log(caller, ...)
 		end
 
 		local t = ""
-		if (self:getPrintCallerInfo()) then
+		local callerInfo = self:getPrintCallerInfo()
+		if (callerInfo == Logger.LOG_LEVEL_FILE or callerInfo == Logger.LOG_LEVEL_CONSOLE) then
 			t = caller .. "\n"
 		end
 
@@ -160,7 +165,7 @@ end
 
 local delimiter = "\n"
 function BasicLoggerImpl:output(message, caller)
-	if (self:getPrintCallerInfo()) then
+	if (self:getPrintCallerInfo() == Logger.LOG_LEVEL_CONSOLE) then
 		ConsolePrint(caller)
 		print(caller)
 	end

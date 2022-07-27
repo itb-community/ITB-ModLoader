@@ -15,7 +15,7 @@ local function createUi()
 	local cboxScrollableLogger = nil
 	local ddLogLevel = nil
 	local cboxDebugLogs = nil
-	local cboxCaller = nil
+	local ddCaller = nil
 	local cboxClearLogs = nil
 	local cboxDevelopmentMode = nil
 	local cboxFloatyTooltips = nil
@@ -31,10 +31,10 @@ local function createUi()
 
 	local onExit = function(self)
 		local data = {
-			scrollableLogger    = cboxScrollableLogger.checked,
-			logLevel            = ddLogLevel.value,
-			debugLogs           = cboxDebugLogs.checked,
-			printCallerInfo     = cboxCaller.checked,
+			scrollableLogger      = cboxScrollableLogger.checked,
+			logLevel              = ddLogLevel.value,
+			debugLogs             = cboxDebugLogs.checked,
+			printCallerInfo       = ddCaller.value,
 			clearLogFileOnStartup = cboxClearLogs.checked,
 			developmentMode       = cboxDevelopmentMode.checked,
 			floatyTooltips        = cboxFloatyTooltips.checked,
@@ -61,7 +61,7 @@ local function createUi()
 		ddLogLevel.value                   = config.logLevel
 		ddLogLevel.choice                  = ddLogLevel.value + 1
 		cboxDebugLogs.checked              = config.debugLogs
-		cboxCaller.checked                 = config.printCallerInfo
+		ddCaller.value                     = config.printCallerInfo
 		cboxClearLogs.checked              = config.clearLogFileOnStartup
 		cboxDevelopmentMode.checked        = config.developmentMode
 		cboxFloatyTooltips.checked         = config.floatyTooltips
@@ -232,9 +232,35 @@ local function createUi()
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Caller information
-		cboxCaller = createCheckboxOption(
-			GetText("ModLoaderConfig_Text_Caller"),
-			GetText("ModLoaderConfig_Tooltip_Caller")
+		ddCaller = UiDropDown(
+			{
+				Logger.LOG_LEVEL_NONE,
+				Logger.LOG_LEVEL_CONSOLE,
+				Logger.LOG_LEVEL_FILE
+			},
+			{
+				GetText("ModLoaderConfig_DD_Caller_0"),
+				GetText("ModLoaderConfig_DD_Caller_1"),
+				GetText("ModLoaderConfig_DD_Caller_2")
+			},
+			mod_loader.logger:getPrintCallerInfo(),
+			{
+				GetText("ModLoaderConfig_DD_Tip_Caller_0"),
+				GetText("ModLoaderConfig_DD_Tip_Caller_1"),
+				GetText("ModLoaderConfig_DD_Tip_Caller_2")
+			}
+		)
+		:width(1):heightpx(41)
+		:decorate({
+			DecoButton(),
+			DecoAlign(0, 2),
+			DecoText(GetText("ModLoaderConfig_Text_Caller")),
+			DecoDropDownText(nil, nil, nil, 33),
+			DecoAlign(0, -2),
+			DecoDropDown()
+		})
+		:settooltip(GetText("ModLoaderConfig_Tooltip_Caller"))
+		:addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Clear logs on startup

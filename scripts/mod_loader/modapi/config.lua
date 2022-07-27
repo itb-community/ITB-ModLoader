@@ -56,10 +56,10 @@ end
 
 function DefaultModLoaderConfig()
 	return {
-		scrollableLogger    = false,
-		logLevel            = 1, -- log to console by default
-		debugLogs           = false,
-		printCallerInfo     = true,
+		scrollableLogger      = false,
+		logLevel              = 2, -- log to console and file by default
+		debugLogs             = false,
+		printCallerInfo       = 2, -- log to file only by default
 		clearLogFileOnStartup = true,
 
 		developmentMode     = false,
@@ -101,6 +101,11 @@ function LoadModLoaderConfig(overrideLoadProfileConfig)
 
 	if loadProfile and modApi:isProfilePath() then
 		sdlext.config(modApi:getCurrentProfilePath().."modcontent.lua", readConfigFn)
+	end
+
+	-- legavy: printCallerInfo was a boolean before
+	if type(data.printCallerInfo) == 'boolean' then
+		data.printCallerInfo = data.printCallerInfo and 1 or 0
 	end
 
 	return data

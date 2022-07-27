@@ -124,6 +124,12 @@ return {
 
 	["ModLoaderConfig_Text_Caller"] = "Print Caller Information",
 	["ModLoaderConfig_Tooltip_Caller"] = "Include timestamp and stacktrace in LOG messages.",
+	["ModLoaderConfig_DD_Caller_0"] = "Do not include",
+	["ModLoaderConfig_DD_Caller_1"] = "File and console",
+	["ModLoaderConfig_DD_Caller_2"] = "Only file",
+	["ModLoaderConfig_DD_Tip_Caller_0"] = "Don't caller info anywhere.",
+	["ModLoaderConfig_DD_Tip_Caller_1"] = "Print caller info to the in-game console, and modloader.log file in the game's directory.",
+	["ModLoaderConfig_DD_Tip_Caller_2"] = "Print caller info to modloader.log file in the game's directory only.",
 
 	["ModLoaderConfig_Text_DevMode"] = "Development Mode",
 	["ModLoaderConfig_Tooltip_DevMode"] = "Enable debug mod loader features. May disrupt normal gameplay.\n\n"..
