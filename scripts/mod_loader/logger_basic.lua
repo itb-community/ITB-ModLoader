@@ -24,7 +24,7 @@ function BasicLoggerImpl:buildCallerMessage(callerOffset)
 
 	local timestamp = getCurrentDate()
 	local info = debug.getinfo(3 + callerOffset, "Sl")
-	local caller = string.format("%s %s:%d", timestamp, info.short_src, info.currentline)
+	local caller = string.format("[%s] [%s:%d]", timestamp, info.short_src, info.currentline)
 
 	return caller
 end
@@ -112,7 +112,7 @@ function BasicLoggerImpl:log(caller, ...)
 		local t = ""
 		local callerInfo = self:getPrintCallerInfo()
 		if (callerInfo == Logger.LOG_LEVEL_FILE or callerInfo == Logger.LOG_LEVEL_CONSOLE) then
-			t = caller .. "\n"
+			t = caller .. ": "
 		end
 
 		t = t .. message .. "\n"
@@ -165,12 +165,12 @@ end
 
 local delimiter = "\n"
 function BasicLoggerImpl:output(message, caller)
+	local text = message
 	if (self:getPrintCallerInfo() == Logger.LOG_LEVEL_CONSOLE) then
-		ConsolePrint(caller)
-		print(caller)
+		text = caller .. ": " .. text
 	end
 
-	for match in (message..delimiter):gmatch("(.-)"..delimiter) do
+	for match in (text..delimiter):gmatch("(.-)"..delimiter) do
 		ConsolePrint(match)
 		print(match)
 	end
