@@ -6,14 +6,8 @@ local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 function modApi:assetExists(resource)
 	Assert.ResourceDatIsOpen("assetExists")
 	Assert.Equals("string", type(resource))
-	
-	for i, file in ipairs(self.resource._files) do
-		if file._meta._filename == resource then
-			return true
-		end
-	end
-	
-	return false
+
+	return self.resource:file_exists(resource)
 end
 
 --[[
@@ -29,28 +23,24 @@ function modApi:writeAsset(resource, content)
 	Assert.Equals("string", type(resource))
 	Assert.Equals("string", type(content))
 
-	for i, file in ipairs(self.resource._files) do
-		if file._meta._filename == resource then
-			file._meta.body = content
-			file._meta._fileSize = file._meta.body:len()
-
-			-- Overwriting an existing file, return early
-			return
-		end
+	local existing = self.resource:find_existing_file(resource)
+	if existing ~= nil then
+		existing._meta.body = content
+		existing._meta._fileSize = content:len()
+		-- Overwriting an existing file, return early
+		return
 	end
 
 	-- Writing a new file to the archive
-	self.resource._numFiles = self.resource._numFiles + 1
-
 	local file = FtlDat.File(self.resource._io,self.resource,self.resource.m_root)
 	file._meta = FtlDat.Meta(file._io, file, file.m_root)
-	
+
 	file._meta._filenameSize = resource:len()
 	file._meta._filename = resource
 	file._meta.body = content
 	file._meta._fileSize = file._meta.body:len()
 
-	table.insert(self.resource._files, file)
+	self.resource:insert_file(file)
 end
 
 --[[
@@ -66,10 +56,9 @@ function modApi:readAsset(resource)
 	Assert.ResourceDatIsOpen("readAsset")
 	Assert.Equals("string", type(resource))
 
-	for i, file in ipairs(self.resource._files) do
-		if file._meta._filename == resource then
-			return file._meta.body
-		end
+	local existing = self.resource:find_existing_file(resource)
+	if existing ~= nil then
+		return existing._meta.body
 	end
 
 	error(string.format("Could not find file '%s' in resource.dat archive", resource))
@@ -100,22 +89,14 @@ end
 
 function modApi:appendDat(filePath)
 	local instance = FtlDat.FtlDat:from_file(filePath)
-	
+
 	for i, file in ipairs(instance._files) do
-		local found = false
-		for j, og in ipairs(self.resource) do
-			if file._meta._filename == og._meta._filename then
-				og._meta.body = file._meta.body
-				og._meta._fileSize = file._meta._fileSize
-				found = true
-			
-				break
-			end
-		end
-		
-		if not found then
-			table.insert(self.resource._files,file)
-			self.resource._numFiles = self.resource._numFiles + 1
+		local existing = self.resource:find_existing_file(file._meta._filename)
+		if existing ~= nil then
+			existing._meta.body = file._meta.body
+			existing._meta._fileSize = file._meta._fileSize
+		else
+			self.resource:insert_file(file)
 		end
 	end
 end
@@ -130,9 +111,8 @@ function modApi:fileDirectoryToDat(path)
 	end
 	
 	local ftldat = FtlDat.FtlDat()
-	ftldat._files = {}
-	ftldat._numFiles = 0
-	
+	ftldat:remove_all_files()
+
 	local function addDir(directory)
 		for i, dir in pairs(os.listdirs(path..directory)) do
 			addDir(directory..dir.."/")
@@ -140,9 +120,7 @@ function modApi:fileDirectoryToDat(path)
 		for i, dirfile in pairs(os.listfiles(path..directory)) do
 			
 			local f = io.open(path..directory..dirfile,"rb")
-			
-			ftldat._numFiles = ftldat._numFiles + 1
-	
+
 			local file = FtlDat.File()
 			file._meta = FtlDat.Meta()
 	
@@ -152,8 +130,8 @@ function modApi:fileDirectoryToDat(path)
 			file._meta._fileSize = file._meta.body:len()
 			
 			f:close()
-			
-			table.insert(ftldat._files,file)
+
+			ftldat:insert_file(file)
 		end
 	end
 	
@@ -176,7 +154,6 @@ function modApi:finalize()
 
 		if not self.resource.signature then
 			self.resource.signature = true
-			self.resource._numFiles = self.resource._numFiles + 1
 			local file = FtlDat.File(self.resource._io,self.resource,self.resource.m_root)
 			file._meta = FtlDat.Meta(file._io, file, file.m_root)
 
@@ -184,7 +161,7 @@ function modApi:finalize()
 			file._meta._filenameSize = file._meta._filename:len()
 			file._meta.body = "OK"
 			file._meta._fileSize = file._meta.body:len()
-			table.insert(self.resource._files,file)
+			self.resource:insert_file(file)
 		end
 
 		local output = self.resource:_write()

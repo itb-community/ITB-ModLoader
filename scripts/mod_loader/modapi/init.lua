@@ -50,13 +50,14 @@ function modApi:init()
 
 			local instance = nil
 			try(function()
-				local content = file:read("*all")
-				file:close()
+				-- use stream instead of io:read("*all") as it *drastically* reduces memory
+				local stream = KaitaiStream(file)
 
 				LOGD("Building FTLDat...")
-				Assert.NotEquals(nil, content, "Reading resource.dat")
-				Assert.NotEquals(0, string.len(content), "Size of content of resource.dat")
-				instance = FtlDat.FtlDat:from_string(content)
+				Assert.NotEquals(0, stream:size(), "Size of content of resource.dat")
+				instance = FtlDat.FtlDat(stream)
+				instance:_read(true)
+				instance._io:close()
 				LOGD("Done!")
 			end)
 			:catch(function(err)
@@ -77,6 +78,8 @@ function modApi:init()
 
 	LOGD("Building FTLDat...")
 	self.resource = FtlDat.FtlDat:from_file("resources/resource.dat")
+	-- self.resource already read in all data, so we can safely close the stream
+	self.resource._io:close()
 	LOGD("Done!")
 
 	self.squadKeys = {

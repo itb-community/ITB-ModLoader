@@ -11,10 +11,10 @@ function KaitaiStruct:close()
     self._io:close()
 end
 
-function KaitaiStruct:from_file(filename)
+function KaitaiStruct:from_file(filename, cloneStream)
     local inp = assert(io.open(filename, "rb"))
 
-    local instance = self(KaitaiStream(inp))
+    local instance = self(KaitaiStream(inp, cloneStream))
     instance:_read()
 	return instance
 end
@@ -22,17 +22,21 @@ end
 function KaitaiStruct:from_string(s)
     local ss = stringstream(s)
 
-    local instance = self(KaitaiStream(ss))
+    local instance = self(KaitaiStream(ss, false))
     instance:_read()
 	return instance
 end
 
 KaitaiStream = class.class()
 
-function KaitaiStream:_init(io)
-	local s = io:read("*all")
-	io:close()
-    self._io = stringstream(s)
+function KaitaiStream:_init(io, cloneStream)
+    if cloneStream == true then
+	     local s = io:read("*all")
+       self._io = stringstream(s)
+       io:close()
+    else
+      self._io = io
+    end
     self:align_to_byte()
 end
 
