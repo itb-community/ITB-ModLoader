@@ -24,14 +24,16 @@ function BufferedLogger:log(caller, ...)
 	if (self:getLoggingLevel() == Logger.LOG_LEVEL_NONE) then
 		return
 	end
+
 	if (self:getLoggingLevel() == Logger.LOG_LEVEL_FILE) then
 		if (not self.logFileHandle) then
 			self.logFileHandle = self:openLogFile(self:getLogFileName())
 		end
 
 		local t = ""
-		if (self:getPrintCallerInfo()) then
-			t = caller .. "\n"
+		local callerInfo = self:getPrintCallerInfo()
+		if (callerInfo == Logger.LOG_LEVEL_FILE or callerInfo == Logger.LOG_LEVEL_CONSOLE) then
+			t = caller .. ": "
 		end
 
 		t = t .. message .. "\n"
@@ -40,8 +42,8 @@ function BufferedLogger:log(caller, ...)
 		self.logFileHandle:flush()
 	end
 
-	if self:getPrintCallerInfo() then
-		self:pushMessage(caller)
+	if (self:getPrintCallerInfo() == Logger.LOG_LEVEL_CONSOLE) then
+		message = caller .. ": " .. message
 	end
 
 	for match in (message..delimiter):gmatch("(.-)"..delimiter) do
