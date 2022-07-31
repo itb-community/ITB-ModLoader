@@ -410,8 +410,13 @@ local function calculateOpenTestingConsoleButtonPosition()
 	-- This way we don't have to worry about calculating locations
 	-- for our UI, we can just offset based on the game's own UI
 	-- whenever the screen is resized.
-	local btnEndTurn = Buttons["action_end"]
-	return btnEndTurn.pos.x, btnEndTurn.pos.y
+	local btnDoneTesting = Buttons["done_testing"]
+	-- I don't know why the in-game "Done Testing" button offset by this
+	-- about from the entry in Buttons table.
+	local magicOffset = 13
+	local padding = 6
+	return btnDoneTesting.pos.x + magicOffset,
+	       btnDoneTesting.pos.y + btnDoneTesting.hitstats.h + magicOffset + padding
 end
 
 local function createOpenTestingConsoleButton(root)
