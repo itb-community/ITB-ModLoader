@@ -251,7 +251,7 @@ function modApi:getGameVersion()
         local content = file:read(200)
         file:close()
 
-        local version = string.match(content, "Into the Breach: (%d+.%d+.%d+)")
+        local version = string.match(content, "Into the Breach: (%S+)")
         if version then
             modApi.gameVersion = version
             return modApi.gameVersion
