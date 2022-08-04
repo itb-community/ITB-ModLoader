@@ -11,7 +11,7 @@ function BasicLoggerImpl:new()
 	self.logFileName = "modloader.log"
 	self.logFileHandle = nil
 	self.printCallerInfo = false
-	self.openFileMode = "a+"
+	self.clearLogFileOnStartup = false
 end
 
 local function getCurrentDate()
@@ -76,15 +76,19 @@ end
 function BasicLoggerImpl:setClearLogFileOnStartup(clearLogFileOnStartup)
 	assert(type(clearLogFileOnStartup) == "boolean")
 
-	if clearLogFileOnStartup then
-		self.openFileMode = "w+"
-	else
-		self.openFileMode = "a+"
-	end
+	self.clearLogFileOnStartup = clearLogFileOnStartup
 end
 
 function BasicLoggerImpl:openLogFile(fileName)
-	local fileHandle = io.open(fileName, self.openFileMode)
+	-- opening the file in write mode will clear out all contents
+	-- we prefer append mode for later work as it causes less issues if the user edits the log file while the game is running
+	if self.clearLogFileOnStartup then
+		local clearFile = io.open(fileName, "w")
+		clearFile:flush()
+		clearFile:close()
+	end
+
+	local fileHandle = io.open(fileName, "a+")
 
 	local t = string.format("\n===== Logging started at: %s =====\n", getCurrentDate())
 
