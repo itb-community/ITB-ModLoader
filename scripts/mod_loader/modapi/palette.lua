@@ -420,5 +420,6 @@ function modApi:getPalette(id)
 	return PaletteDictionary:get(id)
 end
 
+migrateColorMaps()
 modApi.events.onModInitialized:subscribe(migrateColorMaps)
 modApi.events.onModsInitialized:subscribe(finalizePalettes)
