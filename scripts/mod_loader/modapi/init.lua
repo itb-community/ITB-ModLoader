@@ -64,6 +64,10 @@ function modApi:init()
 				LOGD("Done!")
 			end)
 			:catch(function(err)
+				if instance ~= nil then
+					instance._io:close()
+					instance = nil
+				end
 				LOG("Failed to create FTLDat instance from resource.dat:", err)
 			end)
 
