@@ -2,33 +2,48 @@ modApi.weaponDeck = {}
 -- all weapon defaults as defined by mods
 local DEFAULT_WEAPONS
 -- weapons available in vanilla
-local VANILLA_WEAPONS = {}
+local VANILLA_WEAPONS
 
--- constants for enabling binary
-local NONE = modApi.constants.WEAPON_CONFIG_NONE
-local SHOP_NORMAL = modApi.constants.WEAPON_CONFIG_SHOP_NORMAL
-local SHOP_ADVANCED = modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED
-local POD_NORMAL = modApi.constants.WEAPON_CONFIG_POD_NORMAL
-local POD_ADVANCED = modApi.constants.WEAPON_CONFIG_POD_ADVANCED
-local ALL = modApi.constants.WEAPON_CONFIG_ALL
+-----------
+-- utils --
+-----------
+
+-- filters the deck by the given bit
+local function filterDeck(deckConfig, firstBit, secondBit)
+	local deck = {}
+	for id, enabled in pairs(deckConfig) do
+		if is_bit_set(enabled, firstBit) or (secondBit ~= nil and is_bit_set(enabled, secondBit)) then
+			local thing = _G[id]
+			if type(thing) == "table" and (thing.GetUnlocked == nil or thing:GetUnlocked()) then
+				table.insert(deck, id)
+			end
+		end
+	end
+	return deck
+end
+
+
+-------------
+-- weapons --
+-------------
 
 -- compacts a config table into a compact integer, to prevent bloating the save file
 function modApi:compactWeaponConfig(config)
 	local compact = 0
 	-- true means both, string to filter
 	if config.shop == true then
-		compact = compact + SHOP_NORMAL + SHOP_ADVANCED
+		compact = compact + modApi.constants.WEAPON_CONFIG_SHOP_NORMAL + modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED
 	elseif config.shop == "normal" then
-		compact = compact + SHOP_NORMAL
+		compact = compact + modApi.constants.WEAPON_CONFIG_SHOP_NORMAL
 	elseif config.shop == "advanced" then
-		compact = compact + SHOP_ADVANCED
+		compact = compact + modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED
 	end
 	if config.pod == true then
-		compact = compact + POD_NORMAL + POD_ADVANCED
+		compact = compact + modApi.constants.WEAPON_CONFIG_POD_NORMAL + modApi.constants.WEAPON_CONFIG_POD_ADVANCED
 	elseif config.pod == "normal" then
-		compact = compact + POD_NORMAL
+		compact = compact + modApi.constants.WEAPON_CONFIG_POD_NORMAL
 	elseif config.pod == "advanced" then
-		compact = compact + POD_ADVANCED
+		compact = compact + modApi.constants.WEAPON_CONFIG_POD_ADVANCED
 	end
 
 	return compact
@@ -52,10 +67,10 @@ function modApi:addWeaponDrop(config, enabled)
 		value = self:compactWeaponConfig(config)
 		-- false is disabled but available to select
 	elseif enabled == false then
-		value = NONE
+		value = modApi.constants.WEAPON_CONFIG_NONE
 	-- true means enable all, nil means enable all if not set already
 	elseif enabled == true or (enabled == nil and DEFAULT_WEAPONS[id] == nil) then
-		value = ALL
+		value = modApi.constants.WEAPON_CONFIG_ALL
 	end
 
 	-- if any of the above passed, set the value into both defaults and the deck
@@ -65,28 +80,9 @@ function modApi:addWeaponDrop(config, enabled)
 	end
 end
 
--- checks if the given bit is set in the value
-local function hasBit(value, bit)
-	return value % (bit + bit) >= bit
-end
-
--- gets a list of all weapons with the given bit set
-local function getWeaponList(firstBit, secondBit)
-	local deck = {}
-	for id, enabled in pairs(modApi.weaponDeck) do
-		if hasBit(enabled, firstBit) or (secondBit ~= nil and hasBit(enabled, secondBit)) then
-			local weapon = _G[id]
-			if type(weapon) == "table" and (weapon.GetUnlocked == nil or weapon:GetUnlocked()) then
-				table.insert(deck, id)
-			end
-		end
-	end
-	return deck
-end
-
 --- gets a list of all possible shop weapons
 function modApi:getFullWeaponDeck()
-	return getWeaponList(SHOP_NORMAL, SHOP_ADVANCED)
+	return filterDeck(modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
 end
 
 --- Gets the list of weapons for the shop
@@ -97,10 +93,10 @@ function modApi:getWeaponDeck(advanced)
 	end
 	-- true: anything enabled in advanced
 	if advanced then
-		return getWeaponList(SHOP_ADVANCED)
+		return filterDeck(modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
 	end
 	-- false: anything enabled when not advanced
-	return getWeaponList(SHOP_NORMAL)
+	return filterDeck(modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL)
 end
 
 --- Gets the list of weapons for the shop
@@ -111,10 +107,10 @@ function modApi:getPodWeaponDeck(advanced)
 	end
 	-- true: anything enabled in advanced
 	if advanced then
-		return getWeaponList(POD_ADVANCED)
+		return filterDeck(modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_POD_ADVANCED)
 	end
 	-- false: anything enabled when not advanced
-	return getWeaponList(POD_NORMAL)
+	return filterDeck(modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_POD_NORMAL)
 end
 
 --- gets the default value for the given weapon, as a compact integer
@@ -140,9 +136,10 @@ local oldGame = GAME
 local oldIsNewEquipment = IsNewEquipment
 
 -- helper to populate the vanilla tables
-local function populateVanillaWeapons(list, value)
-	for _, id in ipairs(list) do
-		VANILLA_WEAPONS[id] = (VANILLA_WEAPONS[id] or 0) + value
+VANILLA_WEAPONS = {}
+local function populateVanilla(dest, src, value)
+	for _, id in ipairs(src) do
+		dest[id] = (dest[id] or 0) + value
 	end
 end
 
@@ -152,8 +149,8 @@ function IsNewEquipment()
 end
 GAME = GameObject:new{}
 checkWeaponDeck()
-populateVanillaWeapons(GAME.WeaponDeck, SHOP_NORMAL)
-populateVanillaWeapons(GAME.PodWeaponDeck, POD_NORMAL)
+populateVanilla(VANILLA_WEAPONS, GAME.WeaponDeck,    modApi.constants.WEAPON_CONFIG_SHOP_NORMAL)
+populateVanilla(VANILLA_WEAPONS, GAME.PodWeaponDeck, modApi.constants.WEAPON_CONFIG_POD_NORMAL)
 
 -- next, advanced weapons
 function IsNewEquipment()
@@ -161,8 +158,8 @@ function IsNewEquipment()
 end
 GAME = GameObject:new{}
 checkWeaponDeck()
-populateVanillaWeapons(GAME.WeaponDeck, SHOP_ADVANCED)
-populateVanillaWeapons(GAME.PodWeaponDeck, POD_ADVANCED)
+populateVanilla(VANILLA_WEAPONS, GAME.WeaponDeck,    modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
+populateVanilla(VANILLA_WEAPONS, GAME.PodWeaponDeck, modApi.constants.WEAPON_CONFIG_POD_ADVANCED)
 
 -- defaults start as a copy of vanilla, but will be populated with mods later
 DEFAULT_WEAPONS = copy_table(VANILLA_WEAPONS)
