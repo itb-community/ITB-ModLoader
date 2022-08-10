@@ -33,7 +33,11 @@ function loadPilotsOrder()
 		end
 	end)
 	for k, v in ipairs(PilotListExtended) do
-		if order[v] == nil then
+		-- put any pilots that are hidden at the end, to keep this order consistent with the hangar
+			local pilot = _G[v]
+		if pilot.GetUnlocked ~= nil and not pilot:GetUnlocked() then
+			order[v] = 100000 + k
+		elseif order[v] == nil then
 			order[v] = 10000 + k
 		end
 	end
@@ -93,6 +97,11 @@ end
 local pilotsLayout = nil
 local function buildPilotButton(pilotId, placeholder)
 	local pilot = _G[pilotId]
+	-- if the pilot is a secret (not yet available in time pods/perfect island rewards), skip the button
+	if pilot.GetUnlocked ~= nil and not pilot:GetUnlocked() then
+		return nil
+	end
+
 	local unlocked = isPilotUnlocked(pilotId)
 	local surface = getOrCreatePilotSurface(pilotId)
 
@@ -176,7 +185,9 @@ local function buildPilotArrangeContent(scroll)
 			pilotSeen[pilotId] = true
 
 			local button = buildPilotButton(pilotId, placeholder)
-			pilotsLayout:add(button)
+			if button ~= nil then
+				pilotsLayout:add(button)
+			end
 		end
 	end
 

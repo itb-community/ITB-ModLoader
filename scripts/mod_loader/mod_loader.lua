@@ -623,8 +623,14 @@ function mod_loader:loadPilotList()
 	loadPilotsOrder()
 	PilotList = {}
 
+	-- skip pilots that are not unlocked
+	-- note they are sorted at the end of the list due to loadPilotsOrder
 	for i = 1, modApi.constants.MAX_PILOTS do
-		PilotList[i] = PilotListExtended[i]
+		local name = PilotListExtended[i]
+		local pilot = _G[name]
+		if pilot.GetUnlocked == nil or pilot:GetUnlocked() then
+			PilotList[i] = name
+		end
 	end
 end
 
