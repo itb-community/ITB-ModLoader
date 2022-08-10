@@ -206,7 +206,6 @@ local function validateEnabled(enabledMap)
 
 	-- not enough pilots? just fill with default
 	local need_recuits = recruits < 2
-	LOG(recruits)
 	if pod_normal or pod_advanced or need_recuits then
 		for id, enabled in pairs(enabledMap) do
 			local default = modApi:getVanillaPilotConfig(id)
