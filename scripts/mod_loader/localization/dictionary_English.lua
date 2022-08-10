@@ -60,6 +60,9 @@ return {
 	["ModContent_Button_ConfigureWeaponDeck"] = "Select Weapon Deck",
 	["ModContent_ButtonTooltip_ConfigureWeaponDeck"] = "Select which weapons are available in runs from the shop, time pods, and perfect island bonuses. Will not have any affect in existing save games.",
 
+	["ModContent_Button_ConfigurePilotDeck"] = "Select Pilot Deck",
+	["ModContent_ButtonTooltip_ConfigurePilotDeck"] = "Select which pilots are available in runs from time pods and perfect island bonuses. Will not have any affect in existing save games.",
+
 	["ConfigureDeck_PresetLoad_Title"] = "Load",
 	["ConfigureDeck_PresetLoad_Tooltip"] = "Loads the current preset, replacing the selected weapons",
 	["ConfigureDeck_PresetSave_Title"] = "Save",
@@ -70,6 +73,12 @@ return {
 	["ConfigureWeaponDeck_Deck_Tip_All"] = "Edits weapons in both decks",
 	["ConfigureWeaponDeck_Deck_Tip_Shop"] = "Edits weapons available in stores at the end of each island",
 	["ConfigureWeaponDeck_Deck_Tip_Pod"] = "Edits weapons available in time pods and perfect island rewards",
+
+	["ConfigurePilotDeck_Deck_Title"] = "Deck: ",
+	["ConfigurePilotDeck_Deck_Tooltip"] = "Select which pilot deck to edit.",
+	["ConfigurePilotDeck_Deck_Tip_All"] = "Edits pilots in both decks",
+	["ConfigurePilotDeck_Deck_Tip_Pod"] = "Edits weapons available in time pods and perfect island rewards",
+	["ConfigurePilotDeck_Deck_Tip_Recruit"] = "Edit pilots available as starter pilots",
 
 	["ConfigureDeck_Mode_Title"] = "Mode: ",
 	["ConfigureDeck_Mode_Tooltip"] = "Select whether to edit normal or advanced content.",

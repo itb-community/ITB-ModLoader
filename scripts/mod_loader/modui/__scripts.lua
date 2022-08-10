@@ -19,6 +19,7 @@ local scripts = {
 	
 	"mod_configuration",
 	"pilot_arrange",
+	"pilot_deck_selector",
 	"palette_arrange",
 	"squad_selector",
 	"weapon_deck_selector",
