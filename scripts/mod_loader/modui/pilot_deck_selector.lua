@@ -150,13 +150,19 @@ local function getClassList(oldConfig)
 		local pilot = _G[id]
 		if type(pilot) == "table" and (not pilot.GetUnlocked or pilot:GetUnlocked()) then
 			local desc = nil
+			-- hide tooltip when not unlocked
 			local unlocked = isPilotUnlocked(id)
 			if unlocked then
+				-- if the pilot lacks a skill, state "No Special Ability"
 				local key = GetSkillInfo(pilot.Skill).desc
 				if not key or key == "" then
 					key = "Hangar_NoAbility"
 				end
 				desc = GetText(key)
+				-- show power requirement
+				if pilot.PowerCost > 0 then
+					desc = GetText("Pilot_PowerReq", pilot.PowerCost) .. "\n" .. desc
+				end
 			end
 			table.insert(singleList, {
 				id = id,

@@ -119,7 +119,12 @@ local function buildPilotButton(pilotId, placeholder)
 		if not desc or desc == "" then
 			desc = "Hangar_NoAbility"
 		end
-		button:settooltip(GetText(desc), GetText(pilot.Name))
+		local descText = GetText(desc)
+		-- show power requirement
+		if pilot.PowerCost > 0 then
+			descText = GetText("Pilot_PowerReq", pilot.PowerCost) .. "\n" .. descText
+		end
+		button:settooltip(descText, GetText(pilot.Name))
 	end
 
 	button:registerDragDropList(placeholder)
