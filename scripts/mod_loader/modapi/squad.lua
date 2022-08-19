@@ -17,6 +17,14 @@ local validMechClasses = {
 	"TechnoVek",
 }
 
+local CLASS_ORDER = {
+	Prime = 0,
+	Brute = 1,
+	Ranged = 2,
+	Science = 3,
+	TechnoVek = 4,
+}
+
 function modApi:addSquad(squad, name, desc, icon)
 	Assert.ModInitializingOrLoading()
 
@@ -43,6 +51,17 @@ function modApi:addSquad(squad, name, desc, icon)
 				ptable.Class,
 				string.format("Squad %q - pawn with id %q has an invalid Class", squad.id, mechType)
 		)
+
+		if i > 2 then
+			local ptable_prev = _G[squad[i-1]]
+			local pri = CLASS_ORDER[ptable.Class] or INT_MAX
+			local pri_prev = CLASS_ORDER[ptable_prev.Class] or INT_MAX
+
+			if pri < pri_prev then
+				-- swap entries
+				squad[i-1], squad[i] = squad[i], squad[i-1]
+			end
+		end
 	end
 
 	modApi.mod_squads_by_id[squad.id] = squad
