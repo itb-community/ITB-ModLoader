@@ -77,6 +77,11 @@ function Skill:GetUnlocked()
   return self.Unlocked
 end
 
+-- Determines if a pilot is available in time pods, the hangar, and mod UIs
+function Pilot:IsEnabled()
+  return self.Enabled == nil or self.Enabled
+end
+
 -- allow defining a custom rarity for skills
 local oldSkillGetRarity = Skill.GetRarity
 function Skill:GetRarity()

@@ -14,14 +14,11 @@ local VANILLA_PILOTS
 -----------
 
 -- filters the deck by the given bit
-local function filterDeck(deckConfig, firstBit, secondBit)
+local function filterDeck(enabledFunction, deckConfig, firstBit, secondBit)
 	local deck = {}
 	for id, enabled in pairs(deckConfig) do
-		if is_bit_set(enabled, firstBit) or (secondBit ~= nil and is_bit_set(enabled, secondBit)) then
-			local thing = _G[id]
-			if type(thing) == "table" and (thing.GetUnlocked == nil or thing:GetUnlocked()) then
-				table.insert(deck, id)
-			end
+		if is_bit_set(enabled, firstBit) or (secondBit ~= nil and is_bit_set(enabled, secondBit)) and enabledFunction(id) then
+			table.insert(deck, id)
 		end
 	end
 	return deck
@@ -85,9 +82,15 @@ function modApi:addWeaponDrop(config, enabled)
 	end
 end
 
+-- checks if a weapon ID should show in time pods
+local function isWeaponUnlocked(id)
+	local weapon = _G[id]
+	return type(weapon) == "table" and (weapon.GetUnlocked == nil or weapon:GetUnlocked())
+end
+
 --- gets a list of all possible shop weapons
 function modApi:getFullWeaponDeck()
-	return filterDeck(modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
+	return filterDeck(isWeaponUnlocked, modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
 end
 
 --- Gets the list of weapons for the shop
@@ -98,10 +101,10 @@ function modApi:getWeaponDeck(advanced)
 	end
 	-- true: anything enabled in advanced
 	if advanced then
-		return filterDeck(modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
+		return filterDeck(isWeaponUnlocked, modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
 	end
 	-- false: anything enabled when not advanced
-	return filterDeck(modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL)
+	return filterDeck(isWeaponUnlocked, modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL)
 end
 
 --- Gets the list of weapons for the shop
@@ -112,10 +115,10 @@ function modApi:getPodWeaponDeck(advanced)
 	end
 	-- true: anything enabled in advanced
 	if advanced then
-		return filterDeck(modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_POD_ADVANCED)
+		return filterDeck(isWeaponUnlocked, modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_POD_ADVANCED)
 	end
 	-- false: anything enabled when not advanced
-	return filterDeck(modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_POD_NORMAL)
+	return filterDeck(isWeaponUnlocked, modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_POD_NORMAL)
 end
 
 --- gets the default value for the given weapon, as a compact integer
@@ -168,14 +171,20 @@ function modApi:addPilotDrop(config)
 	DEFAULT_PILOTS[config.id] = value
 end
 
+-- checks if a weapon ID should show in time pods
+local function isPilotEnabled(id)
+	local pilot = _G[id]
+	return type(pilot) == "table" and (pilot.IsEnabled == nil or pilot:IsEnabled())
+end
+
 --- gets a list of all possible shop weapons
 function modApi:getFullPilotDeck()
-	return filterDeck(modApi.pilotDeck, modApi.constants.PILOT_CONFIG_POD_NORMAL, modApi.constants.PILOT_CONFIG_POD_ADVANCED)
+	return filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.PILOT_CONFIG_POD_NORMAL, modApi.constants.PILOT_CONFIG_POD_ADVANCED)
 end
 
 --- gets a list of all possible shop weapons
 function modApi:getStarterPilotDeck()
-	local deck = filterDeck(modApi.pilotDeck, modApi.constants.PILOT_CONFIG_RECRUIT)
+	local deck = filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.PILOT_CONFIG_RECRUIT)
 	-- bad config?
 	if #deck == 0 then
 		return {"Pilot_Archive", "Pilot_Rust", "Pilot_Detritus", "Pilot_Pinnacle"}
@@ -191,10 +200,10 @@ function modApi:getPilotDeck(advanced)
 	end
 	-- true: anything enabled in advanced
 	if advanced then
-		return filterDeck(modApi.pilotDeck, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
+		return filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
 	end
 	-- false: anything enabled when not advanced
-	return filterDeck(modApi.pilotDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL)
+	return filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL)
 end
 
 --- gets the default value for the given weapon, as a compact integer

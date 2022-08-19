@@ -148,7 +148,7 @@ local function getClassList(oldConfig)
 	local singleList = {}
 	for id, enabled in pairs(modApi.pilotDeck) do
 		local pilot = _G[id]
-		if type(pilot) == "table" and (not pilot.GetUnlocked or pilot:GetUnlocked()) then
+		if type(pilot) == "table" and (pilot.IsEnabled == nil or pilot:IsEnabled()) then
 			local desc = nil
 			-- hide tooltip when not unlocked
 			local unlocked = isPilotUnlocked(id)
