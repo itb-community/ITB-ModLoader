@@ -55,41 +55,81 @@ function SpaceDamage:ToTable()
 	return result
 end
 
+-- deprecated: space damage is no longer metadata
 function SpaceDamage:IsMetadata()
-    Assert.Equals("userdata", type(self), "Argument #0")
-
-    if not self.sScript then
-        return false
-    end
-    
-    return modApi:stringStartsWith(self.sScript, "return")
+    return false
 end
 
-function DamageList:GetMetadata()
-    local metadata = {}
-
-    for i, v in ipairs(extract_table(self)) do
-        if v:IsMetadata() then
-            metadata[i] = loadstring(v.sScript)()
-        else
-            metadata[i] = false
+-- creates a list of metadata where
+function DamageList:GetMetadata(effectMeta)
+    local metaList = {}
+    local size = self:size()
+    if effectMeta == nil then
+        for i = 1, size do
+          metaList[i - 1] = false
+        end
+    else
+        for i = 1, size do
+            local damageMeta = effectMeta[i]
+            if damageMeta ~= nil then
+                metaList[i - 1] = damageMeta
+            else
+                metaList[i - 1] = false
+            end
         end
     end
 
-    return metadata
+    return metaList
+end
+
+-- adds all effects from one damage list into another
+function DamageList:AppendAll(list)
+    Assert.Equals("userdata", type(self), "Argument #0")
+    Assert.Equals("userdata", type(list), "Argument #1")
+
+    for i = 1, list:size() do
+        self:push_back(list:index(i))
+    end
 end
 
 function SkillEffect:GetMetadata()
-    return self.effect:GetMetadata()
+    return self.effect:GetMetadata(self.meta)
 end
 function SkillEffect:GetQueuedMetadata()
-    return self.q_effect:GetMetadata()
+    return self.q_effect:GetMetadata(self.q_meta)
 end
 
-local function addDamageListMetadata(damageList, metadataTable)
-    local metadataInstance = SpaceDamage()
-    metadataInstance.sScript = "return " .. save_table(metadataTable)
-    damageList:push_back(metadataInstance)
+-- appends metadata to the damage list, creating the meta table if missing
+local function addDamageListMetadata(self, key, index, metadataTable)
+    if self[key] == nil then
+        self[key] = {}
+    end
+    self[key][index] = metadataTable
+end
+
+-- copy metadata from one skill effect to another
+local function copyMeta(target, targetSize, targetKey, meta, metaSize)
+  if meta ~= nil then
+      if target[targetKey] == nil then
+          target[targetKey] = {}
+      end
+      for i = 1, metaSize do
+          if meta[i] ~= nil then
+              target[targetKey][i + targetSize] = meta[i]
+          end
+      end
+  end
+end
+
+function SkillEffect:AppendAll(other)
+    Assert.Equals("userdata", type(self), "Argument #0")
+    Assert.Equals("userdata", type(other), "Argument #1")
+
+    -- need to meta copy first, as we need the size before we copy to know where the new meta goes
+    copyMeta(self, self.effect:size(), "meta", other.meta, other.effect:size())
+    copyMeta(self, self.q_effect:size(), "q_meta", other.q_meta, other.q_effect:size())
+    self.effect:AppendAll(other.effect)
+    self.q_effect:AppendAll(other.q_effect)
 end
 
 -- Create an initial SkillEffect instance that we use to grab
@@ -104,13 +144,16 @@ SkillEffect.AddGrapple = function(self, source, target, anim, ...)
     metadataTable.source = Point(source.x, source.y)
     metadataTable.target = Point(target.x, target.y)
     metadataTable.anim = anim
-    addDamageListMetadata(self.effect, metadataTable)
+    -- add 1 to the size as we are adding the effect after
+    addDamageListMetadata(self, "meta", self.effect:size() + 1, metadataTable)
 
     oldAddGrapple(self, source, target, anim, ...)
 end
 
 local function overrideProjectileOrArtillery(funcName, oldFunc)
-    local damageList = modApi:stringStartsWith(funcName, "AddQueued") and "q_effect" or "effect"
+    local queued = modApi:stringStartsWith(funcName, "AddQueued")
+    local damageList = queued and "q_effect" or "effect"
+    local metaKey = queued and "q_meta" or "meta"
     local metadataType = funcName:gsub("^Add", ""):gsub("^Queued", ""):lower()
 
     assert(metadataType == "projectile" or metadataType == "artillery", "This function only works for projectile or artillery weapons")
@@ -136,8 +179,9 @@ local function overrideProjectileOrArtillery(funcName, oldFunc)
         metadataTable.projectileArt = projectileArt
         metadataTable.source = source or (Pawn and Pawn:GetSpace()) or nil
         metadataTable.target = damageInstance.loc
-        addDamageListMetadata(self[damageList], metadataTable)
-		
+        -- add 1 to the size as we are adding the effect after
+        addDamageListMetadata(self, metaKey, self[damageList]:size() + 1, metadataTable)
+
 		if source ~= nil then
 			oldFunc(self, source, damageInstance, projectileArt, delay or PROJ_DELAY)
 		else
@@ -246,10 +290,8 @@ local function AddQueued(name)
     SkillEffect["AddQueued".. name] = function(self, ...)
         local fx = SkillEffect()
         fx["Add".. name](fx, ...)
-
-        for _, v in ipairs(extract_table(fx.effect)) do
-            self.q_effect:push_back(v)
-        end
+        copyMeta(self, self.q_effect:size(), "q_meta", fx.meta, fx.effect:size())
+        self.q_effect:AppendAll(fx.effect)
     end
 end
 
