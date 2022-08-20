@@ -38,6 +38,7 @@ end
 
 globalizeLocalVariable("scripts/text.lua", "Global_Texts")
 globalizeLocalVariable("scripts/spawner_backend.lua", "WeakPawns")
+globalizeLocalVariable("scripts/spawner_backend.lua", "exclusiveElements")
 globalizeLocalVariable("scripts/game.lua", "GameObject")
 globalizeLocalVariable("scripts/text_population.lua", "PopEvent")
 globalizeLocalVariable("scripts/personalities/personalities.lua", "PilotPersonality")
