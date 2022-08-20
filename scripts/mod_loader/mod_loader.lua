@@ -628,7 +628,7 @@ function mod_loader:loadPilotList()
 	for i = 1, modApi.constants.MAX_PILOTS do
 		local name = PilotListExtended[i]
 		local pilot = _G[name]
-		if pilot.IsEnabled == nil or pilot:IsEnabled() then
+		if pilot ~= nil and (pilot.IsEnabled == nil or pilot:IsEnabled()) then
 			PilotList[i] = name
 		end
 	end
