@@ -39,18 +39,16 @@ local globalTextsMetatable = {
 }
 Global_Texts = setmetatable(Global_Texts, globalTextsMetatable)
 
+local oldGetStatusTooltip = GetStatusTooltip
 function GetStatusTooltip(id)
-	local title_text = "Status_"..id.."_Title"
+	local ret = oldGetStatusTooltip(id)
 
-	if IsText(title_text) then
-		return {title_text, "Status_"..id.."_Text"}
-	end
-
-	if STATUS_TOOLTIPS[id] ~= nil then
+	-- if it returns the ID, it means it was not found, fallback to global table
+	if ret[1] == id and STATUS_TOOLTIPS[id] ~= nil then
 		return STATUS_TOOLTIPS[id]
-	else
-		return { id, "NOT FOUND"}
 	end
+
+	return ret
 end
 
 -- ///////////////////////////////////////////////////////////////////////////////////
