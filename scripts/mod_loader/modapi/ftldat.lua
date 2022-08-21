@@ -109,7 +109,6 @@ end
 function modApi:finalize()
 	try(function()
 	    if not self.resource.signature then
-	        LOG("mod loader signature not found, adding it")
             self.resource.signature = true
             self.resource:put_entry(self:getSignature(), "OK")
 	    end
