@@ -1,8 +1,6 @@
 -- //////////////////////////////////////////////////////////////////////////////
 -- Resource.dat handling
 
-local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
-
 function modApi:assetExists(resource)
 	Assert.ResourceDatIsOpen("assetExists")
 	Assert.Equals("string", type(resource))
@@ -21,26 +19,9 @@ end
 function modApi:writeAsset(resource, content)
 	Assert.ResourceDatIsOpen("writeAsset")
 	Assert.Equals("string", type(resource))
-	Assert.Equals("string", type(content))
+	Assert.Equals({"string", "table"}, type(content))
 
-	local existing = self.resource:find_existing_file(resource)
-	if existing ~= nil then
-		existing._meta.body = content
-		existing._meta._fileSize = content:len()
-		-- Overwriting an existing file, return early
-		return
-	end
-
-	-- Writing a new file to the archive
-	local file = FtlDat.File(self.resource._io,self.resource,self.resource.m_root)
-	file._meta = FtlDat.Meta(file._io, file, file.m_root)
-
-	file._meta._filenameSize = resource:len()
-	file._meta._filename = resource
-	file._meta.body = content
-	file._meta._fileSize = file._meta.body:len()
-
-	self.resource:insert_file(file)
+	self.resource:put_entry(resource, content)
 end
 
 --[[
@@ -56,12 +37,7 @@ function modApi:readAsset(resource)
 	Assert.ResourceDatIsOpen("readAsset")
 	Assert.Equals("string", type(resource))
 
-	local existing = self.resource:find_existing_file(resource)
-	if existing ~= nil then
-		return existing._meta.body
-	end
-
-	error(string.format("Could not find file '%s' in resource.dat archive", resource))
+    return self.resource:entry_content_binary(resource)
 end
 
 function modApi:appendAsset(resource, filePath)
@@ -88,17 +64,13 @@ function modApi:copyAsset(src, dst)
 end
 
 function modApi:appendDat(filePath)
-	local instance = FtlDat.FtlDat:from_file(filePath)
+	local instance = FtlDat(filePath)
 
-	for i, file in ipairs(instance._files) do
-		local existing = self.resource:find_existing_file(file._meta._filename)
-		if existing ~= nil then
-			existing._meta.body = file._meta.body
-			existing._meta._fileSize = file._meta._fileSize
-		else
-			self.resource:insert_file(file)
-		end
-	end
+    for i, innerPath in ipairs(instance:inner_paths()) do
+        self.resource:put_entry(innerPath, instance:entry_content_binary(innerPath))
+    end
+
+    instance:destroy()
 end
 
 function modApi:fileDirectoryToDat(path)
@@ -109,38 +81,25 @@ function modApi:fileDirectoryToDat(path)
 	if path:sub(len) ~= [[/]] and path:sub(len) ~= [[\]] then
 		path = path.."/"
 	end
-	
-	local ftldat = FtlDat.FtlDat()
-	ftldat:remove_all_files()
+
+	local ftldat = FtlDat()
 
 	local function addDir(directory)
 		for i, dir in pairs(os.listdirs(path..directory)) do
 			addDir(directory..dir.."/")
 		end
 		for i, dirfile in pairs(os.listfiles(path..directory)) do
-			
 			local f = io.open(path..directory..dirfile,"rb")
-
-			local file = FtlDat.File()
-			file._meta = FtlDat.Meta()
-	
-			file._meta._filename = directory..dirfile
-			file._meta._filenameSize = file._meta._filename:len()
-			file._meta.body = f:read("*all")
-			file._meta._fileSize = file._meta.body:len()
-			
+			local content = f:read("*all")
 			f:close()
-
-			ftldat:insert_file(file)
+            ftldat:put_entry(directory.dirfile, content)
 		end
 	end
 	
 	addDir("")
-	
-	local f = io.open(path.."resource.dat","wb+")
-	local output = ftldat:_write()
-	f:write(output)
-	f:close()
+
+	ftldat:write(path.."resource.dat")
+	ftldat:destroy()
 end
 
 function modApi:getSignature()
@@ -148,33 +107,19 @@ function modApi:getSignature()
 end
 
 function modApi:finalize()
-	local f = nil
 	try(function()
-		f = io.open("resources/resource.dat","wb")
+	    if not self.resource.signature then
+	        LOG("mod loader signature not found, adding it")
+            self.resource.signature = true
+            self.resource:put_entry(self:getSignature(), "OK")
+	    end
 
-		if not self.resource.signature then
-			self.resource.signature = true
-			local file = FtlDat.File(self.resource._io,self.resource,self.resource.m_root)
-			file._meta = FtlDat.Meta(file._io, file, file.m_root)
-
-			file._meta._filename = self:getSignature()
-			file._meta._filenameSize = file._meta._filename:len()
-			file._meta.body = "OK"
-			file._meta._fileSize = file._meta.body:len()
-			self.resource:insert_file(file)
-		end
-
-		local output = self.resource:_write()
-		f:write(output)
+	    self.resource:write("resources/resource.dat")
 	end)
 	:catch(function(err)
 		LOG("Failed to finalize resource.dat: ", err)
 	end)
-	:finally(function()
-		if f then
-			f:close()
-		end
-	end)
 
+    self.resource:destroy()
 	self.resource = nil
 end

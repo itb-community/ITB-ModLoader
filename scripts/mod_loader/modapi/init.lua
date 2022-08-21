@@ -1,5 +1,4 @@
 
-local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 local parentDirectory = GetParentPath(...)
 
 modApi = modApi or {}
@@ -16,7 +15,7 @@ function modApi:init()
 	-- if we start logging before we apply the config, we may not update the log file correctly
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
-	self.version = "2.7.1"
+	self.version = "2.7.1.dev"
 	LOG("GAME VERSION", self:getGameVersion())
 	LOG("MOD-API VERSION", self.version)
 	LOGD("Parent directory:", parentDirectory)
@@ -47,26 +46,15 @@ function modApi:init()
 			modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
 			LOGD("Done!")
 		else
-			LOGD("Opening resource.dat to check mod loader signature...")
-			local file = io.open("resources/resource.dat","rb")
-			LOGD("Done!")
-
 			local instance = nil
 			try(function()
-				-- use stream instead of io:read("*all") as it *drastically* reduces memory
-				local stream = KaitaiStream(file)
-
-				LOGD("Building FTLDat...")
-				Assert.NotEquals(0, stream:size(), "Size of content of resource.dat")
-				instance = FtlDat.FtlDat(stream)
-				instance:_read(true)
-				instance._io:close()
+				LOGD("Building FTLDat to check signature...")
+				instance = FtlDat("resources/resource.dat")
 				LOGD("Done!")
 			end)
 			:catch(function(err)
 				if instance ~= nil then
-					instance._io:close()
-					instance = nil
+				    instance:destroy()
 				end
 				LOG("Failed to create FTLDat instance from resource.dat:", err)
 			end)
@@ -84,9 +72,7 @@ function modApi:init()
 	end
 
 	LOGD("Building FTLDat...")
-	self.resource = FtlDat.FtlDat:from_file("resources/resource.dat")
-	-- self.resource already read in all data, so we can safely close the stream
-	self.resource._io:close()
+	self.resource = FtlDat("resources/resource.dat")
 	LOGD("Done!")
 
 	self.squadKeys = {
