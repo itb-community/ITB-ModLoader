@@ -11,6 +11,7 @@ local DIFFICULTIES = {
 	"EASY",
 	"NORMAL",
 	"HARD",
+	"UNFAIR",
 }
 
 local VANILLA_SQUADS = {
@@ -112,8 +113,8 @@ local function writeMedalData(self, squad_id, difficulty, islandsSecured)
 		not modApi:isProfilePath()         or
 		not modApi:isModdedSquad(squad_id) or
 		islandsSecured < 2                 or
-		difficulty < 0                     or
-		difficulty > 2 -- TODO: update for Unfair difficulty
+		difficulty < DIFF_EASY             or
+		difficulty > DIFF_UNFAIR
 	then
 		return
 	end

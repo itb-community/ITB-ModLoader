@@ -57,23 +57,27 @@ modApi.events.onFtldatFinalized:subscribe(function()
 	}
 end)
 
+-- the 2 island unfair ribbon is shifted to the left by one pixel,
+-- as a result all our medal locations need to be shifted to the left 1 pixel or the border cuts off on the left
+-- the sizes later on are also 1 pixel larger than you would otherwise expect
 local MEDAL_OFFSETS_X = {
-	EASY = -29,
-	NORMAL = -54,
-	HARD = -79,
-	NONE = -4
+	EASY = -26,
+	NORMAL = -51,
+	HARD = -76,
+	UNFAIR = -101,
+	NONE = -1
 }
 
 -- UI measurements
 local UI = {
 	MEDAL = {
 		SMALL = {
-			WIDTH = 15,
-			HEIGHT = 24
+			WIDTH = 22,
+			HEIGHT = 32
 		},
 		LARGE = {
-			WIDTH = 34,
-			HEIGHT = 52
+			WIDTH = 46,
+			HEIGHT = 64
 		}
 	},
 	COIN = {
@@ -94,20 +98,20 @@ local UI = {
 	},
 	HANGAR = {
 		WIDTH = 367,
-		HEIGHT = 67,
-		X_OFFSET = 541,
+		HEIGHT = 68,
+		X_OFFSET = 537,
 		Y_OFFSET = 209,
 		MEDAL_HOLDER = {
-			WIDTH = 135,
-			HEIGHT = 60,
-			Y = 5,
-			HORIZONTAL_GAP = 11,
-			PADDING_ALL = 3
+			WIDTH = 140,
+			HEIGHT = 68,
+			Y = 1,
+			HORIZONTAL_GAP = -1,
+			PADDING_ALL = 1
 		},
 		ACHIEVEMENT_HOLDER = {
 			WIDTH = 212,
 			HEIGHT = 64,
-			X = 155,
+			X = 159,
 			HORIZONTAL_GAP = 10
 		}
 	},
@@ -116,37 +120,38 @@ local UI = {
 		HEIGHT = 303,
 		HORIZONTAL_GAP = 315,
 		VERTICAL_GAP = {
-			SMALL_UI = 76,
+			SMALL_UI = 68,
 			LARGE_UI = 69
 		},
 		X_OFFSET = 285,
 		Y_OFFSET = {
-			SMALL_UI = 95,
+			SMALL_UI = 91,
 			LARGE_UI = 60
 		},
 		PROGRESS = {
 			WIDTH = 160,
-			HEIGHT = 24,
+			HEIGHT = 32,
 			MEDAL_HOLDER = {
-				HORIZONTAL_GAP = 8,
-				PADDING_LEFT = 9
+				HORIZONTAL_GAP = 1,
+				PADDING_LEFT = 6
 			},
 			COIN_HOLDER = {
 				HEIGHT = 20,
-				HORIZONTAL_GAP = 5
+				HORIZONTAL_GAP = 5,
+				PADDING_TOP = 8
 			}
 		}
 	},
 	ESCAPE_MENU = {
 		WIDTH = 208,
-		HEIGHT = 135,
-		X_OFFSET = 354,
+		HEIGHT = 143,
+		X_OFFSET = 361,
 		Y_OFFSET = 60,
 		MEDAL_HOLDER = {
-			HEIGHT = 52,
-			Y = 83,
-			HORIZONTAL_GAP = 21,
-			PADDING_LEFT = 33,
+			HEIGHT = 68,
+			Y = 76,
+			HORIZONTAL_GAP = 9,
+			PADDING_LEFT = 27,
 		},
 		ACHIEVEMENT_HOLDER = {
 			HEIGHT = 74,
@@ -559,6 +564,7 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 						:dynamicResize(false)
 						:addTo(squadProgressUi)
 					coinHolder.squadIndex = squadIndex
+					coinHolder.padt = UI.SQUAD_SELECT.PROGRESS.COIN_HOLDER.PADDING_TOP
 					coinHolder.draw = draw_if_squad_unlocked
 
 					for islandsSecured = 2, 4 do

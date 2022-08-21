@@ -104,7 +104,8 @@ return {
 	["Achievements_Medal_Island_Victory_Easy"] = "Easy",
 	["Achievements_Medal_Island_Victory_Normal"] = "Normal",
 	["Achievements_Medal_Island_Victory_Hard"] = "Hard",
-
+	["Achievements_Medal_Island_Victory_Unfair"] = "Unfair",
+	
 	["ModContent_Button_ModLoaderConfig"] = "Configure Mod Loader",
 	["ModContent_ButtonTooltip_ModLoaderConfig"] = "Configure some features of the mod loader.",
 	["ModLoaderConfig_FrameTitle"] = "Mod Loader Configuration",
