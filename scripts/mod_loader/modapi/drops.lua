@@ -1,34 +1,51 @@
 modApi.weaponDeck = {}
+modApi.pilotDeck = {}
 -- all weapon defaults as defined by mods
 local DEFAULT_WEAPONS
+-- all pilots defaults as defined by mods
+local DEFAULT_PILOTS
 -- weapons available in vanilla
-local VANILLA_WEAPONS = {}
+local VANILLA_WEAPONS
+-- pilots available in vanilla
+local VANILLA_PILOTS
 
--- constants for enabling binary
-local NONE = modApi.constants.WEAPON_CONFIG_NONE
-local SHOP_NORMAL = modApi.constants.WEAPON_CONFIG_SHOP_NORMAL
-local SHOP_ADVANCED = modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED
-local POD_NORMAL = modApi.constants.WEAPON_CONFIG_POD_NORMAL
-local POD_ADVANCED = modApi.constants.WEAPON_CONFIG_POD_ADVANCED
-local ALL = modApi.constants.WEAPON_CONFIG_ALL
+-----------
+-- utils --
+-----------
+
+-- filters the deck by the given bit
+local function filterDeck(enabledFunction, deckConfig, firstBit, secondBit)
+	local deck = {}
+	for id, enabled in pairs(deckConfig) do
+		if is_bit_set(enabled, firstBit) or (secondBit ~= nil and is_bit_set(enabled, secondBit)) and enabledFunction(id) then
+			table.insert(deck, id)
+		end
+	end
+	return deck
+end
+
+
+-------------
+-- weapons --
+-------------
 
 -- compacts a config table into a compact integer, to prevent bloating the save file
 function modApi:compactWeaponConfig(config)
 	local compact = 0
 	-- true means both, string to filter
 	if config.shop == true then
-		compact = compact + SHOP_NORMAL + SHOP_ADVANCED
+		compact = compact + modApi.constants.WEAPON_CONFIG_SHOP_NORMAL + modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED
 	elseif config.shop == "normal" then
-		compact = compact + SHOP_NORMAL
+		compact = compact + modApi.constants.WEAPON_CONFIG_SHOP_NORMAL
 	elseif config.shop == "advanced" then
-		compact = compact + SHOP_ADVANCED
+		compact = compact + modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED
 	end
 	if config.pod == true then
-		compact = compact + POD_NORMAL + POD_ADVANCED
+		compact = compact + modApi.constants.WEAPON_CONFIG_POD_NORMAL + modApi.constants.WEAPON_CONFIG_POD_ADVANCED
 	elseif config.pod == "normal" then
-		compact = compact + POD_NORMAL
+		compact = compact + modApi.constants.WEAPON_CONFIG_POD_NORMAL
 	elseif config.pod == "advanced" then
-		compact = compact + POD_ADVANCED
+		compact = compact + modApi.constants.WEAPON_CONFIG_POD_ADVANCED
 	end
 
 	return compact
@@ -52,10 +69,10 @@ function modApi:addWeaponDrop(config, enabled)
 		value = self:compactWeaponConfig(config)
 		-- false is disabled but available to select
 	elseif enabled == false then
-		value = NONE
+		value = modApi.constants.WEAPON_CONFIG_NONE
 	-- true means enable all, nil means enable all if not set already
 	elseif enabled == true or (enabled == nil and DEFAULT_WEAPONS[id] == nil) then
-		value = ALL
+		value = modApi.constants.WEAPON_CONFIG_ALL
 	end
 
 	-- if any of the above passed, set the value into both defaults and the deck
@@ -65,28 +82,15 @@ function modApi:addWeaponDrop(config, enabled)
 	end
 end
 
--- checks if the given bit is set in the value
-local function hasBit(value, bit)
-	return value % (bit + bit) >= bit
-end
-
--- gets a list of all weapons with the given bit set
-local function getWeaponList(firstBit, secondBit)
-	local deck = {}
-	for id, enabled in pairs(modApi.weaponDeck) do
-		if hasBit(enabled, firstBit) or (secondBit ~= nil and hasBit(enabled, secondBit)) then
-			local weapon = _G[id]
-			if type(weapon) == "table" and (weapon.GetUnlocked == nil or weapon:GetUnlocked()) then
-				table.insert(deck, id)
-			end
-		end
-	end
-	return deck
+-- checks if a weapon ID should show in time pods
+local function isWeaponUnlocked(id)
+	local weapon = _G[id]
+	return type(weapon) == "table" and (weapon.GetUnlocked == nil or weapon:GetUnlocked())
 end
 
 --- gets a list of all possible shop weapons
 function modApi:getFullWeaponDeck()
-	return getWeaponList(SHOP_NORMAL, SHOP_ADVANCED)
+	return filterDeck(isWeaponUnlocked, modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
 end
 
 --- Gets the list of weapons for the shop
@@ -97,10 +101,10 @@ function modApi:getWeaponDeck(advanced)
 	end
 	-- true: anything enabled in advanced
 	if advanced then
-		return getWeaponList(SHOP_ADVANCED)
+		return filterDeck(isWeaponUnlocked, modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
 	end
 	-- false: anything enabled when not advanced
-	return getWeaponList(SHOP_NORMAL)
+	return filterDeck(isWeaponUnlocked, modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL)
 end
 
 --- Gets the list of weapons for the shop
@@ -111,10 +115,10 @@ function modApi:getPodWeaponDeck(advanced)
 	end
 	-- true: anything enabled in advanced
 	if advanced then
-		return getWeaponList(POD_ADVANCED)
+		return filterDeck(isWeaponUnlocked, modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_POD_ADVANCED)
 	end
 	-- false: anything enabled when not advanced
-	return getWeaponList(POD_NORMAL)
+	return filterDeck(isWeaponUnlocked, modApi.weaponDeck, modApi.constants.WEAPON_CONFIG_POD_NORMAL)
 end
 
 --- gets the default value for the given weapon, as a compact integer
@@ -131,6 +135,93 @@ end
 function modApi:isDefaultWeapon(id)
 	return self:getVanillaWeaponConfig(id) > 0
 end
+
+------------
+-- pilots --
+------------
+
+-- compacts a config table into a compact integer, to prevent bloating the save file
+function modApi:compactPilotConfig(config)
+	local compact = 0
+	-- true means both, string to filter
+	if config.pod == true then
+		compact = compact + modApi.constants.PILOT_CONFIG_POD_NORMAL + modApi.constants.PILOT_CONFIG_POD_ADVANCED
+	elseif config.pod == "normal" then
+		compact = compact + modApi.constants.PILOT_CONFIG_POD_NORMAL
+	elseif config.pod == "advanced" then
+		compact = compact + modApi.constants.PILOT_CONFIG_POD_ADVANCED
+	end
+	-- true means both, string to filter
+	if config.recruit == true then
+		compact = compact + modApi.constants.PILOT_CONFIG_RECRUIT
+	end
+
+	return compact
+end
+
+--- Adds a pilot to the deck, or overrides their config if already present
+-- Note that CreatePilot will automatically add the pilot to the deck
+function modApi:addPilotDrop(config)
+	assert(type(config) == "table", "argument must be a table")
+	assert(type(config.id) == "string", "id must be a string")
+
+	-- if set to a table, compact into the proper bits to say what is enabled
+	local value = self:compactPilotConfig(config)
+	modApi.pilotDeck[config.id] = value
+	DEFAULT_PILOTS[config.id] = value
+end
+
+-- checks if a weapon ID should show in time pods
+local function isPilotEnabled(id)
+	local pilot = _G[id]
+	return type(pilot) == "table" and (pilot.IsEnabled == nil or pilot:IsEnabled())
+end
+
+--- gets a list of all possible shop weapons
+function modApi:getFullPilotDeck()
+	return filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.PILOT_CONFIG_POD_NORMAL, modApi.constants.PILOT_CONFIG_POD_ADVANCED)
+end
+
+--- gets a list of all possible shop weapons
+function modApi:getStarterPilotDeck()
+	local deck = filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.PILOT_CONFIG_RECRUIT)
+	-- bad config?
+	if #deck == 0 then
+		return {"Pilot_Archive", "Pilot_Rust", "Pilot_Detritus", "Pilot_Pinnacle"}
+	end
+	return deck
+end
+
+--- Gets the list of pilots for the shop
+function modApi:getPilotDeck(advanced)
+	-- nil: return all weapons
+	if advanced == nil then
+		advanced = IsNewEquipment()
+	end
+	-- true: anything enabled in advanced
+	if advanced then
+		return filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
+	end
+	-- false: anything enabled when not advanced
+	return filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL)
+end
+
+--- gets the default value for the given weapon, as a compact integer
+function modApi:getDefaultPilotConfig(id)
+	return DEFAULT_PILOTS[id] or 0
+end
+
+--- gets the vanilla value for the given weapon, as a compact integer
+function modApi:getVanillaPilotConfig(id)
+	return VANILLA_PILOTS[id] or 0
+end
+
+--- gets the vanilla value for the given weapon, as a compact integer
+function modApi:isVanillaPilot(id)
+	return VANILLA_PILOTS[id] ~= nil
+end
+
+
 --------------------
 -- initialization --
 --------------------
@@ -140,9 +231,10 @@ local oldGame = GAME
 local oldIsNewEquipment = IsNewEquipment
 
 -- helper to populate the vanilla tables
-local function populateVanillaWeapons(list, value)
-	for _, id in ipairs(list) do
-		VANILLA_WEAPONS[id] = (VANILLA_WEAPONS[id] or 0) + value
+VANILLA_WEAPONS = {}
+local function populateVanilla(dest, src, value)
+	for _, id in ipairs(src) do
+		dest[id] = (dest[id] or 0) + value
 	end
 end
 
@@ -152,8 +244,8 @@ function IsNewEquipment()
 end
 GAME = GameObject:new{}
 checkWeaponDeck()
-populateVanillaWeapons(GAME.WeaponDeck, SHOP_NORMAL)
-populateVanillaWeapons(GAME.PodWeaponDeck, POD_NORMAL)
+populateVanilla(VANILLA_WEAPONS, GAME.WeaponDeck,    modApi.constants.WEAPON_CONFIG_SHOP_NORMAL)
+populateVanilla(VANILLA_WEAPONS, GAME.PodWeaponDeck, modApi.constants.WEAPON_CONFIG_POD_NORMAL)
 
 -- next, advanced weapons
 function IsNewEquipment()
@@ -161,8 +253,8 @@ function IsNewEquipment()
 end
 GAME = GameObject:new{}
 checkWeaponDeck()
-populateVanillaWeapons(GAME.WeaponDeck, SHOP_ADVANCED)
-populateVanillaWeapons(GAME.PodWeaponDeck, POD_ADVANCED)
+populateVanilla(VANILLA_WEAPONS, GAME.WeaponDeck,    modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
+populateVanilla(VANILLA_WEAPONS, GAME.PodWeaponDeck, modApi.constants.WEAPON_CONFIG_POD_ADVANCED)
 
 -- defaults start as a copy of vanilla, but will be populated with mods later
 DEFAULT_WEAPONS = copy_table(VANILLA_WEAPONS)
@@ -171,6 +263,19 @@ modApi.weaponDeck = copy_table(VANILLA_WEAPONS)
 -- restore values we overwrote
 GAME = oldGame
 IsNewEquipment = oldIsNewEquipment
+
+
+-- next, get pilots from the vanilla list
+VANILLA_PILOTS = {}
+populateVanilla(VANILLA_PILOTS, PilotList, modApi.constants.PILOT_CONFIG_POD_NORMAL + modApi.constants.PILOT_CONFIG_POD_ADVANCED)
+for _, id in ipairs(New_PilotList) do
+	VANILLA_PILOTS[id] = modApi.constants.PILOT_CONFIG_POD_ADVANCED
+end
+populateVanilla(VANILLA_PILOTS, Pilot_Recruits, modApi.constants.PILOT_CONFIG_RECRUIT)
+populateVanilla(VANILLA_PILOTS, {"Pilot_Mantis", "Pilot_Rock", "Pilot_Zoltan"}, 0)
+DEFAULT_PILOTS = copy_table(VANILLA_PILOTS)
+modApi.pilotDeck = copy_table(VANILLA_PILOTS)
+
 
 -- load in the config based on what should be enabled
 modApi.events.onModsFirstLoaded:subscribe(function()
@@ -184,6 +289,26 @@ modApi.events.onModsFirstLoaded:subscribe(function()
 	end
 	GAME = oldGame
 
-	-- load weapon enable values from the config
+	-- copy in modded pilots
+	for _, id in ipairs(PilotListExtended) do
+		if DEFAULT_PILOTS[id] == nil then
+			modApi:addPilotDrop{
+				id = id,
+				pod = list_contains(New_PilotList, id) and "advanced" or true
+			}
+		end
+	end
+	-- copy in mod starters
+	for _, id in ipairs(Pilot_Recruits) do
+		if DEFAULT_PILOTS[id] == nil then
+			modApi:addPilotDrop{
+				id = id,
+				recruit = true
+			}
+		end
+	end
+
+	-- load weapons and pilots enable values from the config
 	loadWeaponDeck()
+	loadPilotDeck()
 end)

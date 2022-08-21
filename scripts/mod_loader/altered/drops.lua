@@ -47,14 +47,26 @@ end
 -- replace default to use the full list instead of the partial one
 function checkPilotDeck()
 	if #GAME.PilotDeck == 0 then
-		GAME.PilotDeck = copy_table(PilotListExtended)
-		if not IsNewEquipment() then
-			LOG("Mod Loader: Removing new pilots!")
-			for i,pilot in ipairs(New_PilotList) do
-				remove_element(pilot,GAME.PilotDeck)
-			end
+		if IsNewEquipment() then
+			LOG("Mod Loader: Including advanced pilots!")
+			GAME.PilotDeck = modApi:getPilotDeck(true)
+		else
+			LOG("Mod Loader: Using normal pilots!")
+			GAME.PilotDeck = modApi:getPilotDeck(false)
 		end
 	end
+end
+
+-- modloader lets you add recruits to the pilot deck, but they have a 0 rarity
+-- however, the user's intention might be to include recruits in the drop table
+-- for simplicty, just ignore rarity
+function getPilotDrop()
+	checkPilotDeck()
+
+	local drop = random_element(GAME.PilotDeck)
+	removePilot(drop)
+
+	return drop
 end
 
 -- Determines if a skill is available in the shop
@@ -63,6 +75,11 @@ function Skill:GetUnlocked()
     return true
   end
   return self.Unlocked
+end
+
+-- Determines if a pilot is available in time pods, the hangar, and mod UIs
+function Pilot:IsEnabled()
+  return self.Enabled == nil or self.Enabled
 end
 
 -- allow defining a custom rarity for skills

@@ -94,3 +94,8 @@ pairs = function(t, ...)
 
 	return __pairs(t, ...)
 end
+
+-- checks if the given bit is set in the value
+function is_bit_set(value, bit)
+	return value % (bit + bit) >= bit
+end
