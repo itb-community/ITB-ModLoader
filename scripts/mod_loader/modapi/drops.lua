@@ -291,10 +291,11 @@ modApi.events.onModsFirstLoaded:subscribe(function()
 
 	-- copy in modded pilots
 	for _, id in ipairs(PilotListExtended) do
-		if DEFAULT_PILOTS[id] == nil then
+		if DEFAULT_PILOTS[id] == nil and _G[id] ~= nil and _G[id].Rarity ~= 0 then
 			modApi:addPilotDrop{
 				id = id,
-				pod = list_contains(New_PilotList, id) and "advanced" or true
+				pod = list_contains(New_PilotList, id) and "advanced" or true,
+				recruit = list_contains(Pilot_Recruits, id)
 			}
 		end
 	end
