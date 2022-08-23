@@ -3,20 +3,12 @@
 --- Override default Move:GetSkillEffect to fix leap movement
 -------------------------------------------------------------
 
-function Move:GetSkillEffect(p1, p2)
-	local ret = SkillEffect()
+-- create Default_Move as a skill for modders to extend if they wished to extend Move
+Default_Move = Move
 
-	if Pawn:IsJumper() then
-		local plist = PointList()
-		plist:push_back(p1)
-		plist:push_back(p2)
-		ret:AddLeap(plist, FULL_DELAY)
-	elseif Pawn:IsTeleporter() then
-		ret:AddTeleport(p1, p2, FULL_DELAY)
-	else
-		ret:AddMove(Board:GetPath(p1, p2, Pawn:GetPathProf()), FULL_DELAY)
-	end
-	
+-- helper to apply Adjacent_Heal and Web_Vek
+-- modders are free to override this function to easily add additional effects
+function Move.DoPostMoveEffects(moveSkill, ret, p1, p2)
 	if Pawn:IsAbility("Web_Vek") then
 		for i = 0, 3 do
 			local curr = p2 + DIR_VECTORS[i]
@@ -33,6 +25,27 @@ function Move:GetSkillEffect(p1, p2)
 				ret:AddDamage(SpaceDamage(curr,-1))
 			end
 		end
+	end
+end
+
+function Move:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+
+	if Pawn:IsJumper() then
+		local plist = PointList()
+		plist:push_back(p1)
+		plist:push_back(p2)
+		ret:AddLeap(plist, FULL_DELAY)
+	elseif Pawn:IsTeleporter() then
+		ret:AddTeleport(p1, p2, FULL_DELAY)
+	else
+		ret:AddMove(Board:GetPath(p1, p2, Pawn:GetPathProf()), FULL_DELAY)
+	end
+
+	-- custom move skill will automatically get the post move effects as part of the modloader's GetSkillEffect below
+	-- to prevent running them twice, skip if Default_Move is extended
+	if self == Default_Move then
+		Move.DoPostMoveEffects(self, ret, p1, p2)
 	end
 
 	return ret
@@ -78,17 +91,29 @@ local function assertIsStringToSkillTable(skill_id, msg)
 	assert(type(skill) == "table" and type(skill.GetTargetArea) == "function" and type(skill.GetSkillEffect) == "function", msg)
 end
 
+-- extend default move to create the new move skill, means any vanilla skills extending Move will not get the injections
+Move = Default_Move:new()
+
+-- helper to get the move skill for a pawn, since we use it in multiple places
+-- making it public will also help modders use it
+function Move.GetPawnMoveSkill()
+	local pawnType = Pawn:GetType()
+	local moveSkill = _G[pawnType].MoveSkill
+
+	if type(moveSkill) == 'string' then
+		assertIsStringToSkillTable(moveSkill, string.format("%s.moveSkill = %q", pawnType, tostring(moveSkill)))
+
+		moveSkill = _G[moveSkill]
+	end
+
+	return moveSkill
+end
+
 local oldMoveGetTargetArea = Move.GetTargetArea
 function Move:GetTargetArea(point)
 	local pawnType = Pawn:GetType()
-	local moveSkill = _G[pawnType].MoveSkill
-	
-	if type(moveSkill) == 'string' then
-		assertIsStringToSkillTable(moveSkill, string.format("%s.moveSkill = %q", pawnType, tostring(moveSkill)))
-		
-		moveSkill = _G[moveSkill]
-	end
-	
+	local moveSkill = Move.GetPawnMoveSkill()
+
 	if moveSkill ~= nil and moveSkill.GetTargetArea ~= nil then
 		return moveSkill:GetTargetArea(point)
 	end
@@ -100,18 +125,19 @@ end
 local oldMoveGetSkillEffect = Move.GetSkillEffect
 function Move:GetSkillEffect(p1, p2)
 	local pawnType = Pawn:GetType()
-	local moveSkill = _G[pawnType].MoveSkill
+	local moveSkill = Move.GetPawnMoveSkill()
 
-	if type(moveSkill) == 'string' then
-		assertIsStringToSkillTable(moveSkill, string.format("%s.moveSkill = %q", pawnType, tostring(moveSkill)))
-		
-		moveSkill = _G[moveSkill]
-	end
-	
 	if moveSkill ~= nil and moveSkill.GetSkillEffect ~= nil then
-		return moveSkill:GetSkillEffect(p1, p2)
+		local ret = moveSkill:GetSkillEffect(p1, p2)
+		-- unless they opt out, add in Adjacent_Heal and Web_Vek, prevents old custom move skills from breaking
+		-- if their GetSkillEffect is the default logic, that means they extended Default_Move without modifying GetSkillEffect, so they alreay got post move effects
+		if not moveSkill.SkipPostMoveEffects then
+			Move.DoPostMoveEffects(moveSkill, ret, p1, p2)
+		end
+		return ret
 	end
 
+	-- old move skill will call DoPostMoveEffects directly
 	return oldMoveGetSkillEffect(self, p1, p2)
 end
 
