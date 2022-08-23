@@ -46,16 +46,18 @@ end
 function SpaceDamage:ToTable()
     Assert.Equals("userdata", type(self), "Argument #0")
 
-	local result = {}
-	
-	for _, k in ipairs(self:ListFields()) do
-		result[k] = self[k]
-	end
-	
-	return result
+    local result = {}
+
+    for _, k in ipairs(self:ListFields()) do
+        result[k] = self[k]
+    end
+
+    return result
 end
 
-function SpaceDamage:IsMetadata()
+-- returns true if this space data contains metadata
+-- it may contain other data as well, use IsMetadata to check if this is only metadata
+function SpaceDamage:HasMetadata()
     Assert.Equals("userdata", type(self), "Argument #0")
 
     if not self.sScript then
@@ -63,6 +65,36 @@ function SpaceDamage:IsMetadata()
     end
     
     return modApi:stringStartsWith(self.sScript, "return")
+end
+
+-- gets the metadata in the current space damage
+function SpaceDamage:GetMetadata()
+    Assert.Equals("userdata", type(self), "Argument #0")
+
+    if not self:HasMetadata() then
+        return {}
+    end
+
+    return loadstring(self.sScript)()
+end
+
+-- checks if this space damage is exclusively metadata
+-- note, if you plan to use GetMetadata later, it is more efficient to use
+-- local meta = spaceDamage:GetMetadata()
+-- local isMetadata = not meta.storedInSourceDamage
+function SpaceDamage:IsMetadata()
+    Assert.Equals("userdata", type(self), "Argument #0")
+
+    return self:HasMetadata() and not self:GetMetadata().storedInSourceDamage
+end
+
+function DamageList:AppendAll(list)
+    Assert.Equals("userdata", type(self), "Argument #0")
+    Assert.Equals("userdata", type(list), "Argument #1")
+
+    for i = 1, list:size() do
+        self:push_back(list:index(i))
+    end
 end
 
 function DamageList:GetMetadata()
@@ -86,10 +118,32 @@ function SkillEffect:GetQueuedMetadata()
     return self.q_effect:GetMetadata()
 end
 
-local function addDamageListMetadata(damageList, metadataTable)
-    local metadataInstance = SpaceDamage()
-    metadataInstance.sScript = "return " .. save_table(metadataTable)
-    damageList:push_back(metadataInstance)
+function SkillEffect:AppendAll(other)
+    Assert.Equals("userdata", type(self), "Argument #0")
+    Assert.Equals("userdata", type(other), "Argument #1")
+
+    self.effect:AppendAll(other.effect)
+    self.q_effect:AppendAll(other.q_effect)
+end
+
+local function addDamageListMetadata(damageList, metadataTable, addToPrevious)
+    -- store in the source damage if possible, prevents breaking the bombermechs AP cannon achievement
+    local damageToModify
+    if addToPrevious then
+        damageToModify = damageList:back()
+        if damageToModify.sScript ~= "" then
+            LOG("Warning: unable to save metadata from skill effect. Metadata \n" + save_table(metadataTable))
+            return
+        end
+        metadataTable.storedInSourceDamage = true
+    else
+        damageToModify = SpaceDamage()
+        metadataTable.storedInSourceDamage = false
+    end
+    damageToModify.sScript = "return " .. save_table(metadataTable)
+    if not addToPrevious then
+        damageList:push_back(damageToModify)
+    end
 end
 
 -- Create an initial SkillEffect instance that we use to grab
@@ -104,9 +158,10 @@ SkillEffect.AddGrapple = function(self, source, target, anim, ...)
     metadataTable.source = Point(source.x, source.y)
     metadataTable.target = Point(target.x, target.y)
     metadataTable.anim = anim
-    addDamageListMetadata(self.effect, metadataTable)
 
     oldAddGrapple(self, source, target, anim, ...)
+    -- store metadaata in the grapple space damage
+    addDamageListMetadata(self.effect, metadataTable, true)
 end
 
 local function overrideProjectileOrArtillery(funcName, oldFunc)
@@ -116,37 +171,44 @@ local function overrideProjectileOrArtillery(funcName, oldFunc)
     assert(metadataType == "projectile" or metadataType == "artillery", "This function only works for projectile or artillery weapons")
 
     SkillEffect[funcName] = function(self, source, damageInstance, projectileArt, delay)
-		
-		if not isUserdataPoint(source) then
-			delay = projectileArt
-			projectileArt = damageInstance
-			damageInstance = source
-			
-			-- adding backwards compatibility for mods made before ITB 1.2
-			-- it only works if piOrigin was set before AddProjectile/AddArtillery was called
-			source = self.piOrigin ~= Point(-INT_MAX, -INT_MAX) and self.piOrigin or nil
-		end
-		
-		if type(damageInstance) ~= 'userdata' then
-			damageInstance = {}
-		end
-		
+        if not isUserdataPoint(source) then
+            delay = projectileArt
+            projectileArt = damageInstance
+            damageInstance = source
+
+            -- adding backwards compatibility for mods made before ITB 1.2
+            -- it only works if piOrigin was set before AddProjectile/AddArtillery was called
+            source = self.piOrigin ~= Point(-INT_MAX, -INT_MAX) and self.piOrigin or nil
+        end
+
+        if type(damageInstance) ~= 'userdata' then
+            damageInstance = {}
+        end
+
         local metadataTable = {}
         metadataTable.type = metadataType
         metadataTable.projectileArt = projectileArt
         metadataTable.source = source or (Pawn and Pawn:GetSpace()) or nil
         metadataTable.target = damageInstance.loc
-        addDamageListMetadata(self[damageList], metadataTable)
-		
-		if source ~= nil then
-			oldFunc(self, source, damageInstance, projectileArt, delay or PROJ_DELAY)
-		else
-			if delay ~= nil then
-				oldFunc(self, damageInstance, projectileArt, delay)
-			else
-				oldFunc(self, damageInstance, projectileArt)
-			end
-		end
+
+        -- if the damage contains a script, add metadta first
+        if damageInstance.sScript ~= "" then
+            addDamageListMetadata(self[damageList], metadataTable, false)
+        end
+
+        -- call original function
+        if source ~= nil then
+            oldFunc(self, source, damageInstance, projectileArt, delay or PROJ_DELAY)
+        elseif delay ~= nil then
+            oldFunc(self, damageInstance, projectileArt, delay)
+        else
+            oldFunc(self, damageInstance, projectileArt)
+        end
+
+        -- if the damage does not contain a script, add metadata to the existing source
+        if damageInstance.sScript == "" then
+            addDamageListMetadata(self[damageList], metadataTable, true)
+        end
     end
 end
 
@@ -246,10 +308,7 @@ local function AddQueued(name)
     SkillEffect["AddQueued".. name] = function(self, ...)
         local fx = SkillEffect()
         fx["Add".. name](fx, ...)
-
-        for _, v in ipairs(extract_table(fx.effect)) do
-            self.q_effect:push_back(v)
-        end
+        self.q_effect:AppendAll(fx.effect)
     end
 end
 
