@@ -54,6 +54,33 @@ BoardClass.SetShield = function(self, loc, shield)
 	self:DamageSpace(dmg)
 end
 
+-- gets the currently active psion on the board, returns a value from the LEADER globals if found, nil if not
+BoardClass.GetMutation = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	local enemies = self:GetPawns(TEAM_ENEMY)
+	-- scan the board for a psion, if found return its effect
+	-- note that when multiple psions exist, the mutation is the newest psion, this is consistent with the game logic
+	-- this also may give inaccurate results in the mech tester, as spawning a psion does not update mutations there
+	for i = enemies:size(), 1, -1 do
+		local leader = _G[self:GetPawn(enemies:index(i)):GetType()]:GetLeader()
+		if leader ~= LEADER_NONE then
+			return leader
+		end
+	end
+	return nil
+end
+
+-- checks if the given mutation is active on the board. Note that for health, regen, and explision, returns true for th especific psion and the boss
+BoardClass.IsMutation = function(self, predicate)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(predicate), "Argument #1")
+
+	-- for boss psions, return true if any of the three were passed as the argument
+	local mutation = self:GetMutation()
+	return mutation == predicate or (mutation == LEADER_BOSS and (predicate == LEADER_HEALTH or predicate == LEADER_REGEN or predicate == LEADER_EXPLODE))
+end
+
 BoardClass.GetLuaString = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	
