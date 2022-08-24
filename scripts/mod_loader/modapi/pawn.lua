@@ -103,34 +103,51 @@ BoardPawn.IsPowered = function(self)
 
 	return powered
 end
-	
+
+-- checks if the pawn receives psion effects
+BoardPawn.CanMutate = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	-- enemies support mutations if not minor and not leaders
+	if self:GetTeam() == TEAM_ENEMY then
+  	local pawnType = _G[self:GetType()]
+		return not pawnType:GetMinor() and pawnType:GetLeader() == LEADER_NONE
+	end
+	-- mechs support mutations if the passive is active
+	return self:IsMech() and IsPassiveSkill("Psion_Leech")
+end
+
 BoardPawn.GetMutation = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 
-	if not Board or GetCurrentMission() == nil then
-		return
+	if Board and self:CanMutate() then
+		-- scan the board for a psion, if found return its effect
+		-- note that when multiple psions exist, the mutation is the newest psion
+		-- this also may give inaccurate results in the mech tester, as spawning a psion does not update mutations there
+		local enemies = Board:GetPawns(TEAM_ENEMY)
+		for i = enemies:size(), 1, -1 do
+			local leader = _G[Board:GetPawn(enemies:index(i)):GetType()]:GetLeader()
+			if leader ~= LEADER_NONE then
+				return leader
+			end
+		end
 	end
-	
-	local ptable = self:GetPawnTable()
-	
-	return ptable.iMutation
+	return nil
 end
 
 BoardPawn.IsMutation = function(self, mutation)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	Assert.Equals("number", type(mutation), "Argument #1")
 
-	return self:GetMutation() == mutation
+	-- the boss has regen, health, and explode
+	local currentMutation = self:GetMutation()
+	return currentMutation == mutation or currentMutation == LEADER_BOSS and (mutation == LEADER_REGEN or mutation == LEADER_HEALTH or mutation == LEADER_EXPLODE)
 end
 
 BoardPawn.IsArmor = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 
 	local pawnType = _G[self:GetType()]
-
-	-- TODO: Bug: killing an armor psion then respawning it via Board:AddPawn() causes this function to return false
-	-- Need to update the savefile after a new pawn appears on the board
-
 	return self:IsAbility("Armored")            -- pilot ability
 			or pawnType:GetArmor()                  -- pawn ability
 			-- psion ability, but not on the psion itself
