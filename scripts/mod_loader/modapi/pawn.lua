@@ -105,32 +105,56 @@ BoardPawn.IsPowered = function(self)
 end
 
 -- checks if the pawn receives psion effects
-BoardPawn.CanMutate = function(self)
+BoardPawn.CanMutate = function(self, targetPlayer)
 	Assert.Equals("userdata", type(self), "Argument #0")
-
-	-- enemies support mutations if not minor and not leaders
-	if self:GetTeam() == TEAM_ENEMY then
-  	local pawnType = _G[self:GetType()]
-		return not pawnType:GetMinor() and pawnType:GetLeader() == LEADER_NONE
+	if targetPlayer == nil then
+		targetPlayer = false
 	end
-	-- mechs support mutations if the passive is active
-	return self:IsMech() and IsPassiveSkill("Psion_Leech")
+	Assert.Equals("boolean", type(targetPlayer), "Argument #1")
+
+	if self:IsEnemy()  then
+		-- final island psion has inverted targeting
+		if targetPlayer and not IsPassiveSkill("Psion_Leech") then
+			return false
+		end
+
+		-- enemies support mutations if not minor, bots, or leaders
+  	local pawnType = _G[self:GetType()]
+		return not pawnType:GetMinor() and pawnType:GetLeader() == LEADER_NONE and pawnType:GetDefaultFaction() ~= FACTION_BOTS
+	end
+
+		-- mechs support mutations if the passive is active or the final island psion
+	if self:IsPlayer() then
+		return targetPlayer or (self:IsMech() and IsPassiveSkill("Psion_Leech"))
+	end
+
+	return false
 end
 
 BoardPawn.GetMutation = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 
-	if Board and self:CanMutate() then
-		return Board:GetMutation()
+	if Board then
+		local mutation = Board:GetMutation()
+		if self:CanMutate(mutation == LEADER_TENTACLE) then
+			return mutation
+		end
 	end
 	return nil
 end
 
-BoardPawn.IsMutation = function(self, mutation)
+BoardPawn.IsMutation = function(self, predicate)
 	Assert.Equals("userdata", type(self), "Argument #0")
-	Assert.Equals("number", type(mutation), "Argument #1")
+	Assert.Equals("number", type(predicate), "Argument #1")
 
-	return Board and self:CanMutate() and Board:IsMutation(mutation)
+	if Board then
+		-- need to invert mutation if its LEADER_TENTACLE
+		-- if LEADER_BOSS, accept a predicate of any of the three that BOSS is made of
+		local mutation = Board:GetMutation()
+		return self:CanMutate(mutation == LEADER_TENTACLE)
+		  and (mutation == predicate or (mutation == LEADER_BOSS and (predicate == LEADER_HEALTH or predicate == LEADER_REGEN or predicate == LEADER_EXPLODE)))
+	end
+	return false
 end
 
 BoardPawn.IsArmor = function(self)
