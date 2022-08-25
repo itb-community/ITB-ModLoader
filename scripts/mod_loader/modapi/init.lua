@@ -54,7 +54,7 @@ function modApi:init()
 			end)
 			:catch(function(err)
 				if instance ~= nil then
-				    instance:destroy()
+					instance:destroy()
 				end
 				LOG("Failed to create FTLDat instance from resource.dat:", err)
 			end)
@@ -231,24 +231,24 @@ function modApi:getCurrentModcontentPath()
 end
 
 function modApi:getGameVersion()
-    if modApi.gameVersion then
-        return modApi.gameVersion
-    end
+	if modApi.gameVersion then
+		return modApi.gameVersion
+	end
 
-    local logPath = GetSavedataLocation() .. "log.txt"
-    if modApi:fileExists(logPath) then
-        local file = assert(io.open(logPath, "r"), "Failed to open file: "..logPath)
-        local content = file:read(200)
-        file:close()
+	local logPath = GetSavedataLocation() .. "log.txt"
+	if modApi:fileExists(logPath) then
+		local file = assert(io.open(logPath, "r"), "Failed to open file: " .. logPath)
+		local content = file:read(200)
+		file:close()
 
-        local version = string.match(content, "Into the Breach: (%S+)")
-        if version then
-            modApi.gameVersion = version
-            return modApi.gameVersion
-        end
-    end
+		local version = string.match(content, "Into the Breach: (%S+)")
+		if version then
+			modApi.gameVersion = version
+			return modApi.gameVersion
+		end
+	end
 
-    LOG("WARNING: Unable to get game version!")
+	LOG("WARNING: Unable to get game version!")
 end
 
 modApi.events.onSettingsChanged:subscribe(function(old, neu)

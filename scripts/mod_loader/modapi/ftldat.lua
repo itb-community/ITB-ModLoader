@@ -19,7 +19,7 @@ end
 function modApi:writeAsset(resource, content)
 	Assert.ResourceDatIsOpen("writeAsset")
 	Assert.Equals("string", type(resource))
-	Assert.Equals({"string", "table"}, type(content))
+	Assert.Equals({ "string", "table" }, type(content))
 
 	self.resource:put_entry(resource, content)
 end
@@ -37,14 +37,14 @@ function modApi:readAsset(resource)
 	Assert.ResourceDatIsOpen("readAsset")
 	Assert.Equals("string", type(resource))
 
-    return self.resource:entry_content_binary(resource)
+	return self.resource:entry_content_binary(resource)
 end
 
 function modApi:appendAsset(resource, filePath)
 	Assert.Equals("string", type(resource))
 	Assert.Equals("string", type(filePath))
-	local f = io.open(filePath,"rb")
-	Assert.NotEquals(nil, f, "File doesn't exist: ".. filePath)
+	local f = io.open(filePath, "rb")
+	Assert.NotEquals(nil, f, "File doesn't exist: " .. filePath)
 	local content = f:read("*all")
 	f:close()
 
@@ -66,39 +66,39 @@ end
 function modApi:appendDat(filePath)
 	local instance = FtlDat(filePath)
 
-    for i, innerPath in ipairs(instance:inner_paths()) do
-        self.resource:put_entry(innerPath, instance:entry_content_binary(innerPath))
-    end
+	for i, innerPath in ipairs(instance:inner_paths()) do
+		self.resource:put_entry(innerPath, instance:entry_content_binary(innerPath))
+	end
 
-    instance:destroy()
+	instance:destroy()
 end
 
 function modApi:fileDirectoryToDat(path)
 	Assert.Equals("string", type(path))
 	local len = path:len()
 	assert(len > 0)
-	
+
 	if path:sub(len) ~= [[/]] and path:sub(len) ~= [[\]] then
-		path = path.."/"
+		path = path .. "/"
 	end
 
 	local ftldat = FtlDat()
 
 	local function addDir(directory)
-		for i, dir in pairs(os.listdirs(path..directory)) do
-			addDir(directory..dir.."/")
+		for i, dir in pairs(os.listdirs(path .. directory)) do
+			addDir(directory .. dir .. "/")
 		end
-		for i, dirfile in pairs(os.listfiles(path..directory)) do
-			local f = io.open(path..directory..dirfile,"rb")
+		for i, dirfile in pairs(os.listfiles(path .. directory)) do
+			local f = io.open(path .. directory .. dirfile, "rb")
 			local content = f:read("*all")
 			f:close()
-            ftldat:put_entry(directory.dirfile, content)
+			ftldat:put_entry(directory.dirfile, content)
 		end
 	end
-	
+
 	addDir("")
 
-	ftldat:write(path.."resource.dat")
+	ftldat:write(path .. "resource.dat")
 	ftldat:destroy()
 end
 
@@ -108,17 +108,17 @@ end
 
 function modApi:finalize()
 	try(function()
-	    if not self.resource.signature then
-            self.resource.signature = true
-            self.resource:put_entry(self:getSignature(), "OK")
-	    end
+		if not self.resource.signature then
+			self.resource.signature = true
+			self.resource:put_entry(self:getSignature(), "OK")
+		end
 
-	    self.resource:write("resources/resource.dat")
+		self.resource:write("resources/resource.dat")
 	end)
 	:catch(function(err)
 		LOG("Failed to finalize resource.dat: ", err)
 	end)
 
-    self.resource:destroy()
+	self.resource:destroy()
 	self.resource = nil
 end
