@@ -37,6 +37,9 @@ function modApi:addSquad(squad, name, desc, icon)
 	squad.id = squad.id or buildSquadId(squad)
 	Assert.Equals(nil, modApi.mod_squads_by_id[squad.id], string.format("Squad with id %q already exists", squad.id))
 
+	-- sort the squad name first
+	local mechOrder = {[squad[1]] = -1}
+
 	-- Validate the squad
 	for i = 2, 4 do
 		local mechType = squad[i]
@@ -52,17 +55,11 @@ function modApi:addSquad(squad, name, desc, icon)
 				string.format("Squad %q - pawn with id %q has an invalid Class", squad.id, mechType)
 		)
 
-		if i > 2 then
-			local ptable_prev = _G[squad[i-1]]
-			local pri = CLASS_ORDER[ptable.Class] or INT_MAX
-			local pri_prev = CLASS_ORDER[ptable_prev.Class] or INT_MAX
-
-			if pri < pri_prev then
-				-- swap entries
-				squad[i-1], squad[i] = squad[i], squad[i-1]
-			end
-		end
+		mechOrder[mechType] = CLASS_ORDER[ptable.Class] or INT_MAX
 	end
+
+	-- sort mechs in squad by class
+	table.sort(squad, function(a, b) return mechOrder[a] < mechOrder[b] end)
 
 	modApi.mod_squads_by_id[squad.id] = squad
 
