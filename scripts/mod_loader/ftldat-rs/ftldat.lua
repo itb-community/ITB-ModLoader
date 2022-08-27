@@ -84,6 +84,38 @@ function FtlDat:put_entry_string(innerPath, content)
 	end)
 end
 
+function FtlDat:put_entry_byte_array(innerPath, content)
+	Assert.Equals("table", type(self))
+	Assert.Equals("string", type(innerPath))
+	Assert.Equals("table", type(content))
+
+	try(function()
+		self.package:put_entry_from_byte_array(innerPath, content)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to put entry '%s' content from byte array\n%s",
+				innerPath, tostring(err)
+		))
+	end)
+end
+
+function FtlDat:put_entry_file(innerPath, sourcePath)
+	Assert.Equals("table", type(self))
+	Assert.Equals("string", type(innerPath))
+	Assert.Equals("string", type(sourcePath))
+
+	try(function()
+		self.package:put_entry_from_file(innerPath, sourcePath)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to put entry '%s' content from file '%s'\n%s",
+				innerPath, sourcePath, tostring(err)
+		))
+	end)
+end
+
 function FtlDat:file_exists(name)
 	Assert.Equals("table", type(self))
 	Assert.Equals("string", type(name))

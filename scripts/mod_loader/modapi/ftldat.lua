@@ -40,15 +40,19 @@ function modApi:readAsset(resource)
 	return self.resource:entry_content_string(resource)
 end
 
+--[[
+	Appends content of the specified file to the resource.dat archive.
+
+	resource:
+		Path to the file within the archive
+	filePath:
+		Path to the file containing content to be saved within the archive
+--]]
 function modApi:appendAsset(resource, filePath)
 	Assert.Equals("string", type(resource))
 	Assert.Equals("string", type(filePath))
-	local f = io.open(filePath, "rb")
-	Assert.NotEquals(nil, f, "File doesn't exist: " .. filePath)
-	local content = f:read("*all")
-	f:close()
 
-	self:writeAsset(resource, content)
+	self.resource:put_entry_file(resource, filePath)
 end
 
 --[[
@@ -89,10 +93,7 @@ function modApi:fileDirectoryToDat(path)
 			addDir(directory .. dir .. "/")
 		end
 		for i, dirfile in pairs(os.listfiles(path .. directory)) do
-			local f = io.open(path .. directory .. dirfile, "rb")
-			local content = f:read("*all")
-			f:close()
-			ftldat:put_entry_string(directory.dirfile, content)
+			ftldat:put_entry_file(directory.dirfile, path .. directory .. dirfile)
 		end
 	end
 
