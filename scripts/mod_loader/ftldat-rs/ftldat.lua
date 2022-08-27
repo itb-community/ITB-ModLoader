@@ -44,12 +44,12 @@ function FtlDat:new(filename)
 end
 
 function FtlDat:remove_all_files()
-	Assert.Equals("table", type(self))
+	Assert.Equals("table", type(self), "Check for . vs :")
 	self.package:clear()
 end
 
 function FtlDat:write(outputPath)
-	Assert.Equals("table", type(self))
+	Assert.Equals("table", type(self), "Check for . vs :")
 	Assert.Equals("string", type(outputPath))
 
 	try (function()
@@ -64,28 +64,23 @@ function FtlDat:write(outputPath)
 end
 
 function FtlDat:put_entry_string(innerPath, content)
-	Assert.Equals("table", type(self))
+	Assert.Equals("table", type(self), "Check for . vs :")
 	Assert.Equals("string", type(innerPath))
 	Assert.Equals("string", type(content))
 
 	try(function()
 		self.package:put_entry_from_string(innerPath, content)
 	end)
-	:catch(function(err_string)
-		try(function()
-			self.package:put_entry_from_byte_array(innerPath, content)
-		end)
-		:catch(function(err_byte_array)
-			error(string.format(
-					"Failed to put entry '%s' content from string\nas string: %s\nas byte array: %s",
-					innerPath, tostring(err_string), tostring(err_byte_array)
-			))
-		end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to put entry '%s' content from string\n%s",
+				innerPath, tostring(err)
+		))
 	end)
 end
 
 function FtlDat:put_entry_byte_array(innerPath, content)
-	Assert.Equals("table", type(self))
+	Assert.Equals("table", type(self), "Check for . vs :")
 	Assert.Equals("string", type(innerPath))
 	Assert.Equals("table", type(content))
 
@@ -101,7 +96,7 @@ function FtlDat:put_entry_byte_array(innerPath, content)
 end
 
 function FtlDat:put_entry_file(innerPath, sourcePath)
-	Assert.Equals("table", type(self))
+	Assert.Equals("table", type(self), "Check for . vs :")
 	Assert.Equals("string", type(innerPath))
 	Assert.Equals("string", type(sourcePath))
 
@@ -117,14 +112,14 @@ function FtlDat:put_entry_file(innerPath, sourcePath)
 end
 
 function FtlDat:file_exists(name)
-	Assert.Equals("table", type(self))
+	Assert.Equals("table", type(self), "Check for . vs :")
 	Assert.Equals("string", type(name))
 	return self.package:exists(name)
 end
 
 --- Returns content of the specified file, interpreted as text.
 function FtlDat:entry_content_string(innerPath)
-	Assert.Equals("table", type(self))
+	Assert.Equals("table", type(self), "Check for . vs :")
 	Assert.Equals("string", type(innerPath))
 
 	local result
@@ -143,7 +138,7 @@ end
 
 --- Returns content of the specified file as an array of bytes.
 function FtlDat:entry_content_byte_array(innerPath)
-	Assert.Equals("table", type(self))
+	Assert.Equals("table", type(self), "Check for . vs :")
 	Assert.Equals("string", type(innerPath))
 
 	local result
@@ -161,7 +156,7 @@ function FtlDat:entry_content_byte_array(innerPath)
 end
 
 function FtlDat:inner_paths()
-	Assert.Equals("table", type(self))
+	Assert.Equals("table", type(self), "Check for . vs :")
 	return self.package:inner_paths()
 end
 
@@ -176,7 +171,7 @@ end
 
 --- Extract the specified file from .dat and save it to the specified destination.
 function FtlDat:extract_file(innerPath, destinationPath)
-	Assert.Equals("table", type(self))
+	Assert.Equals("table", type(self), "Check for . vs :")
 	Assert.Equals("string", type(innerPath))
 	Assert.Equals("string", type(destinationPath))
 

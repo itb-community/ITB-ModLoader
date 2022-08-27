@@ -21,7 +21,11 @@ function modApi:writeAsset(resource, content)
 	Assert.Equals("string", type(resource))
 	Assert.Equals({ "string", "table" }, type(content))
 
-	self.resource:put_entry_string(resource, content)
+	if type(content) == "string" then
+		self.resource:put_entry_string(resource, content)
+	else
+		self.resource:put_entry_byte_array(resource, content)
+	end
 end
 
 --[[
