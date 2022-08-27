@@ -21,11 +21,11 @@ function modApi:writeAsset(resource, content)
 	Assert.Equals("string", type(resource))
 	Assert.Equals({ "string", "table" }, type(content))
 
-	self.resource:put_entry(resource, content)
+	self.resource:put_entry_string(resource, content)
 end
 
 --[[
-	Reads the specified file from the resouce.dat archive.
+	Reads the specified file from the resource.dat archive.
 	Throws an error if the file could not be found.
 
 	resource:
@@ -37,7 +37,7 @@ function modApi:readAsset(resource)
 	Assert.ResourceDatIsOpen("readAsset")
 	Assert.Equals("string", type(resource))
 
-	return self.resource:entry_content_binary(resource)
+	return self.resource:entry_content_string(resource)
 end
 
 function modApi:appendAsset(resource, filePath)
@@ -60,14 +60,14 @@ function modApi:copyAsset(src, dst)
 	Assert.Equals("string", type(src))
 	Assert.Equals("string", type(dst))
 
-	self:writeAsset(dst, self:readAsset(src))
+	self.resource:put_entry_byte_array(dst, self.resource:entry_content_byte_array(src))
 end
 
 function modApi:appendDat(filePath)
 	local instance = FtlDat(filePath)
 
 	for i, innerPath in ipairs(instance:inner_paths()) do
-		self.resource:put_entry(innerPath, instance:entry_content_binary(innerPath))
+		self.resource:put_entry_byte_array(innerPath, instance:entry_content_byte_array(innerPath))
 	end
 
 	instance:destroy()
@@ -92,7 +92,7 @@ function modApi:fileDirectoryToDat(path)
 			local f = io.open(path .. directory .. dirfile, "rb")
 			local content = f:read("*all")
 			f:close()
-			ftldat:put_entry(directory.dirfile, content)
+			ftldat:put_entry_string(directory.dirfile, content)
 		end
 	end
 
@@ -110,7 +110,7 @@ function modApi:finalize()
 	try(function()
 		if not self.resource.signature then
 			self.resource.signature = true
-			self.resource:put_entry(self:getSignature(), "OK")
+			self.resource:put_entry_string(self:getSignature(), "OK")
 		end
 
 		self.resource:write("resources/resource.dat")

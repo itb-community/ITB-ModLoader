@@ -39,7 +39,7 @@ function FtlDat:write(outputPath)
 	self.package:to_file(outputPath)
 end
 
-function FtlDat:put_entry(innerPath, content)
+function FtlDat:put_entry_string(innerPath, content)
 	if type(content) == "string" then
 		-- Sending some strings back to ftldat-rs causes an access violation when the string represents
 		-- content of a file that is typically binary (eg. images or fonts).
@@ -48,7 +48,7 @@ function FtlDat:put_entry(innerPath, content)
 	end
 	Assert.Equals("table", type(content))
 
-	self.package:put_binary_entry(innerPath, content)
+	self.package:put_entry_from_byte_array(innerPath, content)
 end
 
 function FtlDat:file_exists(name)
@@ -56,13 +56,13 @@ function FtlDat:file_exists(name)
 end
 
 --- Returns content of the specified file, interpreted as text.
-function FtlDat:entry_content(innerPath)
-	return self.package:content_text_by_path(innerPath)
+function FtlDat:entry_content_string(innerPath)
+	return self.package.read_content_as_string(innerPath)
 end
 
 --- Returns content of the specified file as an array of bytes.
-function FtlDat:entry_content_binary(innerPath)
-	return self.package:content_binary_by_path(innerPath)
+function FtlDat:entry_content_byte_array(innerPath)
+	return self.package:read_content_as_byte_array(innerPath)
 end
 
 function FtlDat:inner_paths()
@@ -80,7 +80,7 @@ end
 
 --- Extract the specified file from .dat and save it to the specified destination.
 function FtlDat:extract_file(innerPath, destinationPath)
-	local content = self.package:content_binary_by_path(innerPath)
+	local content = self.package:read_content_as_byte_array(innerPath)
 	content = utf8_from(content)
 
 	local f = assert(io.open(destinationPath, "wb"), destinationPath)
