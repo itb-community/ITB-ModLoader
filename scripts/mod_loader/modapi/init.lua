@@ -1,5 +1,4 @@
 
-local FtlDat = require("scripts/mod_loader/ftldat/ftldat")
 local parentDirectory = GetParentPath(...)
 
 modApi = modApi or {}
@@ -47,26 +46,15 @@ function modApi:init()
 			modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
 			LOGD("Done!")
 		else
-			LOGD("Opening resource.dat to check mod loader signature...")
-			local file = io.open("resources/resource.dat","rb")
-			LOGD("Done!")
-
 			local instance = nil
 			try(function()
-				-- use stream instead of io:read("*all") as it *drastically* reduces memory
-				local stream = KaitaiStream(file)
-
-				LOGD("Building FTLDat...")
-				Assert.NotEquals(0, stream:size(), "Size of content of resource.dat")
-				instance = FtlDat.FtlDat(stream)
-				instance:_read(true)
-				instance._io:close()
+				LOGD("Building FTLDat to check signature...")
+				instance = FtlDat("resources/resource.dat")
 				LOGD("Done!")
 			end)
 			:catch(function(err)
 				if instance ~= nil then
-					instance._io:close()
-					instance = nil
+					instance:destroy()
 				end
 				LOG("Failed to create FTLDat instance from resource.dat:", err)
 			end)
@@ -84,9 +72,7 @@ function modApi:init()
 	end
 
 	LOGD("Building FTLDat...")
-	self.resource = FtlDat.FtlDat:from_file("resources/resource.dat")
-	-- self.resource already read in all data, so we can safely close the stream
-	self.resource._io:close()
+	self.resource = FtlDat("resources/resource.dat")
 	LOGD("Done!")
 
 	self.squadKeys = {
@@ -245,24 +231,24 @@ function modApi:getCurrentModcontentPath()
 end
 
 function modApi:getGameVersion()
-    if modApi.gameVersion then
-        return modApi.gameVersion
-    end
+	if modApi.gameVersion then
+		return modApi.gameVersion
+	end
 
-    local logPath = GetSavedataLocation() .. "log.txt"
-    if modApi:fileExists(logPath) then
-        local file = assert(io.open(logPath, "r"), "Failed to open file: "..logPath)
-        local content = file:read(200)
-        file:close()
+	local logPath = GetSavedataLocation() .. "log.txt"
+	if modApi:fileExists(logPath) then
+		local file = assert(io.open(logPath, "r"), "Failed to open file: " .. logPath)
+		local content = file:read(200)
+		file:close()
 
-        local version = string.match(content, "Into the Breach: (%S+)")
-        if version then
-            modApi.gameVersion = version
-            return modApi.gameVersion
-        end
-    end
+		local version = string.match(content, "Into the Breach: (%S+)")
+		if version then
+			modApi.gameVersion = version
+			return modApi.gameVersion
+		end
+	end
 
-    LOG("WARNING: Unable to get game version!")
+	LOG("WARNING: Unable to get game version!")
 end
 
 modApi.events.onSettingsChanged:subscribe(function(old, neu)

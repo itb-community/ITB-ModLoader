@@ -12,7 +12,7 @@ local scripts = {
 	"modui/__scripts",
 
 	"modapi/__scripts",
-	"ftldat/__scripts",
+	"ftldat-rs/__scripts",
 	"altered/__scripts",
 	"compat/__scripts",
 

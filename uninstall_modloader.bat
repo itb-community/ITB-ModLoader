@@ -7,6 +7,7 @@ IF EXIST MODLOADER_README.txt DEL /q MODLOADER_README.txt
 DEL /q lua5.1.dll
 DEL /q opengl32.dll
 DEL /q SDL2.dll
+DEL /q ftldat.dll
 DEL /q scripts\scripts.lua
 IF EXIST resources\resource.dat.bak DEL /q resources\resource.dat
 RMDIR /q /s resources\mods
