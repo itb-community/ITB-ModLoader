@@ -17,6 +17,14 @@ local validMechClasses = {
 	"TechnoVek",
 }
 
+local CLASS_ORDER = {
+	Prime = 0,
+	Brute = 1,
+	Ranged = 2,
+	Science = 3,
+	TechnoVek = 4,
+}
+
 function modApi:addSquad(squad, name, desc, icon)
 	Assert.ModInitializingOrLoading()
 
@@ -28,6 +36,9 @@ function modApi:addSquad(squad, name, desc, icon)
 
 	squad.id = squad.id or buildSquadId(squad)
 	Assert.Equals(nil, modApi.mod_squads_by_id[squad.id], string.format("Squad with id %q already exists", squad.id))
+
+	-- sort the squad name first
+	local mechOrder = {[squad[1]] = -1}
 
 	-- Validate the squad
 	for i = 2, 4 do
@@ -43,7 +54,12 @@ function modApi:addSquad(squad, name, desc, icon)
 				ptable.Class,
 				string.format("Squad %q - pawn with id %q has an invalid Class", squad.id, mechType)
 		)
+
+		mechOrder[mechType] = CLASS_ORDER[ptable.Class] or INT_MAX
 	end
+
+	-- sort mechs in squad by class
+	table.sort(squad, function(a, b) return mechOrder[a] < mechOrder[b] end)
 
 	modApi.mod_squads_by_id[squad.id] = squad
 
