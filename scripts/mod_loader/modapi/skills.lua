@@ -8,6 +8,7 @@ function SpaceDamage:ListFields()
         "bHide",
         "bHideIcon",
         "bHidePath",
+        "bKO_Effect",
         "bSimpleMark",
         "fDelay",
         "iAcid",
