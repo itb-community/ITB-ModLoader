@@ -3,9 +3,6 @@
 --- Override default Move:GetSkillEffect to fix leap movement
 -------------------------------------------------------------
 
--- create Default_Move as a skill for modders to extend if they wished to extend Move
-Default_Move = Move
-
 -- helper to apply Adjacent_Heal and Web_Vek
 -- modders are free to override this function to easily add additional effects
 function Move.DoPostMoveEffects(moveSkill, ret, p1, p2)
@@ -40,12 +37,6 @@ function Move:GetSkillEffect(p1, p2)
 		ret:AddTeleport(p1, p2, FULL_DELAY)
 	else
 		ret:AddMove(Board:GetPath(p1, p2, Pawn:GetPathProf()), FULL_DELAY)
-	end
-
-	-- custom move skill will automatically get the post move effects as part of the modloader's GetSkillEffect below
-	-- to prevent running them twice, skip if Default_Move is extended
-	if self == Default_Move then
-		Move.DoPostMoveEffects(self, ret, p1, p2)
 	end
 
 	return ret
@@ -90,6 +81,9 @@ local function assertIsStringToSkillTable(skill_id, msg)
 	msg = msg .. string.format("Expected _G[%q] to be a valid Skill/Weapon, but was %s%s", skill_id, type(skill), traceback())
 	assert(type(skill) == "table" and type(skill.GetTargetArea) == "function" and type(skill.GetSkillEffect) == "function", msg)
 end
+
+-- create Default_Move as a skill for modders to extend if they wished to extend Move
+Default_Move = Move
 
 -- extend default move to create the new move skill, means any vanilla skills extending Move will not get the injections
 Move = Default_Move:new()
@@ -137,8 +131,11 @@ function Move:GetSkillEffect(p1, p2)
 		return ret
 	end
 
-	-- old move skill will call DoPostMoveEffects directly
-	return oldMoveGetSkillEffect(self, p1, p2)
+	-- run DoPostMoveEffects here rather than in Default_Move as we automatically call DoPostMoveEffects after custom move skills
+	-- running it in the above could cause an extension of Default_Move that only modifies the target area to run post move effects twice
+	local ret = oldMoveGetSkillEffect(self, p1, p2)
+	Move.DoPostMoveEffects(self, ret, p1, p2)
+	return ret
 end
 
 -------------------------------------------------------------
