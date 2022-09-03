@@ -101,6 +101,8 @@ t.onWindowHidden = Event()
 t.onMissionChanged = Event()
 t.onMissionDismissed = Event()
 t.onGameVictory = Event()
+t.onSquadEnteredGame = Event()
+t.onSquadExitedGame = Event()
 
 t.onShiftToggled = Event()
 t.onAltToggled = Event()

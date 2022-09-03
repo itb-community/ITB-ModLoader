@@ -68,3 +68,24 @@ function modApi:addSquad(squad, name, desc, icon)
 	table.insert(self.squad_text, desc)
 	table.insert(self.squad_icon, icon or "resources/mods/squads/unknown.png")
 end
+
+local function onGameEntered()
+	local squadData = GAME.additionalSquadData
+	local squadId = squadData.squad
+
+	if squadId ~= nil then
+		modApi.events.onSquadEnteredGame:dispatch(squadId)
+	end
+end
+
+local function onGameExited()
+	local squadData = GAME.additionalSquadData
+	local squadId = squadData.squad
+
+	if squadId ~= nil then
+		modApi.events.onSquadExitedGame:dispatch(squadId)
+	end
+end
+
+modApi.events.onGameEntered:subscribe(onGameEntered)
+modApi.events.onGameExited:subscribe(onGameExited)
