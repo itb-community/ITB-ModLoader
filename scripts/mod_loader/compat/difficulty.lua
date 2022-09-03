@@ -1,3 +1,20 @@
+
+-- EVENTS
+---------
+
+local difficulty
+
+modApi.events.onFrameDrawStart:subscribe(function()
+	local prev_difficulty = difficulty
+
+	difficulty = GetDifficulty()
+
+	if difficulty ~= prev_difficulty then
+		modApi.events.onDifficultyChanged:dispatch(difficulty, prev_difficulty)
+	end
+end)
+
+
 -- Legacy: originally GetDifficulty() returned the custom difficulty while GetRealDifficulty() returned vanilla
 GetRealDifficulty = GetDifficulty
 
