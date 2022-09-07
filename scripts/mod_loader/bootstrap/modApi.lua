@@ -101,6 +101,8 @@ t.onWindowHidden = Event()
 
 t.onMissionChanged = Event()
 t.onMissionDismissed = Event()
+t.onIslandLeft = Event()
+t.onGameStateChanged = Event()
 t.onGameVictory = Event()
 t.onSquadEnteredGame = Event()
 t.onSquadExitedGame = Event()
