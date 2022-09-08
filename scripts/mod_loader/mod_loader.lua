@@ -274,16 +274,33 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 				enabled = data.enabled == nil and true or data.enabled,
 				version = data.version,
 			}
+
+			if data.dependencies then
+				data.requirements = data.requirements or {}
+
+				-- Initialize and load dependencies before this mod
+				-- By adding them to the requiremends table.
+				for _, id in ipairs(data.dependencies) do
+					if not list_contains(data.requirements, id) then
+						table.insert(data.requirements, id)
+					end
+				end
+			end
 			
 			if parentMod then
 				table.insert(parentMod.children, data.id)
 				data.parent = parentMod.id
 				
 				data.requirements = data.requirements or {}
+				data.dependencies = data.dependencies or {}
 				
 				-- Initialize and load parent mod before submods
 				if not list_contains(data.requirements, parentMod.id) then
 					table.insert(data.requirements, parentMod.id)
+				end
+				-- Add dependency to parent mod
+				if not list_contains(data.dependencies, parentMod.id) then
+					table.insert(data.dependencies, parentMod.id)
 				end
 			end
 			
@@ -517,6 +534,32 @@ local function requireMod(self, options, ordered, traversed, id)
 	end
 end
 
+local function isDependenciesInitialized(mod)
+	if type(mod.dependencies) == "table" then
+		local uninitedDependencies = {}
+		mod.uninitializedDependencies = uninitedDependencies
+
+		for _, id in ipairs(mod.dependencies) do
+			local dependency = mod_loader.mods[id]
+
+			if false
+				or dependency == nil
+				or dependency.initialized ~= true
+			then
+				table.insert(uninitedDependencies, id)
+			end
+		end
+
+		if #uninitedDependencies > 0 then
+			mod.hasUninitializedDependencies = true
+
+			return false
+		end
+	end
+
+	return true
+end
+
 function mod_loader:orderMods(options, savedOrder)
 	local options = shallow_copy(options)
 	
@@ -569,8 +612,10 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 	for i, id in ipairs(orderedMods) do
 		local mod = self.mods[id]
 
-		-- don't try to load mods that were not initialized
-		if mod.initialized then
+		-- Don't try to load mods that were not initialized.
+		-- Dont initialize mods where dependencies are either
+		-- missing, or uninitialized.
+		if mod.initialized and isDependenciesInitialized(mod) then
 			modApi:setCurrentMod(id)
 
 			local ok, err = xpcall(
