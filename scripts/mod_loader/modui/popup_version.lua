@@ -12,10 +12,14 @@ end
 
 local function showVersionDialog(text)
 	sdlext.showButtonDialog(
-		GetText("OldVersion_FrameTitle"), text,
+		GetText("Version_FrameTitle"), text,
 		responseFn,
 		{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
-		{ "", GetText("ButtonTooltip_DisablePopup") }
+		{ "", GetText("ButtonTooltip_DisablePopup") },
+		{
+			maxW = ScreenSizeX() * 0.6,
+			maxH = ScreenSizeY() * 0.8,
+		}
 	)
 end
 
@@ -32,26 +36,62 @@ modApi.events.onMainMenuEntered:subscribe(function(screen, wasHangar, wasGame)
 			-- when using 'reload' command to reload scripts, and getting
 			-- a script error.
 			modApi:scheduleHook(50, function()
-				local text = ""
-				local isOutOfDate = false
+				local modsOutdated = false
+				local texts_mods = {""}
 
 				for id, mod in pairs(mod_loader.mods) do
-					if mod.outOfDate then
-						isOutOfDate = true
-						text = text .. string.format(
-							GetText("OldVersion_ListEntry"),
-							mod.name, mod.modApiVersion
-						) .. "\n"
+					local modOutdated = false
+					local texts = {""}
+
+					if mod.modLoaderVersionOutOfDate then
+						modOutdated = true
+
+						texts[#texts+1] = GetText("Version_Outdated_ModLoader")
+						texts[#texts+1] = mod.modApiVersion
+
+					elseif mod.modLoaderVersionMismatch then
+						modOutdated = true
+
+						texts[#texts+1] = GetText("Version_Mismatch_ModLoader")
+						texts[#texts+1] = mod.modApiVersion
+					end
+
+					if modOutdated and (mod.gameVersionOutOfDate or mod.gameVersionMismatch) then
+						texts[#texts+1] = GetText("Version_And")
+					end
+
+					if mod.gameVersionOutOfDate then
+						modOutdated = true
+
+						texts[#texts+1] = GetText("Version_Outdated_Game")
+						texts[#texts+1] = mod.gameVersion
+
+					elseif mod.gameVersionMismatch then
+						modOutdated = true
+
+						texts[#texts+1] = GetText("Version_Mismatch_Game")
+						texts[#texts+1] = mod.gameVersion
+					end
+
+					if modOutdated then
+						modsOutdated = true
+
+						texts[1] = string.format(
+							GetText("Version_ListEntry"),
+							mod.name
+						)
+
+						texts_mods[#texts_mods+1] = table.concat(texts, "")
 					end
 				end
 
-				if isOutOfDate then
-					text = string.format(
-						GetText("OldVersion_FrameText"),
-						text, modApi.version
-					)
-
-					showVersionDialog(text)
+				if modsOutdated then
+					showVersionDialog(string.format(
+						GetText("Version_FrameText"),
+						modApi.version,
+						modApi.gameVersion,
+						table.concat(texts_mods, "\n")
+					))
 				end
 			end)
 		end

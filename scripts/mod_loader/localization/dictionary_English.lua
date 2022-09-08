@@ -198,9 +198,20 @@ return {
 	["PaletteRestartRequired_FrameTitle"] = "Restart Required",
 	["PaletteRestartRequired_FrameText"] = "Order of squad palettes has been changed. You must restart the game for the changes to take effect.",
 
-	["OldVersion_FrameTitle"] = "Mod Loader Outdated",
-	["OldVersion_FrameText"] = "The following mods could not be loaded, because they require a newer version of the mod loader:\n\n%s\nYour installed version: %s",
-	["OldVersion_ListEntry"] = "- [%s] requires at least version %s.",
+	["Version_FrameTitle"] = "Version mismatch",
+	["Version_FrameText"] = "Your installed versions - "
+		.."Mod Loader: %s - Game: %s\n\nThe following mods could not be loaded, "
+		.."because they require a different version of the mod loader "
+		.."and/or game:\n%s\n\n"
+		.."You can change version control settings in [Mod Content] > [Configure Mod Loader]",
+	["Version_Outdated_ListEntry"] = "- [%s] requires at least version %s.",
+	["Version_Mismatch_ListEntry"] = "- [%s] requires %s.",
+	["Version_ListEntry"] = "- [%s] requires ",
+	["Version_And"] = " and ",
+	["Version_Outdated_ModLoader"] = "at least mod loader v",
+	["Version_Mismatch_ModLoader"] = "mod loader v",
+	["Version_Outdated_Game"] = "at least game v",
+	["Version_Mismatch_Game"] = "game v",
 
 	["ResourceError_FrameTitle"] = "Resource Error",
 	["ResourceError_FrameText"] = "The mod loader failed to load game resources. "..
