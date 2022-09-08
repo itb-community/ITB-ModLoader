@@ -3,7 +3,9 @@ return {
 	["Button_Yes"] = "YES",
 	["Button_No"] = "NO",
 	["Button_DisablePopup"] = "GOT IT, DON'T TELL ME AGAIN",
+	["Button_ShowScriptError"] = "Show Error",
 	["ButtonTooltip_DisablePopup"] = "This dialog will not be shown anymore. You can re-enable it in Mod Content > Configure Mod Loader.",
+	["ButtonTooltip_ShowScriptError"] = "Show the first error encountered while loading mods.",
 
 	["MainMenu_Button_ModContent"] = "Mod Content",
 	["ModContent_FrameTitle"] = "Mod Content",
@@ -191,6 +193,16 @@ return {
 
 	["ScriptError_FrameTitle"] = "Script Error",
 	["ScriptError_FrameText_Mount"] = "Unable to mount mod at [%s]:\n%s",
+	["ScriptError_Friendly_FrameTitle"] = "Mods failed to load",
+	["ScriptError_Friendly_FrameText"] = "Some mods could not be loaded "
+		.."because they threw errors on startup.\n\n"
+		.."Things you can try to resolve the issue:\n"
+		.."- Update mods that might have a newer version available.\n"
+		.."- Test for mod conflicts: Disable all other mods, and restart the game.\n"
+		.."- Change version control settings in [Mod Content] > [Configure Mod Loader].\n\n"
+		.."List of mods that failed to load:\n\n%s",
+	["ScriptError_Friendly_ListEntryError"] = "- [%s%s] - id: [%s]",
+	["ScriptError_Friendly_ListEntryMount"] = "- [%s]",
 
 	["RestartRequired_FrameTitle"] = "Restart Required",
 	["RestartRequired_FrameText"] = "You have enabled one or more mods. In order to apply them, game restart is required.",
