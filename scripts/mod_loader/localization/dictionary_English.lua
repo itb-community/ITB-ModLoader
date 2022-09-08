@@ -180,6 +180,15 @@ return {
 	["ModLoaderConfig_Text_ProfileFrame"] = "Show Profile Settings Change Popup",
 	["ModLoaderConfig_Tooltip_ProfileFrame"] = "Show a popup reminding to restart the game when switching profiles with Profile-Specific Configuration enabled.",
 
+	["ModLoaderConfig_Text_FriendlyModFailPopup"] = "Show frienly popup when mods fail to load",
+	["ModLoaderConfig_Tooltip_FriendlyModFailPopup"] = "Show a more helpful popup for non-coders when one or more mods fail to initialize.",
+
+	["ModLoaderConfig_Text_NeedExactGameVersion"] = "Disable mods not built for game version",
+	["ModLoaderConfig_Tooltip_NeedExactGameVersion"] = "Disable mods not specifically built for the current game version.",
+
+	["ModLoaderConfig_Text_NeedExactMLVersion"] = "Disable mods not built for mod loader version",
+	["ModLoaderConfig_Tooltip_NeedExactMLVersion"] = "Disable mods not specifically built for the current mod loader version.",
+
 	["ScriptError_FrameTitle"] = "Script Error",
 	["ScriptError_FrameText_Mount"] = "Unable to mount mod at [%s]:\n%s",
 

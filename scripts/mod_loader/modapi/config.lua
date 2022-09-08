@@ -20,6 +20,10 @@ function CurrentModLoaderConfig()
 	data.showPaletteRestartReminder = modApi.showPaletteRestartReminder
 	data.showProfileSettingsFrame   = modApi.showProfileSettingsFrame
 
+	data.friendlyModFailPopup       = modApi.friendlyModFailPopup
+	data.modsNeedExactGameVersion   = modApi.modsNeedExactGameVersion
+	data.modsNeedExactMLVersion     = modApi.modsNeedExactMLVersion
+
 	return data
 end
 
@@ -74,7 +78,11 @@ function DefaultModLoaderConfig()
 		showRestartReminder = true,
 		showPilotRestartReminder   = true,
 		showPaletteRestartReminder = true,
-		showProfileSettingsFrame   = true
+		showProfileSettingsFrame   = true,
+
+		friendlyModFailPopup       = true,
+		modsNeedExactGameVersion       = false,
+		modsNeedExactMLVersion         = false,
 	}
 end
 
@@ -159,6 +167,10 @@ function ApplyModLoaderConfig(config)
 	modApi.showPilotRestartReminder   = config.showPilotRestartReminder
 	modApi.showPaletteRestartReminder = config.showPaletteRestartReminder
 	modApi.showProfileSettingsFrame   = config.showProfileSettingsFrame
+
+	modApi.friendlyModFailPopup       = config.friendlyModFailPopup
+	modApi.modsNeedExactGameVersion   = config.modsNeedExactGameVersion
+	modApi.modsNeedExactMLVersion     = config.modsNeedExactMLVersion
 end
 
 modApi.events.onSettingsChanged:subscribe(function(old, neu)

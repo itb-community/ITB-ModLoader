@@ -28,6 +28,9 @@ local function createUi()
 	local cboxPilotRestartReminder = nil
 	local cboxPaletteRestartReminder = nil
 	local cboxProfileFrame = nil
+	local cboxFriendlyModFailPopup = nil
+	local cboxNeedExactGameVersion = nil
+	local cboxNeedExactMLVersion = nil
 
 	local onExit = function(self)
 		local data = {
@@ -47,7 +50,11 @@ local function createUi()
 			showRestartReminder = cboxRestartReminder.checked,
 			showPilotRestartReminder   = cboxPilotRestartReminder.checked,
 			showPaletteRestartReminder = cboxPaletteRestartReminder.checked,
-			showProfileSettingsFrame   = cboxProfileFrame.checked
+			showProfileSettingsFrame   = cboxProfileFrame.checked,
+
+			friendlyModFailPopup       = cboxFriendlyModFailPopup.checked,
+			modsNeedExactGameVersion   = cboxNeedExactGameVersion.checked,
+			modsNeedExactMLVersion     = cboxNeedExactMLVersion.checked,
 		}
 
 		ApplyModLoaderConfig(data)
@@ -75,6 +82,10 @@ local function createUi()
 		cboxPilotRestartReminder.checked   = config.showPilotRestartReminder
 		cboxPaletteRestartReminder.checked = config.showPaletteRestartReminder
 		cboxProfileFrame.checked           = config.showProfileSettingsFrame
+
+		cboxFriendlyModFailPopup.checked   = config.friendlyModFailPopup
+		cboxNeedExactGameVersion.checked   = config.modsNeedExactGameVersion
+		cboxNeedExactMLVersion.checked     = config.modsNeedExactMLVersion
 
 		local t = cboxFloatyTooltips.root.tooltip
 		modApi.floatyTooltips = config.floatyTooltips
@@ -308,6 +319,23 @@ local function createUi()
 
 			return result
 		end
+
+		-- ////////////////////////////////////////////////////////////////////////
+		-- Mod initialization options
+		cboxFriendlyModFailPopup = createCheckboxOption(
+			GetText("ModLoaderConfig_Text_FriendlyModFailPopup"),
+			GetText("ModLoaderConfig_Tooltip_FriendlyModFailPopup")
+		):addTo(layout)
+
+		cboxNeedExactGameVersion = createCheckboxOption(
+			GetText("ModLoaderConfig_Text_NeedExactGameVersion"),
+			GetText("ModLoaderConfig_Tooltip_NeedExactGameVersion")
+		):addTo(layout)
+
+		cboxNeedExactMLVersion = createCheckboxOption(
+			GetText("ModLoaderConfig_Text_NeedExactMLVersion"),
+			GetText("ModLoaderConfig_Tooltip_NeedExactMLVersion")
+		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
 		-- Warning dialogs
