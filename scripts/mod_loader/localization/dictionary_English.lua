@@ -193,15 +193,14 @@ return {
 
 	["ScriptError_FrameTitle"] = "Script Error",
 	["ScriptError_FrameText_Mount"] = "Unable to mount mod at [%s]:\n%s",
-	["ScriptError_Friendly_FrameTitle"] = "Mods failed to load",
-	["ScriptError_Friendly_FrameText"] = "Some mods could not be loaded "
+	["ScriptError_Friendly_FrameTitle"] = "Mods failed to initialize",
+	["ScriptError_Friendly_FrameText"] = "Some mods could not be initialized "
 		.."because they threw errors on startup.\n\n"
 		.."Things you can try to resolve the issue:\n"
 		.."- Update mods that might have a newer version available.\n"
-		.."- Test for mod conflicts: Disable all other mods, and restart the game.\n"
-		.."- Change version control settings in [Mod Content] > [Configure Mod Loader].\n\n"
-		.."List of mods that failed to load:\n\n%s",
-	["ScriptError_Friendly_ListEntryError"] = "- [%s%s] - id: [%s]",
+		.."- Test for mod conflicts: Disable all other mods, and restart the game.\n\n"
+		.."List of mods that failed to initialize:\n%s",
+	["ScriptError_Friendly_ListEntryError"] = "- [%s%s] with id [%s] - %s",
 	["ScriptError_Friendly_ListEntryMount"] = "- [%s]",
 
 	["RestartRequired_FrameTitle"] = "Restart Required",

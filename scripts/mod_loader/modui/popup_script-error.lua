@@ -28,7 +28,7 @@ local function showDialog(text, friendly)
 		buttonTooltips = {
 			"",
 			GetText("ButtonTooltip_DisablePopup"),
-			GetText("ButtonTooltip_ShowScriptsError")
+			GetText("ButtonTooltip_ShowScriptError")
 		}
 	else
 		frameTitle = GetText("ScriptError_FrameTitle")
@@ -96,15 +96,17 @@ modApi.events.onMainMenuEntered:subscribe(function(screen, wasHangar, wasGame)
 						)
 					end
 
-					for id, mod in pairs(mod_loader.mods) do
+					-- List errors in the same order they were initialized
+					for _, mod in ipairs(mod_loader.mod_initOrder) do
 						if mod.error then
 							isError = true
 							-- Mods requring to have a version is not enforced.
 							local version = mod.version and " v"..mod.version or ""
+							local reason = mod.haltReason or "Script Error"
 
 							texts[#texts+1] = string.format(
 								GetText("ScriptError_Friendly_ListEntryError"),
-								mod.name, version, mod.id
+								mod.name, version, mod.id, reason
 							)
 						end
 					end

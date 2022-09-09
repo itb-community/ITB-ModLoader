@@ -52,6 +52,7 @@ function mod_loader:init()
 	self.mods = {}
 	self.mod_list = {}
 	self.mod_options = {}
+	self.mod_initOrder = {}
 
 	self.unmountedMods = {} -- mods which had malformed init.lua
 	self.firsterror = nil
@@ -371,6 +372,8 @@ end
 function mod_loader:initMod(id, mod_options)
 	local mod = self.mods[id]
 	local badVersion = false
+
+	table.insert(self.mod_initOrder, mod)
 
 	local function isBadVersion(version, targetVersion, exactMatch)
 		if exactMatch then
