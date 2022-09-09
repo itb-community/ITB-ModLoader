@@ -85,3 +85,35 @@ function modApi:getModOptions(modId)
 	local modContent = mod_loader.currentModContent or mod_loader:getModConfig()
 	return modContent[modId].options
 end
+
+function modApi:haltModInit(text)
+	Assert.Equals("string", type(text), "Argument #1")
+
+	if mod_loader.initializing then
+		local mod = modApi:getCurrentMod()
+		local occurances
+
+		text, occurances = text:gsub("%c", "")
+
+		if occurances > 0 then
+			-- Warning
+			LOG("Warning - Argument #1 to modApi.haltModInit contains control characters, which will be removed.")
+		end
+
+		if text:len() > modApi.constants.MOD_HALT_REASON_CHARS then
+			-- Warning
+			LOGF(
+				"Warning - Argument #1 to modApi.haltModInit is longer than %s, and will be truncated.",
+				modApi.constants.MOD_HALT_REASON_CHARS
+			)
+			text = text:sub(1,modApi.constants.MOD_HALT_REASON_CHARS)
+		end
+
+		mod.haltReason = text
+
+		error("Halted on purpose: "..text)
+	else
+		-- Warning
+		LOG("Warning - call to modApi.haltModInit outside of init")
+	end
+end
