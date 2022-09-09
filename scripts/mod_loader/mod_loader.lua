@@ -54,6 +54,8 @@ function mod_loader:init()
 
 	self.unmountedMods = {} -- mods which had malformed init.lua
 	self.firsterror = nil
+	self.initializing = true
+	self.initialized = false
 
 	LOGD("Enumerating mods...")
 	self:enumerateMods("mods/")
@@ -141,6 +143,9 @@ function mod_loader:init()
 
 		modApi.events.onModsFirstLoaded:dispatch()
 	end)
+
+	self.initializing = false
+	self.initialized = true
 
 	LOGD("Mod loader init success!")
 end

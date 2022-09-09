@@ -16,6 +16,8 @@ function modApi:init()
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
 	self.version = "2.7.2"
+	self.initializing = true
+	self.initialized = false
 	LOG("GAME VERSION", self:getGameVersion())
 	LOG("MOD-API VERSION", self.version)
 	LOGD("Parent directory:", parentDirectory)
@@ -134,6 +136,7 @@ function modApi:init()
 	end
 
 	sdlext.executeAddModContent()
+	self.initializing = false
 	self.initialized = true
 
 	LOGD("modApi init success!")
