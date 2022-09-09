@@ -5,6 +5,7 @@ local ScrollableLogger = require("scripts/mod_loader/logger_scrollable")
 
 local BasicLoggerImpl = require("scripts/mod_loader/logger_basic")
 local BufferedLoggerImpl = require("scripts/mod_loader/logger_buffered")
+local isDependenciesInitialized
 
 mod_loader.scrollableLogger = false
 if mod_loader.scrollableLogger then
@@ -430,18 +431,34 @@ function mod_loader:initMod(id, mod_options)
 		return
 	end
 
-	local ok, err = xpcall(
-		function()
-			LOGF("Initializing mod [%s] with id [%s]...", mod.name, id)
-			mod.init(mod, mod_options[id].options)
-		end,
-		function(e)
-			return string.format(
-				"Initializing mod [%s] with id [%s] failed:\n%s\n\n%s",
-				mod.name, id, e, debug.traceback("", 2)
-			)
-		end
-	)
+	local ok, err
+
+	if isDependenciesInitialized(mod) then
+		ok, err = xpcall(
+			function()
+				LOGF("Initializing mod [%s] with id [%s]...", mod.name, id)
+				mod.init(mod, mod_options[id].options)
+			end,
+			function(e)
+				return string.format(
+					"Initializing mod [%s] with id [%s] failed:\n%s\n\n%s",
+					mod.name, id, e, debug.traceback("", 2)
+				)
+			end
+		)
+	else
+		-- Just show the first dependency that didn't initialize.
+		mod.haltReason = string.format(
+			"Dependency with id [%s] was not initialized",
+			mod.uninitializedDependencies[1]
+		)
+
+		ok = false
+		err = string.format(
+			"Initializing mod [%s] with id [%s] failed:\n%s",
+			mod.name, id, mod.haltReason
+		)
+	end
 
 	if ok then
 		mod.initialized = true
@@ -585,7 +602,7 @@ local function requireMod(self, options, ordered, traversed, id)
 	end
 end
 
-local function isDependenciesInitialized(mod)
+function isDependenciesInitialized(mod)
 	if type(mod.dependencies) == "table" then
 		local uninitedDependencies = {}
 		mod.uninitializedDependencies = uninitedDependencies
@@ -666,7 +683,7 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 		-- Don't try to load mods that were not initialized.
 		-- Dont initialize mods where dependencies are either
 		-- missing, or uninitialized.
-		if mod.initialized and isDependenciesInitialized(mod) then
+		if mod.initialized then
 			modApi:setCurrentMod(id)
 
 			local ok, err = xpcall(
