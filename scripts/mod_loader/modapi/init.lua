@@ -237,10 +237,7 @@ function modApi:getGameVersion()
 
 	local logPath = GetSavedataLocation() .. "log.txt"
 	if modApi:fileExists(logPath) then
-		local file = assert(io.open(logPath, "r"), "Failed to open file: " .. logPath)
-		local content = file:read(200)
-		file:close()
-
+		local content = File(logPath):read_to_string()
 		local version = string.match(content, "Into the Breach: (%S+)")
 		if version then
 			modApi.gameVersion = version

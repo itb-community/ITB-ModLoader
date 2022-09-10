@@ -2,67 +2,28 @@ modApi = modApi or {}
 
 function modApi:fileExists(name)
 	Assert.Equals('string', type(name), "Argument #1")
-
-	-- ignore the error, since typically we don't care about it
-	local ok, _, code = os.rename(name, name)
-
-	if not ok then
-		if code == 13 then
-			-- Permission denied, but it exists
-			return true
-		end
-        if code == 17 then
-            -- Error code says it exists
-            return true
-        end
-
-		-- make sure we always return a non-nil, boolean value
-		return false
-	end
-
-	return true
+	return File(name):exists()
 end
 
 function modApi:directoryExists(path)
-	return self:fileExists(path .."/")
+	return Directory(path):exists()
 end
 
 function modApi:writeFile(path, content)
 	assert(type(path) == "string")
 	assert(type(content) == "string")
 
-	local f = io.open(path, "w")
-	assert(f, "Unable to open " .. path)
-	f:write(content)
-	f:close()
+	File(path):write_string(content)
 end
 
 function modApi:copyFile(src, dst)
 	assert(type(src) == "string")
 	assert(type(dst) == "string")
 
-	local input = io.open(src, "r")
-	assert(input, "Unable to open " .. src)
-	local content = input:read("*a")
-	input:close()
-
-	local output = io.open(dst, "w")
-	assert(output, "Unable to open " .. dst)
-	output:write(content)
-	output:close()
+	File(src):copy(dst)
 end
 
-function modApi:copyFileOS(src, dst)
-	assert(type(src) == "string")
-	assert(type(dst) == "string")
-
-	-- Need Windows-style paths with \ as separator
-	src = string.gsub(src, "/", "\\")
-	dst = string.gsub(dst, "/", "\\")
-
-	-- Copy via OS command rather than lua open/write, since it's much faster.
-	os.execute("COPY /V /Y " .. src .. " " .. dst)
-end
+modApi.copyFileOS = modApi.copyFile
 
 function modApi:pruneExtension(filename)
 	-- gsub() returns multiple values, store the first
