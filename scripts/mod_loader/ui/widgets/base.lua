@@ -563,6 +563,16 @@ function Ui:startDrag(mx, my, button)
 	self:stopDrag(mx, my, button)
 end
 
+function Ui:textinput(textinput)
+	if not self.visible then return false end
+
+	if self.parent then
+		return self.parent:textinput(textinput)
+	end
+
+	return false
+end
+
 function Ui:swapSibling(destIndex)
 	if self.parent == nil then return self end
 	local list = self.parent.children

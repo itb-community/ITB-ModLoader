@@ -332,6 +332,14 @@ function UiRoot:event(eventloop)
 		end
 	end
 
+	if type == sdl.events.textinput then
+		if self.focuschild then
+			return self.focuschild:textinput(eventloop:textinput())
+		else
+			return false
+		end
+	end
+
 	return false
 end
 
