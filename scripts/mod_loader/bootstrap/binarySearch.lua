@@ -20,7 +20,7 @@ function BinarySearch(key, array, approximation, arg4, arg5)
 		setmetatable(array, array_mt)
 	end
 
-	-- Run binary search while there are 3 or more values left
+	-- Run binary search until there are 2 or fewer values left.
 	while high - low > 1 do
 		local mid = math.floor((low + high) / 2)
 		local val = array[mid]
@@ -32,7 +32,7 @@ function BinarySearch(key, array, approximation, arg4, arg5)
 		end
 	end
 
-	-- There are only 1 or 2 values left, 'low' and 'high'
+	-- There are only 1 or 2 values left, 'low' and 'high'.
 	if approximation == "nearest" then
 		local low_diff = math.abs(key - array[low])
 		local high_diff = math.abs(key - array[high])
