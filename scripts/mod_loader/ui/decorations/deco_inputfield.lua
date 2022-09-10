@@ -208,9 +208,11 @@ function DecoInputField:screenToIndex(screenx, screeny)
 	elseif screeny - overshoot > y + surfaceHeight then
 		character = textLength
 	else
-		character = BinarySearchMin(0, textLength, screenx, function(i)
-			return x + drawbuffer[i * 2 + 1] + (drawbuffer[i * 2]:w() + charSpacing) / 2 
-		end)
+		local function getValue(i)
+			return x + drawbuffer[i * 2 + 1] + (drawbuffer[i * 2]:w() + charSpacing) / 2
+		end
+
+		character = BinarySearch(screenx, 0, textLength, getValue, "up")
 	end
 
 	return character
@@ -225,6 +227,9 @@ function DecoInputField:indexToScreen(index)
 end
 
 function DecoInputField:draw(screen, widget)
+	-- drawbuffer is a 0-indexed array containing alternating entries
+	-- of surfaces to draw, and the x position to draw them, starting
+	-- at 0 for the first character.
 	local drawbuffer = self.drawbuffer
 
 	local widgetWidth = widget.w

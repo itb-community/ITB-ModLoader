@@ -1,32 +1,64 @@
 
--- Find the element with the smallest return, larger than target.
--- Assumes a list with sorted returns in ascending order.
-function BinarySearchMin(left, right, target, compareFn)
-	local floor = math.floor
-	while left < right do
-		local middle = floor((left + right) / 2)
-		if compareFn(middle) < target then
-			left = middle + 1
+local array_mt = {
+	__index = function(self, key)
+		return self.__getValue(key)
+	end
+}
+
+function BinarySearch(key, array, approximation, arg4, arg5)
+	local low, high
+
+	if type(array) == 'table' then
+		low, high = 1, #array
+	else
+		local arg2, arg3 = array, approximation
+		local getValue = arg4
+		low, high = arg2, arg3
+		approximation = arg5
+
+		array = { __getValue = getValue }
+		setmetatable(array, array_mt)
+	end
+
+	-- Run binary search while there are 3 or more values left
+	while high - low > 1 do
+		local mid = math.floor((low + high) / 2)
+		local val = array[mid]
+
+		if key > val then
+			low = mid
 		else
-			right = middle
+			high = mid
 		end
 	end
 
-	return left
-end
+	-- There are only 1 or 2 values left, 'low' and 'high'
+	if approximation == "nearest" then
+		local low_diff = math.abs(key - array[low])
+		local high_diff = math.abs(key - array[high])
 
--- Find the element with the largest return, smaller than target.
--- Assumes a list with sorted returns in ascending order.
-function BinarySearchMax(left, right, target, compareFn)
-	local ceil = math.ceil
-	while left < right do
-		local middle = ceil((left + right) / 2)
-		if compareFn(middle) > target then
-			right = middle - 1
+		if low_diff < high_diff then
+			return low
 		else
-			left = middle
+			return high
+		end
+	elseif approximation == "up" then
+		if key > array[low] then
+			return high
+		else
+			return low
+		end
+	elseif approximation == "down" then
+		if key < array[high] then
+			return low
+		else
+			return high
+		end
+	else
+		if key == array[low] then
+			return low
+		elseif key == array[high] then
+			return high
 		end
 	end
-
-	return left
 end
