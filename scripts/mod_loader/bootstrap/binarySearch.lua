@@ -20,6 +20,10 @@ function BinarySearch(key, array, approximation, arg4, arg5)
 		setmetatable(array, array_mt)
 	end
 
+	if high <= low then
+		return nil
+	end
+
 	-- Run binary search until there are 2 or fewer values left.
 	while high - low > 1 do
 		local mid = math.floor((low + high) / 2)
