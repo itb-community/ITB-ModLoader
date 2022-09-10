@@ -11,10 +11,10 @@ function BinarySearch(key, array, approximation, arg4, arg5)
 	if type(array) == 'table' then
 		low, high = 1, #array
 	else
-		local arg2, arg3 = array, approximation
-		local getValue = arg4
-		low, high = arg2, arg3
-		approximation = arg5
+		local getValue
+
+		-- Pass over variables from alternate signature.
+		key, low, high, getValue, approximation = key, array, approximation, arg4, arg5
 
 		array = { __getValue = getValue }
 		setmetatable(array, array_mt)
