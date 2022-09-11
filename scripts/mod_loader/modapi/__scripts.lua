@@ -4,6 +4,7 @@ local scripts = {
 	"global",
 	"statistics",
 	"ftldat",
+	"version",
 	"misc",
 	"sandbox",
 	"config",
