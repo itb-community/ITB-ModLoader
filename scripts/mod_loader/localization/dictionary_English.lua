@@ -202,6 +202,7 @@ return {
 		.."List of mods that failed to initialize:\n%s",
 	["ScriptError_Friendly_ListEntryError"] = "- [%s%s] with id [%s] - %s",
 	["ScriptError_Friendly_ListEntryMount"] = "- [%s]",
+	["ScriptError_DependencyNotInitialized"] = "Dependency with id [%s] was not initialized",
 
 	["RestartRequired_FrameTitle"] = "Restart Required",
 	["RestartRequired_FrameText"] = "You have enabled one or more mods. In order to apply them, game restart is required.",

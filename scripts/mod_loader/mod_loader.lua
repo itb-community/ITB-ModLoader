@@ -472,7 +472,7 @@ function mod_loader:initMod(id, mod_options)
 	else
 		-- Just show the first dependency that didn't initialize.
 		mod.haltReason = string.format(
-			"Dependency with id [%s] was not initialized",
+			GetText("ScriptError_DependencyNotInitialized"),
 			mod.uninitializedDependencies[1]
 		)
 
