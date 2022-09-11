@@ -21,8 +21,8 @@ function CurrentModLoaderConfig()
 	data.showProfileSettingsFrame   = modApi.showProfileSettingsFrame
 
 	data.friendlyModFailPopup       = modApi.friendlyModFailPopup
-	data.modsNeedExactGameVersion   = modApi.modsNeedExactGameVersion
-	data.modsNeedExactMLVersion     = modApi.modsNeedExactMLVersion
+	data.gameVersionThreshold       = modApi.gameVersionThreshold
+	data.mlVersionThreshold         = modApi.mlVersionThreshold
 
 	return data
 end
@@ -81,8 +81,8 @@ function DefaultModLoaderConfig()
 		showProfileSettingsFrame   = true,
 
 		friendlyModFailPopup       = true,
-		modsNeedExactGameVersion       = false,
-		modsNeedExactMLVersion         = false,
+		gameVersionThreshold       = modApi.gameVersion,
+		mlVersionThreshold         = modApi.version,
 	}
 end
 
@@ -169,8 +169,8 @@ function ApplyModLoaderConfig(config)
 	modApi.showProfileSettingsFrame   = config.showProfileSettingsFrame
 
 	modApi.friendlyModFailPopup       = config.friendlyModFailPopup
-	modApi.modsNeedExactGameVersion   = config.modsNeedExactGameVersion
-	modApi.modsNeedExactMLVersion     = config.modsNeedExactMLVersion
+	modApi.gameVersionThreshold       = config.gameVersionThreshold
+	modApi.mlVersionThreshold         = config.mlVersionThreshold
 end
 
 modApi.events.onSettingsChanged:subscribe(function(old, neu)

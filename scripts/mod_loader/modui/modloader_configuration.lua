@@ -29,8 +29,8 @@ local function createUi()
 	local cboxPaletteRestartReminder = nil
 	local cboxProfileFrame = nil
 	local cboxFriendlyModFailPopup = nil
-	local cboxNeedExactGameVersion = nil
-	local cboxNeedExactMLVersion = nil
+	local vboxGameVersionThreshold = nil
+	local vboxMLVersionThreshold = nil
 
 	local onExit = function(self)
 		local data = {
@@ -53,8 +53,9 @@ local function createUi()
 			showProfileSettingsFrame   = cboxProfileFrame.checked,
 
 			friendlyModFailPopup       = cboxFriendlyModFailPopup.checked,
-			modsNeedExactGameVersion   = cboxNeedExactGameVersion.checked,
-			modsNeedExactMLVersion     = cboxNeedExactMLVersion.checked,
+
+			gameVersionThreshold       = vboxGameVersionThreshold:getVersion(),
+			mlVersionThreshold         = vboxMLVersionThreshold:getVersion(),
 		}
 
 		ApplyModLoaderConfig(data)
@@ -84,8 +85,9 @@ local function createUi()
 		cboxProfileFrame.checked           = config.showProfileSettingsFrame
 
 		cboxFriendlyModFailPopup.checked   = config.friendlyModFailPopup
-		cboxNeedExactGameVersion.checked   = config.modsNeedExactGameVersion
-		cboxNeedExactMLVersion.checked     = config.modsNeedExactMLVersion
+
+		vboxGameVersionThreshold:setVersion(config.gameVersionThreshold)
+		vboxMLVersionThreshold:setVersion(config.mlVersionThreshold)
 
 		local t = cboxFloatyTooltips.root.tooltip
 		modApi.floatyTooltips = config.floatyTooltips
@@ -97,6 +99,29 @@ local function createUi()
 		local result = UiCheckbox.clicked(self, button)
 		if self.updateTooltip then self:updateTooltip() end
 		return result
+	end
+
+	local getDigit = function(self)
+		return tostring(self.textfield or 0)
+	end
+
+	local setDigit = function(self, digit)
+		self:setText(tostring(digit or 0))
+	end
+
+	local getVersion = function(self)
+		return string.format(
+			"%s.%s.%s",
+			self.digits[1]:getDigit(),
+			self.digits[2]:getDigit(),
+			self.digits[3]:getDigit()
+		)
+	end
+
+	local setVersion = function(self, version)
+		self.digits[1]:setDigit(version:match("^(%d+)"))
+		self.digits[2]:setDigit(version:match("^%d+\.(%d+)"))
+		self.digits[3]:setDigit(version:match("^%d+\.%d+\.(%d+)"))
 	end
 
 	local createCheckboxOption = function(text, tooltipOn, tooltipOff)
@@ -122,6 +147,67 @@ local function createUi()
 		cbox.clicked = checkboxClickFn
 
 		return cbox
+	end
+
+	local createVersionboxOption = function(text, tooltipOn)
+		local holder = UiWeightLayout()
+			:width(1):heightpx(41)
+		holder.digits = {}
+
+		local textbox = Ui()
+			:width(1):height(1)
+			:settooltip(tooltipOn)
+			:decorate({
+				DecoFrame(),
+				DecoAlign(5),
+				DecoText(text)
+			})
+			:addTo(holder)
+
+		local versionHolder = UiBoxLayout()
+			:widthpx(84):height(1)
+			:hgap(0)
+			:decorate({
+				DecoFrame()
+			})
+			:addTo(holder)
+
+		local widths = {20, 20, 40}
+		local lengths = {2, 2, 4}
+
+		for i = 1, 3 do
+			local inputDigit = UiInputField()
+				:widthpx(widths[i]):height(1)
+				:setAlphabet(UiInputField._ALPHABET_NUMBERS)
+				:setMaxLength(lengths[i])
+				:clip()
+				:decorate({
+					DecoInputField{
+						alignH = "center",
+						alignV = "center",
+					}
+				})
+				:addTo(versionHolder)
+
+			inputDigit.getDigit = getDigit
+			inputDigit.setDigit = setDigit
+
+			table.insert(holder.digits, inputDigit)
+
+			if i < 3 then
+				Ui():widthpx(2):height(1)
+					:decorate{
+						DecoAlign(-4),
+						DecoText(".")
+					}
+					:addTo(versionHolder)
+			end
+		end
+
+		holder.getVersion = getVersion
+		holder.setVersion = setVersion
+
+		return holder
 	end
 
 	local createSeparator = function(h)
@@ -327,14 +413,14 @@ local function createUi()
 			GetText("ModLoaderConfig_Tooltip_FriendlyModFailPopup")
 		):addTo(layout)
 
-		cboxNeedExactGameVersion = createCheckboxOption(
-			GetText("ModLoaderConfig_Text_NeedExactGameVersion"),
-			GetText("ModLoaderConfig_Tooltip_NeedExactGameVersion")
+		vboxGameVersionThreshold = createVersionboxOption(
+			GetText("ModLoaderConfig_Text_GameVersionThreshold"),
+			GetText("ModLoaderConfig_Tooltip_GameVersionThreshold")
 		):addTo(layout)
 
-		cboxNeedExactMLVersion = createCheckboxOption(
-			GetText("ModLoaderConfig_Text_NeedExactMLVersion"),
-			GetText("ModLoaderConfig_Tooltip_NeedExactMLVersion")
+		vboxMLVersionThreshold = createVersionboxOption(
+			GetText("ModLoaderConfig_Text_MLVersionThreshold"),
+			GetText("ModLoaderConfig_Tooltip_MLVersionThreshold")
 		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
