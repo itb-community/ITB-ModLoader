@@ -92,7 +92,7 @@ modApi.events.onMainMenuEntered:subscribe(function(screen, wasHangar, wasGame)
 
 						texts[#texts+1] = string.format(
 							GetText("ScriptError_Friendly_ListEntryMount"),
-							dir
+							dir, err
 						)
 					end
 

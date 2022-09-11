@@ -201,7 +201,7 @@ return {
 		.."- Test for mod conflicts: Disable all other mods, and restart the game.\n\n"
 		.."List of mods that failed to initialize:\n%s",
 	["ScriptError_Friendly_ListEntryError"] = "- [%s%s] with id [%s] - %s",
-	["ScriptError_Friendly_ListEntryMount"] = "- [%s]",
+	["ScriptError_Friendly_ListEntryMount"] = "- [%s] - %s",
 	["ScriptError_DependencyNotInitialized"] = "Dependency with id [%s] was not initialized",
 
 	["RestartRequired_FrameTitle"] = "Restart Required",
