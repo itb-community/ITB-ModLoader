@@ -248,10 +248,30 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 			err = "Missing version"
 		end
 		
-		if ok and not version.parseVersion(data.version) then
+		if ok and not modApi:isValidVersion(data.version) then
 			ok = false
 			err = "Invalid version format"
 		end]]
+
+		if ok then
+			if type(data.modApiVersion) ~= "string" then
+				LOGF("Warning - mod [%s] with id [%s] missing modApiVersion", data.name, data.id)
+
+			elseif not modApi:isValidVersion(data.modApiVersion) then
+				ok = false
+				err = "Invalid modApiVersion format"
+			end
+		end
+
+		if ok then
+			if type(data.gameVersion) ~= "string" then
+				LOGF("Warning - mod [%s] with id [%s] missing gameVersion", data.name, data.id)
+
+			elseif not modApi:isValidVersion(data.gameVersion) then
+				ok = false
+				err = "Invalid gameVersion format"
+			end
+		end
 
 		-- Optional fields, just verify the type if they're defined
 		if ok and data.icon and type(data.icon) ~= "string" then
