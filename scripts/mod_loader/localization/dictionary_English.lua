@@ -4,8 +4,10 @@ return {
 	["Button_No"] = "NO",
 	["Button_DisablePopup"] = "GOT IT, DON'T TELL ME AGAIN",
 	["Button_ShowScriptError"] = "Show Error",
+	["Button_DisableMods"] = "Disable Mods",
 	["ButtonTooltip_DisablePopup"] = "This dialog will not be shown anymore. You can re-enable it in Mod Content > Configure Mod Loader.",
 	["ButtonTooltip_ShowScriptError"] = "Show the first error encountered while loading mods.",
+	["ButtonTooltip_DisableMods"] = "Disable mods that failed to initialize and close this dialog.",
 
 	["MainMenu_Button_ModContent"] = "Mod Content",
 	["ModContent_FrameTitle"] = "Mod Content",

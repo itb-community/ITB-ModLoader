@@ -7,6 +7,18 @@ local function responseFn(btnIndex)
 	if btnIndex == 2 then
 		modApi.showVersionFrame = false
 		SaveModLoaderConfig(CurrentModLoaderConfig())
+	elseif btnIndex == 3 then
+		for id, mod in ipairs(mod_loader.mods) do
+			if false
+				or mod.modLoaderVersionOutOfDate
+				or mod.gameVersionOutOfDate
+				or mod.modLoaderVersionBelowThreshold
+				or mod.gameVersionBelowThreshold
+			then
+				-- unimplemented
+				-- disableModAndItsSubmods(mod)
+			end
+		end
 	end
 end
 
@@ -14,8 +26,16 @@ local function showVersionDialog(text)
 	sdlext.showButtonDialog(
 		GetText("Version_FrameTitle"), text,
 		responseFn,
-		{ GetText("Button_Ok"), GetText("Button_DisablePopup") },
-		{ "", GetText("ButtonTooltip_DisablePopup") },
+		{
+			GetText("Button_Ok"),
+			GetText("Button_DisablePopup"),
+			GetText("Button_DisableMods")
+		},
+		{
+			"",
+			GetText("ButtonTooltip_DisablePopup"),
+			GetText("ButtonTooltip_DisableMods")
+		},
 		{
 			maxW = ScreenSizeX() * 0.6,
 			maxH = ScreenSizeY() * 0.8,

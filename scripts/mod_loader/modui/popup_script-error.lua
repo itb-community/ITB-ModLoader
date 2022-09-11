@@ -10,6 +10,13 @@ local function responseFn(btnIndex)
 		SaveModLoaderConfig(CurrentModLoaderConfig())
 	elseif btnIndex == 3 then
 		showScriptError()
+	elseif btnIndex == 4 then
+		for id, mod in ipairs(mod_loader.mods) do
+			if mod.error then
+				-- unimplemented
+				-- disableModAndItsSubmods(mod)
+			end
+		end
 	end
 end
 
@@ -23,12 +30,14 @@ local function showDialog(text, friendly)
 		buttonTexts = {
 			GetText("Button_Ok"),
 			GetText("Button_DisablePopup"),
-			GetText("Button_ShowScriptError")
+			GetText("Button_ShowScriptError"),
+			GetText("Button_DisableMods")
 		}
 		buttonTooltips = {
 			"",
 			GetText("ButtonTooltip_DisablePopup"),
-			GetText("ButtonTooltip_ShowScriptError")
+			GetText("ButtonTooltip_ShowScriptError"),
+			GetText("ButtonTooltip_DisableMods")
 		}
 	else
 		frameTitle = GetText("ScriptError_FrameTitle")
