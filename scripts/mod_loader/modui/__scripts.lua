@@ -7,8 +7,8 @@ local scripts = {
 	"hangar",
 	"version_string",
 
-	"popup_version",
 	"popup_script-error",
+	"popup_version",
 	"popup_resource-error",
 	"popup_profile-config",
 	"popup_gamepad-warning",
