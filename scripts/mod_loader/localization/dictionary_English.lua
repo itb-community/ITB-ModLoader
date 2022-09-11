@@ -182,14 +182,14 @@ return {
 	["ModLoaderConfig_Text_ProfileFrame"] = "Show Profile Settings Change Popup",
 	["ModLoaderConfig_Tooltip_ProfileFrame"] = "Show a popup reminding to restart the game when switching profiles with Profile-Specific Configuration enabled.",
 
-	["ModLoaderConfig_Text_FriendlyModFailPopup"] = "Show frienly popup when mods fail to load",
+	["ModLoaderConfig_Text_FriendlyModFailPopup"] = "Show frienly popup when mods fail to initialize",
 	["ModLoaderConfig_Tooltip_FriendlyModFailPopup"] = "Show a more helpful popup for non-coders when one or more mods fail to initialize.",
 
-	["ModLoaderConfig_Text_NeedExactGameVersion"] = "Disable mods not built for game version",
-	["ModLoaderConfig_Tooltip_NeedExactGameVersion"] = "Disable mods not specifically built for the current game version.",
+	["ModLoaderConfig_Text_GameVersionThreshold"] = "Game version threshold",
+	["ModLoaderConfig_Tooltip_GameVersionThreshold"] = "Disable mods built for a game version prior to this.",
 
-	["ModLoaderConfig_Text_NeedExactMLVersion"] = "Disable mods not built for mod loader version",
-	["ModLoaderConfig_Tooltip_NeedExactMLVersion"] = "Disable mods not specifically built for the current mod loader version.",
+	["ModLoaderConfig_Text_MLVersionThreshold"] = "Mod loader version threshold",
+	["ModLoaderConfig_Tooltip_MLVersionThreshold"] = "Disable mods built for a mod loader version prior to this.",
 
 	["ScriptError_FrameTitle"] = "Script Error",
 	["ScriptError_FrameText_Mount"] = "Unable to mount mod at [%s]:\n%s",
@@ -211,19 +211,20 @@ return {
 	["PaletteRestartRequired_FrameText"] = "Order of squad palettes has been changed. You must restart the game for the changes to take effect.",
 
 	["Version_FrameTitle"] = "Version mismatch",
-	["Version_FrameText"] = "Your installed versions - "
-		.."Mod Loader: %s - Game: %s\n\nThe following mods could not be loaded, "
-		.."because they require a different version of the mod loader "
-		.."and/or game:\n%s\n\n"
-		.."You can change version control settings in [Mod Content] > [Configure Mod Loader]",
-	["Version_Outdated_ListEntry"] = "- [%s] requires at least version %s.",
-	["Version_Mismatch_ListEntry"] = "- [%s] requires %s.",
-	["Version_ListEntry"] = "- [%s] requires ",
+	["Version_FrameText"] = "Your installed versions - Mod Loader: %s - Game: %s\n\n%s",
+	["Version_ModList_Outdated"] = "The following mods could not be initalized, "
+		.."because they require a higher version of the mod loader or game:\n%s\n\n",
+	["Version_ModList_Threshold"] = "The following mods were not initalized, "
+		.."because they are built for a mod loader or game version that is below the user "
+		.."defined thresholds:\n%s\n\n"
+		.."Your current thresholds - Mod Loader: %s - Game: %s\n"
+		.."You can change version thresholds in [Mod Content] > [Configure Mod Loader]",
+	["Version_ListEntry_Requires"] = "- [%s] with id [%s] requires ",
+	["Version_ListEntry_BuiltFor"] = "- [%s] with id [%s] is built for ",
 	["Version_And"] = " and ",
-	["Version_Outdated_ModLoader"] = "at least mod loader v",
-	["Version_Mismatch_ModLoader"] = "mod loader v",
-	["Version_Outdated_Game"] = "at least game v",
-	["Version_Mismatch_Game"] = "game v",
+	["Version_AtLeast"] = "at least ",
+	["Version_ModLoaderV"] = "mod loader v",
+	["Version_GameV"] = "game v",
 
 	["ResourceError_FrameTitle"] = "Resource Error",
 	["ResourceError_FrameText"] = "The mod loader failed to load game resources. "..

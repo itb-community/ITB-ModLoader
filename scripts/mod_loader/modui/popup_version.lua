@@ -36,61 +36,103 @@ modApi.events.onMainMenuEntered:subscribe(function(screen, wasHangar, wasGame)
 			-- when using 'reload' command to reload scripts, and getting
 			-- a script error.
 			modApi:scheduleHook(50, function()
-				local modsOutdated = false
-				local texts_mods = {""}
+				local showDialog = false
+				local texts_outdated = {}
+				local texts_threshold = {}
 
 				for id, mod in pairs(mod_loader.mods) do
-					local modOutdated = false
+					local outdated = false
+					local belowThreshold = false
 					local texts = {""}
 
 					if mod.modLoaderVersionOutOfDate then
-						modOutdated = true
+						outdated = true
 
-						texts[#texts+1] = GetText("Version_Outdated_ModLoader")
+						texts[#texts+1] = GetText("Version_AtLeast")
+						texts[#texts+1] = GetText("Version_ModLoaderV")
 						texts[#texts+1] = mod.modApiVersion
-
-					elseif mod.modLoaderVersionMismatch then
-						modOutdated = true
-
-						texts[#texts+1] = GetText("Version_Mismatch_ModLoader")
-						texts[#texts+1] = mod.modApiVersion
-					end
-
-					if modOutdated and (mod.gameVersionOutOfDate or mod.gameVersionMismatch) then
-						texts[#texts+1] = GetText("Version_And")
 					end
 
 					if mod.gameVersionOutOfDate then
-						modOutdated = true
+						if outdated then
+							texts[#texts+1] = GetText("Version_And")
+						else
+							texts[#texts+1] = GetText("Version_AtLeast")
+							outdated = true
+						end
 
-						texts[#texts+1] = GetText("Version_Outdated_Game")
-						texts[#texts+1] = mod.gameVersion
-
-					elseif mod.gameVersionMismatch then
-						modOutdated = true
-
-						texts[#texts+1] = GetText("Version_Mismatch_Game")
+						texts[#texts+1] = GetText("Version_GameV")
 						texts[#texts+1] = mod.gameVersion
 					end
 
-					if modOutdated then
-						modsOutdated = true
+					if outdated then
+						showDialog = true
 
 						texts[1] = string.format(
-							GetText("Version_ListEntry"),
-							mod.name
+							GetText("Version_ListEntry_Requires"),
+							mod.name, mod.id
 						)
 
-						texts_mods[#texts_mods+1] = table.concat(texts, "")
+						texts_outdated[#texts_outdated+1] = table.concat(texts, "")
+					end
+
+					-- Clear and reuse table.
+					texts = {""}
+
+					if mod.modLoaderVersionBelowThreshold then
+						belowThreshold = true
+
+						texts[#texts+1] = GetText("Version_ModLoaderV")
+						texts[#texts+1] = mod.modApiVersion
+					end
+
+					if mod.gameVersionBelowThreshold then
+						if belowThreshold then
+							texts[#texts+1] = GetText("Version_And")
+						else
+							belowThreshold = true
+						end
+
+						texts[#texts+1] = GetText("Version_GameV")
+						texts[#texts+1] = mod.gameVersion
+					end
+
+					if belowThreshold then
+						showDialog = true
+
+						texts[1] = string.format(
+							GetText("Version_ListEntry_BuiltFor"),
+							mod.name, mod.id
+						)
+
+						texts_threshold[#texts_threshold+1] = table.concat(texts, "")
 					end
 				end
 
-				if modsOutdated then
+				if showDialog then
+					local texts = {}
+
+					if #texts_outdated > 0 then
+						texts[#texts+1] = string.format(
+							GetText("Version_ModList_Outdated"),
+							table.concat(texts_outdated, "\n")
+						)
+					end
+
+					if #texts_threshold > 0 then
+						texts[#texts+1] = string.format(
+							GetText("Version_ModList_Threshold"),
+							table.concat(texts_threshold, "\n"),
+							modApi.mlVersionThreshold,
+							modApi.gameVersionThreshold
+						)
+					end
+
 					showVersionDialog(string.format(
 						GetText("Version_FrameText"),
 						modApi.version,
 						modApi.gameVersion,
-						table.concat(texts_mods, "\n")
+						table.concat(texts)
 					))
 				end
 			end)
