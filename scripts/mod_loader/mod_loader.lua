@@ -395,58 +395,53 @@ function mod_loader:initMod(id, mod_options)
 
 	table.insert(self.mod_initOrder, mod)
 
-	local function isBadVersion(version, targetVersion, exactMatch)
-		if exactMatch then
-			return version ~= targetVersion
-		else
-			return not modApi:isVersion(version, targetVersion)
-		end
-	end
-
 	-- Process version in init, so that mods that are not enabled don't
 	-- trigger the warning dialog.
 	if mod.modApiVersion then
-		local exactMatch = modApi.modsNeedExactMLVersion
-		local output = "Could not initialize mod [%s] with id [%s], "
-					.."because it requires mod loader version %s%s (installed: %s)."
-		local orHigher = " or higher"
-
-		if isBadVersion(mod.modApiVersion, modApi.version, exactMatch) then
+		if modApi:isVersionAboveTarget(mod.modApiVersion, modApi.version) then
 			badVersion = true
-			mod.initialized = false
-			mod.installed = false
+			mod.modLoaderVersionOutOfDate = true
 
-			if exactMatch then
-				orHigher = ""
-				mod.modLoaderVersionMismatch = true
-			else
-				mod.modLoaderVersionOutOfDate = true
-			end
+			LOGF(""
+				.."Could not initialize mod [%s] with id [%s], "
+				.."because it requires mod loader version %s or higher (installed: %s).",
+				mod.name, id, mod.modApiVersion, modApi.version
+			)
 
-			LOGF(output, mod.name, id, mod.modApiVersion, orHigher, modApi.version)
+		elseif modApi:isVersionBelowTarget(mod.modApiVersion, modApi.mlVersionThreshold) then
+			badVersion = true
+			mod.modLoaderVersionBelowThreshold = true
+
+			LOGF(""
+				.."Did not initialize mod [%s] with id [%s] "
+				.."built for mod loader version %s, "
+				.."because user defined threshold is set to %s.",
+				mod.name, id, mod.modApiVersion, modApi.mlVersionThreshold
+			)
 		end
 	end
 
 	if mod.gameVersion then
-		local exactMatch = modApi.modsNeedExactGameVersion
-		local output = "Could not initialize mod [%s] with id [%s], "
-					.."because it requires game version %s%s (installed: %s)."
-		local orHigher = " or higher"
-
-		if isBadVersion(mod.gameVersion, modApi.gameVersion, exactMatch) then
+		if modApi:isVersionAboveTarget(mod.gameVersion, modApi.gameVersion) then
 			badVersion = true
-			mod.initialized = false
-			mod.installed = false
+			mod.gameVersionOutOfDate = true
 
-			if exactMatch then
-				orHigher = ""
+			LOGF(""
+				.."Could not initialize mod [%s] with id [%s], "
+				.."because it requires game version %s or higher (installed: %s).",
+				mod.name, id, mod.gameVersion, modApi.gameVersion
+			)
 
-				mod.gameVersionMismatch = true
-			else
-				mod.gameVersionOutOfDate = true
-			end
+		elseif modApi:isVersionBelowTarget(mod.gameVersion, modApi.gameVersionThreshold) then
+			badVersion = true
+			mod.gameVersionBelowThreshold = true
 
-			LOGF(output, mod.name, id, mod.gameVersion, orHigher, modApi.gameVersion)
+			LOGF(""
+				.."Did not initialize mod [%s] with id [%s] "
+				.."built for game version %s, "
+				.."because user defined threshold is set to %s.",
+				mod.name, id, mod.gameVersion, modApi.gameVersionThreshold
+			)
 		end
 	end
 
