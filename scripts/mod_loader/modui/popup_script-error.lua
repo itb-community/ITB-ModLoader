@@ -120,8 +120,6 @@ modApi.events.onMainMenuEntered:subscribe(function(screen, wasHangar, wasGame)
 				else
 					showScriptError()
 				end
-
-				mod_loader.unmountedMods = {}
 			end)
 		end
 	end
