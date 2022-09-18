@@ -67,43 +67,6 @@ BoardPawn.ClearUndoMove = function(self)
 	)
 end
 
-BoardPawn.IsNeutral = function(self)
-	Assert.Equals("userdata", type(self), "Argument #0")
-
-	if not Board or GetCurrentMission() == nil then
-		return
-	end
-	
-	local ptable = self:GetPawnTable()
-	local neutral = ptable.bNeutral
-
-	if neutral == nil then
-		neutral = _G[self:GetType()]:GetNeutral()
-	end
-	if neutral == nil then
-		neutral = false
-	end
-
-	return neutral
-end
-
-BoardPawn.IsPowered = function(self)
-	Assert.Equals("userdata", type(self), "Argument #0")
-
-	if not Board or GetCurrentMission() == nil then
-		return
-	end
-	
-	local ptable = self:GetPawnTable()
-	local powered = ptable.bPowered
-
-	if powered == nil then
-		powered = true
-	end
-
-	return powered
-end
-
 -- checks if the pawn receives psion effects
 BoardPawn.CanMutate = function(self, targetPlayer)
 	Assert.Equals("userdata", type(self), "Argument #0")
@@ -462,34 +425,6 @@ local function initializeBoardPawn()
 	-- order to grab a reference to original functions, we require a pawn instance.
 
 	local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
-	
-	local oldSetNeutral = pawn.SetNeutral
-	BoardPawn.SetNeutral = function(self, neutral)
-		Assert.Equals("userdata", type(self), "Argument #0")
-		Assert.Equals("boolean", type(neutral), "Argument #1")
-
-		oldSetNeutral(self, neutral)
-
-		if not Board or GetCurrentMission() == nil then
-			return
-		end
-
-		setSavefileFieldsForPawn(self, { bNeutral = neutral })
-	end
-
-	local oldSetPowered = pawn.SetPowered
-	BoardPawn.SetPowered = function(self, powered)
-		Assert.Equals("userdata", type(self), "Argument #0")
-		Assert.Equals("boolean", type(powered), "Argument #1")
-
-		oldSetPowered(self, powered)
-
-		if not Board or GetCurrentMission() == nil then
-			return
-		end
-
-		setSavefileFieldsForPawn(self, { bPowered = powered })
-	end
 
 	BoardPawn.IsPilotSkill = pawn.IsAbility
 	BoardPawn.GetPilotSkill = pawn.GetAbility
