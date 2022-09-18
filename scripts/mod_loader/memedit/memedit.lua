@@ -27,7 +27,7 @@ function modApi.memedit:load(options)
 	options = options or {}
 
 	local function loadSilent()
-		package.loadlib("cutils.dll", "luaopen_memedit")(options)
+		package.loadlib("memedit.dll", "luaopen_memedit")(options)
 		self.dll = memedit
 		memedit = nil
 	end
