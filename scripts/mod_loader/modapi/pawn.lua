@@ -67,25 +67,6 @@ BoardPawn.ClearUndoMove = function(self)
 	)
 end
 
-BoardPawn.IsNeutral = function(self)
-	Assert.Equals("userdata", type(self), "Argument #0")
-	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
-
-	local result = false
-
-	try(function()
-		result = modApi.memedit.dll.pawn.isNeutral(self)
-	end)
-	:catch(function(err)
-		error(string.format(
-				"memedit.dll: %s",
-				tostring(err)
-		))
-	end)
-
-	return result
-end
-
 -- checks if the pawn receives psion effects
 BoardPawn.CanMutate = function(self, targetPlayer)
 	Assert.Equals("userdata", type(self), "Argument #0")
@@ -439,6 +420,640 @@ end
 BoardPawn.GetString = BoardPawn.GetLuaString
 
 
+-- memedit functions
+--------------------
+
+BoardPawn.GetClass = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.getClass(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.GetCustomAnim = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.getCustomAnim(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.GetDefaultFaction = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.getDefaultFaction(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.GetImageOffset = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.getImageOffset(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.GetImpactMaterial = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.getImpactMaterial(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.GetLeader = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.getLeader(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.GetMaxBaseHealth = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.getMaxBaseHealth(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.GetMaxHealth = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.getMaxHealth(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.GetOwner = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.getOwner(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.GetQueuedTarget = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = Point(
+			modApi.memedit.dll.pawn.getQueuedTargetX(self),
+			modApi.memedit.dll.pawn.getQueuedTargetY(self)
+		)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.IsInvisible = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.isInvisible(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.IsMassive = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.isMassive(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.IsMinor = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.isMinor(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.IsMissionCritical = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.isMissionCritical(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.IsNeutral = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.isNeutral(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.IsPushable = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.isPushable(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.IsSpaceColor = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result
+
+	try(function()
+		result = modApi.memedit.dll.pawn.isSpaceColor(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.SetBoosted = function(self, boosted)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("boolean", type(boosted), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setBoosted(self, boosted)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetClass = function(self, class)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(class), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setClass(self, class)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetCorpse = function(self, corpse)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("boolean", type(corpse), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setPushable(self, corpse)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetDefaultFaction = function(self, faction)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(faction), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setDefaultFaction(self, faction)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetFlying = function(self, flying)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("boolean", type(flying), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setFlying(self, flying)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetId = function(self, id)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(id), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setId(self, id)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetImageOffset = function(self, imageOffset)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(imageOffset), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setImageOffset(self, imageOffset)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetImpactMaterial = function(self, impactMaterial)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(impactMaterial), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setImpactMaterial(self, impactMaterial)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetJumper = function(self, jumper)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("boolean", type(jumper), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setJumper(self, jumper)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetLeader = function(self, leader)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(leader), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setLeader(self, leader)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetMassive = function(self, massive)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("boolean", type(massive), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setMassive(self, massive)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetMaxBaseHealth = function(self, maxBaseHealth)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(maxBaseHealth), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setMaxBaseHealth(self, maxBaseHealth)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetMaxHealth = function(self, maxHealth)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(maxHealth), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setMaxHealth(self, maxHealth)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetMinor = function(self, minor)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("boolean", type(minor), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setMinor(self, minor)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetMoveSpeed = function(self, moveSpeed)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(moveSpeed), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setMoveSpeed(self, moveSpeed)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetOwner = function(self, ownerId)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("number", type(ownerId), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setOwner(self, ownerId)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetPushable = function(self, pushable)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("boolean", type(pushable), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setPushable(self, pushable)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetSpaceColor = function(self, spaceColor)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("boolean", type(spaceColor), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setSpaceColor(self, spaceColor)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetTeleporter = function(self, teleporter)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("boolean", type(teleporter), "Argument #1")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	try(function()
+		modApi.memedit.dll.pawn.setTeleporter(self, teleporter)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+
 local function initializeBoardPawn()
 	-- Overrides of existing functions need to be added at later time, since in
 	-- order to grab a reference to original functions, we require a pawn instance.
@@ -447,6 +1062,84 @@ local function initializeBoardPawn()
 
 	BoardPawn.IsPilotSkill = pawn.IsAbility
 	BoardPawn.GetPilotSkill = pawn.GetAbility
+
+
+	-- Vanilla IsJumping checks if the unit type definition
+	-- has Jumper == true, instead of checking the class instance.
+	BoardPawn.IsJumperVanilla = pawn.IsJumper
+	BoardPawn.IsJumper = function(self)
+		Assert.Equals("userdata", type(self), "Argument #0")
+		local memedit = modApi.memedit and modApi.memedit.calibrated
+
+		if not memedit then
+			return self:IsJumperVanilla()
+		end
+
+		local result
+
+		try(function()
+			result = modApi.memedit.dll.pawn.isJumper(self)
+		end)
+		:catch(function(err)
+			error(string.format(
+					"memedit.dll: %s",
+					tostring(err)
+			))
+		end)
+
+		return result
+	end
+
+	-- Vanilla IsTeleporter checks if the unit type definition
+	-- has Teleporter == true, instead of checking the class instance.
+	BoardPawn.IsTeleporterVanilla = pawn.IsTeleporter
+	BoardPawn.IsTeleporter = function(self)
+		Assert.Equals("userdata", type(self), "Argument #0")
+		local memedit = modApi.memedit and modApi.memedit.calibrated
+
+		if not memedit then
+			return self:IsTeleporterVanilla()
+		end
+
+		local result
+
+		try(function()
+			result = modApi.memedit.dll.pawn.isTeleporter(self)
+		end)
+		:catch(function(err)
+			error(string.format(
+					"memedit.dll: %s",
+					tostring(err)
+			))
+		end)
+
+		return result
+	end
+
+	-- Vanilla Setmech can only set mech to true, not false.
+	BoardPawn.SetMechVanilla = pawn.SetMech
+	BoardPawn.SetMech = function(self, mech)
+		Assert.Equals("userdata", type(self), "Argument #0")
+		local memedit = modApi.memedit and modApi.memedit.calibrated
+
+		if mech == nil then
+			self:SetMechVanilla()
+			return
+		end
+
+		Assert.Equals("boolean", type(mech), "Argument #1")
+		Assert.Equals(true, memedit, "memedit not available")
+
+		try(function()
+			modApi.memedit.dll.pawn.setMech(self, mech)
+		end)
+		:catch(function(err)
+			error(string.format(
+					"memedit.dll: %s",
+					tostring(err)
+			))
+		end)
+	end
 
 
 	modApi.events.onPawnClassInitialized:dispatch(BoardPawn, pawn)
