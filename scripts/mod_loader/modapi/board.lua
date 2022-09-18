@@ -187,3 +187,31 @@ BoardClass.__ipairs = function(self, ...)
 		end
 	end
 end
+
+local boardClass = BoardClass
+local boardInitialized = false
+
+local function initializeBoardClass(board)
+	boardInitialized = true
+
+
+	-- Override existing Board class functions here
+
+
+	modApi.events.onBoardClassInitialized:dispatch(boardClass, board)
+	modApi.events.onBoardClassInitialized:unsubscribeAll()
+
+	boardClass = nil
+end
+
+local oldSetBoard = SetBoard
+function SetBoard(board)
+	if true
+		and board ~= nil
+		and boardInitialized == false
+	then
+		initializeBoardClass(board)
+	end
+
+	oldSetBoard(board)
+end

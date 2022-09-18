@@ -27,6 +27,10 @@ t.onInitialLoadingFinished = Event()
 t.onFtldatFinalized = Event()
 t.onModContentReset = Event()
 
+t.onBoardClassInitialized = Event()
+t.onPawnClassInitialized = Event()
+t.onGameClassInitialized = Event()
+
 t.onUiRootCreating = Event()
 t.onUiRootCreated = Event()
 t.onGameWindowResized = Event()
