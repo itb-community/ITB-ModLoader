@@ -587,65 +587,6 @@ local function buildButtons(buttonLayout)
 		}
 		:addTo(btnContainer)
 
-	-- local inspectObject = UiTextBox()
-		-- :width(1):heightpx(BUTTON.HEIGHT)
-		-- :clip()
-		-- :decorate{
-			-- DecoTextBox{
-				-- alignH = "center",
-				-- alignV = "center"
-			-- },
-			-- DecoBorder(),
-			-- DecoInvertedLabel("obj"),
-		-- }
-		-- :addTo(centerContainer)
-	-- inspectObject.onEnter = function(self)
-		-- local text = self.textfield:get(1, self.textfield:size())
-		-- local obj = _G[text]
-		-- if type(obj) == 'userdata' then
-			-- setRootNode{obj = obj, name = text}
-		-- end
-		-- self.textfield:delete(0, self.textfield:size())
-	-- end
-
-	-- local searchObject = UiTextBox()
-		-- :width(1):heightpx(BUTTON.HEIGHT)
-		-- :clip()
-		-- :decorate{
-			-- DecoTextBox{
-				-- alignH = "center",
-				-- alignV = "center"
-			-- },
-			-- DecoBorder(),
-			-- DecoInvertedLabel("search"),
-		-- }
-		-- :addTo(centerContainer)
-	-- searchObject.onEnter = function(self)
-		-- local text = self.textfield:get(1, self.textfield:size())
-		-- if not searchForValue(text) then
-			-- self.textfield:delete(0, self.textfield:size())
-		-- end
-	-- end
-
-	-- local objectSize = UiTextBox(string.format("0x%X", objectSize))
-		-- :width(1):heightpx(BUTTON.HEIGHT)
-		-- :clip()
-		-- :decorate{
-			-- DecoTextBox(),
-			-- DecoBorder(),
-			-- DecoInvertedLabel("size"),
-		-- }
-		-- :addTo(centerContainer)
-	-- objectSize.onEnter = function(self)
-		-- local text = self.textfield:get(1, self.textfield:size())
-		-- local size = tonumber(text)
-		-- if size == nil or size <= 0 then
-			-- self.textfield:delete(0, self.textfield:size())
-			-- return
-		-- end
-		-- setObjectSize(size)
-	-- end
-
 	function arrowLeft:onclicked(button)
 		if button ~= 1 then
 			return
