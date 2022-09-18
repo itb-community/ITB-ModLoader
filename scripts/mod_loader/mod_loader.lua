@@ -1,5 +1,6 @@
 mod_loader = {}
 
+local rootPath = GetParentPath(...)
 Logger = require("scripts/mod_loader/logger")
 local ScrollableLogger = require("scripts/mod_loader/logger_scrollable")
 
@@ -51,6 +52,9 @@ function mod_loader:init()
 	self.mods = {}
 	self.mod_list = {}
 	self.mod_options = {}
+	self.extensions = {}
+	self.inertExtensions = {
+	}
 
 	self.unmountedMods = {} -- mods which had malformed init.lua
 	self.firsterror = nil
@@ -362,6 +366,12 @@ function mod_loader:initMod(id, mod_options)
 		return
 	end
 
+	if mod.extensions then
+		for i, extension in ipairs(mod.extensions) do
+			mod_loader:initExtension(extension)
+		end
+	end
+
 	local ok, err = xpcall(
 		function()
 			LOGF("Initializing mod [%s] with id [%s]...", mod.name, id)
@@ -416,6 +426,22 @@ function mod_loader:initMetadata(id)
 			LOG(err)
 		end
 	end
+end
+
+function mod_loader:initExtension(extensionId)
+	local extensionPath = self.inertExtensions[extensionId]
+
+	if extensionPath then
+		self.inertExtensions[extensionId] = nil
+
+		LOGF("Initializing mod loader extension [%s]...", extensionId)
+		self.extensions[extensionId] = require(rootPath..extensionPath)
+		LOGF("Initialized mod loader extension [%s] successfully!", extensionId)
+	end
+end
+
+function mod_loader:hasExtension(extensionId)
+	return self.extensions[extensionId] ~= nil
 end
 
 function mod_loader:hasMod(id)
