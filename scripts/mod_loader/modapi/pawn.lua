@@ -1064,6 +1064,61 @@ local function initializeBoardPawn()
 	BoardPawn.GetPilotSkill = pawn.GetAbility
 
 
+	-- Board.SetSmoke has two parameter. Param #2 allows setting
+	-- smoke without an animation. Add this functionality to
+	-- Pawn.SetAcid.
+	BoardPawn.SetAcidVanilla = pawn.SetAcid
+	BoardPawn.SetAcid = function(self, acid, skipAnimation)
+		Assert.Equals("userdata", type(self), "Argument #0")
+		Assert.Equals("boolean", type(acid), "Argument #1")
+		Assert.Equals({"nil", "boolean"}, type(skipAnimation), "Argument #2")
+		local memedit = modApi.memedit and modApi.memedit.calibrated
+
+		if memedit and skipAnimation then
+			try(function()
+				modApi.memedit.dll.pawn.setAcid(self, acid)
+			end)
+			:catch(function(err)
+				error(string.format(
+						"memedit.dll: %s",
+						tostring(err)
+				))
+			end)
+
+			return
+		end
+
+		self:SetAcidVanilla(acid)
+	end
+
+
+	-- Board.SetSmoke has two parameter. Param #2 allows setting
+	-- smoke without an animation. Add this functionality to
+	-- Pawn.SetFrozen.
+	BoardPawn.SetFrozenVanilla = pawn.SetFrozen
+	BoardPawn.SetFrozen = function(self, frozen, skipAnimation)
+		Assert.Equals("userdata", type(self), "Argument #0")
+		Assert.Equals("boolean", type(frozen), "Argument #1")
+		Assert.Equals({"nil", "boolean"}, type(skipAnimation), "Argument #2")
+		local memedit = modApi.memedit and modApi.memedit.calibrated
+
+		if memedit and skipAnimation then
+			try(function()
+				modApi.memedit.dll.pawn.setFrozen(self, frozen)
+			end)
+			:catch(function(err)
+				error(string.format(
+						"memedit.dll: %s",
+						tostring(err)
+				))
+			end)
+
+			return
+		end
+
+		self:SetFrozenVanilla(frozen)
+	end
+
 	-- Vanilla IsJumping checks if the unit type definition
 	-- has Jumper == true, instead of checking the class instance.
 	BoardPawn.IsJumperVanilla = pawn.IsJumper
@@ -1088,6 +1143,33 @@ local function initializeBoardPawn()
 		end)
 
 		return result
+	end
+
+	-- Board.SetSmoke has two parameter. Param #2 allows setting
+	-- smoke without an animation. Add this functionality to
+	-- Pawn.SetShield.
+	BoardPawn.SetShieldVanilla = pawn.SetShield
+	BoardPawn.SetShield = function(self, shield, skipAnimation)
+		Assert.Equals("userdata", type(self), "Argument #0")
+		Assert.Equals("boolean", type(shield), "Argument #1")
+		Assert.Equals({"nil", "boolean"}, type(skipAnimation), "Argument #2")
+		local memedit = modApi.memedit and modApi.memedit.calibrated
+
+		if memedit and skipAnimation then
+			try(function()
+				modApi.memedit.dll.pawn.setShield(self, shield)
+			end)
+			:catch(function(err)
+				error(string.format(
+						"memedit.dll: %s",
+						tostring(err)
+				))
+			end)
+
+			return
+		end
+
+		self:SetShieldVanilla(shield)
 	end
 
 	-- Vanilla IsTeleporter checks if the unit type definition
