@@ -7,6 +7,43 @@ function Tests.RequireBoard()
 	assert(Board ~= nil, "Error: this test requires a Board to be available" .. "\n" .. debug.traceback("", 2))
 end
 
+function Tests.RequireMemEdit()
+	assert(modApi.memedit ~= nil and modApi.memedit.calibrated ~= nil, "Error: this test requires memedit.dll to be available" .. "\n" .. debug.traceback("", 2))
+end
+
+function Tests.GetCleanTile()
+	local tiles = randomize(extract_table(Board:GetTiles()))
+
+	for i, p in ipairs(tiles) do
+		if not Board:IsPawnSpace(p) then
+			Board:ClearSpace(p)
+			return p
+		end
+	end
+
+	error("Error: no non-pawn tile available")
+end
+
+function Tests.GetNonUniqueBuildingTile()
+	local tiles = randomize(extract_table(Board:GetTiles()))
+
+	for i, p in ipairs(tiles) do
+		if not Board:IsPawnSpace(p) then
+			local terrain = Board:GetTerrain(p)
+			Board:SetTerrain(p, TERRAIN_BUILDING)
+			local isUniqueBuilding = Board:IsUniqueBuilding(p)
+			Board:SetTerrain(p, terrain)
+
+			if not isUniqueBuilding then
+				Board:ClearSpace(p)
+				return p
+			end
+		end
+	end
+
+	error("Error: no non-pawn, non-unique-building tile available")
+end
+
 function Tests.ExecuteWhenCondition(resultTable, executeFn, conditionFn)
 	Assert.Equals("table", type(resultTable), "Argument #1")
 	Assert.Equals("function", type(executeFn), "Argument #2")

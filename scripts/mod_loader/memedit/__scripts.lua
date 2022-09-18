@@ -1,6 +1,7 @@
 local scripts = {
 	"dummy",
 	"memedit",
+	"tests",
 }
 
 local rootpath = GetParentPath(...)
