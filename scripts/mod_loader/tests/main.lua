@@ -21,3 +21,6 @@ Testsuites.modApi = require(rootpath.."modApi")
 Testsuites.vector = require(rootpath.."vector")
 Testsuites.text = require(rootpath.."text")
 Testsuites.deque = require(rootpath.."deque")
+
+modApi.events.onTestsuitesCreated:dispatch()
+modApi.events.onTestsuitesCreated:unsubscribeAll()

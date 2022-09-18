@@ -26,6 +26,7 @@ t.onModsFirstLoaded = Event()
 t.onInitialLoadingFinished = Event()
 t.onFtldatFinalized = Event()
 t.onModContentReset = Event()
+t.onTestsuitesCreated = Event()
 
 t.onBoardClassInitialized = Event()
 t.onPawnClassInitialized = Event()
