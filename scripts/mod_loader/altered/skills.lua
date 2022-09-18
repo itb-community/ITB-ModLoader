@@ -157,10 +157,12 @@ end
 
 modApi.events.onFrameDrawStart:subscribe(function()
 	if tipSkillLast and tipSkillCurrent ~= tipSkillLast then
+		TipImageBoard = nil
 		modApi:fireTipImageHiddenHooks(tipSkillLast)
 	end
 
 	if tipSkillCurrent and tipSkillCurrent ~= tipSkillLast then
+		TipImageBoard = LastTipImageBoard
 		modApi:fireTipImageShownHooks(tipSkillCurrent)
 	end
 
