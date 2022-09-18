@@ -91,6 +91,74 @@ scans.frozen = inheritClass(Scan, {
 	},
 })
 
+scans.health = inheritClass(Scan, {
+	id = "Health",
+	questName = "Health",
+	questHelp = "Wait",
+	prerequisiteScans = tilePreRequisites,
+	access = "RW",
+	dataType = "int",
+	condition = boardExists,
+	actions = {
+		function(self)
+			local p = randomNonUniqueBuildingPoint()
+			local health = math.random(1,3)
+			Board:SetTerrain(p, TERRAIN_BUILDING)
+			Board:SetHealth(p, health, 4)
+			self:searchTile(p, health)
+			self:evaluateResults()
+			Board:SetTerrain(p, TERRAIN_ROAD)
+		end
+	},
+})
+
+scans.maxHealth = inheritClass(Scan, {
+	id = "MaxHealth",
+	questName = "Max Health",
+	questHelp = "Wait",
+	prerequisiteScans = tilePreRequisites,
+	access = "RW",
+	dataType = "int",
+	condition = boardExists,
+	actions = {
+		function(self)
+			local p = randomNonUniqueBuildingPoint()
+			local maxHealth = math.random(2,4)
+			Board:SetTerrain(p, TERRAIN_BUILDING)
+			Board:SetHealth(p, 1, maxHealth)
+			self:searchTile(p, maxHealth)
+			self:evaluateResults()
+			Board:SetTerrain(p, TERRAIN_ROAD)
+		end
+	},
+})
+
+scans.rubbleType = inheritClass(Scan, {
+	id = "RubbleType",
+	questName = "Rubble Type",
+	questHelp = "Wait",
+	prerequisiteScans = tilePreRequisites,
+	access = "RW",
+	dataType = "byte",
+	condition = boardExists,
+	actions = {
+		function(self)
+			local p = randomNonUniqueBuildingPoint()
+			local rubbleType = math.random(0,1)
+			if rubbleType == 0 then
+				Board:SetTerrain(p, TERRAIN_BUILDING)
+				Board:SetTerrain(p, TERRAIN_RUBBLE)
+			else
+				Board:SetTerrain(p, TERRAIN_MOUNTAIN)
+				Board:SetTerrain(p, TERRAIN_RUBBLE)
+			end
+			self:searchTile(p, rubbleType)
+			self:evaluateResults()
+			Board:ClearSpace(p)
+		end
+	},
+})
+
 scans.shield = inheritClass(Scan, {
 	id = "Shield",
 	questName = "Tile Shield",
@@ -132,26 +200,6 @@ scans.smoke = inheritClass(Scan, {
 	},
 })
 
-scans.terrainIcon = inheritClass(Scan, {
-	id = "TerrainIcon",
-	questName = "Terrain Icon",
-	questHelp = "Wait",
-	prerequisiteScans = tilePreRequisites,
-	access = "RW",
-	dataType = "string",
-	condition = boardExists,
-	actions = {
-		function(self)
-			local p = randomCleanPoint()
-			local terrainIcon = "testIcon"
-			Board:SetTerrainIcon(p, terrainIcon)
-			self:searchTile(p, terrainIcon)
-			self:evaluateResults()
-			Board:SetTerrainIcon(p, "")
-		end
-	},
-})
-
 scans.terrain = inheritClass(Scan, {
 	id = "Terrain",
 	questName = "Terrain",
@@ -172,70 +220,22 @@ scans.terrain = inheritClass(Scan, {
 	},
 })
 
-scans.rubbleType = inheritClass(Scan, {
-	id = "RubbleType",
-	questName = "Rubble Type",
+scans.terrainIcon = inheritClass(Scan, {
+	id = "TerrainIcon",
+	questName = "Terrain Icon",
 	questHelp = "Wait",
 	prerequisiteScans = tilePreRequisites,
 	access = "RW",
-	dataType = "byte",
+	dataType = "string",
 	condition = boardExists,
 	actions = {
 		function(self)
-			local p = randomNonUniqueBuildingPoint()
-			local rubbleType = math.random(0,1)
-			if rubbleType == 0 then
-				Board:SetTerrain(p, TERRAIN_BUILDING)
-				Board:SetTerrain(p, TERRAIN_RUBBLE)
-			else
-				Board:SetTerrain(p, TERRAIN_MOUNTAIN)
-				Board:SetTerrain(p, TERRAIN_RUBBLE)
-			end
-			self:searchTile(p, rubbleType)
+			local p = randomCleanPoint()
+			local terrainIcon = "testIcon"
+			Board:SetTerrainIcon(p, terrainIcon)
+			self:searchTile(p, terrainIcon)
 			self:evaluateResults()
-			Board:ClearSpace(p)
-		end
-	},
-})
-
-scans.health = inheritClass(Scan, {
-	id = "Health",
-	questName = "Health",
-	questHelp = "Wait",
-	prerequisiteScans = tilePreRequisites,
-	access = "RW",
-	dataType = "int",
-	condition = boardExists,
-	actions = {
-		function(self)
-			local p = randomNonUniqueBuildingPoint()
-			local health = math.random(1,3)
-			Board:SetTerrain(p, TERRAIN_BUILDING)
-			Board:SetHealth(p, health, 4)
-			self:searchTile(p, health)
-			self:evaluateResults()
-			Board:SetTerrain(p, TERRAIN_ROAD)
-		end
-	},
-})
-
-scans.maxHealth = inheritClass(Scan, {
-	id = "MaxHealth",
-	questName = "Max Health",
-	questHelp = "Wait",
-	prerequisiteScans = tilePreRequisites,
-	access = "RW",
-	dataType = "int",
-	condition = boardExists,
-	actions = {
-		function(self)
-			local p = randomNonUniqueBuildingPoint()
-			local maxHealth = math.random(2,4)
-			Board:SetTerrain(p, TERRAIN_BUILDING)
-			Board:SetHealth(p, 1, maxHealth)
-			self:searchTile(p, maxHealth)
-			self:evaluateResults()
-			Board:SetTerrain(p, TERRAIN_ROAD)
+			Board:SetTerrainIcon(p, "")
 		end
 	},
 })
