@@ -27,6 +27,7 @@ local scripts = {
 	"achievements",
 	"achievements_squads",
 	"toast",
+	"meminspect",
 
 	"modcontent_entries",
 }

@@ -226,6 +226,14 @@ return {
 	["TestingConsole_FailSummary_FrameTitle"] = "Failure Summary",
 	["TestingConsole_FailSummary_Tooltip"] = "This test has failed. Click to bring up a detailed summary.",
 
+	["MemInspect_General_Text"] = "Inspect",
+	["MemInspect_Board_Title"] = "Inspect Board",
+	["MemInspect_Board_Text"] = "Inspect Board memory",
+	["MemInspect_Board_Tooltip"] = "Opens up the memory of Board for inspection",
+	["MemInspect_Pawn_Title"] = "Inspect Pawn",
+	["MemInspect_Pawn_Text"] = "Inspect %s memory",
+	["MemInspect_Pawn_Tooltip"] = "Opens up the memory of selected Pawn for inspection",
+
 	["Palette_Name_Rift_Walkers"] = "Rift Walkers Olive",
 	["Palette_Name_Rusting_Hulks"] = "Rusting Hulks Amber",
 	["Palette_Name_Zenith_Guard"] = "Zenith Guard Blue",
