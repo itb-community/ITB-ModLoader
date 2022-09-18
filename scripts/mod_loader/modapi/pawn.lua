@@ -67,6 +67,25 @@ BoardPawn.ClearUndoMove = function(self)
 	)
 end
 
+BoardPawn.IsNeutral = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals(true, mod_loader:hasExtension("memedit"), "memedit not available")
+
+	local result = false
+
+	try(function()
+		result = modApi.memedit.dll.pawn.isNeutral(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
 -- checks if the pawn receives psion effects
 BoardPawn.CanMutate = function(self, targetPlayer)
 	Assert.Equals("userdata", type(self), "Argument #0")
