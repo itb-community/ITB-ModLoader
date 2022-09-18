@@ -54,6 +54,7 @@ function mod_loader:init()
 	self.mod_options = {}
 	self.extensions = {}
 	self.inertExtensions = {
+		memedit = "memedit/__scripts",
 	}
 
 	self.unmountedMods = {} -- mods which had malformed init.lua
