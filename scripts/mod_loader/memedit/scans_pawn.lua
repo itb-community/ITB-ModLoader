@@ -194,7 +194,7 @@ scans.customAnim = inheritClass(Scan, {
 })
 
 scans.defaultfaction = inheritClass(Scan, {
-	id = "Leader",
+	id = "DefaultFaction",
 	questName = "Pawn Default Faction",
 	questHelp = "Wait",
 	prerequisiteScans = {"vital.size_pawn"},
