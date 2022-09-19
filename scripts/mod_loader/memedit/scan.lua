@@ -72,12 +72,14 @@ local Scan = newClass{
 		self.result = result
 		self.failed = false
 		self.completed = true
+		self:reset()
 	end,
 
 	fail = function(self)
 		self.result = nil
 		self.failed = true
 		self.completed = true
+		self:reset()
 	end,
 
 	getResultString = function(self, logLevel)
