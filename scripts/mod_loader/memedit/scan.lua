@@ -40,8 +40,8 @@ local Scan = newClass{
 	-- The datatype of the address we are scanning for.
 	dataType = "int",
 
-	-- The number of iterations this scan has been running for.
-	iterations = 0,
+	-- The current iteration of this scan.
+	iteration = 0,
 
 	-- For some addresses, there will be multiple hits that fits the criteria
 	-- Define how many results we expect, and which of the results we select.

@@ -177,6 +177,7 @@ function Scanner:start()
 			self:cleanupLastScan()
 			self.currentScan = scan
 			self.iteration = 0
+			scan.iteration = 0
 
 			if scan then
 				self.onScanStarted:dispatch(scan)
@@ -197,7 +198,7 @@ function Scanner:start()
 
 				LOGF(
 					"Memory Scanner - %s - %s - #iteration: %s - #results: %s",
-					scan.fullId, action, self.iteration, results
+					scan.fullId, action, scan.iteration, results
 				)
 			end
 
@@ -213,6 +214,7 @@ function Scanner:start()
 				local ok, issue = scan:condition()
 				if ok then
 					scan.issue = nil
+					scan.iteration = scan.iteration + 1
 					scan:action()
 				else
 					scan.issue = issue
