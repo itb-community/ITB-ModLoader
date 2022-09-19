@@ -8,7 +8,7 @@ Scanner.scandefs = {
 	vital = require("scripts/mod_loader/memedit/scans_vital"),
 	pawn = require("scripts/mod_loader/memedit/scans_pawn"),
 	-- weapon = require("scripts/mod_loader/memedit/scans_weapon"),
-	-- board = require("scripts/mod_loader/memedit/scans_board"),
+	board = require("scripts/mod_loader/memedit/scans_board"),
 	tile = require("scripts/mod_loader/memedit/scans_tile"),
 	-- game = require("scripts/mod_loader/memedit/scans_game"),
 }
