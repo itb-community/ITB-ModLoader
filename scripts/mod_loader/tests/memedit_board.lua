@@ -12,8 +12,8 @@ testsuite.test_tile_acid = function()
 	Assert.Equals(true, isAcid)
 
 	Board:SetAcid(p, false)
-	local isNotAcid = modApi.memedit.dll.board.isAcid(p)
-	Assert.Equals(false, isNotAcid)
+	local isNotAcid = not modApi.memedit.dll.board.isAcid(p)
+	Assert.Equals(true, isNotAcid)
 
 	return true
 end
@@ -29,69 +29,23 @@ testsuite.test_tile_frozen = function()
 	Assert.Equals(true, isFrozen)
 
 	Board:SetFrozen(p, false)
-	local isNotFrozen = modApi.memedit.dll.board.isFrozen(p)
-	Assert.Equals(false, isNotFrozen)
+	local isNotFrozen = not modApi.memedit.dll.board.isFrozen(p)
+	Assert.Equals(true, isNotFrozen)
 
 	return true
 end
 
-testsuite.test_tile_shield = function()
+testsuite.test_tile_health = function()
 	Tests.RequireBoard()
 	Tests.RequireMemEdit()
-	local p = Tests.GetCleanTile()
-	Board:SetTerrain(p, TERRAIN_MOUNTAIN)
+	local p = Tests.GetNonUniqueBuildingTile()
 
-	Board:SetShield(p, true)
-	local isShield = modApi.memedit.dll.board.isShield(p)
-	Assert.Equals(true, isShield)
-
-	Board:SetShield(p, false)
-	local isNotShield = modApi.memedit.dll.board.isShield(p)
-	Assert.Equals(false, isNotShield)
-
-	return true
-end
-
-testsuite.test_tile_smoke = function()
-	Tests.RequireBoard()
-	Tests.RequireMemEdit()
-	local p = Tests.GetCleanTile()
-
-	Board:SetSmoke(p, true, true)
-	local isSmoke = modApi.memedit.dll.board.isSmoke(p)
-	Assert.Equals(true, isSmoke)
-
-	Board:SetSmoke(p, false, true)
-	local isNotSmoke = modApi.memedit.dll.board.isSmoke(p)
-	Assert.Equals(false, isNotSmoke)
-
-	return true
-end
-
-testsuite.test_tile_terrainIcon = function()
-	Tests.RequireBoard()
-	Tests.RequireMemEdit()
-	local p = Tests.GetCleanTile()
-
-	Board:SetTerrainIcon(p, "testTerrainIcon")
-	local terrainIcon = modApi.memedit.dll.board.getTerrainIcon(p)
-	Assert.Equals("testTerrainIcon", terrainIcon)
-
-	Board:SetTerrainIcon(p, "")
-	local terrainIcon = modApi.memedit.dll.board.getTerrainIcon(p)
-	Assert.Equals("", terrainIcon)
-
-	return true
-end
-
-testsuite.test_tile_terrain = function()
-	Tests.RequireBoard()
-	Tests.RequireMemEdit()
-	local p = Tests.GetCleanTile()
-
-	Board:SetTerrain(p, TERRAIN_MOUNTAIN)
-	local terrain = modApi.memedit.dll.board.getTerrain(p)
-	Assert.Equals(TERRAIN_MOUNTAIN, terrain)
+	Board:SetTerrain(p, TERRAIN_BUILDING)
+	Board:SetHealth(p, 3,4)
+	local health = modApi.memedit.dll.board.getHealth(p)
+	local maxHealth = modApi.memedit.dll.board.getMaxHealth(p)
+	Assert.Equals(3, health)
+	Assert.Equals(4, maxHealth)
 
 	Board:ClearSpace(p)
 	return true
@@ -116,19 +70,65 @@ testsuite.test_tile_rubbleType = function()
 	return true
 end
 
-testsuite.test_tile_health = function()
+testsuite.test_tile_shield = function()
 	Tests.RequireBoard()
 	Tests.RequireMemEdit()
-	local p = Tests.GetNonUniqueBuildingTile()
+	local p = Tests.GetCleanTile()
+	Board:SetTerrain(p, TERRAIN_MOUNTAIN)
 
-	Board:SetTerrain(p, TERRAIN_BUILDING)
-	Board:SetHealth(p, 3,4)
-	local health = modApi.memedit.dll.board.getHealth(p)
-	local maxHealth = modApi.memedit.dll.board.getMaxHealth(p)
-	Assert.Equals(3, health)
-	Assert.Equals(4, maxHealth)
+	Board:SetShield(p, true)
+	local isShield = modApi.memedit.dll.board.isShield(p)
+	Assert.Equals(true, isShield)
+
+	Board:SetShield(p, false)
+	local isNotShield = not modApi.memedit.dll.board.isShield(p)
+	Assert.Equals(true, isNotShield)
+
+	return true
+end
+
+testsuite.test_tile_smoke = function()
+	Tests.RequireBoard()
+	Tests.RequireMemEdit()
+	local p = Tests.GetCleanTile()
+
+	Board:SetSmoke(p, true, true)
+	local isSmoke = modApi.memedit.dll.board.isSmoke(p)
+	Assert.Equals(true, isSmoke)
+
+	Board:SetSmoke(p, false, true)
+	local isNotSmoke = not modApi.memedit.dll.board.isSmoke(p)
+	Assert.Equals(true, isNotSmoke)
+
+	return true
+end
+
+testsuite.test_tile_terrain = function()
+	Tests.RequireBoard()
+	Tests.RequireMemEdit()
+	local p = Tests.GetCleanTile()
+
+	Board:SetTerrain(p, TERRAIN_MOUNTAIN)
+	local terrain = modApi.memedit.dll.board.getTerrain(p)
+	Assert.Equals(TERRAIN_MOUNTAIN, terrain)
 
 	Board:ClearSpace(p)
+	return true
+end
+
+testsuite.test_tile_terrainIcon = function()
+	Tests.RequireBoard()
+	Tests.RequireMemEdit()
+	local p = Tests.GetCleanTile()
+
+	Board:SetTerrainIcon(p, "testTerrainIcon")
+	local terrainIcon = modApi.memedit.dll.board.getTerrainIcon(p)
+	Assert.Equals("testTerrainIcon", terrainIcon)
+
+	Board:SetTerrainIcon(p, "")
+	local terrainIcon = modApi.memedit.dll.board.getTerrainIcon(p)
+	Assert.Equals("", terrainIcon)
+
 	return true
 end
 
