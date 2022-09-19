@@ -170,6 +170,22 @@ local Scan = newClass{
 		self:search(pawn, 0, vital.size_pawn, val, dataType)
 	end,
 
+	searchBoard = function(self, val, dataType)
+		local dll = modApi.memedit.dll
+		local vital = self.scanner.output.vital
+
+		if false
+			or Board == nil
+			or vital.size_board == nil
+		then
+			return
+		end
+
+		local boardAddr = dll.debug.getObjAddr(Board)
+
+		self:search(boardAddr, 0, vital.size_board, val, dataType)
+	end,
+
 	searchTile = function(self, p, val, dataType)
 		local dll = modApi.memedit.dll
 		local vital = self.scanner.output.vital
