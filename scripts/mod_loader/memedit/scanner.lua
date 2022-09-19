@@ -32,8 +32,8 @@ function Scanner:new()
 	self.status = self.STATUS_STOPPED
 	self.output = {}
 	self.logLevel = 0
-	self.logScanFirstPrompt = 10 -- 1/6 seconds
-	self.logScanIterationInterval = 150 -- 2.5 seconds
+	self.logoutFirstPrompt = 10 -- 1/6 seconds
+	self.logoutIterationInterval = 150 -- 2.5 seconds
 	self.iteratingFunction = nil
 
 	-- Events for the scanner.
@@ -176,7 +176,7 @@ function Scanner:start()
 		if scan ~= self.lastScan then
 			self:cleanupLastScan()
 			self.currentScan = scan
-			self.currentScanIterations = 0
+			self.iteration = 0
 
 			if scan then
 				self.onScanStarted:dispatch(scan)
@@ -186,18 +186,18 @@ function Scanner:start()
 		self.lastScan = scan
 
 		if scan then
-			self.currentScanIterations = self.currentScanIterations + 1
+			self.iteration = self.iteration + 1
 
 			if
-				(self.currentScanIterations - self.logScanFirstPrompt)
-				% self.logScanIterationInterval == 0
+				(self.iteration - self.logoutFirstPrompt)
+				% self.logoutIterationInterval == 0
 			then
 				local action = scan.issue or "scanning..."
 				local results = scan.results and #scan.results or "N/A"
 
 				LOGF(
 					"Memory Scanner - %s - %s - #iteration: %s - #results: %s",
-					scan.fullId, action, self.currentScanIterations, results
+					scan.fullId, action, self.iteration, results
 				)
 			end
 
