@@ -261,22 +261,6 @@ testsuite.test_Pawn_Frozen = function()
 	return true
 end
 
--- testsuite.test_Pawn_Id = function()
-	-- local memedit = getMemedit()
-
-	-- if memedit then
-		-- local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
-
-		-- pawn:SetId(999)
-		-- Assert.Equals(999, pawn:GetId())
-	-- else
-		-- local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
-		-- Assert.ShouldError(pawn.SetId, {pawn, 999}, "Function should fail without memedit")
-	-- end
-
-	-- return true
--- end
-
 testsuite.test_Pawn_ImageOffset = function()
 	local memedit = getMemedit()
 

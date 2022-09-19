@@ -286,23 +286,6 @@ scans.frozen = inheritClass(Scan, {
 	end
 })
 
-scans.id = inheritClass(Scan, {
-	id = "Id",
-	questName = "Pawn Id",
-	questHelp = "Wait",
-	prerequisiteScans = {"vital.size_pawn"},
-	expectedResults = 2,
-	expectedResultIndex = 1,
-	access = "RW",
-	dataType = "int",
-	action = function(self)
-		local pawn = PAWN_FACTORY:CreatePawn("ScanPawn")
-
-		self:searchPawn(pawn, pawn:GetId())
-		self:evaluateResults()
-	end
-})
-
 scans.imageOffset = inheritClass(Scan, {
 	id = "ImageOffset",
 	questName = "Pawn Image Offset",
