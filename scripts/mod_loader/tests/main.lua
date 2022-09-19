@@ -14,6 +14,7 @@ Testsuites = Tests.Testsuite()
 Testsuites.name = "Root Testsuite"
 
 Testsuites.pawn = require(rootpath.."pawn")
+Testsuites.board = require(rootpath.."board")
 Testsuites.sandbox = require(rootpath.."sandbox")
 Testsuites.classes = require(rootpath.."classes")
 Testsuites.event = require(rootpath.."event")
