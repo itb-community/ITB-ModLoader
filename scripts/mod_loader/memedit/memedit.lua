@@ -4,12 +4,10 @@ local Scanner = require("scripts/mod_loader/memedit/scanner")
 modApi.memedit = {
 	initialized = false,
 	dll = nil,
-	addresses = nil,
 	scanner = Scanner(),
 	calibrated = false,
 	calibrating = false,
 	onCalibrateStart = Event(),
-	onCalibrateUpdate = Event(),
 	onCalibrateFinished = Event(),
 }
 
@@ -20,71 +18,64 @@ function modApi.memedit:isDebug()
 end
 
 function modApi.memedit:unload()
+	LOG("Memedit - Unloading memedit.dll!")
+	self.calibrated = false
 	self.dll = nil
 end
 
 function modApi.memedit:load(options)
+	self.calibrated = false
 	options = options or {}
 
-	local function loadSilent()
-		package.loadlib("memedit.dll", "luaopen_memedit")(options)
-		self.dll = memedit
-		memedit = nil
+	if not options.silent then
+		if options.debug then
+			LOGF("Memedit - Loading memedit.dll in debug mode...")
+		else
+			LOGF("Memedit - Loading memedit.dll...")
+		end
 	end
 
-	local function load()
-		local inDebugMode = options.debug
-			and " in debug mode"
-			or ""
-
-		LOGF("Memedit - Loading memedit.dll%s...", inDebugMode)
-		loadSilent()
-		LOG("Memedit - Successfully loaded memedit.dll!")
-	end
-
-	if options.silent then
-		load = loadSilent
-	end
-
-	try(load)
-	:catch(function(err)
-		error(string.format(
-				"Memdit - Failed to load memedit.dll: %s",
-				tostring(err)
-		))
-	end)
-end
-
-function modApi.memedit:verifyAndLoad(options)
-	LOG("Memedit - Verifying and loading...")
-	local ok = true
-
+	local complete = true
 	for scanType, scandefs in pairs(self.scanner.scandefs) do
 		local addresses = options[scanType]
 
 		if type(addresses) == 'table' then
 			for _, scandef in pairs(scandefs) do
 				if addresses[scandef.id] == nil then
-					ok = false
+					complete = false
 					break
 				end
 			end
 		else
-			ok = false
+			complete = false
 		end
 
-		if not ok then
+		if not complete then
 			break
 		end
 	end
 
-	if ok then
-		LOG("Memedit - Verified!")
-		self.calibrated = true
-		self:load(options)
-	else
-		LOG("Memedit - Failed to load - Calibration incomplete")
-		self.calibrated = false
+	try(function()
+		package.loadlib("memedit.dll", "luaopen_memedit")(options)
+		self.dll = memedit
+		memedit = nil
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Memdit - Failed to load memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	self.calibrated = complete
+	if not options.silent then
+		if options.debug then
+			LOG("Memedit - Successfully loaded memedit.dll in debug mode!")
+		elseif complete then
+			LOG("Memedit - Successfully loaded fully calibrated memedit.dll!")
+		else
+			LOG("Memedit - Successfully loaded uncalibrated memedit.dll!")
+		end
 	end
 end
 
@@ -136,27 +127,33 @@ end
 function modApi.memedit:recalibrate()
 	if self.calibrating then return end
 
-	self.calibrated = false
+	LOG("Memedit - Calibration started - Follow the instructions to complete the process...")
+	self:unload()
 	self.calibrating = true
 
-	LOG("Memedit - Calibration started - Follow the instructions to complete the process...")
 	self.scanner:restart()
 	self.scanner.onFinishedSuccessfully:subscribe(function(addressLists)
 		self.calibrating = false
 
-		LOG("Memedit - Storing results to file...")
-		self:saveAddressesToFile(addressLists)
-		LOG("Memedit - Results saved!")
+		self:load(addressLists)
 
-		self:verifyAndLoad(addressLists)
+		if self.calibrated then
+			LOG("Memedit - Calibration finished successfully!")
+			LOG("Memedit - Storing results to file...")
+			self:saveAddressesToFile(addressLists)
+			LOG("Memedit - Results saved!")
+		else
+			LOG("Memedit - Calibration ended with incomplete results!")
+			LOG("Memedit - Discarding results!")
+		end
 
-		LOG("Memedit - Calibration successful!")
+		self.onCalibrateFinished:dispatch(self.calibrated)
 	end)
 
 	self.scanner.onFinishedUnsuccessfully:subscribe(function()
 		self.calibrating = false
-
-		LOG("Memedit - Caibration failed!")
+		LOG("Memedit - Caibration ended in failure!")
+		self.onCalibrateFinished:dispatch(self.calibrated)
 	end)
 
 	self.onCalibrateStart:dispatch()
@@ -164,17 +161,17 @@ end
 
 function modApi.memedit:init()
 	if self.initialized then return end
+	self.initialized = true
 
 	LOG("Memedit - Initializing...")
-	local options = self:loadAddressesFromFile()
+	local addressLists = self:loadAddressesFromFile()
+	self:load(addressLists)
 
-	if options then
-		self:verifyAndLoad(options)
+	if self.calibrated then
+		LOG("Memedit - Initialized successfully!")
 	else
-		LOG("Memedit - Failed to load - Calibration incomplete.")
+		LOG("Memedit - Initialization incomplete - Calibration required!")
 	end
-
-	LOG("Memedit - Initialization complete!")
 end
 
 modApi.memedit:init()
