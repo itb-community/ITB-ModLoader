@@ -217,16 +217,6 @@ local Scan = newClass{
 		elseif #self.results == self.expectedResults then
 			table.sort(self.results, function(a,b) return a < b end)
 			self:succeed(self.results[self.expectedResultIndex])
-		-- elseif self.scanner.logLevel >= 1 then
-			-- local details = ""
-
-			-- if self.scanner.logLevel >= 2 and #self.results < 5 then
-				-- details = " - "..table.concat(self.results, ", ")
-							-- :gsub("%x+", function(s) return string.format("0x%x", s) end)
-			-- end
-
-			-- LOGF("Memory Scanner - Evaluate %s - #results = %s%s",
-				-- self.objType.."."..self.id, #self.results, details)
 		end
 	end,
 }
