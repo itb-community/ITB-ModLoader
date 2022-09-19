@@ -979,6 +979,23 @@ BoardPawn.SetPushable = function(self, pushable)
 	end)
 end
 
+BoardPawn.SetQueuedTarget = function(self, loc)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.TypePoint(loc, "Argument #1")
+
+	try(function()
+		local memedit = requireMemedit()
+		memedit.pawn.setQueuedTargetX(self, loc.x)
+		memedit.pawn.setQueuedTargetY(self, loc.y)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
 BoardPawn.SetSpaceColor = function(self, spaceColor)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	Assert.Equals("boolean", type(spaceColor), "Argument #1")
