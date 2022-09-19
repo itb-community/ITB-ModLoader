@@ -5,7 +5,8 @@ local scripts = {
 	"classes",
 	"event",
 	"modApi",
-	"constants"
+	"constants",
+	"binarySearch",
 }
 
 local rootpath = GetParentPath(...)

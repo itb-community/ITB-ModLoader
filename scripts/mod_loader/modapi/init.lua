@@ -15,7 +15,7 @@ function modApi:init()
 	-- if we start logging before we apply the config, we may not update the log file correctly
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
-	self.version = "2.7.2"
+	self.version = "2.7.3"
 	LOG("GAME VERSION", self:getGameVersion())
 	LOG("MOD-API VERSION", self.version)
 	LOGD("Parent directory:", parentDirectory)
