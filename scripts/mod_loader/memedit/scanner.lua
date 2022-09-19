@@ -260,6 +260,9 @@ function Scanner:stop()
 		self.onFinishedUnsuccessfully:dispatch()
 	end
 
+	self.onFinishedSuccessfully:unsubscribeAll()
+	self.onFinishedUnsuccessfully:unsubscribeAll()
+
 	return self
 end
 
