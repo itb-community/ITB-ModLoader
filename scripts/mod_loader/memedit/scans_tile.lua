@@ -8,6 +8,7 @@ local cleanPoint = utils.cleanPoint
 local randomCleanPoint = utils.randomCleanPoint
 local nonUniqueBuildingPoint = utils.nonUniqueBuildingPoint
 local randomNonUniqueBuildingPoint = utils.randomNonUniqueBuildingPoint
+local requireScanMovePawn = utils.requireScanMovePawn
 local scans = {}
 
 
@@ -110,6 +111,45 @@ scans.health = inheritClass(Scan, {
 			Board:SetTerrain(p, TERRAIN_ROAD)
 		end
 	},
+})
+
+scans.highlighted = inheritClass(Scan, {
+	id = "Highlighted",
+	questName = "Tile Highlighted",
+	questHelp = "Wait",
+	prerequisiteScans = tilePreRequisites,
+	access = "R",
+	dataType = "bool",
+	condition = boardExists,
+	cleanup = function(self)
+		if ScanMove.Caller == self then
+			ScanMove:TeardownEvent()
+		end
+	end,
+	actions = {
+		function(self)
+			requireScanMovePawn()
+
+			if self.iteration == 1 then
+				ScanMove:RegisterEvent{
+					Event = self.onMoveHighlighted,
+					Caller = self,
+				}
+			end
+
+			self.issue = "Hover tiles with the provided ScanPawn's Move skill"
+		end
+	},
+	onMoveHighlighted = function(self, p2)
+		for i,p in ipairs(Board) do
+			if p == p2 then
+				self:searchTile(p, true, "bool")
+			else
+				self:searchTile(p, false, "bool")
+			end
+			self:evaluateResults()
+		end
+	end,
 })
 
 scans.maxHealth = inheritClass(Scan, {
