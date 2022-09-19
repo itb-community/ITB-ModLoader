@@ -378,10 +378,9 @@ local function initializeBoardClass(board)
 		local memedit = getMemEdit()
 		if memedit and skipAnimation then
 			try(function()
-				local board = modApi.memedit.dll.board
-				local terrain = board.getTerrain(loc)
+				local terrain = memedit.board.getTerrain(loc)
 				local customTile = self:GetCustomTile(loc)
-				local fireType = board.getFireType(loc)
+				local fireType = memedit.board.getFireType(loc)
 				local isFreezableTerrain = false
 					or terrain == TERRAIN_MOUNTAIN
 					or terrain == TERRAIN_BUILDING
@@ -392,12 +391,12 @@ local function initializeBoardClass(board)
 					end
 
 					if fireType ~= FIRE_TYPE_NONE then
-						board.setFireType(loc, FIRE_TYPE_NONE)
+						memedit.board.setFireType(loc, FIRE_TYPE_NONE)
 					end
 				end
 
 				if isFreezableTerrain then
-					board.setFrozen(loc, frozen)
+					memedit.board.setFrozen(loc, frozen)
 				else
 					local pawn = self:GetPawn(loc)
 					if pawn then
