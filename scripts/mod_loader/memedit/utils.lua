@@ -150,4 +150,43 @@ function utils.removePawns(team)
 	end
 end
 
+local scanMovePawn
+local scanMovePawnId
+function utils.requireScanMovePawn()
+
+	if false
+		or scanMovePawnId == nil
+		or Board:GetPawn(scanMovePawnId) == nil
+	then
+		utils.prepareScanPawn{
+			Name = "ScanPawn",
+			Image = "MechPunch",
+			MoveSpeed = 99,
+			Health = 9,
+			MoveSkill = "ScanMove",
+			DefaultTeam = TEAM_PLAYER,
+			SkillList = {"ScanWeapon"},
+		}
+		scanMovePawn = PAWN_FACTORY:CreatePawn("ScanPawn")
+		scanMovePawnId = scanMovePawn:GetId()
+
+		local p = Point(7,7)
+		local pawn = Board:GetPawn(p)
+
+		if pawn then
+			pawn:SetSpace(Point(-1,-1))
+		end
+
+		scanMovePawn:SetHealth(9)
+		Board:AddPawn(scanMovePawn, p)
+		Board:Ping(p, GL_Color(50, 255, 50))
+
+		if pawn then
+			pawn:SetSpace(utils.cleanPoint())
+		end
+	end
+
+	return scanMovePawn
+end
+
 return utils
