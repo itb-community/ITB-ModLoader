@@ -540,7 +540,7 @@ BoardPawn.GetMaxBaseHealth = function(self)
 	local result
 
 	try(function()
-		result = requireMemedit().pawn.getMaxBaseHealth(self)
+		result = requireMemedit().pawn.getBaseMaxHealth(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -703,7 +703,7 @@ end
 BoardPawn.IsPushable = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 
-	return self:IsGuarding()
+	return not self:IsGuarding()
 end
 
 BoardPawn.IsSpaceColor = function(self)
@@ -741,7 +741,7 @@ end
 
 BoardPawn.SetClass = function(self, class)
 	Assert.Equals("userdata", type(self), "Argument #0")
-	Assert.Equals("number", type(class), "Argument #1")
+	Assert.Equals("string", type(class), "Argument #1")
 
 	try(function()
 		requireMemedit().pawn.setClass(self, class)
@@ -759,7 +759,7 @@ BoardPawn.SetCorpse = function(self, corpse)
 	Assert.Equals("boolean", type(corpse), "Argument #1")
 
 	try(function()
-		requireMemedit().pawn.setPushable(self, corpse)
+		requireMemedit().pawn.setCorpse(self, corpse)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -894,7 +894,7 @@ BoardPawn.SetMaxBaseHealth = function(self, maxBaseHealth)
 	Assert.Equals("number", type(maxBaseHealth), "Argument #1")
 
 	try(function()
-		requireMemedit().pawn.setMaxBaseHealth(self, maxBaseHealth)
+		requireMemedit().pawn.setBaseMaxHealth(self, maxBaseHealth)
 	end)
 	:catch(function(err)
 		error(string.format(
