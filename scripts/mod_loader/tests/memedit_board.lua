@@ -4,7 +4,7 @@ testsuite.name = "Memedit-generated-board-functions tests"
 
 testsuite.test_tile_acid = function()
 	Tests.RequireBoard()
-	Tests.RequireMemEdit()
+	Tests.RequireMemedit()
 	local p = Tests.GetCleanTile()
 
 	Board:SetAcid(p, true)
@@ -20,7 +20,7 @@ end
 
 testsuite.test_tile_frozen = function()
 	Tests.RequireBoard()
-	Tests.RequireMemEdit()
+	Tests.RequireMemedit()
 	local p = Tests.GetCleanTile()
 	Board:SetTerrain(p, TERRAIN_MOUNTAIN)
 
@@ -37,7 +37,7 @@ end
 
 testsuite.test_tile_health = function()
 	Tests.RequireBoard()
-	Tests.RequireMemEdit()
+	Tests.RequireMemedit()
 	local p = Tests.GetNonUniqueBuildingTile()
 
 	Board:SetTerrain(p, TERRAIN_BUILDING)
@@ -53,7 +53,7 @@ end
 
 testsuite.test_tile_rubbleType = function()
 	Tests.RequireBoard()
-	Tests.RequireMemEdit()
+	Tests.RequireMemedit()
 	local p = Tests.GetNonUniqueBuildingTile()
 
 	Board:SetTerrain(p, TERRAIN_BUILDING)
@@ -72,7 +72,7 @@ end
 
 testsuite.test_tile_shield = function()
 	Tests.RequireBoard()
-	Tests.RequireMemEdit()
+	Tests.RequireMemedit()
 	local p = Tests.GetCleanTile()
 	Board:SetTerrain(p, TERRAIN_MOUNTAIN)
 
@@ -89,7 +89,7 @@ end
 
 testsuite.test_tile_smoke = function()
 	Tests.RequireBoard()
-	Tests.RequireMemEdit()
+	Tests.RequireMemedit()
 	local p = Tests.GetCleanTile()
 
 	Board:SetSmoke(p, true, true)
@@ -105,7 +105,7 @@ end
 
 testsuite.test_tile_terrain = function()
 	Tests.RequireBoard()
-	Tests.RequireMemEdit()
+	Tests.RequireMemedit()
 	local p = Tests.GetCleanTile()
 
 	Board:SetTerrain(p, TERRAIN_MOUNTAIN)
@@ -118,7 +118,7 @@ end
 
 testsuite.test_tile_terrainIcon = function()
 	Tests.RequireBoard()
-	Tests.RequireMemEdit()
+	Tests.RequireMemedit()
 	local p = Tests.GetCleanTile()
 
 	Board:SetTerrainIcon(p, "testTerrainIcon")

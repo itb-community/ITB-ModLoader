@@ -1,7 +1,7 @@
 
 -- Returns the dll instance of memedit,
 -- if it is avalable and calibrated
-function modApi.getMemEdit()
+function modApi.getMemedit()
 	if modApi.memedit and modApi.memedit.calibrated then
 		return modApi.memedit.dll
 	end
@@ -12,7 +12,7 @@ end
 -- Returns the dll instance of memedit,
 -- if it is avalable and calibrated.
 -- Throws an error if it is not.
-function modApi.requireMemEdit()
+function modApi.requireMemedit()
 	if not modApi.memedit then
 		error("Mod loader extension memedit is unavailable")
 	elseif not modApi.memedit.calibrated then

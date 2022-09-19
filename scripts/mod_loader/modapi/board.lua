@@ -182,8 +182,8 @@ end
 -- memedit functions
 --------------------
 
-local getMemEdit = modApi.getMemEdit
-local requireMemEdit = modApi.requireMemEdit
+local getMemedit = modApi.getMemedit
+local requireMemedit = modApi.requireMemedit
 
 BoardClass.GetFireType = function(self, loc)
 	Assert.Equals("userdata", type(self), "Argument #0")
@@ -192,7 +192,7 @@ BoardClass.GetFireType = function(self, loc)
 	local result
 
 	try(function()
-		result = requireMemEdit().board.getFireType(loc)
+		result = requireMemedit().board.getFireType(loc)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -211,7 +211,7 @@ BoardClass.GetTerrainIcon = function(self, loc)
 	local result
 
 	try(function()
-		result = requireMemEdit().board.getTerrainIcon(loc)
+		result = requireMemedit().board.getTerrainIcon(loc)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -230,7 +230,7 @@ BoardClass.IsForest = function(self, loc)
 	local result
 
 	try(function()
-		local memedit = requireMemEdit()
+		local memedit = requireMemedit()
 		local fireType = memedit.board.getFireType(loc)
 		local terrain = memedit.board.getTerrain(loc)
 
@@ -255,7 +255,7 @@ BoardClass.IsForestFire = function(self, loc)
 	local result
 
 	try(function()
-		result = requireMemEdit().board.getFireType(loc) == FIRE_TYPE_FOREST_FIRE
+		result = requireMemedit().board.getFireType(loc) == FIRE_TYPE_FOREST_FIRE
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -274,7 +274,7 @@ BoardClass.IsShield = function(self, loc)
 	local result
 
 	try(function()
-		result = requireMemEdit().board.isShield(loc)
+		result = requireMemedit().board.isShield(loc)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -294,7 +294,7 @@ BoardClass.SetShield = function(self, loc, shield, skipAnimation)
 	Assert.Equals("boolean", type(shield), "Argument #2")
 	Assert.Equals({"nil", "boolean"}, type(skipAnimation), "Argument #3")
 
-	local memedit = getMemEdit()
+	local memedit = getMemedit()
 	if memedit and skipAnimation then
 		try(function()
 			local terrain = memedit.board.getTerrain(loc)
@@ -348,7 +348,7 @@ local function initializeBoardClass(board)
 		Assert.Equals("boolean", type(acid), "Argument #2")
 		Assert.Equals({"nil", "boolean"}, type(skipAnimation), "Argument #3")
 
-		local memedit = getMemEdit()
+		local memedit = getMemedit()
 		if memedit and skipAnimation then
 			try(function()
 				memedit.board.setAcid(loc, acid)
@@ -375,7 +375,7 @@ local function initializeBoardClass(board)
 		Assert.Equals("boolean", type(frozen), "Argument #2")
 		Assert.Equals({"nil", "boolean"}, type(skipAnimation), "Argument #3")
 
-		local memedit = getMemEdit()
+		local memedit = getMemedit()
 		if memedit and skipAnimation then
 			try(function()
 				local terrain = memedit.board.getTerrain(loc)

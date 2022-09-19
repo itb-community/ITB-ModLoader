@@ -1,13 +1,13 @@
 local testsuite = Tests.Testsuite()
 testsuite.name = "Board-related tests"
 
-local getMemEdit = modApi.getMemEdit
+local getMemedit = modApi.getMemedit
 
 
 testsuite.test_GetFireType = function()
 	Tests.RequireBoard()
 	local p = Tests.GetCleanTile()
-	local memedit = getMemEdit()
+	local memedit = getMemedit()
 
 	if memedit then
 		Board:ClearSpace(p)
@@ -38,7 +38,7 @@ end
 testsuite.test_GetTerrainIcon = function()
 	Tests.RequireBoard()
 	local p = Tests.GetCleanTile()
-	local memedit = getMemEdit()
+	local memedit = getMemedit()
 
 	if memedit then
 		Board:SetTerrainIcon(p, "terrainIcon_Test")
@@ -61,7 +61,7 @@ end
 testsuite.test_IsForest = function()
 	Tests.RequireBoard()
 	local p = Tests.GetCleanTile()
-	local memedit = getMemEdit()
+	local memedit = getMemedit()
 
 	if memedit then
 		Board:SetTerrain(p, TERRAIN_FOREST)
@@ -84,7 +84,7 @@ end
 testsuite.test_IsForestFire = function()
 	Tests.RequireBoard()
 	local p = Tests.GetCleanTile()
-	local memedit = getMemEdit()
+	local memedit = getMemedit()
 
 	if memedit then
 		Board:SetTerrain(p, TERRAIN_FOREST)
@@ -110,7 +110,7 @@ end
 testsuite.test_IsShield = function()
 	Tests.RequireBoard()
 	local p = Tests.GetCleanTile()
-	local memedit = getMemEdit()
+	local memedit = getMemedit()
 
 	if memedit then
 		Board:ClearSpace(p)

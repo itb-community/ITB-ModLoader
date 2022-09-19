@@ -7,8 +7,8 @@ function Tests.RequireBoard()
 	assert(Board ~= nil, "Error: this test requires a Board to be available" .. "\n" .. debug.traceback("", 2))
 end
 
-function Tests.RequireMemEdit()
-	assert(modApi.getMemEdit() ~= nil, "Error: this test requires memedit.dll to be available and calibrated" .. "\n" .. debug.traceback("", 2))
+function Tests.RequireMemedit()
+	assert(modApi.getMemedit() ~= nil, "Error: this test requires memedit.dll to be available and calibrated" .. "\n" .. debug.traceback("", 2))
 end
 
 function Tests.GetCleanTile()

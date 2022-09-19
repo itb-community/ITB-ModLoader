@@ -423,8 +423,8 @@ BoardPawn.GetString = BoardPawn.GetLuaString
 -- memedit functions
 --------------------
 
-local getMemEdit = modApi.getMemEdit
-local requireMemedit = modApi.requireMemEdit
+local getMemedit = modApi.getMemedit
+local requireMemedit = modApi.requireMemedit
 
 BoardPawn.GetClass = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
@@ -432,7 +432,7 @@ BoardPawn.GetClass = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.getClass(self)
+		result = requireMemedit().pawn.getClass(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -450,7 +450,7 @@ BoardPawn.GetCustomAnim = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.getCustomAnim(self)
+		result = requireMemedit().pawn.getCustomAnim(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -468,7 +468,7 @@ BoardPawn.GetDefaultFaction = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.getDefaultFaction(self)
+		result = requireMemedit().pawn.getDefaultFaction(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -486,7 +486,7 @@ BoardPawn.GetImageOffset = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.getImageOffset(self)
+		result = requireMemedit().pawn.getImageOffset(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -504,7 +504,7 @@ BoardPawn.GetImpactMaterial = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.getImpactMaterial(self)
+		result = requireMemedit().pawn.getImpactMaterial(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -522,7 +522,7 @@ BoardPawn.GetLeader = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.getLeader(self)
+		result = requireMemedit().pawn.getLeader(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -540,7 +540,7 @@ BoardPawn.GetMaxBaseHealth = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.getMaxBaseHealth(self)
+		result = requireMemedit().pawn.getMaxBaseHealth(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -558,7 +558,7 @@ BoardPawn.GetMaxHealth = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.getMaxHealth(self)
+		result = requireMemedit().pawn.getMaxHealth(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -576,7 +576,7 @@ BoardPawn.GetOwner = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.getOwner(self)
+		result = requireMemedit().pawn.getOwner(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -594,7 +594,7 @@ BoardPawn.GetQueuedTarget = function(self)
 	local result
 
 	try(function()
-		local memedit = requireMemEdit()
+		local memedit = requireMemedit()
 		result = Point(
 			memedit.pawn.getQueuedTargetX(self),
 			memedit.pawn.getQueuedTargetY(self)
@@ -616,7 +616,7 @@ BoardPawn.IsInvisible = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.isInvisible(self)
+		result = requireMemedit().pawn.isInvisible(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -634,7 +634,7 @@ BoardPawn.IsMassive = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.isMassive(self)
+		result = requireMemedit().pawn.isMassive(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -652,7 +652,7 @@ BoardPawn.IsMinor = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.isMinor(self)
+		result = requireMemedit().pawn.isMinor(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -670,7 +670,7 @@ BoardPawn.IsMissionCritical = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.isMissionCritical(self)
+		result = requireMemedit().pawn.isMissionCritical(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -688,7 +688,7 @@ BoardPawn.IsNeutral = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.isNeutral(self)
+		result = requireMemedit().pawn.isNeutral(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -712,7 +712,7 @@ BoardPawn.IsSpaceColor = function(self)
 	local result
 
 	try(function()
-		result = requireMemEdit().pawn.isSpaceColor(self)
+		result = requireMemedit().pawn.isSpaceColor(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -729,7 +729,7 @@ BoardPawn.SetBoosted = function(self, boosted)
 	Assert.Equals("boolean", type(boosted), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setBoosted(self, boosted)
+		requireMemedit().pawn.setBoosted(self, boosted)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -744,7 +744,7 @@ BoardPawn.SetClass = function(self, class)
 	Assert.Equals("number", type(class), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setClass(self, class)
+		requireMemedit().pawn.setClass(self, class)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -759,7 +759,7 @@ BoardPawn.SetCorpse = function(self, corpse)
 	Assert.Equals("boolean", type(corpse), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setPushable(self, corpse)
+		requireMemedit().pawn.setPushable(self, corpse)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -774,7 +774,7 @@ BoardPawn.SetDefaultFaction = function(self, faction)
 	Assert.Equals("number", type(faction), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setDefaultFaction(self, faction)
+		requireMemedit().pawn.setDefaultFaction(self, faction)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -789,7 +789,7 @@ BoardPawn.SetFlying = function(self, flying)
 	Assert.Equals("boolean", type(flying), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setFlying(self, flying)
+		requireMemedit().pawn.setFlying(self, flying)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -804,7 +804,7 @@ BoardPawn.SetId = function(self, id)
 	Assert.Equals("number", type(id), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setId(self, id)
+		requireMemedit().pawn.setId(self, id)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -819,7 +819,7 @@ BoardPawn.SetImageOffset = function(self, imageOffset)
 	Assert.Equals("number", type(imageOffset), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setImageOffset(self, imageOffset)
+		requireMemedit().pawn.setImageOffset(self, imageOffset)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -834,7 +834,7 @@ BoardPawn.SetImpactMaterial = function(self, impactMaterial)
 	Assert.Equals("number", type(impactMaterial), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setImpactMaterial(self, impactMaterial)
+		requireMemedit().pawn.setImpactMaterial(self, impactMaterial)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -849,7 +849,7 @@ BoardPawn.SetJumper = function(self, jumper)
 	Assert.Equals("boolean", type(jumper), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setJumper(self, jumper)
+		requireMemedit().pawn.setJumper(self, jumper)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -864,7 +864,7 @@ BoardPawn.SetLeader = function(self, leader)
 	Assert.Equals("number", type(leader), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setLeader(self, leader)
+		requireMemedit().pawn.setLeader(self, leader)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -879,7 +879,7 @@ BoardPawn.SetMassive = function(self, massive)
 	Assert.Equals("boolean", type(massive), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setMassive(self, massive)
+		requireMemedit().pawn.setMassive(self, massive)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -894,7 +894,7 @@ BoardPawn.SetMaxBaseHealth = function(self, maxBaseHealth)
 	Assert.Equals("number", type(maxBaseHealth), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setMaxBaseHealth(self, maxBaseHealth)
+		requireMemedit().pawn.setMaxBaseHealth(self, maxBaseHealth)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -909,7 +909,7 @@ BoardPawn.SetMaxHealth = function(self, maxHealth)
 	Assert.Equals("number", type(maxHealth), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setMaxHealth(self, maxHealth)
+		requireMemedit().pawn.setMaxHealth(self, maxHealth)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -924,7 +924,7 @@ BoardPawn.SetMinor = function(self, minor)
 	Assert.Equals("boolean", type(minor), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setMinor(self, minor)
+		requireMemedit().pawn.setMinor(self, minor)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -939,7 +939,7 @@ BoardPawn.SetMoveSpeed = function(self, moveSpeed)
 	Assert.Equals("number", type(moveSpeed), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setMoveSpeed(self, moveSpeed)
+		requireMemedit().pawn.setMoveSpeed(self, moveSpeed)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -954,7 +954,7 @@ BoardPawn.SetOwner = function(self, ownerId)
 	Assert.Equals("number", type(ownerId), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setOwner(self, ownerId)
+		requireMemedit().pawn.setOwner(self, ownerId)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -969,7 +969,7 @@ BoardPawn.SetPushable = function(self, pushable)
 	Assert.Equals("boolean", type(pushable), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setPushable(self, pushable)
+		requireMemedit().pawn.setPushable(self, pushable)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -984,7 +984,7 @@ BoardPawn.SetSpaceColor = function(self, spaceColor)
 	Assert.Equals("boolean", type(spaceColor), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setSpaceColor(self, spaceColor)
+		requireMemedit().pawn.setSpaceColor(self, spaceColor)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -999,7 +999,7 @@ BoardPawn.SetTeleporter = function(self, teleporter)
 	Assert.Equals("boolean", type(teleporter), "Argument #1")
 
 	try(function()
-		requireMemEdit().pawn.setTeleporter(self, teleporter)
+		requireMemedit().pawn.setTeleporter(self, teleporter)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -1026,7 +1026,7 @@ local function initializeBoardPawn()
 	BoardPawn.IsJumper = function(self)
 		Assert.Equals("userdata", type(self), "Argument #0")
 
-		local memedit = getMemEdit()
+		local memedit = getMemedit()
 		if memedit then
 			local result
 
@@ -1052,7 +1052,7 @@ local function initializeBoardPawn()
 	BoardPawn.IsTeleporter = function(self)
 		Assert.Equals("userdata", type(self), "Argument #0")
 
-		local memedit = getMemEdit()
+		local memedit = getMemedit()
 		if memedit then
 			local result
 
@@ -1081,7 +1081,7 @@ local function initializeBoardPawn()
 		Assert.Equals("boolean", type(acid), "Argument #1")
 		Assert.Equals({"nil", "boolean"}, type(skipAnimation), "Argument #2")
 
-		local memedit = getMemEdit()
+		local memedit = getMemedit()
 		if memedit and skipAnimation then
 			try(function()
 				memedit.pawn.setAcid(self, acid)
@@ -1108,7 +1108,7 @@ local function initializeBoardPawn()
 		Assert.Equals("boolean", type(frozen), "Argument #1")
 		Assert.Equals({"nil", "boolean"}, type(skipAnimation), "Argument #2")
 
-		local memedit = getMemEdit()
+		local memedit = getMemedit()
 		if memedit and skipAnimation then
 			try(function()
 				memedit.pawn.setFrozen(self, frozen)
@@ -1132,7 +1132,7 @@ local function initializeBoardPawn()
 		Assert.Equals("userdata", type(self), "Argument #0")
 		Assert.Equals({"nil", "boolean"}, type(mech), "Argument #1")
 
-		local memedit = getMemEdit()
+		local memedit = getMemedit()
 		if memedit and mech ~= nil then
 			try(function()
 				memedit.pawn.setMech(self, mech)
@@ -1159,7 +1159,7 @@ local function initializeBoardPawn()
 		Assert.Equals("boolean", type(shield), "Argument #1")
 		Assert.Equals({"nil", "boolean"}, type(skipAnimation), "Argument #2")
 
-		local memedit = getMemEdit()
+		local memedit = getMemedit()
 		if memedit and skipAnimation then
 			try(function()
 				memedit.pawn.setShield(self, shield)
