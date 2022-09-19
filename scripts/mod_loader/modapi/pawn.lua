@@ -87,23 +87,6 @@ BoardPawn.IsNeutral = function(self)
 	return neutral
 end
 
-BoardPawn.IsPowered = function(self)
-	Assert.Equals("userdata", type(self), "Argument #0")
-
-	if not Board or GetCurrentMission() == nil then
-		return
-	end
-	
-	local ptable = self:GetPawnTable()
-	local powered = ptable.bPowered
-
-	if powered == nil then
-		powered = true
-	end
-
-	return powered
-end
-
 -- checks if the pawn receives psion effects
 BoardPawn.CanMutate = function(self, targetPlayer)
 	Assert.Equals("userdata", type(self), "Argument #0")
@@ -475,20 +458,6 @@ local function initializeBoardPawn()
 		end
 
 		setSavefileFieldsForPawn(self, { bNeutral = neutral })
-	end
-
-	local oldSetPowered = pawn.SetPowered
-	BoardPawn.SetPowered = function(self, powered)
-		Assert.Equals("userdata", type(self), "Argument #0")
-		Assert.Equals("boolean", type(powered), "Argument #1")
-
-		oldSetPowered(self, powered)
-
-		if not Board or GetCurrentMission() == nil then
-			return
-		end
-
-		setSavefileFieldsForPawn(self, { bPowered = powered })
 	end
 
 	BoardPawn.IsPilotSkill = pawn.IsAbility

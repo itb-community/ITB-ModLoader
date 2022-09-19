@@ -26,7 +26,9 @@ local scripts = {
 	"board",
 	"pawn",
 	"localization",
-	"compat"
+	"compat",
+	"deployment",
+	"gameState",
 }
 
 local rootpath = GetParentPath(...)

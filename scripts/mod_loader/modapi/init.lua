@@ -15,7 +15,7 @@ function modApi:init()
 	-- if we start logging before we apply the config, we may not update the log file correctly
 	ApplyModLoaderConfig(LoadModLoaderConfig())
 
-	self.version = "2.7.2"
+	self.version = "2.7.3"
 	self.initializing = true
 	self.initialized = false
 	LOG("GAME VERSION", self:getGameVersion())
