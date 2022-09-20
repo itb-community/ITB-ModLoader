@@ -189,4 +189,13 @@ function utils.requireScanMovePawn()
 	return scanMovePawn
 end
 
+function utils.cleanupScanMovePawn()
+	if Board then
+		local pawn = Board:GetPawn(scanMovePawnId)
+		if pawn then
+			pawn:SetHealth(0)
+		end
+	end
+end
+
 return utils

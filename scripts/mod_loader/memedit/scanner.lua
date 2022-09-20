@@ -141,10 +141,7 @@ end
 
 function Scanner:cleanupLastScan()
 	if self.lastScan then
-		if self.lastScan:condition() then
-			self.lastScan:reset()
-		end
-
+		self.lastScan:reset()
 		self.lastScan = nil
 	end
 

@@ -9,6 +9,7 @@ local randomCleanPoint = utils.randomCleanPoint
 local nonUniqueBuildingPoint = utils.nonUniqueBuildingPoint
 local randomNonUniqueBuildingPoint = utils.randomNonUniqueBuildingPoint
 local requireScanMovePawn = utils.requireScanMovePawn
+local cleanupScanMovePawn = utils.cleanupScanMovePawn
 local scans = {}
 
 
@@ -69,7 +70,9 @@ scans.frozen = inheritClass(Scan, {
 	condition = boardExists,
 	cleanup = function(self)
 		if self.data then
-			Board:ClearSpace(self.data.p)
+			if Board then
+				Board:ClearSpace(self.data.p)
+			end
 			self.data = nil
 		end
 	end,
@@ -122,6 +125,7 @@ scans.highlighted = inheritClass(Scan, {
 	dataType = "bool",
 	condition = boardExists,
 	cleanup = function(self)
+		cleanupScanMovePawn()
 		if ScanMove.Caller == self then
 			ScanMove:TeardownEvent()
 		end
@@ -131,8 +135,8 @@ scans.highlighted = inheritClass(Scan, {
 			requireScanMovePawn()
 
 			if self.iteration == 1 then
-				ScanMove:RegisterEvent{
-					Event = self.onMoveHighlighted,
+				ScanMove:SetEvents{
+					TargetEvent = self.onMoveHighlighted,
 					Caller = self,
 				}
 			end

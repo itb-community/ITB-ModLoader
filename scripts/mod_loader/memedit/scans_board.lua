@@ -5,6 +5,7 @@ local utils = require(rootpath.."utils")
 local inheritClass = utils.inheritClass
 local boardExists = utils.boardExists
 local requireScanMovePawn = utils.requireScanMovePawn
+local cleanupScanMovePawn = utils.cleanupScanMovePawn
 local scans = {}
 
 local boardPreRequisites = {"vital.size_board"}
@@ -18,6 +19,7 @@ scans.highlightedX = inheritClass(Scan, {
 	dataType = "int",
 	condition = boardExists,
 	cleanup = function(self)
+		cleanupScanMovePawn()
 		if ScanMove.Caller == self then
 			ScanMove:TeardownEvent()
 		end

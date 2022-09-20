@@ -220,7 +220,9 @@ scans.fire = inheritClass(Scan, {
 	condition = boardExists,
 	cleanup = function(self)
 		if self.data then
-			Board:ClearSpace(self.data.p)
+			if Board then
+				Board:ClearSpace(self.data.p)
+			end
 			self.data = nil
 		end
 	end,
@@ -526,7 +528,9 @@ scans.owner = inheritClass(Scan, {
 	condition = boardExists,
 	cleanup = function(self)
 		if self.data then
-			Board:ClearSpace(self.data.p)
+			if Board then
+				Board:ClearSpace(self.data.p)
+			end
 			self.data = nil
 		end
 	end,
