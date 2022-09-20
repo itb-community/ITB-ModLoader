@@ -61,7 +61,7 @@ scans.boardObjSize = inheritClass(Scan, {
 	boardCount = 30,
 	condition = function(self)
 		-- Include tipimage boards to speed up the process.
-		local board = Board or TipImageBoard
+		local board = TipImageBoard or Board
 
 		if true
 			and board
