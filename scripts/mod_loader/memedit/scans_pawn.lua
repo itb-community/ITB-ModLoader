@@ -486,6 +486,46 @@ scans.missionCritical = inheritClass(Scan, {
 	end
 })
 
+scans.movementSpent = inheritClass(Scan, {
+	id = "MovementSpent",
+	questName = "Pawn Movement Spent",
+	questHelp = "Wait",
+	prerequisiteScans = {"vital.size_pawn"},
+	access = "RW",
+	dataType = "bool",
+	expectedResults = 2,
+	expectedResultIndex = 1,
+	reloadMemeditOnSuccess = true,
+	condition = missionBoardExists,
+	cleanup = function(self)
+		cleanupScanMovePawn()
+		if ScanMove.Caller == self then
+			ScanMove:TeardownEvent()
+		end
+	end,
+	action = function(self)
+		requireScanMovePawn()
+
+		if self.iteration == 1 then
+			ScanMove:SetEvents{
+				TargetEvent = self.onMoveTarget,
+				AfterEffectEvent = self.afterMoveEffect,
+				Caller = self,
+			}
+		end
+
+		self.issue = "Move the provided ScanPawn"
+	end,
+	onMoveTarget = function(self, pawn, p1, p2)
+		self:searchPawn(pawn, 0, "byte")
+		self:evaluateResults()
+	end,
+	afterMoveEffect = function(self, pawn, p1, p2)
+		self:searchPawn(pawn, 1, "byte")
+		self:evaluateResults()
+	end,
+})
+
 scans.moveSpeed = inheritClass(Scan, {
 	id = "MoveSpeed",
 	questName = "Pawn Move Speed",
@@ -724,46 +764,6 @@ scans.teleporter = inheritClass(Scan, {
 		self:searchPawn(pawn, teleporter)
 		self:evaluateResults()
 	end
-})
-
-scans.movementSpent = inheritClass(Scan, {
-	id = "MovementSpent",
-	questName = "Pawn Movement Spent",
-	questHelp = "Wait",
-	prerequisiteScans = {"vital.size_pawn"},
-	access = "RW",
-	dataType = "bool",
-	expectedResults = 2,
-	expectedResultIndex = 1,
-	reloadMemeditOnSuccess = true,
-	condition = missionBoardExists,
-	cleanup = function(self)
-		cleanupScanMovePawn()
-		if ScanMove.Caller == self then
-			ScanMove:TeardownEvent()
-		end
-	end,
-	action = function(self)
-		requireScanMovePawn()
-
-		if self.iteration == 1 then
-			ScanMove:SetEvents{
-				TargetEvent = self.onMoveTarget,
-				AfterEffectEvent = self.afterMoveEffect,
-				Caller = self,
-			}
-		end
-
-		self.issue = "Move the provided ScanPawn"
-	end,
-	onMoveTarget = function(self, pawn, p1, p2)
-		self:searchPawn(pawn, 0, "byte")
-		self:evaluateResults()
-	end,
-	afterMoveEffect = function(self, pawn, p1, p2)
-		self:searchPawn(pawn, 1, "byte")
-		self:evaluateResults()
-	end,
 })
 
 scans.undoX = inheritClass(Scan, {
