@@ -166,6 +166,7 @@ function modApi.memedit:init()
 	LOG("Memedit - Initializing...")
 	local addressLists = self:loadAddressesFromFile()
 	self:load(addressLists)
+	self.loaded = self.calibrated
 
 	if self.calibrated then
 		LOG("Memedit - Initialized successfully!")

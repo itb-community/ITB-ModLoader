@@ -52,8 +52,7 @@ function mod_loader:init()
 	self.mods = {}
 	self.mod_list = {}
 	self.mod_options = {}
-	self.extensions = {}
-	self.inertExtensions = {
+	self.extensions = {
 		memedit = "memedit/__scripts",
 	}
 
@@ -368,8 +367,16 @@ function mod_loader:initMod(id, mod_options)
 	end
 
 	if mod.extensions then
-		for i, extension in ipairs(mod.extensions) do
-			mod_loader:initExtension(extension)
+		for i, extensionId in ipairs(mod.extensions) do
+			local extension = self:initExtension(extensionId)
+
+			if extension and not extension.loaded then
+				LOG(string.format(
+					"Initializing mod [%s] with id [%s] failed due to mod loader extension [%s] not loading properly",
+					mod.name, id, extensionId
+				))
+				return
+			end
 		end
 	end
 
@@ -430,15 +437,18 @@ function mod_loader:initMetadata(id)
 end
 
 function mod_loader:initExtension(extensionId)
-	local extensionPath = self.inertExtensions[extensionId]
+	local extension = self.extensions[extensionId]
+	local extensionPath = extension
 
-	if extensionPath then
-		self.inertExtensions[extensionId] = nil
-
+	if type(extensionPath) == "string" then
 		LOGF("Initializing mod loader extension [%s]...", extensionId)
-		self.extensions[extensionId] = require(rootPath..extensionPath)
+		extension = require(rootPath..extensionPath)
+		self.extensions[extensionId] = extension
+		Assert.Equals("table", type(extension), "Extension did not return a table")
 		LOGF("Initialized mod loader extension [%s] successfully!", extensionId)
 	end
+
+	return extension
 end
 
 function mod_loader:hasExtension(extensionId)
