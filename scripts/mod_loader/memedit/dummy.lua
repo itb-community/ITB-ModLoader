@@ -59,7 +59,22 @@ function ScanMove:GetSkillEffect(p1, p2)
 		self.Event(self.Caller, p2)
 	end
 
-	local ret = SkillEffect()
 	ret:AddMove(Board:GetPath(p1, p2, PATH_FLYER), FULL_DELAY)
+
+	if pawn then
+		ret:AddScript(string.format([[
+			local fx = SkillEffect() 
+			fx:AddScript([=[
+				local pawn = Board:GetPawn(%s) 
+				if pawn then 
+					if ScanMove.AfterEffectEvent then 
+						ScanMove.AfterEffectEvent(ScanMove.Caller, pawn, %s, %s) 
+					end 
+				end
+			]=]) 
+			Board:AddEffect(fx)
+		]], pawn:GetId(), p1:GetString(), p2:GetString()))
+	end
+
 	return ret
 end

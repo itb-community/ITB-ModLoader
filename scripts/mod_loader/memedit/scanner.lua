@@ -55,9 +55,16 @@ function Scanner:new()
 			status, id, completedScan:getResultString(self.logLevel)
 		))
 
+		if completedScan.failed then
+			return
+		end
+
 		self:addToOutput(completedScan)
 
-		if completedScan.objType == "vital" then
+		if false
+			or completedScan.objType == "vital"
+			or completedScan.reloadMemeditOnSuccess
+		then
 			-- reload memedit with new vital functions
 			local options = shallow_copy(self.output)
 			options.debug = true
@@ -174,9 +181,9 @@ function Scanner:start()
 			self:cleanupLastScan()
 			self.currentScan = scan
 			self.iteration = 0
-			scan.iteration = 0
 
 			if scan then
+				scan.iteration = 0
 				self.onScanStarted:dispatch(scan)
 			end
 		end
