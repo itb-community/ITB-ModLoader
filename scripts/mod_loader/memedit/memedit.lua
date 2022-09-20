@@ -173,6 +173,7 @@ function modApi.memedit:init()
 	if self.calibrated then
 		LOG("Memedit - Initialized successfully!")
 	else
+		require("scripts/mod_loader/memedit/ui_calibrate")()
 		LOG("Memedit - Initialization incomplete - Calibration required!")
 	end
 end

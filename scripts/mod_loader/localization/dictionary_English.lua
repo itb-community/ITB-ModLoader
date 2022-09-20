@@ -217,6 +217,23 @@ return {
 
 	["VersionString"] = "Mod loader version: ",
 
+	["Memedit_FrameTitle"] = "Memedit Calibration Tool",
+	["Memedit_Title_CurrentScan"] = "Current Scan",
+	["Memedit_Title_Iteration"] = "#i",
+	["Memedit_Title_Results"] = "#Results",
+	["Memedit_Title_Instructions"] = "Instructions",
+	["Memedit_Text_Initial"] = "The following mods did not initialize because they require memedit to be calibrated:\n%s",
+	["Memedit_Text_Success"] = "Memedit has been successfully calibrated! Restart the game to initialize the following mods requiring memedit:\n%s",
+	["Memedit_Text_Failed"] = "Memedit calibration failed. The following mods will remain uninitialized until calibration has been completed successfully:\n%s",
+	["Memedit_Button_Start"] = "Calibrate",
+	["Memedit_ButtonTooltip_Start"] = "Start memedit calibration process.",
+	["Memedit_Button_Stop"] = "Stop",
+	["Memedit_ButtonTooltip_Stop"] = "Stop memedit calibration process.",
+	["Memedit_Button_Close"] = "Close",
+	["Memedit_ButtonTooltip_Close"] = "Close dialog",
+	["Memedit_Button_Retry"] = "Retry",
+	["Memedit_ButtonTooltip_Retry"] = "Retry the memedit calibration process",
+
 	["TestingConsole_ToggleButton_Text"] = "TESTING CONSOLE",
 	["TestingConsole_ToggleButton_Tooltip"] = "Opens a console for running mod loader integration tests.",
 	["TestingConsole_FrameTitle"] = "Testing Console",

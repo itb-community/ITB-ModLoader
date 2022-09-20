@@ -24,7 +24,7 @@ function utils.boardExists()
 	then
 		return true
 	else
-		return false, "Board not found"
+		return false, "Enter a mission"
 	end
 end
 
@@ -34,7 +34,7 @@ function utils.missionBoardExists()
 		or Board:IsBusy()
 		or Board:IsMissionBoard() == false
 	then
-		return false, "MissionBoard not found"
+		return false, "Enter a mission"
 	end
 
 	return true
