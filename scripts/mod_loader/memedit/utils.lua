@@ -159,14 +159,14 @@ function utils.requireScanMovePawn()
 		or Board:GetPawn(scanMovePawnId) == nil
 	then
 		utils.prepareScanPawn{
-			Name = "ScanPawn",
 			Image = "MechPunch",
 			MoveSpeed = 99,
 			Health = 9,
-			MoveSkill = "ScanMove",
+			Flying = true,
 			DefaultTeam = TEAM_PLAYER,
 			SkillList = {"ScanWeapon"},
 		}
+
 		scanMovePawn = PAWN_FACTORY:CreatePawn("ScanPawn")
 		scanMovePawnId = scanMovePawn:GetId()
 
@@ -185,6 +185,9 @@ function utils.requireScanMovePawn()
 			pawn:SetSpace(utils.cleanPoint())
 		end
 	end
+
+	ScanPawn.Name = "ScanPawn"
+	ScanPawn.MoveSkill = "ScanMove"
 
 	return scanMovePawn
 end

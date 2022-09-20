@@ -29,8 +29,8 @@ scans.highlightedX = inheritClass(Scan, {
 			requireScanMovePawn()
 
 			if self.iteration == 1 then
-				ScanMove:RegisterEvent{
-					Event = self.onMoveHighlighted,
+				ScanMove:SetEvents{
+					TargetEvent = self.onMoveHighlighted,
 					Caller = self,
 				}
 			end
@@ -38,7 +38,7 @@ scans.highlightedX = inheritClass(Scan, {
 			self.issue = "Hover tiles with the provided ScanPawn's Move skill"
 		end
 	},
-	onMoveHighlighted = function(self, p2)
+	onMoveHighlighted = function(self, pawn, p1, p2)
 		self:searchBoard(p2.x)
 		self:evaluateResults()
 	end,
@@ -53,6 +53,7 @@ scans.highlightedY = inheritClass(Scan, {
 	dataType = "int",
 	condition = boardExists,
 	cleanup = function(self)
+		cleanupScanMovePawn()
 		if ScanMove.Caller == self then
 			ScanMove:TeardownEvent()
 		end
@@ -62,8 +63,8 @@ scans.highlightedY = inheritClass(Scan, {
 			requireScanMovePawn()
 
 			if self.iteration == 1 then
-				ScanMove:RegisterEvent{
-					Event = self.onMoveHighlighted,
+				ScanMove:SetEvents{
+					TargetEvent = self.onMoveHighlighted,
 					Caller = self,
 				}
 			end
@@ -71,7 +72,7 @@ scans.highlightedY = inheritClass(Scan, {
 			self.issue = "Hover tiles with the provided ScanPawn's Move skill"
 		end
 	},
-	onMoveHighlighted = function(self, p2)
+	onMoveHighlighted = function(self, pawn, p1, p2)
 		self:searchBoard(p2.y)
 		self:evaluateResults()
 	end,

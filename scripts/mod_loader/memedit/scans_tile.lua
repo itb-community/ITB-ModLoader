@@ -144,7 +144,7 @@ scans.highlighted = inheritClass(Scan, {
 			self.issue = "Hover tiles with the provided ScanPawn's Move skill"
 		end
 	},
-	onMoveHighlighted = function(self, p2)
+	onMoveHighlighted = function(self, pawn, p1, p2)
 		for i,p in ipairs(Board) do
 			if p == p2 then
 				self:searchTile(p, true, "bool")

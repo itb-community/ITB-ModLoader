@@ -41,22 +41,40 @@ function ScanMove:TeardownEvent()
 		self.Teardown(self.Caller)
 	end
 
-	self.Event = nil
+	self.TargetEvent = nil
+	self.BeforeEffectEvent = nil
+	self.AfterEffectEvent = nil
 	self.Caller = nil
 	self.Teardown = nil
 end
 
-function ScanMove:RegisterEvent(options)
+function ScanMove:SetEvents(options)
 	self:TeardownEvent()
 
-	self.Event = options.Event
+	self.TargetEvent = options.TargetEvent
+	self.BeforeEffectEvent = options.BeforeEffectEvent
+	self.AfterEffectEvent = options.AfterEffectEvent
 	self.Caller = options.Caller
 	self.Teardown = options.Teardown
 end
 
 function ScanMove:GetSkillEffect(p1, p2)
-	if self.Event then
-		self.Event(self.Caller, p2)
+	local ret = SkillEffect()
+	local pawn = Board:GetPawn(p1)
+
+	if pawn and self.TargetEvent then
+		self.TargetEvent(self.Caller, pawn, p1, p2)
+	end
+
+	if pawn then
+		ret:AddScript(string.format([[
+			local pawn = Board:GetPawn(%s) 
+			if pawn then 
+				if ScanMove.BeforeEffectEvent then 
+					ScanMove.BeforeEffectEvent(ScanMove.Caller, pawn, %s, %s) 
+				end 
+			end
+		]], pawn:GetId(), p1:GetString(), p2:GetString()))
 	end
 
 	ret:AddMove(Board:GetPath(p1, p2, PATH_FLYER), FULL_DELAY)
