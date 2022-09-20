@@ -28,6 +28,18 @@ function utils.boardExists()
 	end
 end
 
+function utils.missionBoardExists()
+	if false
+		or Board == nil
+		or Board:IsBusy()
+		or Board:IsMissionBoard() == false
+	then
+		return false, "MissionBoard not found"
+	end
+
+	return true
+end
+
 -- Destructive function calculating the smallest
 -- gap between any of its values.
 function utils.findSmallestGap(tbl)
