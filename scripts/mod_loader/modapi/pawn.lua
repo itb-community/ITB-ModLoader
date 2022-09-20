@@ -610,6 +610,28 @@ BoardPawn.GetQueuedTarget = function(self)
 	return result
 end
 
+BoardPawn.GetUndoLoc = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	local result
+
+	try(function()
+		local memedit = requireMemedit()
+		result = Point(
+			memedit.pawn.getUndoX(self),
+			memedit.pawn.getUndoY(self)
+		)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
 BoardPawn.IsInvisible = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 
@@ -671,6 +693,24 @@ BoardPawn.IsMissionCritical = function(self)
 
 	try(function()
 		result = requireMemedit().pawn.isMissionCritical(self)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
+BoardPawn.IsMovementSpent = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	local result
+
+	try(function()
+		result = requireMemedit().pawn.isMovementSpent(self)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -934,6 +974,21 @@ BoardPawn.SetMinor = function(self, minor)
 	end)
 end
 
+BoardPawn.SetMovementSpent = function(self, movementSpent)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.Equals("boolean", type(movementSpent), "Argument #1")
+
+	try(function()
+		requireMemedit().pawn.setMovementSpent(self, movementSpent)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
 BoardPawn.SetMoveSpeed = function(self, moveSpeed)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	Assert.Equals("number", type(moveSpeed), "Argument #1")
@@ -1017,6 +1072,23 @@ BoardPawn.SetTeleporter = function(self, teleporter)
 
 	try(function()
 		requireMemedit().pawn.setTeleporter(self, teleporter)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+end
+
+BoardPawn.SetUndoLoc = function(self, loc)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.TypePoint(loc, "Argument #1")
+
+	try(function()
+		local memedit = requireMemedit()
+		memedit.pawn.setUndoX(self, loc.x)
+		memedit.pawn.setUndoY(self, loc.y)
 	end)
 	:catch(function(err)
 		error(string.format(

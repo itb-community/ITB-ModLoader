@@ -91,27 +91,6 @@ BoardClass.IsTipImage = function(self)
 	return self:GetSize() == Point(6,6)
 end
 
-BoardClass.GetHighlighted = function(self)
-	Assert.Equals("userdata", type(self), "Argument #0")
-	
-	if GetCurrentMission() == nil then
-		return
-	end
-	
-	return mouseTile()
-end
-
-BoardClass.IsHighlighted = function(self, loc)
-	Assert.Equals("userdata", type(self), "Argument #0")
-	Assert.TypePoint(loc, "Argument #1")
-	
-	if GetCurrentMission() == nil then
-		return
-	end
-	
-	return loc == mouseTile()
-end
-
 BoardClass.GetSelectedPawn = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	
@@ -204,6 +183,36 @@ BoardClass.GetFireType = function(self, loc)
 	return result
 end
 
+BoardClass.GetHighlighted = function(self)
+	Assert.Equals("userdata", type(self), "Argument #0")
+
+	local memedit = getMemedit()
+	if memedit then
+		local result
+
+		try(function()
+			result = Point(
+				memedit.board.getHighlightedX(loc),
+				memedit.board.getHighlightedY(loc)
+			)
+		end)
+		:catch(function(err)
+			error(string.format(
+					"memedit.dll: %s",
+					tostring(err)
+			))
+		end)
+
+		return result
+	end
+
+	if GetCurrentMission() == nil then
+		return
+	end
+
+	return mouseTile()
+end
+
 BoardClass.GetTerrainIcon = function(self, loc)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	Assert.TypePoint(loc, "Argument #1")
@@ -265,6 +274,34 @@ BoardClass.IsForestFire = function(self, loc)
 	end)
 
 	return result
+end
+
+BoardClass.IsHighlighted = function(self, loc)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.TypePoint(loc, "Argument #1")
+
+	local memedit = getMemedit()
+	if memedit then
+		local result
+
+		try(function()
+			result = memedit.board.isHighlighted(loc)
+		end)
+		:catch(function(err)
+			error(string.format(
+					"memedit.dll: %s",
+					tostring(err)
+			))
+		end)
+
+		return result
+	end
+
+	if GetCurrentMission() == nil then
+		return
+	end
+
+	return loc == mouseTile()
 end
 
 BoardClass.IsShield = function(self, loc)
