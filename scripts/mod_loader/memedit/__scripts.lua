@@ -2,6 +2,7 @@ local scripts = {
 	"dummy",
 	"memedit",
 	"tests",
+	"ui_meminspect",
 }
 
 local rootpath = GetParentPath(...)
