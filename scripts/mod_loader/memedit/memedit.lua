@@ -129,6 +129,7 @@ function modApi.memedit:recalibrate()
 
 	LOG("Memedit - Calibration started - Follow the instructions to complete the process...")
 	self:unload()
+	self.failed = false
 	self.calibrating = true
 
 	self.scanner:restart()
@@ -151,6 +152,7 @@ function modApi.memedit:recalibrate()
 	end)
 
 	self.scanner.onFinishedUnsuccessfully:subscribe(function()
+		self.failed = true
 		self.calibrating = false
 		LOG("Memedit - Caibration ended in failure!")
 		self.onCalibrateFinished:dispatch(self.calibrated)
