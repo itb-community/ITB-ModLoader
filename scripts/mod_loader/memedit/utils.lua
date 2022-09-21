@@ -18,26 +18,25 @@ function utils.inheritClass(from, to)
 end
 
 function utils.boardExists()
-	if true
-		and Board ~= nil
-		and Board:IsBusy() == false
-	then
-		return true
-	else
+	if Board == nil then
 		return false, "Enter a mission"
+	elseif Board:IsBusy() then
+		return false, "Wait..."
+	else
+		return true
 	end
 end
 
 function utils.missionBoardExists()
-	if false
-		or Board == nil
-		or Board:IsBusy()
-		or Board:IsMissionBoard() == false
-	then
+	if Board == nil then
 		return false, "Enter a mission"
+	elseif Board:IsMissionBoard() == nil then
+		return false, "Enter a real mission"
+	elseif Board:IsBusy() then
+		return false, "Wait..."
+	else
+		return true
 	end
-
-	return true
 end
 
 -- Destructive function calculating the smallest
