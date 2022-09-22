@@ -25,6 +25,12 @@ local CLASS_ORDER = {
 	TechnoVek = 4,
 }
 
+function modApi:addMech(mech)
+	-- do asserts to verify argument `mech`
+
+	table.insert(modApi.mod_mechs, mech)
+end
+
 function modApi:addSquad(squad, name, desc, icon)
 	Assert.ModInitializingOrLoading()
 

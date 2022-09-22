@@ -30,6 +30,15 @@ function getStartingSquad(choice)
 		local squad = copy_table(modApi.mod_squads[index])
 		squad.id = nil
 
+		-- If it's the secret squad index, add individual mod
+		-- mechs at the end of the squad, so they can be
+		-- picked in random and custom squad
+		if choice == 10 then
+			for _, mech in ipairs(self.mod_mechs) do
+				table.insert(squad, mech)
+			end
+		end
+
 		return squad
 	else
 		return oldGetStartingSquad(choice)

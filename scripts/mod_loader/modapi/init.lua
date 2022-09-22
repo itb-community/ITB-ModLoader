@@ -200,6 +200,7 @@ function modApi:resetModContent()
 		"img/advanced/units/player/prime_firefighter_ns.png",
 		"img/advanced/units/player/prime_bottlecap_ns.png",
 	}
+	self.mod_mechs = {}
 	self.resourceDat = sdl.resourceDat("resources/resource.dat")
 
 	self.conditionalHooks = {}
