@@ -216,6 +216,11 @@ function File:delete()
 	return result
 end
 
+function File:GetLuaString()
+	return string.format("File(%q)", self:path())
+end
+File.GetString = File.GetLuaString
+
 
 Directory = Class.new();
 
@@ -387,3 +392,8 @@ function Directory:delete()
 	end)
 	return result
 end
+
+function Directory:GetLuaString()
+	return string.format("Directory(%q)", self:path())
+end
+Directory.GetString = Directory.GetLuaString
