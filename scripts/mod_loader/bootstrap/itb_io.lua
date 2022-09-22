@@ -160,6 +160,7 @@ function File:write_byte_array(content)
 end
 
 --- Copies this file to the specified destination path
+--- Returns a new File instance for the destination path
 function File:copy(destination)
 	Assert.Equals("table", type(self), "Check for . vs :")
 	Assert.Equals("string", type(destination))
@@ -173,11 +174,14 @@ function File:copy(destination)
 				self:path(), destination, tostring(err)
 		))
 	end)
+
+	return File(destination)
 end
 
 --- Moves this file to the specified destination path
 --- Moving a file to a different location within the same directory is
 --- functionally the same as renaming it.
+--- Returns a new File instance for the destination path
 function File:move(destination)
 	Assert.Equals("table", type(self), "Check for . vs :")
 	Assert.Equals("string", type(destination))
@@ -191,6 +195,8 @@ function File:move(destination)
 				self:path(), destination, tostring(err)
 		))
 	end)
+
+	return File(destination)
 end
 
 --- returns true if this file exists, false otherwise
