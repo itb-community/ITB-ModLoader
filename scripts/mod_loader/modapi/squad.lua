@@ -25,10 +25,15 @@ local CLASS_ORDER = {
 	TechnoVek = 4,
 }
 
-function modApi:addMech(mech)
-	-- do asserts to verify argument `mech`
+function modApi:addMech(mechType)
+	Assert.ModInitializingOrLoading()
+	Assert.Equals('string', type(mechType), "Argument #1")
 
-	table.insert(modApi.mod_mechs, mech)
+	local ptable = _G[mechType]
+	Assert.Equals("table", type(ptable), string.format("No global pawn table with id %q exists", mechType))
+	Assert.Equals(validMechClasses, ptable.Class, string.format("Pawn with id %q has an invalid Class", mechType))
+
+	table.insert(modApi.mod_mechs, mechType)
 end
 
 function modApi:addSquad(squad, name, desc, icon)
