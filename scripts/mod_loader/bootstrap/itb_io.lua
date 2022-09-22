@@ -82,7 +82,7 @@ function File:parent()
 
 	local result
 	try(function()
-		result = self.instance:parent()
+		result = Directory.of(self.instance:parent())
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -287,7 +287,7 @@ function Directory:parent()
 
 	local result
 	try(function()
-		result = self.instance:parent()
+		result = Directory.of(self.instance:parent())
 	end)
 	:catch(function(err)
 		error(string.format(
