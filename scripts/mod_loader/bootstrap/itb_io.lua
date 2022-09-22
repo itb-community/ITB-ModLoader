@@ -272,7 +272,7 @@ function Directory.savedata()
 		:catch(function(err)
 			error(string.format(
 					"Failed to create Directory instance for save data directory: %s",
-					path, tostring(err)
+					tostring(err)
 			))
 		end)
 	end
