@@ -1,14 +1,16 @@
 
 -- modified vanilla save_table with optional 'depth' parameter
 function save_table(target, depth)
+	if target.GetLuaString ~= nil then
+		return target:GetLuaString()
+	end
+
 	local ret = "{"
 	for i, v in pairs(target) do
 		local value = ""
 		if type(v) == "table" then
 			if v ~= target.__index then
-				if v.GetLuaString ~= nil then
-					value = v:GetLuaString()
-				elseif not depth or depth > 0 then
+				if not depth or depth > 0 then
 					value = save_table(v, depth and depth - 1 or nil)
 				else
 					value = "table"
