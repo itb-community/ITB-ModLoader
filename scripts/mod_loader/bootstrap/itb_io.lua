@@ -327,11 +327,19 @@ end
 function Directory:files()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
-	local instances = self.instance:files()
 	local result = {}
-	for _, instance in ipairs(instances) do
-		table.insert(result, File.of(instance))
-	end
+	try(function()
+		local instances = self.instance:files()
+		for _, instance in ipairs(instances) do
+			table.insert(result, File.of(instance))
+		end
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to list child files of %q: %s",
+				self:path(), tostring(err)
+		))
+	end)
 
 	return result
 end
@@ -339,11 +347,19 @@ end
 function Directory:directories()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
-	local instances = self.instance:directories()
 	local result = {}
-	for _, instance in ipairs(instances) do
-		table.insert(result, Directory.of(instance))
-	end
+	try(function()
+		local instances = self.instance:directories()
+		for _, instance in ipairs(instances) do
+			table.insert(result, Directory.of(instance))
+		end
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to list child directories of %q: %s",
+				self:path(), tostring(err)
+		))
+	end)
 
 	return result
 end
