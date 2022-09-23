@@ -24,7 +24,7 @@ File = Class.new();
 --- path - Path to the file. If the path points to a File outside the game's
 ---	       directory or save data directory, an error is thrown.
 ---
---- returns a File instance
+--- Returns a File instance
 function File:new(path)
 	Assert.Equals("string", type(path), "Path must be a string")
 	lazy_load()
@@ -52,31 +52,31 @@ function File.of(instance)
 	return result
 end
 
---- returns string representation of the path to this file
+--- Returns string representation of the path to this file
 function File:path()
 	Assert.Equals("table", type(self), "Check for . vs :")
 	return self.instance:path()
 end
 
---- returns name of this file, including extension
+--- Returns name of this file, including extension
 function File:name()
 	Assert.Equals("table", type(self), "Check for . vs :")
 	return self.instance:name()
 end
 
---- returns name of this file, without extension
+--- Returns name of this file, without extension
 function File:name_without_extension()
 	Assert.Equals("table", type(self), "Check for . vs :")
 	return self.instance:name_without_extension()
 end
 
---- returns the file's extension, or nil if there's none
+--- Returns the file's extension, or nil if there's none
 function File:extension()
 	Assert.Equals("table", type(self), "Check for . vs :")
 	return self.instance:extension()
 end
 
---- returns the parent directory of this file.
+--- Returns the parent directory of this file.
 function File:parent()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
@@ -93,7 +93,7 @@ function File:parent()
 	return result
 end
 
---- returns contents of the file as string
+--- Returns contents of the file as string
 function File:read_to_string()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
@@ -110,7 +110,7 @@ function File:read_to_string()
 	return result
 end
 
---- returns contents of the file as byte array
+--- Returns contents of the file as byte array
 function File:read_to_byte_array()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
@@ -199,7 +199,23 @@ function File:move(destination)
 	return File(destination)
 end
 
---- returns true if this file exists, false otherwise
+--- Creates missing directories in this File's abstract path, ensuring that they
+--- actually exist on the file system.
+function File:make_directories()
+	Assert.Equals("table", type(self), "Check for . vs :")
+
+	try(function()
+		self.instance:parent():make_directories()
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to create directories for %q: %s",
+				self:path(), tostring(err)
+		))
+	end)
+end
+
+--- Returns true if this file exists, false otherwise
 function File:exists()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
@@ -233,7 +249,7 @@ Directory = Class.new();
 --- path - Path to the directory. If the path points to a Directory outside the game's
 ---	       directory or save data directory, an error is thrown.
 ---
---- returns a Directory instance
+--- Returns a Directory instance
 function Directory:new(path)
 	Assert.Equals("string", type(path))
 	lazy_load()
@@ -263,9 +279,8 @@ end
 
 local savedata
 function Directory.savedata()
-	lazy_load()
-
 	if savedata == null then
+		lazy_load()
 		try(function()
 			savedata = factory.save_data_directory();
 		end)
@@ -280,19 +295,19 @@ function Directory.savedata()
 	return Directory.of(savedata)
 end
 
---- returns string representation of the path to this directory
+--- Returns string representation of the path to this directory
 function Directory:path()
 	Assert.Equals("table", type(self), "Check for . vs :")
 	return self.instance:path()
 end
 
---- returns name of this directory
+--- Returns name of this directory
 function Directory:name()
 	Assert.Equals("table", type(self), "Check for . vs :")
 	return self.instance:name()
 end
 
---- returns the parent directory of this directory.
+--- Returns the parent directory of this directory.
 function Directory:parent()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
@@ -375,7 +390,23 @@ function Directory:directories()
 	return result
 end
 
---- returns true if this directory exists, false otherwise
+--- Creates missing directories in this Directory's abstract path, ensuring that they
+--- actually exist on the file system.
+function Directory:make_directories()
+	Assert.Equals("table", type(self), "Check for . vs :")
+
+	try(function()
+		self.instance:make_directories()
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to create directories for %q: %s",
+				self:path(), tostring(err)
+		))
+	end)
+end
+
+--- Returns true if this directory exists, false otherwise
 function Directory:exists()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
