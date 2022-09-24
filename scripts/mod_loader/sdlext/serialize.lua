@@ -3,68 +3,69 @@ local write, writeIndent, writers, refCount;
 persistence =
 {
 	store = function (path, ...)
-		local file, e = io.open(path, "w");
-		if not file then
-			return error(e);
-		end
+		local buffer = {}
 		local n = select("#", ...);
+
 		-- Count references
 		local objRefCount = {}; -- Stores reference that will be exported
 		for i = 1, n do
 			refCount(objRefCount, (select(i,...)));
 		end;
+
 		-- Export Objects with more than one ref and assign name
 		-- First, create empty tables for each
 		local objRefNames = {};
 		local objRefIdx = 0;
-		file:write("-- Persistent Data\n");
-		file:write("local multiRefObjects = {\n");
+		table.insert(buffer, "-- Persistent Data\n");
+		table.insert(buffer, "local multiRefObjects = {\n");
 		for obj, count in pairs(objRefCount) do
 			if count > 1 then
 				objRefIdx = objRefIdx + 1;
 				objRefNames[obj] = objRefIdx;
-				file:write("{};"); -- table objRefIdx
+				table.insert(buffer, "{};"); -- table objRefIdx
 			end;
 		end;
-		file:write("\n} -- multiRefObjects\n");
+		table.insert(buffer, "\n} -- multiRefObjects\n");
+
 		-- Then fill them (this requires all empty multiRefObjects to exist)
 		for obj, idx in pairs(objRefNames) do
 			for k, v in pairs(obj) do
-				file:write("multiRefObjects["..idx.."][");
-				write(file, k, 0, objRefNames);
-				file:write("] = ");
-				write(file, v, 0, objRefNames);
-				file:write(";\n");
+				table.insert(buffer, "multiRefObjects["..idx.."][");
+				write(buffer, k, 0, objRefNames);
+				table.insert(buffer, "] = ");
+				write(buffer, v, 0, objRefNames);
+				table.insert(buffer, ";\n");
 			end;
 		end;
+
 		-- Create the remaining objects
 		for i = 1, n do
-			file:write("local ".."obj"..i.." = ");
-			write(file, (select(i,...)), 0, objRefNames);
-			file:write("\n");
+			table.insert(buffer, "local ".."obj"..i.." = ");
+			write(buffer, (select(i,...)), 0, objRefNames);
+			table.insert(buffer, "\n");
 		end
+
 		-- Return them
 		if n > 0 then
-			file:write("return obj1");
+			table.insert(buffer, "return obj1");
 			for i = 2, n do
-				file:write(" ,obj"..i);
+				table.insert(buffer, " ,obj"..i);
 			end;
-			file:write("\n");
+			table.insert(buffer, "\n");
 		else
-			file:write("return\n");
+			table.insert(buffer, "return\n");
 		end;
-		if type(path) == "string" then
-			file:close();
-		end;
+
+		-- Write the file
+		local content = table.concat(buffer)
+		local file = File(path)
+		file:write_string(content)
 	end;
 
 	load = function (path)
-		local f, e;
-		if type(path) == "string" then
-			f, e = loadfile(path);
-		else
-			f, e = path:read('*a')
-		end
+		local file = File(path);
+		local content = file:read_to_string()
+		local f, e = loadstring(content);
 		if f then
 			return f();
 		else
@@ -76,14 +77,14 @@ persistence =
 -- Private methods
 
 -- write thing (dispatcher)
-write = function (file, item, level, objRefNames)
-	writers[type(item)](file, item, level, objRefNames);
+write = function (buffer, item, level, objRefNames)
+	writers[type(item)](buffer, item, level, objRefNames);
 end;
 
 -- write indent
-writeIndent = function (file, level)
+writeIndent = function (buffer, level)
 	for i = 1, level do
-		file:write("\t");
+		table.insert(buffer, "\t");
 	end;
 end;
 
@@ -107,63 +108,63 @@ end;
 
 -- Format items for the purpose of restoring
 writers = {
-	["nil"] = function (file, item)
-			file:write("nil");
+	["nil"] = function (buffer, item)
+			table.insert(buffer, "nil");
 		end;
-	["number"] = function (file, item)
-			file:write(tostring(item));
+	["number"] = function (buffer, item)
+		table.insert(buffer, tostring(item));
 		end;
-	["string"] = function (file, item)
-			file:write(string.format("%q", item));
+	["string"] = function (buffer, item)
+		table.insert(buffer, string.format("%q", item));
 		end;
-	["boolean"] = function (file, item)
+	["boolean"] = function (buffer, item)
 			if item then
-				file:write("true");
+				table.insert(buffer, "true");
 			else
-				file:write("false");
+				table.insert(buffer, "false");
 			end
 		end;
-	["table"] = function (file, item, level, objRefNames)
+	["table"] = function (buffer, item, level, objRefNames)
 			local refIdx = objRefNames[item];
 			if refIdx then
 				-- Table with multiple references
-				file:write("multiRefObjects["..refIdx.."]");
+				table.insert(buffer, "multiRefObjects["..refIdx.."]");
 			else
 				-- Single use table
-				file:write("{\n");
+				table.insert(buffer, "{\n");
 				for k, v in pairs(item) do
-					writeIndent(file, level+1);
-					file:write("[");
-					write(file, k, level+1, objRefNames);
-					file:write("] = ");
-					write(file, v, level+1, objRefNames);
-					file:write(";\n");
+					writeIndent(buffer, level+1);
+					table.insert(buffer, "[");
+					write(buffer, k, level+1, objRefNames);
+					table.insert(buffer, "] = ");
+					write(buffer, v, level+1, objRefNames);
+					table.insert(buffer, ";\n");
 				end
-				writeIndent(file, level);
-				file:write("}");
+				writeIndent(buffer, level);
+				table.insert(buffer, "}");
 			end;
 		end;
-	["function"] = function (file, item)
+	["function"] = function (buffer, item)
 			-- Does only work for "normal" functions, not those
 			-- with upvalues or c functions
 			local dInfo = debug.getinfo(item, "uS");
 			if dInfo.nups > 0 then
-				file:write("nil --[[functions with upvalue not supported]]");
+				table.insert(buffer, "nil --[[functions with upvalue not supported]]");
 			elseif dInfo.what ~= "Lua" then
-				file:write("nil --[[non-lua function not supported]]");
+				table.insert(buffer, "nil --[[non-lua function not supported]]");
 			else
 				local r, s = pcall(string.dump,item);
 				if r then
-					file:write(string.format("loadstring(%q)", s));
+					table.insert(buffer, string.format("loadstring(%q)", s));
 				else
-					file:write("nil --[[function could not be dumped]]");
+					table.insert(buffer, "nil --[[function could not be dumped]]");
 				end
 			end
 		end;
-	["thread"] = function (file, item)
-			file:write("nil --[[thread]]\n");
+	["thread"] = function (buffer, item)
+			table.insert(buffer, "nil --[[thread]]\n");
 		end;
-	["userdata"] = function (file, item)
-			file:write("nil --[[userdata]]\n");
+	["userdata"] = function (buffer, item)
+			table.insert(buffer, "nil --[[userdata]]\n");
 		end;
 }
