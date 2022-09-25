@@ -64,13 +64,17 @@ persistence =
 
 	load = function (path)
 		local file = File(path);
-		local content = file:read_to_string()
-		local f, e = loadstring(content);
-		if f then
-			return f();
+		if file:exists() then
+			local content = file:read_to_string()
+			local f, e = loadstring(content);
+			if f then
+				return f();
+			else
+				return nil, e;
+			end;
 		else
-			return nil, e;
-		end;
+			return nil, "File doesn't exist"
+		end
 	end;
 }
 
