@@ -8,12 +8,10 @@ local requireScanMovePawn = utils.requireScanMovePawn
 local cleanupScanMovePawn = utils.cleanupScanMovePawn
 local scans = {}
 
-local boardPreRequisites = {"vital.size_board"}
-
 scans.highlightedX = inheritClass(Scan, {
 	id = "HighlightedX",
 	name = "Board HighlightedX",
-	prerequisiteScans = boardPreRequisites,
+	prerequisiteScans = {"vital.size_board", "pawn.MovementSpent"},
 	access = "R",
 	dataType = "int",
 	condition = boardExists,
@@ -30,6 +28,7 @@ scans.highlightedX = inheritClass(Scan, {
 			if self.iteration == 1 then
 				ScanMove:SetEvents{
 					TargetEvent = self.onMoveHighlighted,
+					AfterEffectEvent = self.afterMoveEffect,
 					Caller = self,
 				}
 			end
@@ -41,12 +40,15 @@ scans.highlightedX = inheritClass(Scan, {
 		self:searchBoard(p2.x)
 		self:evaluateResults()
 	end,
+	afterMoveEffect = function(self, pawn, p1, p2)
+		modApi.memedit.dll.pawn.setMovementSpent(pawn, false)
+	end,
 })
 
 scans.highlightedY = inheritClass(Scan, {
 	id = "HighlightedY",
 	name = "Board HighlightedY",
-	prerequisiteScans = boardPreRequisites,
+	prerequisiteScans = {"vital.size_board", "pawn.MovementSpent"},
 	access = "R",
 	dataType = "int",
 	condition = boardExists,
@@ -63,6 +65,7 @@ scans.highlightedY = inheritClass(Scan, {
 			if self.iteration == 1 then
 				ScanMove:SetEvents{
 					TargetEvent = self.onMoveHighlighted,
+					AfterEffectEvent = self.afterMoveEffect,
 					Caller = self,
 				}
 			end
@@ -73,6 +76,9 @@ scans.highlightedY = inheritClass(Scan, {
 	onMoveHighlighted = function(self, pawn, p1, p2)
 		self:searchBoard(p2.y)
 		self:evaluateResults()
+	end,
+	afterMoveEffect = function(self, pawn, p1, p2)
+		modApi.memedit.dll.pawn.setMovementSpent(pawn, false)
 	end,
 })
 
