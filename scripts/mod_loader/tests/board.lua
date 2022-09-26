@@ -163,7 +163,7 @@ end
 
 testsuite.test_SetFrozen = function()
 	Tests.RequireBoard()
-	local p = Tests.GetCleanTile()
+	local p = Tests.GetNonUniqueBuildingTile()
 	local skipAnimation = true
 	local damage = SpaceDamage(p, 1)
 
@@ -171,13 +171,13 @@ testsuite.test_SetFrozen = function()
 	Board:SetTerrain(p, TERRAIN_MOUNTAIN)
 	Board:SetFrozen(p, true, skipAnimation)
 	Board:DamageSpace(damage)
-	local isUndamaged = Board:GetHealth(p) == 2
+	local undamagedMountainHp = Board:GetHealth(p)
 
 	Board:ClearSpace(p)
 	Board:SetTerrain(p, TERRAIN_MOUNTAIN)
 	Board:SetFrozen(p, false, skipAnimation)
 	Board:DamageSpace(damage)
-	local isDamaged = Board:GetHealth(p) == 1
+	local damagedMountainHp = Board:GetHealth(p)
 
 	local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 	local maxHealth = pawn:GetHealth()
@@ -185,7 +185,7 @@ testsuite.test_SetFrozen = function()
 	Board:AddPawn(pawn, p)
 	Board:SetFrozen(p, true, skipAnimation)
 	Board:DamageSpace(damage)
-	local isUndamagedPawn = pawn:GetHealth() == maxHealth
+	local undamagedPawnHp = pawn:GetHealth()
 
 	local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 	local maxHealth = pawn:GetHealth()
@@ -193,12 +193,12 @@ testsuite.test_SetFrozen = function()
 	Board:AddPawn(pawn, p)
 	Board:SetFrozen(p, false, skipAnimation)
 	Board:DamageSpace(damage)
-	local isDamagedPawn = pawn:GetHealth() == maxHealth - 1
+	local damagedPawnHp = pawn:GetHealth()
 
-	Assert.Equals(true, isUndamaged)
-	Assert.Equals(true, isDamaged)
-	Assert.Equals(true, isUndamagedPawn)
-	Assert.Equals(true, isDamagedPawn)
+	Assert.Equals(2, undamagedMountainHp)
+	Assert.Equals(1, damagedMountainHp)
+	Assert.Equals(maxHealth, undamagedPawnHp)
+	Assert.Equals(maxHealth - 1, damagedPawnHp)
 
 	Board:ClearSpace(p)
 
@@ -207,7 +207,7 @@ end
 
 testsuite.test_SetShield = function()
 	Tests.RequireBoard()
-	local p = Tests.GetCleanTile()
+	local p = Tests.GetNonUniqueBuildingTile()
 	local skipAnimation = true
 	local damage = SpaceDamage(p, 1)
 
@@ -215,13 +215,13 @@ testsuite.test_SetShield = function()
 	Board:SetTerrain(p, TERRAIN_MOUNTAIN)
 	Board:SetShield(p, true, skipAnimation)
 	Board:DamageSpace(damage)
-	local isUndamaged = Board:GetHealth(p) == 2
+	local undamagedMountainHp = Board:GetHealth(p)
 
 	Board:ClearSpace(p)
 	Board:SetTerrain(p, TERRAIN_MOUNTAIN)
 	Board:SetShield(p, false, skipAnimation)
 	Board:DamageSpace(damage)
-	local isDamaged = Board:GetHealth(p) == 1
+	local damagedMountainHp = Board:GetHealth(p)
 
 	local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 	local maxHealth = pawn:GetHealth()
@@ -229,7 +229,7 @@ testsuite.test_SetShield = function()
 	Board:AddPawn(pawn, p)
 	Board:SetShield(p, true, skipAnimation)
 	Board:DamageSpace(damage)
-	local isUndamagedPawn = pawn:GetHealth() == maxHealth
+	local undamagedPawnHp = pawn:GetHealth()
 
 	local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 	local maxHealth = pawn:GetHealth()
@@ -237,12 +237,12 @@ testsuite.test_SetShield = function()
 	Board:AddPawn(pawn, p)
 	Board:SetShield(p, false, skipAnimation)
 	Board:DamageSpace(damage)
-	local isDamagedPawn = pawn:GetHealth() == maxHealth - 1
+	local damagedPawnHp = pawn:GetHealth()
 
-	Assert.Equals(true, isUndamaged)
-	Assert.Equals(true, isDamaged)
-	Assert.Equals(true, isUndamagedPawn)
-	Assert.Equals(true, isDamagedPawn)
+	Assert.Equals(2, undamagedMountainHp)
+	Assert.Equals(1, damagedMountainHp)
+	Assert.Equals(maxHealth, undamagedPawnHp)
+	Assert.Equals(maxHealth - 1, damagedPawnHp)
 
 	Board:ClearSpace(p)
 
