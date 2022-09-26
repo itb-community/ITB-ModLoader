@@ -129,9 +129,6 @@ local Scan = newClass{
 		if type(base) == "userdata" then
 			base = dll.debug.getObjAddr(base)
 		end
-		if base == nil then
-			LOG(debug.traceback())
-		end
 
 		local memget = {
 			int = dll.debug.getAddrInt,

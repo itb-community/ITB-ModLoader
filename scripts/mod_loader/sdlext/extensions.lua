@@ -32,6 +32,9 @@ local oldsdltext = sdl.text
 function sdl.text(font, textset, text)
 	checkGC()
 
+	if text == nil then
+		LOG(debug.traceback())
+	end
 	return oldsdltext(font, textset, text)
 end
 
