@@ -232,6 +232,25 @@ BoardClass.GetTerrainIcon = function(self, loc)
 	return result
 end
 
+BoardClass.GetUniqueBuilding = function(self, loc)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.TypePoint(loc, "Argument #1")
+
+	local result
+
+	try(function()
+		result = requireMemedit().board.getUniqueBuildingName(loc)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
 BoardClass.IsForest = function(self, loc)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	Assert.TypePoint(loc, "Argument #1")
@@ -362,6 +381,54 @@ BoardClass.SetShield = function(self, loc, shield, skipAnimation)
 		self:AddShield(loc)
 	else
 		self:RemoveShield(loc)
+	end
+end
+
+BoardClass.SetUniqueBuilding = function(self, loc, structureId)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.TypePoint(loc, "Argument #1")
+	Assert.Equals("string", type(structureId), "Argument #2")
+
+	local terrains = { [loc.y * self:GetSize().x + loc.x + 1] = self:GetTerrain(loc) }
+	local memedit = getMemedit()
+
+	if structureId ~= "" then
+		-- Change all buildings to roads
+		for i, p in ipairs(self) do
+			local terrain = self:GetTerrain(p)
+
+			if terrain == TERRAIN_BUILDING then
+				terrains[i] = terrain
+				self:SetTerrain(p, TERRAIN_ROAD)
+			end
+		end
+	end
+
+	if memedit then
+		try(function()
+			memedit.board.setUniqueBuildingName(loc, "")
+		end)
+		:catch(function(err)
+			error(string.format(
+					"memedit.dll: %s",
+					tostring(err)
+			))
+		end)
+	end
+
+	if structureId ~= "" then
+		-- Create a single building so it is the only one
+		-- that can be converted to a unique building
+		self:SetTerrain(loc, TERRAIN_ROAD)
+		self:SetTerrain(loc, TERRAIN_BUILDING)
+		self:AddUniqueBuilding(structureId)
+
+		-- Revart all buildings back to buildings
+		for i, p in ipairs(self) do
+			if terrains[i] then
+				self:SetTerrain(p, terrains[i])
+			end
+		end
 	end
 end
 

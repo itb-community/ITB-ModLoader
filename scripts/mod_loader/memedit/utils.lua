@@ -140,6 +140,77 @@ function utils.nonUniqueBuildingPoint(random)
 	return result
 end
 
+local function saveUniqueBuilding(p)
+	local mission = GetCurrentMission()
+
+	if mission.memedit == nil then
+		mission.memedit = {}
+	end
+
+	mission.memedit.uniqueBar = p
+end
+
+local function getSavedUniqueBuilding()
+	local mission = GetCurrentMission()
+
+	if mission.memedit == nil then
+		mission.memedit = {}
+	end
+
+	return mission.memedit.uniqueBar
+end
+
+-- Finds a tile that if turned into a building,
+-- will not be a unique building; and also does
+-- not have a pawn occupying it.
+-- If there are no such tiles throw an error.
+function utils.uniqueBuildingPoint(random)
+	local result = getSavedUniqueBuilding()
+	local board = Board
+	local terrains = {}
+
+	if result then
+		return result
+	end
+
+	if random then
+		board = randomize(extract_table(Board:GetTiles()))
+	end
+
+	-- Flatten terrain
+	for i, p in ipairs(Board) do
+		terrains[i] = Board:GetTerrain(p)
+		Board:SetTerrain(p, TERRAIN_ROAD)
+	end
+
+	-- Add one unique building
+	for _, p in ipairs(board) do
+		result = p
+		saveUniqueBuilding(p)
+
+		Board:SetTerrain(p, TERRAIN_BUILDING)
+		Board:AddUniqueBuilding("str_bar1")
+		LOG(Board:IsUniqueBuilding(p))
+
+		local pawn = Board:GetPawn(p)
+		if pawn then
+			pawn:SetSpace(utils.cleanPoint())
+		end
+
+		break
+	end
+
+	-- Revert terrain
+	for i, p in ipairs(Board) do
+		if p ~= result then
+			Board:SetTerrain(p, terrains[i])
+		end
+	end
+
+	-- Board:ClearSpace(result)
+	return result
+end
+
 -- Same as cleanPoint, but randomize the
 -- returned tile
 function utils.randomCleanPoint()
@@ -149,7 +220,13 @@ end
 -- Same as nonUniqueBuildingPoint, but randomize the
 -- returned tile
 function utils.randomNonUniqueBuildingPoint()
-	return utils.cleanPoint(true)
+	return utils.nonUniqueBuildingPoint(true)
+end
+
+-- Same as uniqueBuildingPoint, but randomize the
+-- returned tile
+function utils.randomUniqueBuildingPoint()
+	return utils.uniqueBuildingPoint(true)
 end
 
 -- Removes all units of a specified team.

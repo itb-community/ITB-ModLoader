@@ -4,9 +4,8 @@ local Scan = require(rootpath.."scan")
 local utils = require(rootpath.."utils")
 local inheritClass = utils.inheritClass
 local boardExists = utils.boardExists
-local cleanPoint = utils.cleanPoint
 local randomCleanPoint = utils.randomCleanPoint
-local nonUniqueBuildingPoint = utils.nonUniqueBuildingPoint
+local randomUniqueBuildingPoint = utils.randomUniqueBuildingPoint
 local randomNonUniqueBuildingPoint = utils.randomNonUniqueBuildingPoint
 local requireScanMovePawn = utils.requireScanMovePawn
 local cleanupScanMovePawn = utils.cleanupScanMovePawn
@@ -269,6 +268,25 @@ scans.terrainIcon = inheritClass(Scan, {
 			self:searchTile(p, terrainIcon)
 			self:evaluateResults()
 			Board:SetTerrainIcon(p, "")
+		end
+	},
+})
+
+scans.uniqueBuildingName = inheritClass(Scan, {
+	id = "UniqueBuildingName",
+	name = "Tile Unique Building Name",
+	prerequisiteScans = tilePreRequisites,
+	access = "RW",
+	dataType = "string",
+	condition = boardExists,
+	actions = {
+		function(self)
+			local unique = randomUniqueBuildingPoint()
+			-- local nonUnique = randomNonUniqueBuildingPoint()
+			-- Board:SetTerrain(unique, TERRAIN_BUILDING)
+			self:searchTile(unique, "str_bar1")
+			-- self:searchTile(nonUnique, "")
+			self:evaluateResults()
 		end
 	},
 })
