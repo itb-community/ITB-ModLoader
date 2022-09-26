@@ -233,6 +233,22 @@ return {
 	["Memedit_ButtonTooltip_Close"] = "Close dialog",
 	["Memedit_Button_Retry"] = "Retry",
 	["Memedit_ButtonTooltip_Retry"] = "Retry the memedit calibration process",
+	["Memedit_Button_Disable"] = "Disable",
+	["Memedit_ButtonTooltip_Disable"] = "Disable mods that requires memedit and close dialog",
+	["Memedit_Stats_Scans"] = "Scans: ",
+	["Memedit_Stats_Succeeded"] = "Succeeded: ",
+	["Memedit_Stats_Failed"] = "Failed: ",
+	["Memedit_Popup_Calibrated_FrameTitle"] = "Memedit Calibrated!",
+	["Memedit_Popup_Calibrated_FrameText"] = ""
+		.."Memedit has been successfully calibrated!\n\n"
+		.."You need to restart the game in order to initialize mods "
+		.."requring memedit.",
+	["Memedit_Popup_Disable_FrameTitle"] = "Mods disabled",
+	["Memedit_Popup_Disable_FrameText"] = ""
+		.."Mods requiring memedit has been disabled and unchecked.\n\n"
+		.."The next time you restart the game, these mods will no longer "
+		.."attempt to initialize and load unless you enable them again "
+		.."in [Mod Content] > [Mod Configuration].",
 
 	["TestingConsole_ToggleButton_Text"] = "TESTING CONSOLE",
 	["TestingConsole_ToggleButton_Tooltip"] = "Opens a console for running mod loader integration tests.",

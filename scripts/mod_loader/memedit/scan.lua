@@ -109,6 +109,18 @@ local Scan = newClass{
 		return result
 	end,
 
+	getResultCount = function(self)
+		local resultCount = "N/A"
+
+		if self.result then
+			resultCount = 1
+		elseif self.results then
+			resultCount = #self.results
+		end
+
+		return resultCount
+	end,
+
 	search = function(self, base, from, to, val, dataType)
 		local dll = modApi.memedit.dll
 

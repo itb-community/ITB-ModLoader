@@ -22,8 +22,7 @@ local tilePreRequisites = {
 
 scans.acid = inheritClass(Scan, {
 	id = "Acid",
-	questName = "Tile Acid",
-	questHelp = "Wait",
+	name = "Tile Acid",
 	prerequisiteScans = tilePreRequisites,
 	access = "RW",
 	dataType = "bool",
@@ -42,8 +41,7 @@ scans.acid = inheritClass(Scan, {
 
 scans.fireType = inheritClass(Scan, {
 	id = "FireType",
-	questName = "Tile Fire Type",
-	questHelp = "Wait",
+	name = "Tile Fire Type",
 	prerequisiteScans = tilePreRequisites,
 	access = "RW",
 	dataType = "byte",
@@ -62,8 +60,7 @@ scans.fireType = inheritClass(Scan, {
 
 scans.frozen = inheritClass(Scan, {
 	id = "Frozen",
-	questName = "Tile Frozen",
-	questHelp = "Wait",
+	name = "Tile Frozen",
 	prerequisiteScans = tilePreRequisites,
 	access = "RW",
 	dataType = "bool",
@@ -97,8 +94,7 @@ scans.frozen = inheritClass(Scan, {
 
 scans.health = inheritClass(Scan, {
 	id = "Health",
-	questName = "Health",
-	questHelp = "Wait",
+	name = "Tile Health",
 	prerequisiteScans = tilePreRequisites,
 	access = "RW",
 	dataType = "int",
@@ -118,8 +114,7 @@ scans.health = inheritClass(Scan, {
 
 scans.highlighted = inheritClass(Scan, {
 	id = "Highlighted",
-	questName = "Tile Highlighted",
-	questHelp = "Wait",
+	name = "Tile Highlighted",
 	prerequisiteScans = tilePreRequisites,
 	access = "R",
 	dataType = "bool",
@@ -158,8 +153,7 @@ scans.highlighted = inheritClass(Scan, {
 
 scans.maxHealth = inheritClass(Scan, {
 	id = "MaxHealth",
-	questName = "Max Health",
-	questHelp = "Wait",
+	name = "Tile Max Health",
 	prerequisiteScans = tilePreRequisites,
 	access = "RW",
 	dataType = "int",
@@ -179,8 +173,7 @@ scans.maxHealth = inheritClass(Scan, {
 
 scans.rubbleType = inheritClass(Scan, {
 	id = "RubbleType",
-	questName = "Rubble Type",
-	questHelp = "Wait",
+	name = "Tile Rubble Type",
 	prerequisiteScans = tilePreRequisites,
 	access = "RW",
 	dataType = "byte",
@@ -205,8 +198,7 @@ scans.rubbleType = inheritClass(Scan, {
 
 scans.shield = inheritClass(Scan, {
 	id = "Shield",
-	questName = "Tile Shield",
-	questHelp = "Wait",
+	name = "Tile Shield",
 	prerequisiteScans = tilePreRequisites,
 	access = "RW",
 	dataType = "bool",
@@ -226,8 +218,7 @@ scans.shield = inheritClass(Scan, {
 
 scans.smoke = inheritClass(Scan, {
 	id = "Smoke",
-	questName = "Tile Smoke",
-	questHelp = "Wait",
+	name = "Tile Smoke",
 	prerequisiteScans = tilePreRequisites,
 	access = "RW",
 	dataType = "bool",
@@ -246,8 +237,7 @@ scans.smoke = inheritClass(Scan, {
 
 scans.terrain = inheritClass(Scan, {
 	id = "Terrain",
-	questName = "Terrain",
-	questHelp = "Wait",
+	name = "Tile Terrain",
 	prerequisiteScans = tilePreRequisites,
 	access = "RW",
 	dataType = "int",
@@ -266,8 +256,7 @@ scans.terrain = inheritClass(Scan, {
 
 scans.terrainIcon = inheritClass(Scan, {
 	id = "TerrainIcon",
-	questName = "Terrain Icon",
-	questHelp = "Wait",
+	name = "Tile Terrain Icon",
 	prerequisiteScans = tilePreRequisites,
 	access = "RW",
 	dataType = "string",

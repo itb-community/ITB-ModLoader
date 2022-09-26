@@ -2,11 +2,7 @@
 local COLOR_GREEN = sdl.rgb(64, 196, 64)
 local COLOR_YELLOW = sdl.rgb(192, 192, 64)
 local COLOR_RED = sdl.rgb(192, 32, 32)
-local MARK_TICK = deco.surfaces.markTick
-local MARK_CROSS = deco.surfaces.markCross
-local TEXT_SET_GREEN = deco.textset(COLOR_GREEN)
-local TEXT_SET_YELLOW = deco.textset(COLOR_YELLOW)
-local TEXT_SET_RED = deco.textset(COLOR_RED)
+local TEXT_SET_STAT = deco.textset(deco.colors.buttonborder, nil, nil, true)
 
 local function formatGetText(textId, ...)
 	return string.format(GetText(textId), ...)
@@ -21,6 +17,51 @@ function decoPaddedSolid:draw(screen, widget)
 	rect.h = widget.rect.h - widget.padt - widget.padb
 
 	screen:drawrect(self.color, rect)
+end
+
+local function decoTextStat(text)
+	return DecoText(text, deco.uifont.tooltipText.font, TEXT_SET_STAT)
+end
+
+local function decoRAlignedTextStat(text)
+	return DecoRAlignedText(text, deco.uifont.tooltipText.font, TEXT_SET_STAT)
+end
+
+local function disableMemeditMods()
+	local modConfiguration = modApi:getCurrentModConfiguration()
+
+	sdlext.config(
+		modApi:getCurrentModcontentPath(),
+		function(obj)
+			for modId, modOptions in pairs(obj.modOptions) do
+				local mod = mod_loader.mods[modId]
+				if true
+					and mod
+					and mod.extensions
+					and list_contains(mod.extensions, "memedit")
+				then
+					-- Update cache
+					modConfiguration[modId].enabled = false
+					-- Update file
+					modOptions.enabled = false
+
+					-- TODO:
+					-- After merging #163: "feature-failed-mod-popup"
+					-- we can also disable mods that have dependency
+					-- on the mods we disabled, by checking each mod's
+					-- mod.dependency table.
+				end
+			end
+		end
+	)
+
+	sdlext.showButtonDialog(
+		GetText("Memedit_Popup_Disable_FrameTitle"),
+		GetText("Memedit_Popup_Disable_FrameText"),
+		responseFn,
+		{ GetText("Button_Ok") },
+		{ "" }
+	)
 end
 
 local function createUi(screen, uiRoot)
@@ -47,8 +88,100 @@ local function createUi(screen, uiRoot)
 		:padding(10)
 		:addTo(innerFrame)
 
-	local buttons = Ui()
-		:width(1):heightpx(2)
+	-- STATS
+	--------
+
+	local stats_holder = Ui()
+		:width(1):heightpx(40)
+		:addTo(innerFrame)
+
+	local stats_padding = 10
+	local stats_num_width = 40
+	local stats = UiBoxLayout()
+		:height(1) -- adjust width later
+		:anchorH("right")
+		:hgap(stats_padding)
+		:addTo(stats_holder)
+
+	local stat_total_text = Ui()
+		:height(1) -- adjust width later
+		:decorate{ decoTextStat(GetText("Memedit_Stats_Scans")) }
+		:addTo(stats)
+
+	local stat_succeeded_text = Ui()
+		:height(1) -- adjust width later
+		:decorate{ decoTextStat(GetText("Memedit_Stats_Succeeded")) }
+		:addTo(stats)
+
+	local stat_failed_text = Ui()
+		:height(1) -- adjust width later
+		:decorate{ decoTextStat(GetText("Memedit_Stats_Failed")) }
+		:addTo(stats)
+
+	stat_total_text:widthpx(stat_total_text.decorations[1].surface:w() + stats_num_width)
+	stat_succeeded_text:widthpx(stat_succeeded_text.decorations[1].surface:w() + stats_num_width)
+	stat_failed_text:widthpx(stat_failed_text.decorations[1].surface:w() + stats_num_width)
+	stats:widthpx(stat_total_text.w + stat_succeeded_text.w + stat_failed_text.w + stats_padding * 2)
+
+	local stat_total_num = Ui()
+		:widthpx(stats_num_width):height(1)
+		:anchorH("right")
+		:decorate{ decoRAlignedTextStat() }
+		:addTo(stat_total_text)
+
+	local stat_succeeded_num = Ui()
+		:widthpx(stats_num_width):height(1)
+		:anchorH("right")
+		:decorate{ decoRAlignedTextStat() }
+		:addTo(stat_succeeded_text)
+
+	local stat_failed_num = Ui()
+		:widthpx(stats_num_width):height(1)
+		:anchorH("right")
+		:decorate{ decoRAlignedTextStat() }
+		:addTo(stat_failed_text)
+
+	function stat_total_num:relayout()
+		local total = 0
+			+ #memedit.scanner.scans_succeeded
+			+ #memedit.scanner.scans_queued
+			+ #memedit.scanner.scans_blocked
+			+ #memedit.scanner.scans_failed
+
+		self.decorations[1]:setsurface(tostring(total))
+		Ui.relayout(self)
+	end
+
+	function stat_succeeded_num:relayout()
+		local succeeded = #memedit.scanner.scans_succeeded
+
+		if succeeded > 0 then
+			self.decorations[1]:setcolor(COLOR_GREEN)
+		else
+			self.decorations[1]:setcolor(deco.colors.buttonborder)
+		end
+
+		self.decorations[1]:setsurface(tostring(succeeded))
+		Ui.relayout(self)
+	end
+
+	function stat_failed_num:relayout()
+		local failed = #memedit.scanner.scans_failed
+
+		if failed > 0 then
+			self.decorations[1]:setcolor(COLOR_RED)
+		else
+			self.decorations[1]:setcolor(deco.colors.buttonborder)
+		end
+
+		self.decorations[1]:setsurface(tostring(failed))
+		Ui.relayout(self)
+	end
+
+	-- BUTTONS
+	----------
+
+	Ui():width(1):heightpx(2)
 		:decorate{DecoSolid(deco.colors.buttonborder)}
 		:addTo(innerFrame)
 
@@ -56,17 +189,7 @@ local function createUi(screen, uiRoot)
 		:width(1):heightpx(60)
 		:addTo(innerFrame)
 
-	local textbox = UiWrappedText(
-			nil,
-			deco.uifont.tooltipTextLarge.font,
-			deco.uifont.tooltipTextLarge.set
-		)
-		:width(1):height(1)
-		:addTo(scrollarea)
-
-	textbox.pixelWrap = true
-
-	local button = Ui()
+	local button_main = Ui()
 		:widthpx(100):heightpx(41)
 		:anchor("center", "center")
 		:decorate{
@@ -80,7 +203,22 @@ local function createUi(screen, uiRoot)
 		}
 		:addTo(buttons)
 
-	function button:relayout()
+	local button_disable = Ui()
+		:widthpx(100):heightpx(41)
+		:anchor("right", "center")
+		:decorate{
+			DecoButton(),
+			DecoAnchor(),
+			DecoCAlignedText(
+				GetText("Memedit_Button_Disable"),
+				deco.uifont.tooltipTitleLarge.font,
+				deco.uifont.tooltipTitleLarge.set
+			)
+		}
+		:settooltip(GetText("Memedit_ButtonTooltip_Disable"))
+		:addTo(buttons)
+
+	function button_main:relayout()
 		if memedit.failed then
 			self.decorations[3]:setsurface(GetText("Memedit_Button_Retry"))
 			self:settooltip(GetText("Memedit_ButtonTooltip_Retry"))
@@ -98,7 +236,7 @@ local function createUi(screen, uiRoot)
 		Ui.relayout(self)
 	end
 
-	function button:onclicked(button)
+	function button_main:onclicked(button)
 		if button == 1 then
 			if memedit.failed then
 				memedit:recalibrate()
@@ -113,6 +251,29 @@ local function createUi(screen, uiRoot)
 
 		return true
 	end
+
+	function button_disable:onclicked(button)
+		if button == 1 then
+			memedit.scanner:stop()
+			disableMemeditMods()
+			frame:detach()
+		end
+
+		return true
+	end
+
+	-- TEXT BOX
+	-----------
+
+	local textbox = UiWrappedText(
+			nil,
+			deco.uifont.tooltipTextLarge.font,
+			deco.uifont.tooltipTextLarge.set
+		)
+		:width(1):height(1)
+		:addTo(scrollarea)
+
+	textbox.pixelWrap = true
 
 	function textbox:updateText()
 		local mods = mod_loader.mods
@@ -149,6 +310,9 @@ local function createUi(screen, uiRoot)
 		UiWrappedText.relayout(self)
 	end
 
+	-- CURRENT SCAN
+	---------------
+
 	local scan_holder = Ui()
 		:width(1):height(1)
 		:hide()
@@ -181,10 +345,10 @@ local function createUi(screen, uiRoot)
 		:orientation(modApi.constants.ORIENTATION_HORIZONTAL)
 		:addTo(scan_row)
 
-	WIDTH_CURRENT = 0.3
+	WIDTH_CURRENT = 0.40
 	WIDTHPX_ITERATION = 40
 	WIDTHPX_RESULTS = 80
-	WIDTH_INSTRUCTIONS = 0.6
+	WIDTH_INSTRUCTIONS = 0.60
 
 	local title_current = Ui()
 		:width(WIDTH_CURRENT):height(1)
@@ -268,9 +432,8 @@ local function createUi(screen, uiRoot)
 		if scanner.status == scanner.STATUS_RUNNING then
 			local scan = scanner.currentScan
 			if scan then
-				local results = scan:getResultString()
-				if results ~= "N/A" then results = results:match("%x") end
-				self.content_current.decorations[2]:setsurface(scan.questName)
+				local results = tostring(scan:getResultCount())
+				self.content_current.decorations[2]:setsurface(scan.name)
 				self.content_iteration.decorations[2]:setsurface(scan.iteration)
 				self.content_results.decorations[2]:setsurface(results)
 				self.content_instructions.decorations[2]:setsurface(scan.issue or "Wait...")

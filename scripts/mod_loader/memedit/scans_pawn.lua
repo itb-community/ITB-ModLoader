@@ -17,8 +17,7 @@ local scans = {}
 
 scans.acid = inheritClass(Scan, {
 	id = "Acid",
-	questName = "Pawn Acid",
-	questHelp = "Wait",
+	name = "Pawn Acid",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -37,8 +36,7 @@ scans.acid = inheritClass(Scan, {
 
 scans.active = inheritClass(Scan, {
 	id = "Active",
-	questName = "Pawn Active",
-	questHelp = "Wait",
+	name = "Pawn Active",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -57,8 +55,7 @@ scans.active = inheritClass(Scan, {
 
 scans.baseMaxHealth = inheritClass(Scan, {
 	id = "BaseMaxHealth",
-	questName = "Pawn Base Max Health",
-	questHelp = "Wait",
+	name = "Pawn Base Max Health",
 	prerequisiteScans = {"vital.size_pawn"},
 	expectedResults = 2,
 	expectedResultIndex = 2,
@@ -78,8 +75,7 @@ scans.baseMaxHealth = inheritClass(Scan, {
 scans.boosted = inheritClass(Scan, {
 	id = "Boosted",
 	gameVersion = "1.2.63",
-	questName = "Pawn Boosted",
-	questHelp = "Wait",
+	name = "Pawn Boosted",
 	prerequisiteScans = {"vital.size_pawn", "vital.delta_weapons"},
 	access = "RW",
 	-- Set this to bool so we get is/set functions
@@ -146,8 +142,7 @@ scans.boosted = inheritClass(Scan, {
 
 scans.class = inheritClass(Scan, {
 	id = "Class",
-	questName = "Pawn Class",
-	questHelp = "Wait",
+	name = "Pawn Class",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "string",
@@ -163,8 +158,7 @@ scans.class = inheritClass(Scan, {
 
 scans.corpse = inheritClass(Scan, {
 	id = "Corpse",
-	questName = "Pawn Corpse",
-	questHelp = "Wait",
+	name = "Pawn Corpse",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -180,8 +174,7 @@ scans.corpse = inheritClass(Scan, {
 
 scans.customAnim = inheritClass(Scan, {
 	id = "CustomAnim",
-	questName = "Pawn Custom Animation",
-	questHelp = "Wait",
+	name = "Pawn Custom Animation",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "string",
@@ -198,8 +191,7 @@ scans.customAnim = inheritClass(Scan, {
 
 scans.defaultfaction = inheritClass(Scan, {
 	id = "DefaultFaction",
-	questName = "Pawn Default Faction",
-	questHelp = "Wait",
+	name = "Pawn Default Faction",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "int",
@@ -215,8 +207,7 @@ scans.defaultfaction = inheritClass(Scan, {
 
 scans.fire = inheritClass(Scan, {
 	id = "Fire",
-	questName = "Pawn Fire",
-	questHelp = "Wait",
+	name = "Pawn Fire",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -256,8 +247,7 @@ scans.fire = inheritClass(Scan, {
 
 scans.flying = inheritClass(Scan, {
 	id = "Flying",
-	questName = "Pawn Flying",
-	questHelp = "Wait",
+	name = "Pawn Flying",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -273,8 +263,7 @@ scans.flying = inheritClass(Scan, {
 
 scans.frozen = inheritClass(Scan, {
 	id = "Frozen",
-	questName = "Pawn Frozen",
-	questHelp = "Wait",
+	name = "Pawn Frozen",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -293,8 +282,7 @@ scans.frozen = inheritClass(Scan, {
 
 scans.imageOffset = inheritClass(Scan, {
 	id = "ImageOffset",
-	questName = "Pawn Image Offset",
-	questHelp = "Wait",
+	name = "Pawn Image Offset",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "int",
@@ -310,8 +298,7 @@ scans.imageOffset = inheritClass(Scan, {
 
 scans.impactMaterial = inheritClass(Scan, {
 	id = "ImpactMaterial",
-	questName = "Pawn Impact Material",
-	questHelp = "Wait",
+	name = "Pawn Impact Material",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "int",
@@ -327,8 +314,7 @@ scans.impactMaterial = inheritClass(Scan, {
 
 scans.invisible = inheritClass(Scan, {
 	id = "Invisible",
-	questName = "Pawn Invisible",
-	questHelp = "Wait",
+	name = "Pawn Invisible",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -345,8 +331,7 @@ scans.invisible = inheritClass(Scan, {
 
 scans.jumper = inheritClass(Scan, {
 	id = "Jumper",
-	questName = "Pawn Jumper",
-	questHelp = "Wait",
+	name = "Pawn Jumper",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -362,8 +347,7 @@ scans.jumper = inheritClass(Scan, {
 
 scans.leader = inheritClass(Scan, {
 	id = "Leader",
-	questName = "Pawn Leader",
-	questHelp = "Wait",
+	name = "Pawn Leader",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "int",
@@ -379,8 +363,7 @@ scans.leader = inheritClass(Scan, {
 
 scans.neutral = inheritClass(Scan, {
 	id = "Neutral",
-	questName = "Pawn Neutral",
-	questHelp = "Wait",
+	name = "Pawn Neutral",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -396,8 +379,7 @@ scans.neutral = inheritClass(Scan, {
 
 scans.massive = inheritClass(Scan, {
 	id = "Massive",
-	questName = "Pawn Massive",
-	questHelp = "Wait",
+	name = "Pawn Massive",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -413,8 +395,7 @@ scans.massive = inheritClass(Scan, {
 
 scans.maxHealth = inheritClass(Scan, {
 	id = "MaxHealth",
-	questName = "Pawn Max Health",
-	questHelp = "Wait",
+	name = "Pawn Max Health",
 	prerequisiteScans = {"vital.size_pawn"},
 	expectedResults = 2,
 	expectedResultIndex = 1,
@@ -433,8 +414,7 @@ scans.maxHealth = inheritClass(Scan, {
 
 scans.mech = inheritClass(Scan, {
 	id = "Mech",
-	questName = "Pawn Mech",
-	questHelp = "Wait",
+	name = "Pawn Mech",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -453,8 +433,7 @@ scans.mech = inheritClass(Scan, {
 
 scans.minor = inheritClass(Scan, {
 	id = "Minor",
-	questName = "Pawn Minor",
-	questHelp = "Wait",
+	name = "Pawn Minor",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -470,8 +449,7 @@ scans.minor = inheritClass(Scan, {
 
 scans.missionCritical = inheritClass(Scan, {
 	id = "MissionCritical",
-	questName = "Pawn Mission Critical",
-	questHelp = "Wait",
+	name = "Pawn Mission Critical",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -488,8 +466,7 @@ scans.missionCritical = inheritClass(Scan, {
 
 scans.movementSpent = inheritClass(Scan, {
 	id = "MovementSpent",
-	questName = "Pawn Movement Spent",
-	questHelp = "Wait",
+	name = "Pawn Movement Spent",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -528,8 +505,7 @@ scans.movementSpent = inheritClass(Scan, {
 
 scans.moveSpeed = inheritClass(Scan, {
 	id = "MoveSpeed",
-	questName = "Pawn Move Speed",
-	questHelp = "Wait",
+	name = "Pawn Move Speed",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "int",
@@ -545,8 +521,7 @@ scans.moveSpeed = inheritClass(Scan, {
 
 scans.mutation = inheritClass(Scan, {
 	id = "Mutation",
-	questName = "Pawn Mutation",
-	questHelp = "Wait",
+	name = "Pawn Mutation",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "int",
@@ -563,8 +538,7 @@ scans.mutation = inheritClass(Scan, {
 
 scans.owner = inheritClass(Scan, {
 	id = "Owner",
-	questName = "Pawn Owner",
-	questHelp = "Wait",
+	name = "Pawn Owner",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "int",
@@ -603,8 +577,7 @@ scans.owner = inheritClass(Scan, {
 
 scans.powered = inheritClass(Scan, {
 	id = "Powered",
-	questName = "Pawn Powered",
-	questHelp = "Wait",
+	name = "Pawn Powered",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -621,8 +594,7 @@ scans.powered = inheritClass(Scan, {
 
 scans.pushable = inheritClass(Scan, {
 	id = "Pushable",
-	questName = "Pawn Pushable",
-	questHelp = "Wait",
+	name = "Pawn Pushable",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -638,8 +610,7 @@ scans.pushable = inheritClass(Scan, {
 
 scans.queuedTargetX = inheritClass(Scan, {
 	id = "QueuedTargetX",
-	questName = "Pawn Queued Target X",
-	questHelp = "Wait",
+	name = "Pawn Queued Target X",
 	prerequisiteScans = {
 		"vital.size_pawn",
 		"vital.delta_weapons"
@@ -667,8 +638,7 @@ scans.queuedTargetX = inheritClass(Scan, {
 
 scans.queuedTargetY = inheritClass(Scan, {
 	id = "QueuedTargetY",
-	questName = "Pawn Queued Target Y",
-	questHelp = "Wait",
+	name = "Pawn Queued Target Y",
 	prerequisiteScans = {
 		"vital.size_pawn",
 		"vital.delta_weapons"
@@ -696,8 +666,7 @@ scans.queuedTargetY = inheritClass(Scan, {
 
 scans.shield = inheritClass(Scan, {
 	id = "Shield",
-	questName = "Pawn Shield",
-	questHelp = "Wait",
+	name = "Pawn Shield",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -716,8 +685,7 @@ scans.shield = inheritClass(Scan, {
 
 scans.spacecolor = inheritClass(Scan, {
 	id = "SpaceColor",
-	questName = "Pawn Space Color",
-	questHelp = "Wait",
+	name = "Pawn Space Color",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -733,8 +701,7 @@ scans.spacecolor = inheritClass(Scan, {
 
 scans.team = inheritClass(Scan, {
 	id = "Team",
-	questName = "Pawn Team",
-	questHelp = "Wait",
+	name = "Pawn Team",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "int",
@@ -751,8 +718,7 @@ scans.team = inheritClass(Scan, {
 
 scans.teleporter = inheritClass(Scan, {
 	id = "Teleporter",
-	questName = "Pawn Teleporter",
-	questHelp = "Wait",
+	name = "Pawn Teleporter",
 	prerequisiteScans = {"vital.size_pawn"},
 	access = "RW",
 	dataType = "bool",
@@ -768,8 +734,7 @@ scans.teleporter = inheritClass(Scan, {
 
 scans.undoX = inheritClass(Scan, {
 	id = "UndoX",
-	questName = "Pawn Undo X",
-	questHelp = "Wait",
+	name = "Pawn Undo X",
 	prerequisiteScans = {"vital.size_pawn", "pawn.MovementSpent"},
 	access = "RW",
 	dataType = "int",
@@ -803,8 +768,7 @@ scans.undoX = inheritClass(Scan, {
 
 scans.undoY = inheritClass(Scan, {
 	id = "UndoY",
-	questName = "Pawn Undo Y",
-	questHelp = "Wait",
+	name = "Pawn Undo Y",
 	prerequisiteScans = {"vital.size_pawn", "pawn.MovementSpent"},
 	access = "RW",
 	dataType = "int",

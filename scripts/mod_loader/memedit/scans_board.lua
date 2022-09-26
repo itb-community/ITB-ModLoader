@@ -12,8 +12,7 @@ local boardPreRequisites = {"vital.size_board"}
 
 scans.highlightedX = inheritClass(Scan, {
 	id = "HighlightedX",
-	questName = "Board HighlightedX",
-	questHelp = "Wait",
+	name = "Board HighlightedX",
 	prerequisiteScans = boardPreRequisites,
 	access = "R",
 	dataType = "int",
@@ -46,8 +45,7 @@ scans.highlightedX = inheritClass(Scan, {
 
 scans.highlightedY = inheritClass(Scan, {
 	id = "HighlightedY",
-	questName = "Board HighlightedY",
-	questHelp = "Wait",
+	name = "Board HighlightedY",
 	prerequisiteScans = boardPreRequisites,
 	access = "R",
 	dataType = "int",

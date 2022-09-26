@@ -27,8 +27,7 @@ local scans = {}
 -- measure the distance between them in memory.
 scans.pawnObjSize = inheritClass(Scan, {
 	id = "size_pawn",
-	questName = "Pawn Object Size",
-	questHelp = "Wait",
+	name = "Pawn Object Size",
 	-- Overshoot to be on the safe side.
 	pawnCount = 1000,
 	action = function(self)
@@ -54,8 +53,7 @@ scans.pawnObjSize = inheritClass(Scan, {
 -- the current version of ITB, this scan is skipped
 scans.boardObjSize = inheritClass(Scan, {
 	id = "size_board",
-	questName = "Board Object Size",
-	questHelp = "Wait",
+	name = "Board Object Size",
 	-- In testing ~30 boards will yield
 	-- the correct board object size.
 	boardCount = 30,
@@ -106,8 +104,7 @@ scans.boardObjSize = inheritClass(Scan, {
 -- scan for those.
 scans.tileRows = inheritClass(Scan, {
 	id = "delta_rows",
-	questName = "Tile Rows",
-	questHelp = "Wait",
+	name = "Tile Rows",
 	condition = boardExists,
 	action = function(self)
 		local boardAddr = modApi.memedit.dll.debug.getObjAddr(TipImageBoard or Board)
@@ -136,8 +133,7 @@ scans.tileRows = inheritClass(Scan, {
 -- remain this.
 scans.tileRowStep = inheritClass(Scan, {
 	id = "step_rows",
-	questName = "Tile Row Step",
-	questHelp = "Wait",
+	name = "Tile Row Step",
 	action = function(self)
 		-- Skip scan.
 		self:succeed(0xC)
@@ -152,8 +148,7 @@ scans.tileRowStep = inheritClass(Scan, {
 -- difficult to find it.
 scans.tileObjSize = inheritClass(Scan, {
 	id = "size_tile",
-	questName = "Tile Object Size",
-	questHelp = "Wait",
+	name = "Tile Object Size",
 	prerequisiteScans = {"vital.delta_rows"},
 	condition = boardExists,
 	action = function(self)
@@ -204,8 +199,7 @@ scans.tileObjSize = inheritClass(Scan, {
 -- to inspect a pawn object and locate it manually.
 scans.pawnWeaponListDelta = inheritClass(Scan, {
 	id = "delta_weapons",
-	questName = "Pawn Weapon List Delta",
-	questHelp = "Wait",
+	name = "Pawn Weapon List Delta",
 	action = function(self)
 		-- Skip scan.
 		self:succeed(0x4)
