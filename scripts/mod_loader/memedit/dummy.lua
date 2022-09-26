@@ -4,6 +4,10 @@
 ScanPawn = Pawn:new{}
 Item_Scan = {Image = "", Damage = SpaceDamage(), Tooltip = "", Icon = "", UsedImage = ""}
 ScanWeapon = Skill:new{}
+ScanWeaponReset = ScanWeapon:new{
+	Name = "Reset Scan Pawn",
+	Description = "Remove the current Scan Pawn, and retry.",
+}
 
 function ScanWeapon:GetTargetArea(p)
 	local ret = PointList()

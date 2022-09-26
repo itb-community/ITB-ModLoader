@@ -238,21 +238,27 @@ function utils.removePawns(team)
 	end
 end
 
-local scanMovePawn
 local scanMovePawnId
 function utils.requireScanMovePawn()
+	local scanMovePawn
 
-	if false
-		or scanMovePawnId == nil
-		or Board:GetPawn(scanMovePawnId) == nil
-	then
+	if scanMovePawnId then
+		scanMovePawn = Board:GetPawn(scanMovePawnId)
+	end
+
+	if scanMovePawn and not scanMovePawn:IsActive() then
+		Board:RemovePawn(scanMovePawn)
+		scanMovePawn = nil
+	end
+
+	if scanMovePawn == nil then
 		utils.prepareScanPawn{
 			Image = "MechPunch",
 			MoveSpeed = 99,
 			Health = 9,
 			Flying = true,
 			DefaultTeam = TEAM_PLAYER,
-			SkillList = {"ScanWeapon"},
+			SkillList = {"ScanWeaponReset"},
 		}
 
 		scanMovePawn = PAWN_FACTORY:CreatePawn("ScanPawn")
