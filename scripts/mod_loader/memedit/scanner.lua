@@ -197,7 +197,7 @@ function Scanner:start()
 				(self.iteration - self.logoutFirstPrompt)
 				% self.logoutIterationInterval == 0
 			then
-				local action = scan.issue or "scanning..."
+				local action = scan.instruction or "scanning..."
 				local results = scan.results and #scan.results or "N/A"
 
 				LOGF(
@@ -215,13 +215,13 @@ function Scanner:start()
 				end
 				self.onScanCompleted:dispatch(scan)
 			else
-				local ok, issue = scan:condition()
+				local ok, instruction = scan:condition()
 				if ok then
-					scan.issue = nil
+					scan.instruction = nil
 					scan.iteration = scan.iteration + 1
 					scan:action()
 				else
-					scan.issue = issue
+					scan.instruction = instruction
 				end
 			end
 		end

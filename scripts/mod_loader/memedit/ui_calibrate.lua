@@ -218,17 +218,29 @@ local function createUi(screen, uiRoot)
 		:settooltip(GetText("Memedit_ButtonTooltip_Disable"))
 		:addTo(buttons)
 
+	button_main.decorations[1].setcolor = function(self, color)
+		self.bordercolor = color
+	end
+
 	function button_main:relayout()
 		if memedit.failed then
+			self.decorations[1]:setcolor(COLOR_RED)
+			self.decorations[3]:setcolor(COLOR_RED)
 			self.decorations[3]:setsurface(GetText("Memedit_Button_Retry"))
 			self:settooltip(GetText("Memedit_ButtonTooltip_Retry"))
 		elseif memedit.calibrated then
+			self.decorations[1]:setcolor(COLOR_GREEN)
+			self.decorations[3]:setcolor(COLOR_GREEN)
 			self.decorations[3]:setsurface(GetText("Memedit_Button_Close"))
 			self:settooltip(GetText("Memedit_ButtonTooltip_Close"))
 		elseif memedit.calibrating then
+			self.decorations[1]:setcolor(deco.colors.buttonborder)
+			self.decorations[3]:setcolor(deco.colors.white)
 			self.decorations[3]:setsurface(GetText("Memedit_Button_Stop"))
 			self:settooltip(GetText("Memedit_ButtonTooltip_Stop"))
 		else
+			self.decorations[1]:setcolor(deco.colors.buttonborder)
+			self.decorations[3]:setcolor(deco.colors.white)
 			self.decorations[3]:setsurface(GetText("Memedit_Button_Start"))
 			self:settooltip(GetText("Memedit_ButtonTooltip_Start"))
 		end
@@ -260,6 +272,11 @@ local function createUi(screen, uiRoot)
 		end
 
 		return true
+	end
+
+	function button_disable:relayout()
+		self.visible = not memedit.calibrated
+		Ui.relayout(self)
 	end
 
 	-- TEXT BOX
@@ -436,7 +453,7 @@ local function createUi(screen, uiRoot)
 				self.content_current.decorations[2]:setsurface(scan.name)
 				self.content_iteration.decorations[2]:setsurface(scan.iteration)
 				self.content_results.decorations[2]:setsurface(results)
-				self.content_instructions.decorations[2]:setsurface(scan.issue or "Wait...")
+				self.content_instructions.decorations[2]:setsurface(scan.instruction or "Wait...")
 			end
 		end
 

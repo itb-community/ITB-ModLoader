@@ -135,7 +135,7 @@ scans.highlighted = inheritClass(Scan, {
 				}
 			end
 
-			self.issue = "Hover tiles with the provided ScanPawn's Move skill"
+			self.instruction = "Hover tiles with the provided ScanPawn's Move skill"
 		end
 	},
 	onMoveHighlighted = function(self, pawn, p1, p2)

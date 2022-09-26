@@ -481,7 +481,7 @@ scans.movementSpent = inheritClass(Scan, {
 		end
 	end,
 	action = function(self)
-		requireScanMovePawn()
+		local pawn = requireScanMovePawn()
 
 		if self.iteration == 1 then
 			ScanMove:SetEvents{
@@ -491,7 +491,11 @@ scans.movementSpent = inheritClass(Scan, {
 			}
 		end
 
-		self.issue = "Move the provided ScanPawn"
+		if pawn:IsUndoPossible() then
+			self.instruction = "Undo move with the provided ScanPawn"
+		else
+			self.instruction = "Move the provided ScanPawn"
+		end
 	end,
 	onMoveTarget = function(self, pawn, p1, p2)
 		self:searchPawn(pawn, 0, "byte")
@@ -757,7 +761,7 @@ scans.undoX = inheritClass(Scan, {
 			}
 		end
 
-		self.issue = "Move the provided ScanPawn"
+		self.instruction = "Move the provided ScanPawn"
 	end,
 	afterMoveEffect = function(self, pawn, p1, p2)
 		self:searchPawn(pawn, p1.x)
@@ -791,7 +795,7 @@ scans.undoY = inheritClass(Scan, {
 			}
 		end
 
-		self.issue = "Move the provided ScanPawn"
+		self.instruction = "Move the provided ScanPawn"
 	end,
 	afterMoveEffect = function(self, pawn, p1, p2)
 		self:searchPawn(pawn, p1.y)
