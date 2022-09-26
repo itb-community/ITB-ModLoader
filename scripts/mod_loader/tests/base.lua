@@ -29,12 +29,7 @@ function Tests.GetNonUniqueBuildingTile()
 
 	for i, p in ipairs(tiles) do
 		if not Board:IsPawnSpace(p) then
-			local terrain = Board:GetTerrain(p)
-			Board:SetTerrain(p, TERRAIN_BUILDING)
-			local isUniqueBuilding = Board:IsUniqueBuilding(p)
-			Board:SetTerrain(p, terrain)
-
-			if not isUniqueBuilding then
+			if not Board:IsUniqueBuilding(p) then
 				Board:ClearSpace(p)
 				return p
 			end

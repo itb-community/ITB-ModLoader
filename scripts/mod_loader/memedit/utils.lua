@@ -120,12 +120,7 @@ function utils.nonUniqueBuildingPoint(random)
 
 	for _, p in ipairs(board) do
 		if not Board:IsPawnSpace(p) then
-			local terrain = Board:GetTerrain(p)
-			Board:SetTerrain(p, TERRAIN_BUILDING)
-			local isUniqueBuilding = Board:IsUniqueBuilding(p)
-			Board:SetTerrain(p, terrain)
-
-			if not isUniqueBuilding then
+			if not Board:IsUniqueBuilding(p) then
 				result = p
 				break
 			end
