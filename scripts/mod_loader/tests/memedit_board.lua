@@ -132,5 +132,33 @@ testsuite.test_tile_terrainIcon = function()
 	return true
 end
 
+testsuite.test_tile_uniqueBuildingName = function()
+	Tests.RequireBoard()
+	Tests.RequireMemedit()
+	local p = Tests.GetCleanTile()
+
+	-- If this test is run many times, it will clutter
+	-- up the board with many unique buildings.
+	--
+	-- We could use the following function to clear them:
+	-- modApi.memedit.dll.board.getUniqueBuildingName
+	--
+	-- However, it is preferred to only read and not
+	-- write to memory when testing.
+	Board:SetTerrain(p, TERRAIN_BUILDING)
+	Board:AddUniqueBuilding("str_bar1")
+
+	for i, p in ipairs(Board) do
+		local uniqueBuildingName = modApi.memedit.dll.board.getUniqueBuildingName(p)
+		if Board:IsUniqueBuilding(p) then
+			Assert.NotEquals("", uniqueBuildingName)
+		else
+			Assert.Equals("", uniqueBuildingName)
+		end
+	end
+
+	return true
+end
+
 
 return testsuite

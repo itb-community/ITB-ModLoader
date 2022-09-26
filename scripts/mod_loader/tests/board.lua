@@ -249,4 +249,35 @@ testsuite.test_SetShield = function()
 	return true
 end
 
+testsuite.test_UniqueBuilding = function()
+	Tests.RequireBoard()
+	local p = Tests.GetCleanTile()
+	local memedit = getMemedit()
+
+	if memedit then
+		Board:ClearSpace(p)
+		Board:SetUniqueBuilding(p, "str_bar1")
+		local uniqueBuildingName = Board:GetUniqueBuilding(p)
+
+		Board:ClearSpace(p)
+		Board:SetUniqueBuilding(p, "")
+		local noUniqueBuildingName = Board:GetUniqueBuilding(p)
+
+		Assert.Equals("str_bar1", uniqueBuildingName)
+		Assert.Equals("", noUniqueBuildingName)
+
+		Board:ClearSpace(p)
+	else
+		Board:ClearSpace(p)
+		Board:SetUniqueBuilding(p "str_bar1")
+		local isUniqueBuilding = Board:IsUniqueBuilding(p)
+
+		Assert.Equals(true, isUniqueBuilding)
+
+		Board:ClearSpace(p)
+	end
+
+	return true
+end
+
 return testsuite
