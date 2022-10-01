@@ -251,8 +251,12 @@ Directory = Class.new();
 ---
 --- Returns a Directory instance
 function Directory:new(path)
-	Assert.Equals("string", type(path))
+	Assert.Equals({"string", "nil"}, type(path))
 	lazy_load()
+
+	if path == nil then
+		path = "."
+	end
 
 	try(function()
 		self.instance = factory.directory(path)
