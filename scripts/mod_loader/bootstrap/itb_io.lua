@@ -324,30 +324,42 @@ function Directory:parent()
 	return result
 end
 
-function Directory:file(path)
+function Directory:file(...)
 	Assert.Equals("table", type(self), "Check for . vs :")
-	Assert.Equals("string", type(path))
+	local args = { ... }
 
-	local finalPath = string.gsub(self:path(), "\\", "/")
-	if not modApi:stringEndsWith(finalPath, "/") then
-		finalPath = finalPath .. "/"
-	end
-	finalPath = finalPath .. path
+	local result
+	try(function()
+		result = File.of(self.instance:file(unpack(args)))
+	end)
+	:catch(function(err)
+		local path = self:path() .. table.concat(args, "/")
+		error(string.format(
+				"Failed to create File instance for path %q: %s",
+				path, tostring(err)
+		))
+	end)
 
-	return File(finalPath)
+	return result
 end
 
-function Directory:directory(path)
+function Directory:directory(...)
 	Assert.Equals("table", type(self), "Check for . vs :")
-	Assert.Equals("string", type(path))
+	local args = { ... }
 
-	local finalPath = string.gsub(self:path(), "\\", "/")
-	if not modApi:stringEndsWith(finalPath, "/") then
-		finalPath = finalPath .. "/"
-	end
-	finalPath = finalPath .. path
+	local result
+	try(function()
+		result = Directory.of(self.instance:directory(unpack(args)))
+	end)
+	:catch(function(err)
+		local path = self:path() .. table.concat(args, "/")
+		error(string.format(
+				"Failed to create Directory instance for path %q: %s",
+				path, tostring(err)
+		))
+	end)
 
-	return Directory(finalPath)
+	return result
 end
 
 function Directory:files()
