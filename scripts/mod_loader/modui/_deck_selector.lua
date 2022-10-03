@@ -81,14 +81,20 @@ local currentFilter
 
 -- loads the config for the given deck into the mod API
 function deck_selector:loadConfigIntoApi(cfg)
-  sdlext.config(modApi:getCurrentModcontentPath(), function(config)
+	sdlext.config(modApi:getCurrentModcontentPath(), function(config)
 		if config[cfg.configKey] ~= nil then
 			for id, enabled in pairs(config[cfg.configKey]) do
 				if modApi[cfg.apiKey][id] ~= nil then
-					modApi[cfg.apiKey][id] = enabled
+					if enabled == true then
+						modApi[cfg.apiKey][id] = cfg.enabledValue
+					elseif enabled == false then
+						modApi[cfg.apiKey][id] = cfg.disabledValue
+					else
+  					modApi[cfg.apiKey][id] = enabled
+					end
 				end
 			end
-      cfg.validateEnabled(modApi[cfg.apiKey])
+			cfg.validateEnabled(modApi[cfg.apiKey])
 		end
 	end)
 end
