@@ -86,22 +86,20 @@ function modApi:fileDirectoryToDat(path)
 	local len = path:len()
 	assert(len > 0)
 
-	if path:sub(len) ~= [[/]] and path:sub(len) ~= [[\]] then
-		path = path .. "/"
-	end
-
 	local ftldat = FtlDat()
 
 	local function addDir(directory)
-		for i, dir in pairs(os.listdirs(path .. directory)) do
-			addDir(directory .. dir .. "/")
+		for _, childFile in ipairs(directory:files()) do
+			local p = childFile:path()
+			ftldat:put_entry_file(directory:path()..path, path)
 		end
-		for i, dirfile in pairs(os.listfiles(path .. directory)) do
-			ftldat:put_entry_file(directory.dirfile, path .. directory .. dirfile)
+
+		for _, childDirectory in ipairs(directory:directories()) do
+			addDir(childDirectory)
 		end
 	end
 
-	addDir("")
+	addDir(Directory(""))
 
 	ftldat:write(path .. "resource.dat")
 	ftldat:destroy()

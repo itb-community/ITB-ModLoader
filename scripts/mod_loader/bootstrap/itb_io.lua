@@ -25,9 +25,10 @@ File = Class.new();
 ---	       directory or save data directory, an error is thrown.
 ---
 --- Returns a File instance
-function File:new(path)
-	Assert.Equals("string", type(path), "Path must be a string")
+function File:new(...)
 	lazy_load()
+
+	local path = table.concat({...}, "/");
 
 	try(function()
 		self.instance = factory.file(path)
@@ -250,12 +251,15 @@ Directory = Class.new();
 ---	       directory or save data directory, an error is thrown.
 ---
 --- Returns a Directory instance
-function Directory:new(path)
-	Assert.Equals({"string", "nil"}, type(path))
+function Directory:new(...)
 	lazy_load()
 
-	if path == nil then
+	local args = {...}
+	local path
+	if #args == 0 then
 		path = "."
+	else
+		path = table.concat(args, "/");
 	end
 
 	try(function()

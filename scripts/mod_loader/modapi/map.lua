@@ -9,9 +9,10 @@
 function modApi:getMapsList()
 	local list = {}
 
-	for i, file in pairs(os.listfiles("maps")) do
-		if modApi:stringEndsWith(file, ".map") then
-			table.insert(list, self:pruneExtension(file))
+	local dir = Directory("maps")
+	for _, file in ipairs(dir:files()) do
+		if file:extension() == "map" then
+			table.insert(list, file:name_without_extension())
 		end
 	end
 
@@ -21,7 +22,7 @@ end
 function modApi:deleteModdedMaps()
 	for i, mapname in ipairs(self:getMapsList()) do
 		if not list_contains(self.defaultMaps, mapname) then
-			os.remove("maps/"..mapname..".map")
+			File("maps", mapname..".map"):delete()
 		end
 	end
 end
@@ -32,7 +33,7 @@ function modApi:addMap(path)
 	local mapname = self:pruneExtension(mapfile)
 
 	if list_contains(self.defaultMaps, mapname) then
-		LOG(string.format("Unable to add map '%s', because it would overwrite a vanilla map.", path))
+		LOG(string.format("Unable to add map %q, because it would overwrite a vanilla map.", path))
 	else
 		self:copyFile(path, "maps/"..mapfile)
 	end
