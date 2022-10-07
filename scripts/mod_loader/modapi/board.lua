@@ -213,6 +213,25 @@ BoardClass.GetHighlighted = function(self)
 	return mouseTile()
 end
 
+BoardClass.GetMaxHealth = function(self, loc)
+	Assert.Equals("userdata", type(self), "Argument #0")
+	Assert.TypePoint(loc, "Argument #1")
+
+	local result
+
+	try(function()
+		result = requireMemedit().board.getMaxHealth(loc)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"memedit.dll: %s",
+				tostring(err)
+		))
+	end)
+
+	return result
+end
+
 BoardClass.GetTerrainIcon = function(self, loc)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	Assert.TypePoint(loc, "Argument #1")
