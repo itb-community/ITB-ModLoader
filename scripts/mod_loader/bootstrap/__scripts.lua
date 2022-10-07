@@ -1,4 +1,5 @@
 local scripts = {
+	"security",
 	"assert",
 	"classes",
 	"itb_io",
