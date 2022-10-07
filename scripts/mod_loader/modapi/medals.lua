@@ -169,6 +169,52 @@ local function readMedalData(self, squad_id)
 	return self.cachedData[squad_id]
 end
 
+local function isVanillaSquad(squadIndex, mechs)
+	local vanillaSquad = modApi.vanillaSquadsByIndex[squadIndex]
+
+	if vanillaSquad == nil then
+		return false
+	end
+
+	for i, mech in ipairs(mechs) do
+		if vanillaSquad.mechs[i] ~= mech then
+			return false
+		end
+	end
+
+	return true
+end
+
+function modApi:updateVanillaRibbons()
+
+	local currentProfile = modApi:getCurrentProfile()
+	local profileStatistics = modApi:getProfileStatistics(currentProfile)
+
+	if profileStatistics == nil then
+		return
+	end
+
+	local stat_tracker = profileStatistics.stat_tracker
+	local i = 0
+	local score = stat_tracker["score"..i]
+
+	while score do
+		if score.victory and score.islands then
+			if isVanillaSquad(score.squad, score.mechs) then
+				LOG(""
+					.."victory!\n"
+					.."squad: "..tostring(score.squad).."\n"
+					.."islands:"..tostring(score.islands).."\n"
+					.."diff:"..tostring(score.difficulty).."\n"
+				)
+			end
+		end
+
+		i = i + 1
+		score = stat_tracker["score".. i]
+	end
+end
+
 modApi.events.onGameVictory:subscribe(function(difficulty, islandsSecured, squad_id)
 	modApi.medals:writeData(squad_id, difficulty, islandsSecured)
 end)
