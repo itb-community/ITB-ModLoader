@@ -52,7 +52,6 @@ function BasicLoggerImpl:setLogFileName(fileName)
 	assert(type(fileName) == "string")
 
 	if (self.logFileHandle) then
-		self.logFileHandle:close()
 		self.logFileHandle = nil
 	end
 
@@ -80,19 +79,14 @@ function BasicLoggerImpl:setClearLogFileOnStartup(clearLogFileOnStartup)
 end
 
 function BasicLoggerImpl:openLogFile(fileName)
-	-- opening the file in write mode will clear out all contents
-	-- we prefer append mode for later work as it causes less issues if the user edits the log file while the game is running
+	local fileHandle = File(fileName)
 	if self.clearLogFileOnStartup then
-		local f = File(fileName)
-		f:delete()
+		fileHandle:delete()
 	end
-
-	local fileHandle = io.open(fileName, "a+")
 
 	local t = string.format("\n===== Logging started at: %s =====\n", getCurrentDate())
 
-	fileHandle:write(t)
-	fileHandle:flush()
+	fileHandle:append(t)
 
 	ConsolePrint(t)
 	print(t)
@@ -120,8 +114,7 @@ function BasicLoggerImpl:log(caller, ...)
 
 		t = t .. message .. "\n"
 
-		self.logFileHandle:write(t)
-		self.logFileHandle:flush()
+		self.logFileHandle:append(t)
 	end
 
 	self:output(message, caller)

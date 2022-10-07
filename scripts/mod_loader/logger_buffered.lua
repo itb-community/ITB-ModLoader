@@ -38,8 +38,7 @@ function BufferedLogger:log(caller, ...)
 
 		t = t .. message .. "\n"
 
-		self.logFileHandle:write(t)
-		self.logFileHandle:flush()
+		self.logFileHandle:append(t)
 	end
 
 	if (self:getPrintCallerInfo() == Logger.LOG_LEVEL_CONSOLE) then
