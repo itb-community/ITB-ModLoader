@@ -83,9 +83,8 @@ function BasicLoggerImpl:openLogFile(fileName)
 	-- opening the file in write mode will clear out all contents
 	-- we prefer append mode for later work as it causes less issues if the user edits the log file while the game is running
 	if self.clearLogFileOnStartup then
-		local clearFile = io.open(fileName, "w")
-		clearFile:flush()
-		clearFile:close()
+		local f = File(fileName)
+		f:delete()
 	end
 
 	local fileHandle = io.open(fileName, "a+")
