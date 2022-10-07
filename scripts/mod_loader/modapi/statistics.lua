@@ -7,6 +7,16 @@ Placeholder_Personality = CreatePilotPersonality("NULL", "placeholder")
 
 local ProfileDataAffirmed = false
 
+function modApi:getProfileStatistics(profileName)
+	local path_savedata = GetSavedataLocation()
+	local dir_profile = "profile_"..profileName
+	local path_profile = string.format("%s%s/profile.lua", path_savedata, dir_profile)
+
+	if self:fileExists(path_profile) then
+		return self:loadIntoEnv(path_profile).Profile
+	end
+end
+
 function modApi:getProfileList()
 	
 	local result = {}
@@ -15,13 +25,11 @@ function modApi:getProfileList()
 	
 	for dir_profile in directory:lines() do
 		if dir_profile:match("^profile_") then
-			
-			local path_profile = string.format("%s%s/profile.lua", path_savedata, dir_profile)
-			
-			if self:fileExists(path_profile) then
-				local profile = self:loadIntoEnv(path_profile).Profile
-				
-				table.insert(result, profile)
+			local profileName = dir_profile:sub(9,-1)
+			local profileStatistics = self:getProfileStatistics(profileName)
+
+			if profileStatistics then
+				result[profileName] = profileStatistics
 			end
 		end
 	end
@@ -56,7 +64,7 @@ function modApi:affirmProfileData()
 	end
 	
 	local profile_list = self:getProfileList()
-	for _, profile in ipairs(profile_list) do
+	for profileId, profile in pairs(profile_list) do
 		
 		local i = 0
 		local stat_tracker = profile.stat_tracker
