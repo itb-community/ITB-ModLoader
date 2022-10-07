@@ -185,7 +185,7 @@ local function isVanillaSquad(squadIndex, mechs)
 	return true
 end
 
-function modApi:updateVanillaRibbons()
+local function updateVanillaRibbons(self)
 
 	local currentProfile = modApi:getCurrentProfile()
 	local profileStatistics = modApi:getProfileStatistics(currentProfile)
@@ -197,22 +197,43 @@ function modApi:updateVanillaRibbons()
 	local stat_tracker = profileStatistics.stat_tracker
 	local i = 0
 	local score = stat_tracker["score"..i]
+	local vanillaRibbonsTrue = {}
+	local vanillaRibbonsFalse = {}
+	local trueAndFalseRibbons = { vanillaRibbonsTrue, vanillaRibbonsFalse }
 
 	while score do
 		if score.victory and score.islands then
-			if isVanillaSquad(score.squad, score.mechs) then
-				LOG(""
-					.."victory!\n"
-					.."squad: "..tostring(score.squad).."\n"
-					.."islands:"..tostring(score.islands).."\n"
-					.."diff:"..tostring(score.difficulty).."\n"
-				)
+			local squadRibbons
+			local islandsSecured = ISLANDS[score.islands - 1]
+			local difficulty = DIFFICULTIES[score.difficulty + 2]
+
+			-- Tally up all scores into vanillaRibbonsFalse,
+			-- but only tally up scores where the used squad
+			-- is a vanilla squad will all the correct mechs
+			-- into vanillaRibbonsTrue.
+			for _, allRibbons in ipairs(trueAndFalseRibbons) do
+				if false
+					or allRibbons == vanillaRibbonsFalse
+					or isVanillaSquad(score.squad, score.mechs)
+				then
+					squadRibbons = allRibbons[score.squad]
+					if squadRibbons == nil then
+						squadRibbons = {}
+						allRibbons[score.squad] = squadRibbons
+					end
+
+					local currentCompletedDifficulty = squadRibbons[islandsSecured] or DIFFICULTIES[1]
+					squadRibbons[islandsSecured] = getGreaterDifficulty(difficulty, currentCompletedDifficulty)
+				end
 			end
 		end
 
 		i = i + 1
 		score = stat_tracker["score".. i]
 	end
+
+	modApi.medals.vanillaRibbonsTrue = vanillaRibbonsTrue
+	modApi.medals.vanillaRibbonsFalse = vanillaRibbonsFalse
 end
 
 modApi.events.onGameVictory:subscribe(function(difficulty, islandsSecured, squad_id)
@@ -221,10 +242,15 @@ end)
 
 modApi.events.onProfileChanged:subscribe(function()
 	modApi.medals.cachedData = nil
+	modApi.medals.vanillaRibbonsTrue = nil
+	modApi.medals.vanillaRibbonsFalse = nil
 end)
 
 modApi.medals = {
 	cachedData = nil,
+	vanillaRibbonsTrue = nil,
+	vanillaRibbonsFalse = nil,
 	writeData = writeMedalData,
 	readData = readMedalData,
+	updateVanillaRibbons = updateVanillaRibbons,
 }
