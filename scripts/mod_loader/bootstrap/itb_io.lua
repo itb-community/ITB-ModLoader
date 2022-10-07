@@ -144,6 +144,22 @@ function File:write_string(content)
 	end)
 end
 
+--- Appends the specified string content at the end of the file
+function File:append(content)
+	Assert.Equals("table", type(self), "Check for . vs :")
+	Assert.Equals("string", type(content))
+
+	try(function()
+		self.instance:append_string(content)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to append string to file %q: %s",
+				self:path(), tostring(err)
+		))
+	end)
+end
+
 --- Replaces the file's content with the specified byte array content
 function File:write_byte_array(content)
 	Assert.Equals("table", type(self), "Check for . vs :")
