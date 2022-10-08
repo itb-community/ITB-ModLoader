@@ -1,6 +1,7 @@
 
 local function findVanillaSquads()
 	modApi.vanillaSquadsByIndex = {}
+	modApi.vanillaSquadsById = {}
 
 	for i = modApi.constants.SQUAD_INDEX_START, modApi.constants.SQUAD_INDEX_END do
 		if true
@@ -8,6 +9,7 @@ local function findVanillaSquads()
 			and i ~= modApi.constants.SQUAD_INDEX_CUSTOM
 		then
 			local vanillaSquad = getStartingSquad(i)
+			local squadId = vanillaSquad[1]:match("Squad_(.+)")
 
 			-- For some reason the vanilla getStartingSquad returns a list:
 			-- { [1] = "name", [3] = "pawn1", [6] = "pawn2", [9] = "pawn3" }
@@ -18,7 +20,16 @@ local function findVanillaSquads()
 			-- If the game at some point changes its returned indices, the
 			-- following code will have to be updated.
 			modApi.vanillaSquadsByIndex[i] = {
-				id = vanillaSquad[1],
+				id = squadId,
+				mechs = {
+					vanillaSquad[3],
+					vanillaSquad[6],
+					vanillaSquad[9]
+				}
+			}
+
+			modApi.vanillaSquadsById[squadId] = {
+				index = i,
 				mechs = {
 					vanillaSquad[3],
 					vanillaSquad[6],
