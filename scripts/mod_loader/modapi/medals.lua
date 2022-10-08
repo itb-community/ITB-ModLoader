@@ -242,6 +242,49 @@ local function updateVanillaRibbons(self)
 	modApi.medals.statsPolluted = statsPolluted
 end
 
+function isRibbonOvervalued(self, squad_id, islands)
+	if self.statsVanilla == nil or self.statsPolluted == nil then
+		self:updateVanillaRibbons()
+	end
+
+	if type(islands) == "number" then
+		islands = tostring(islands).."islands"
+	end
+
+	-- If this is a modded squad or there is no stat
+	-- pollution, then the ribbon cannot be overvalued.
+	if false
+		or modApi:isModdedSquad(squad_id)
+		or modApi.medals.statsPolluted[squad_id] == nil
+	then
+		return false
+	end
+
+	-- If there is vanilla squad stat pollution and no
+	-- vanilla stats, then the ribbon must be overvalued.
+	if modApi.medals.statsVanilla[squad_id] == nil then
+		return true
+	end
+
+	local scorePolluted = modApi.medals.statsPolluted[squad_id][islands]
+	local scoreVanilla = modApi.medals.statsVanilla[squad_id][islands]
+
+	-- If there is no stat pollution, then the ribbon is
+	-- not overvalued.
+	if scorePolluted == nil then
+		return false
+	end
+
+	-- If there is stat pollution, but no vanilla stat,
+	-- then the ribbon must be overvalued.
+	if scoreVanilla == nil then
+		return true
+	end
+
+	-- LOGF("5 scorePolluted = %s, scoreVanilla = %s", tostring(scorePolluted), tostring(scoreVanilla))
+	return getGreaterDifficulty(scorePolluted, scoreVanilla) ~= scoreVanilla
+end
+
 modApi.events.onGameVictory:subscribe(function(difficulty, islandsSecured, squad_id)
 	modApi.medals:writeData(squad_id, difficulty, islandsSecured)
 	modApi.medals.statsVanilla = nil
@@ -261,4 +304,5 @@ modApi.medals = {
 	writeData = writeMedalData,
 	readData = readMedalData,
 	updateVanillaRibbons = updateVanillaRibbons,
+	isRibbonOvervalued = isRibbonOvervalued,
 }
