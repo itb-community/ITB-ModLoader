@@ -182,7 +182,7 @@ local function buildMedalUi(surface_bucket, squad_id, islandsSecured)
 	deco.surface_hl = SURFACES[surface_bucket][islandsSecured].HL
 
 	local medalData = modApi.medals:readData(squad_id)
-	local difficulty = medalData[islandsSecured.."islands"]
+	local difficulty = medalData[islandsSecured.."islands"] or "NONE"
 	local offset_x = MEDAL_OFFSETS_X[difficulty]
 	local w, h = UI.MEDAL.SMALL.WIDTH, UI.MEDAL.SMALL.HEIGHT
 
@@ -367,10 +367,6 @@ end
 modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 	destroyHangarMedalUi()
 
-	if not modApi:isModdedSquad(squad_id) then
-		return
-	end
-
 	local root = sdlext.getUiRoot()
 	hangarMedalUi = Ui()
 		:widthpx(UI.HANGAR.WIDTH)
@@ -412,21 +408,28 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 	end
 
 	for islandsSecured = 2, 4 do
-		buildMedal2xUi(squad_id, islandsSecured)
-			:addTo(medalHolder)
-	end
-
-	local squadAchievements = modApi.achievements:getSquadAchievements(squad_id)
-	if squadAchievements ~= nil then
-		for i, achievement in ipairs(squadAchievements) do
-			if i > 3 then break end
-			buildAchievementUi(achievement, true)
-				:addTo(achievementHolder)
+		if false
+			or modApi:isModdedSquad(squad_id)
+			or modApi.medals:isRibbonOvervalued(squad_id, islandsSecured)
+		then
+			buildMedal2xUi(squad_id, islandsSecured)
+				:addTo(medalHolder)
 		end
 	end
 
-	setMedalTooltipText(squad_id)
-	setAchievementTooltipText(squad_id)
+	if modApi:isModdedSquad(squad_id) then
+		local squadAchievements = modApi.achievements:getSquadAchievements(squad_id)
+		if squadAchievements ~= nil then
+			for i, achievement in ipairs(squadAchievements) do
+				if i > 3 then break end
+				buildAchievementUi(achievement, true)
+					:addTo(achievementHolder)
+			end
+		end
+
+		setMedalTooltipText(squad_id)
+		setAchievementTooltipText(squad_id)
+	end
 end)
 
 modApi.events.onHangarSquadCleared:subscribe(function()
