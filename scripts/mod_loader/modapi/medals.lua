@@ -197,29 +197,35 @@ local function updateVanillaRibbons(self)
 	local stat_tracker = profileStatistics.stat_tracker
 	local i = 0
 	local score = stat_tracker["score"..i]
-	local vanillaRibbonsTrue = {}
-	local vanillaRibbonsFalse = {}
-	local trueAndFalseRibbons = { vanillaRibbonsTrue, vanillaRibbonsFalse }
+	local statsVanilla = {}
+	local statsPolluted = {}
+	local statsVanillaAndPolluted = { statsVanilla, statsPolluted }
 
 	while score do
-		if score.victory and score.islands then
+		if true
+			and score.victory == true
+			and score.islands ~= nil
+			and score.squad ~= modApi.constants.SQUAD_INDEX_RANDOM
+			and score.squad ~= modApi.constants.SQUAD_INDEX_CUSTOM
+		then
 			local squadRibbons
 			local islandsSecured = ISLANDS[score.islands - 1]
 			local difficulty = DIFFICULTIES[score.difficulty + 2]
 
-			-- Tally up all scores into vanillaRibbonsFalse,
+			-- Tally up all scores into statsPolluted,
 			-- but only tally up scores where the used squad
 			-- is a vanilla squad will all the correct mechs
-			-- into vanillaRibbonsTrue.
-			for _, allRibbons in ipairs(trueAndFalseRibbons) do
+			-- into statsVanilla.
+			for _, allRibbons in ipairs(statsVanillaAndPolluted) do
 				if false
-					or allRibbons == vanillaRibbonsFalse
+					or allRibbons == statsPolluted
 					or isVanillaSquad(score.squad, score.mechs)
 				then
-					squadRibbons = allRibbons[score.squad]
+					local squadId = modApi.vanillaSquadsByIndex[score.squad].id
+					squadRibbons = allRibbons[squadId]
 					if squadRibbons == nil then
 						squadRibbons = {}
-						allRibbons[score.squad] = squadRibbons
+						allRibbons[squadId] = squadRibbons
 					end
 
 					local currentCompletedDifficulty = squadRibbons[islandsSecured] or DIFFICULTIES[1]
@@ -232,24 +238,26 @@ local function updateVanillaRibbons(self)
 		score = stat_tracker["score".. i]
 	end
 
-	modApi.medals.vanillaRibbonsTrue = vanillaRibbonsTrue
-	modApi.medals.vanillaRibbonsFalse = vanillaRibbonsFalse
+	modApi.medals.statsVanilla = statsVanilla
+	modApi.medals.statsPolluted = statsPolluted
 end
 
 modApi.events.onGameVictory:subscribe(function(difficulty, islandsSecured, squad_id)
 	modApi.medals:writeData(squad_id, difficulty, islandsSecured)
+	modApi.medals.statsVanilla = nil
+	modApi.medals.statsPolluted = nil
 end)
 
 modApi.events.onProfileChanged:subscribe(function()
 	modApi.medals.cachedData = nil
-	modApi.medals.vanillaRibbonsTrue = nil
-	modApi.medals.vanillaRibbonsFalse = nil
+	modApi.medals.statsVanilla = nil
+	modApi.medals.statsPolluted = nil
 end)
 
 modApi.medals = {
 	cachedData = nil,
-	vanillaRibbonsTrue = nil,
-	vanillaRibbonsFalse = nil,
+	statsVanilla = nil,
+	statsPolluted = nil,
 	writeData = writeMedalData,
 	readData = readMedalData,
 	updateVanillaRibbons = updateVanillaRibbons,
