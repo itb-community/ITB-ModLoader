@@ -149,10 +149,9 @@ end
 
 -- reads medal data.
 local function readMedalData(self, squad_id)
-	if
-		not modApi:isProfilePath()         or
-		not modApi:isModdedSquad(squad_id)
-	then
+	if modApi:isVanillaSquad(squad_id) then
+		return modApi.medals.statsVanilla[squad_id] or {}
+	elseif modApi:isProfilePath() ~= true then
 		return nil
 	end
 
