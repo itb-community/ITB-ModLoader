@@ -38,11 +38,16 @@ function getStartingSquad(choice)
 		loadSquadSelection()
 	end
 
-	-- squads 0-7 are the first 8 vanilla squads
-	-- 8 and 9 are random and custom
-	-- squad 10 is secret, 11-16 are Advanced
-	if (choice >= 0 and choice <= 7) or (choice >= 10 and choice <= (modApi.constants.MAX_SQUADS + 2)) then
-		if choice >= 10 then
+	if true
+		and choice ~= modApi.constants.SQUAD_INDEX_RANDOM
+		and choice ~= modApi.constants.SQUAD_INDEX_CUSTOM
+		and choice >= modApi.constants.SQUAD_INDEX_START
+		and choice <= modApi.constants.SQUAD_INDEX_END
+	then
+		-- If choice is above the custom squad index,
+		-- reduce the index by 2 to account for random
+		-- and custom squad.
+		if choice > modApi.constants.SQUAD_INDEX_CUSTOM then
 			choice = choice - 2
 		end
 		local index = modApi.squadIndices[choice + 1]
