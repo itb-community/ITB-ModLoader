@@ -57,27 +57,28 @@ modApi.events.onFtldatFinalized:subscribe(function()
 	}
 end)
 
--- the 2 island unfair ribbon is shifted to the left by one pixel,
--- as a result all our medal locations need to be shifted to the left 1 pixel or the border cuts off on the left
--- the sizes later on are also 1 pixel larger than you would otherwise expect
 local MEDAL_OFFSETS_X = {
-	EASY = -26,
-	NORMAL = -51,
-	HARD = -76,
+	EASY = -27,
+	NORMAL = -52,
+	HARD = -77,
 	UNFAIR = -101,
-	NONE = -1
+	NONE = -2
 }
 
 -- UI measurements
 local UI = {
 	MEDAL = {
 		SMALL = {
-			WIDTH = 22,
-			HEIGHT = 32
+			WIDTH = 19,
+			HEIGHT = 28,
+			WIDTH_HITBOX = 19,
+			HEIGHT_HITBOX = 28,
 		},
 		LARGE = {
-			WIDTH = 46,
-			HEIGHT = 64
+			WIDTH = 42,
+			HEIGHT = 60,
+			WIDTH_HITBOX = 42,
+			HEIGHT_HITBOX = 60,
 		}
 	},
 	COIN = {
@@ -88,31 +89,42 @@ local UI = {
 		LARGE = {
 			WIDTH = 22,
 			HEIGHT = 22,
-			X = 44,
-			Y = 47
+			X_OFFSET = 44,
+			Y_OFFSET = 44
 		}
 	},
 	ACHIEVEMENT = {
 		WIDTH = 64,
-		HEIGHT = 64
+		HEIGHT = 64,
+		WIDTH_HITBOX = 63,
+		HEIGHT_HITBOX = 63,
 	},
 	HANGAR = {
-		WIDTH = 367,
-		HEIGHT = 68,
-		X_OFFSET = 537,
-		Y_OFFSET = 209,
+		WIDTH = 416,
+		HEIGHT = 113,
+		X_OFFSET = 512,
+		Y_OFFSET = 186,
+		MEDAL = {
+			X_OFFSET = -2,
+			Y_OFFSET = -2
+		},
 		MEDAL_HOLDER = {
-			WIDTH = 140,
-			HEIGHT = 68,
-			Y = 1,
-			HORIZONTAL_GAP = -1,
-			PADDING_ALL = 1
+			WIDTH = 134,
+			HEIGHT = 59,
+			X_OFFSET = 30,
+			Y_OFFSET = 29,
+			HORIZONTAL_GAP = 3,
+		},
+		ACHIEVEMENT = {
+			X_OFFSET = -1,
+			Y_OFFSET = -1
 		},
 		ACHIEVEMENT_HOLDER = {
 			WIDTH = 212,
 			HEIGHT = 64,
-			X = 159,
-			HORIZONTAL_GAP = 10
+			X_OFFSET = 185,
+			Y_OFFSET = 24,
+			HORIZONTAL_GAP = 11
 		}
 	},
 	SQUAD_SELECT = {
@@ -132,8 +144,9 @@ local UI = {
 			WIDTH = 160,
 			HEIGHT = 32,
 			MEDAL_HOLDER = {
-				HORIZONTAL_GAP = 1,
-				PADDING_LEFT = 6
+				HORIZONTAL_GAP = 4,
+				PADDING_LEFT = 7,
+				PADDING_TOP = 2,
 			},
 			COIN_HOLDER = {
 				HEIGHT = 20,
@@ -165,36 +178,55 @@ local UI = {
 	}
 }
 
-local function medal_deco_draw(self, screen, widget)
-	if widget.parent.medalhovered then
-		self.surface = self.surface_hl
-	else
-		self.surface = self.surface_normal
-	end
+-- Returns a deco draw function that consider the widget hovered
+-- if the ancestor at depth 'hitboxDepth' contains the mouse.
+local function buildDecoDrawFunction(drawFn, hitboxDepth)
+	return function(self, screen, widget)
+		local hitbox = widget
 
-	DecoSurface.draw(self, screen, widget)
+		for i = 1, hitboxDepth do
+			hitbox = hitbox.parent or hitbox
+		end
+
+		local origWidgetHovered = widget.hovered
+		widget.hovered = hitbox.containsMouse
+		drawFn(self, screen, widget)
+		widget.hovered = origWidgetHovered
+	end
 end
 
 local function buildMedalUi(surface_bucket, squad_id, islandsSecured)
-	local deco = DecoSurface()
-	deco.draw = medal_deco_draw
-	deco.surface_normal = SURFACES[surface_bucket][islandsSecured].NORMAL
-	deco.surface_hl = SURFACES[surface_bucket][islandsSecured].HL
-
 	local medalData = modApi.medals:readData(squad_id)
 	local difficulty = medalData[islandsSecured.."islands"] or "NONE"
 	local offset_x = MEDAL_OFFSETS_X[difficulty]
 	local w, h = UI.MEDAL.SMALL.WIDTH, UI.MEDAL.SMALL.HEIGHT
 
+	-- Add solid background to cover up large Unfair medals.
+	local decos = { DecoSolid(deco.colors.framebg) }
+	local decoSurface = DecoSurface()
+
+	decoSurface.draw = buildDecoDrawFunction(DecoSurfaceOutlined.draw, 2)
+	decoSurface.surfacenormal = SURFACES[surface_bucket][islandsSecured].NORMAL
+	decoSurface.surfacehl = SURFACES[surface_bucket][islandsSecured].HL
+
 	if surface_bucket == "MEDALS_LARGE" then
 		offset_x = offset_x * 2
 		w, h = UI.MEDAL.LARGE.WIDTH, UI.MEDAL.LARGE.HEIGHT
+	else
+		-- Add background lines to recreate lines covered up by solid background.
+		decos[#decos+1] = DecoDraw(screen.drawrect, deco.colors.buttonborder, sdl.rect(0,7,w,2))
+		decos[#decos+1] = DecoAnchor()
+		decos[#decos+1] = DecoDraw(screen.drawrect, deco.colors.buttonborder, sdl.rect(0,16,w,2))
+		decos[#decos+1] = DecoAnchor()
 	end
+
+	decos[#decos+1] = DecoAlign(offset_x, 0)
+	decos[#decos+1] = decoSurface
 
 	local medal = Ui()
 		:widthpx(w)
 		:heightpx(h)
-		:decorate{ DecoAlign(offset_x, 0), deco }
+		:decorate(decos)
 		:clip()
 	medal.ignoreMouse = true
 
@@ -246,12 +278,14 @@ local function buildLargeCoinUi(achievement)
 	return buildCoinUi("COIN_LARGE", achievement)
 end
 
-local function buildAchievementUi(achievement, drawCoin)
+local function buildAchievementUi(achievement)
 	local isComplete = achievement:isComplete()
 	local isSecret = achievement.secret or false
 	
 	local solid = nil
 	local surface = nil
+	local decoBorder = DecoBorder(isComplete and deco.colors.achievementborder or deco.colors.buttonborder, 1, deco.colors.achievementborder, 4)
+	decoBorder.draw = buildDecoDrawFunction(DecoBorder.draw, 1)
 	
 	if isSecret and not isComplete then
 		surface = sdlext.getSurface{
@@ -274,17 +308,11 @@ local function buildAchievementUi(achievement, drawCoin)
 			DecoAnchor(),
 			DecoSolid(solid),
 			DecoAnchor(),
-			DecoBorder(isComplete and deco.colors.achievementborder or deco.colors.buttonborder, 1, deco.colors.achievementborder, 4)
+			decoBorder
 		})
-	ui.translucent = true
+	ui.ignoreMouse = true
 	ui.clipRect = sdl.rect(0,0,0,0)
 	ui.draw = clipped_draw
-
-	if drawCoin then
-		buildLargeCoinUi(achievement)
-			:pospx(UI.COIN.LARGE.X, UI.COIN.LARGE.Y)
-			:addTo(ui)
-	end
 
 	return ui
 end
@@ -375,6 +403,9 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 
 	function hangarMedalUi:relayout()
 		local hangarOrigin = GetHangarOrigin()
+		self
+			:widthpx(UI.HANGAR.WIDTH)
+			:heightpx(UI.HANGAR.HEIGHT)
 		self:pospx(hangarOrigin.x + UI.HANGAR.X_OFFSET, hangarOrigin.y + UI.HANGAR.Y_OFFSET)
 		self.visible = sdlext.isHangar() and IsHangarWindowlessState()
 		Ui.relayout(self)
@@ -386,34 +417,39 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 	medalHolder = UiBoxLayout()
 		:widthpx(UI.HANGAR.MEDAL_HOLDER.WIDTH)
 		:heightpx(UI.HANGAR.MEDAL_HOLDER.HEIGHT)
-		:setypx(UI.HANGAR.MEDAL_HOLDER.Y)
+		:setxpx(UI.HANGAR.MEDAL_HOLDER.X_OFFSET)
+		:setypx(UI.HANGAR.MEDAL_HOLDER.Y_OFFSET)
 		:hgap(UI.HANGAR.MEDAL_HOLDER.HORIZONTAL_GAP)
 		:dynamicResize(false)
-		:padding(UI.HANGAR.MEDAL_HOLDER.PADDING_ALL)
 		:addTo(hangarMedalUi)
 	medalHolder.translucent = true
 
 	achievementHolder = UiBoxLayout()
 		:widthpx(UI.HANGAR.ACHIEVEMENT_HOLDER.WIDTH)
 		:heightpx(UI.HANGAR.ACHIEVEMENT_HOLDER.HEIGHT)
-		:setxpx(UI.HANGAR.ACHIEVEMENT_HOLDER.X)
+		:setxpx(UI.HANGAR.ACHIEVEMENT_HOLDER.X_OFFSET)
+		:setypx(UI.HANGAR.ACHIEVEMENT_HOLDER.Y_OFFSET)
 		:hgap(UI.HANGAR.ACHIEVEMENT_HOLDER.HORIZONTAL_GAP)
 		:dynamicResize(false)
 		:addTo(hangarMedalUi)
 	achievementHolder.translucent = true
-
-	function medalHolder:relayout()
-		self.medalhovered = self.containsMouse
-		UiBoxLayout.relayout(self)
-	end
 
 	for islandsSecured = 2, 4 do
 		if false
 			or modApi:isModdedSquad(squad_id)
 			or modApi.medals:isRibbonOvervalued(squad_id, islandsSecured)
 		then
-			buildMedal2xUi(squad_id, islandsSecured)
-				:addTo(medalHolder)
+			medalHolder
+				:beginUi()
+					:setVar("ignoreMouse", true)
+					:widthpx(UI.MEDAL.LARGE.WIDTH_HITBOX)
+					:heightpx(UI.MEDAL.LARGE.HEIGHT_HITBOX)
+
+					:beginUi(buildMedal2xUi(squad_id, islandsSecured))
+						:setxpx(UI.HANGAR.MEDAL.X_OFFSET)
+						:setypx(UI.HANGAR.MEDAL.Y_OFFSET)
+					:endUi()
+				:endUi()
 		end
 	end
 
@@ -422,8 +458,25 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 		if squadAchievements ~= nil then
 			for i, achievement in ipairs(squadAchievements) do
 				if i > 3 then break end
-				buildAchievementUi(achievement, true)
-					:addTo(achievementHolder)
+
+				achievementHolder
+					:beginUi()
+						:setVar("translucent", true)
+						:widthpx(UI.ACHIEVEMENT.WIDTH_HITBOX)
+						:heightpx(UI.ACHIEVEMENT.HEIGHT_HITBOX)
+
+						:beginUi(buildAchievementUi(achievement))
+							:widthpx(UI.ACHIEVEMENT.WIDTH)
+							:heightpx(UI.ACHIEVEMENT.HEIGHT)
+							:setxpx(UI.HANGAR.ACHIEVEMENT.X_OFFSET)
+							:setypx(UI.HANGAR.ACHIEVEMENT.Y_OFFSET)
+
+							:beginUi(buildLargeCoinUi(achievement))
+								:setxpx(UI.COIN.LARGE.X_OFFSET)
+								:setypx(UI.COIN.LARGE.Y_OFFSET)
+							:endUi()
+						:endUi()
+					:endUi()
 			end
 		end
 
@@ -555,6 +608,7 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 						:hgap(UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.HORIZONTAL_GAP)
 						:dynamicResize(false)
 						:addTo(squadProgressUi)
+					medalHolder.padt = UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.PADDING_TOP
 					medalHolder.padl = UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.PADDING_LEFT
 					medalHolder.squadIndex = squadIndex
 					medalHolder.draw = draw_if_squad_unlocked
