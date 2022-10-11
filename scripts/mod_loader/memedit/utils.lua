@@ -185,7 +185,6 @@ function utils.uniqueBuildingPoint(random)
 
 		Board:SetTerrain(p, TERRAIN_BUILDING)
 		Board:AddUniqueBuilding("str_bar1")
-		LOG(Board:IsUniqueBuilding(p))
 
 		local pawn = Board:GetPawn(p)
 		if pawn then
