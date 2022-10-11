@@ -247,7 +247,8 @@ function utils.requireScanMovePawn()
 
 	if scanMovePawn == nil then
 		utils.prepareScanPawn{
-			Image = "MechPunch",
+			Image = "MechScience",
+			ImageOffset = 10,
 			MoveSpeed = 99,
 			Health = 9,
 			Flying = true,
