@@ -57,7 +57,7 @@ modApi.events.onFtldatFinalized:subscribe(function()
 	}
 end)
 
-local MEDAL_OFFSETS_X = {
+local MEDAL_X_OFFSETS = {
 	EASY = -27,
 	NORMAL = -52,
 	HARD = -77,
@@ -198,35 +198,25 @@ end
 local function buildMedalUi(surface_bucket, squad_id, islandsSecured)
 	local medalData = modApi.medals:readData(squad_id)
 	local difficulty = medalData[islandsSecured.."islands"] or "NONE"
-	local offset_x = MEDAL_OFFSETS_X[difficulty]
-	local w, h = UI.MEDAL.SMALL.WIDTH, UI.MEDAL.SMALL.HEIGHT
-
-	-- Add solid background to cover up large Unfair medals.
-	local decos = { DecoSolid(deco.colors.framebg) }
+	local w, h, offset_x
 	local decoSurface = DecoSurface()
 
-	decoSurface.draw = buildDecoDrawFunction(DecoSurfaceOutlined.draw, 2)
+	decoSurface.draw = buildDecoDrawFunction(DecoSurfaceOutlined.draw, 3)
 	decoSurface.surfacenormal = SURFACES[surface_bucket][islandsSecured].NORMAL
 	decoSurface.surfacehl = SURFACES[surface_bucket][islandsSecured].HL
 
 	if surface_bucket == "MEDALS_LARGE" then
-		offset_x = offset_x * 2
+		offset_x = MEDAL_X_OFFSETS[difficulty] * 2
 		w, h = UI.MEDAL.LARGE.WIDTH, UI.MEDAL.LARGE.HEIGHT
 	else
-		-- Add background lines to recreate lines covered up by solid background.
-		decos[#decos+1] = DecoDraw(screen.drawrect, deco.colors.buttonborder, sdl.rect(0,7,w,2))
-		decos[#decos+1] = DecoAnchor()
-		decos[#decos+1] = DecoDraw(screen.drawrect, deco.colors.buttonborder, sdl.rect(0,16,w,2))
-		decos[#decos+1] = DecoAnchor()
+		offset_x = MEDAL_X_OFFSETS[difficulty]
+		w, h = UI.MEDAL.SMALL.WIDTH, UI.MEDAL.SMALL.HEIGHT
 	end
-
-	decos[#decos+1] = DecoAlign(offset_x, 0)
-	decos[#decos+1] = decoSurface
 
 	local medal = Ui()
 		:widthpx(w)
 		:heightpx(h)
-		:decorate(decos)
+		:decorate{ DecoAlign(offset_x, 0), decoSurface }
 		:clip()
 	medal.ignoreMouse = true
 
@@ -395,59 +385,70 @@ end
 modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 	destroyHangarMedalUi()
 
-	local root = sdlext.getUiRoot()
 	hangarMedalUi = Ui()
-		:widthpx(UI.HANGAR.WIDTH)
-		:heightpx(UI.HANGAR.HEIGHT)
-		:addTo(root)
+	local medalHolder = Ui()
+	local achievementHolder = UiBoxLayout()
+
+	function hangarMedalUi:updatePosition()
+		local hangarOrigin = GetHangarOrigin()
+		self:setxpx(hangarOrigin.x + UI.HANGAR.X_OFFSET)
+		self:setypx(hangarOrigin.y + UI.HANGAR.Y_OFFSET)
+	end
+
+	function hangarMedalUi:onGameWindowResized(screen, oldSize)
+		self:updatePosition()
+	end
 
 	function hangarMedalUi:relayout()
-		local hangarOrigin = GetHangarOrigin()
-		self
-			:widthpx(UI.HANGAR.WIDTH)
-			:heightpx(UI.HANGAR.HEIGHT)
-		self:pospx(hangarOrigin.x + UI.HANGAR.X_OFFSET, hangarOrigin.y + UI.HANGAR.Y_OFFSET)
 		self.visible = sdlext.isHangar() and IsHangarWindowlessState()
 		Ui.relayout(self)
 	end
 
-	hangarMedalUi.translucent = true
-	hangarMedalUi:relayout()
+	sdlext.getUiRoot()
+		:beginUi(hangarMedalUi)
+			:setVar("translucent", true)
+			:widthpx(UI.HANGAR.WIDTH)
+			:heightpx(UI.HANGAR.HEIGHT)
 
-	medalHolder = UiBoxLayout()
-		:widthpx(UI.HANGAR.MEDAL_HOLDER.WIDTH)
-		:heightpx(UI.HANGAR.MEDAL_HOLDER.HEIGHT)
-		:setxpx(UI.HANGAR.MEDAL_HOLDER.X_OFFSET)
-		:setypx(UI.HANGAR.MEDAL_HOLDER.Y_OFFSET)
-		:hgap(UI.HANGAR.MEDAL_HOLDER.HORIZONTAL_GAP)
-		:dynamicResize(false)
-		:addTo(hangarMedalUi)
-	medalHolder.translucent = true
+			:beginUi(medalHolder)
+				:setVar("translucent", true)
+				:widthpx(UI.HANGAR.MEDAL_HOLDER.WIDTH)
+				:heightpx(UI.HANGAR.MEDAL_HOLDER.HEIGHT)
+				:setxpx(UI.HANGAR.MEDAL_HOLDER.X_OFFSET)
+				:setypx(UI.HANGAR.MEDAL_HOLDER.Y_OFFSET)
+			:endUi()
 
-	achievementHolder = UiBoxLayout()
-		:widthpx(UI.HANGAR.ACHIEVEMENT_HOLDER.WIDTH)
-		:heightpx(UI.HANGAR.ACHIEVEMENT_HOLDER.HEIGHT)
-		:setxpx(UI.HANGAR.ACHIEVEMENT_HOLDER.X_OFFSET)
-		:setypx(UI.HANGAR.ACHIEVEMENT_HOLDER.Y_OFFSET)
-		:hgap(UI.HANGAR.ACHIEVEMENT_HOLDER.HORIZONTAL_GAP)
-		:dynamicResize(false)
-		:addTo(hangarMedalUi)
-	achievementHolder.translucent = true
+			:beginUi(achievementHolder)
+				:setVar("translucent", true)
+				:widthpx(UI.HANGAR.ACHIEVEMENT_HOLDER.WIDTH)
+				:heightpx(UI.HANGAR.ACHIEVEMENT_HOLDER.HEIGHT)
+				:setxpx(UI.HANGAR.ACHIEVEMENT_HOLDER.X_OFFSET)
+				:setypx(UI.HANGAR.ACHIEVEMENT_HOLDER.Y_OFFSET)
+				:hgap(UI.HANGAR.ACHIEVEMENT_HOLDER.HORIZONTAL_GAP)
+				:dynamicResize(false)
+			:endUi()
+		:endUi()
 
 	for islandsSecured = 2, 4 do
 		if false
 			or modApi:isModdedSquad(squad_id)
 			or modApi.medals:isRibbonOvervalued(squad_id, islandsSecured)
 		then
+			local pos = islandsSecured - 2
+
 			medalHolder
 				:beginUi()
 					:setVar("ignoreMouse", true)
 					:widthpx(UI.MEDAL.LARGE.WIDTH_HITBOX)
 					:heightpx(UI.MEDAL.LARGE.HEIGHT_HITBOX)
+					:setxpx(pos * (UI.MEDAL.LARGE.WIDTH_HITBOX + UI.HANGAR.MEDAL_HOLDER.HORIZONTAL_GAP))
 
-					:beginUi(buildMedal2xUi(squad_id, islandsSecured))
+					:beginUi()
+						:width(1):height(1)
 						:setxpx(UI.HANGAR.MEDAL.X_OFFSET)
 						:setypx(UI.HANGAR.MEDAL.Y_OFFSET)
+						:decorate{ DecoSolid(deco.colors.framebg) }
+						:add(buildMedal2xUi(squad_id, islandsSecured))
 					:endUi()
 				:endUi()
 		end
@@ -483,6 +484,8 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 		setMedalTooltipText(squad_id)
 		setAchievementTooltipText(squad_id)
 	end
+
+	hangarMedalUi:updatePosition()
 end)
 
 modApi.events.onHangarSquadCleared:subscribe(function()
@@ -556,35 +559,32 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 
 	for squadPage, indices in ipairs(SQUAD_INDICES) do
 		local flow = UiFlowLayout()
-			:widthpx(UI.SQUAD_SELECT.WIDTH)
-			:heightpx(UI.SQUAD_SELECT.HEIGHT)
-			:hgap(UI.SQUAD_SELECT.HORIZONTAL_GAP)
-			:dynamicResize(false)
-			:addTo(squadSelectionMedalUi)
+
+		function flow:updatePosition()
+			self:vgap(UI.SQUAD_SELECT.VERTICAL_GAP.SMALL_UI)
+			self:setxpx(Boxes.hangar_select_big.x + UI.SQUAD_SELECT.X_OFFSET)
+			self:setypx(Boxes.hangar_select_big.y + UI.SQUAD_SELECT.Y_OFFSET.SMALL_UI)
+		end
+
+		function flow:onGameWindowResized(screen, oldSize)
+			self:updatePosition()
+		end
 
 		function flow:relayout()
-			local vgap
-			local yOffset
-
-			-- if modApi:isSecretSquadAvailable() then
-			-- 	vgap = UI.SQUAD_SELECT.VERTICAL_GAP.LARGE_UI
-			-- 	yOffset = UI.SQUAD_SELECT.Y_OFFSET.LARGE_UI
-			-- else
-			vgap = UI.SQUAD_SELECT.VERTICAL_GAP.SMALL_UI
-			yOffset = UI.SQUAD_SELECT.Y_OFFSET.SMALL_UI
-			-- end
-
-			if self.gapVertical ~= vgap then
-				self:vgap(vgap)
-			end
-
-			self:pospx(Boxes.hangar_select_big.x + UI.SQUAD_SELECT.X_OFFSET, Boxes.hangar_select_big.y + yOffset)
-			self.visible = not sdlext.isAchievementsWindowVisible() and squadPage == sdlext.getSquadSelectionPage()
+			self.visible = true
+				and sdlext.isAchievementsWindowVisible() ~= true
+				and squadPage == sdlext.getSquadSelectionPage()
 			UiFlowLayout.relayout(self)
 		end
 
-		flow.ignoreMouse = true
-		flow:relayout()
+		squadSelectionMedalUi
+			:beginUi(flow)
+				:setVar("ignoreMouse", true)
+				:widthpx(UI.SQUAD_SELECT.WIDTH)
+				:heightpx(UI.SQUAD_SELECT.HEIGHT)
+				:hgap(UI.SQUAD_SELECT.HORIZONTAL_GAP)
+				:dynamicResize(false)
+			:endUi()
 
 		for visualIndex, squadIndex in ipairs(indices) do
 			-- always added to ensure modded squads show in the right spot when vanilla squads exist
@@ -600,35 +600,64 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 				local trueSquadIndex = modApi.squadIndices[modSquadIndex]
 				local squad_id = modApi.mod_squads[trueSquadIndex].id
 
-				if modApi:isModdedSquad(squad_id) then
+				local medalHolder = Ui()
+				medalHolder.squadIndex = squadIndex
+				medalHolder.padt = UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.PADDING_TOP
+				medalHolder.padl = UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.PADDING_LEFT
+				medalHolder.draw = draw_if_squad_unlocked
 
-					local medalHolder = UiBoxLayout()
+				local coinHolder = UiBoxLayout()
+				coinHolder.squadIndex = squadIndex
+				coinHolder.padt = UI.SQUAD_SELECT.PROGRESS.COIN_HOLDER.PADDING_TOP
+				coinHolder.draw = draw_if_squad_unlocked
+
+				squadProgressUi
+					:beginUi(medalHolder)
 						:width(0.5)
 						:height(1)
-						:hgap(UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.HORIZONTAL_GAP)
-						:dynamicResize(false)
-						:addTo(squadProgressUi)
-					medalHolder.padt = UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.PADDING_TOP
-					medalHolder.padl = UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.PADDING_LEFT
-					medalHolder.squadIndex = squadIndex
-					medalHolder.draw = draw_if_squad_unlocked
-
-					local coinHolder = UiBoxLayout()
+					:endUi()
+					:beginUi(coinHolder)
 						:width(0.5)
 						:heightpx(UI.SQUAD_SELECT.PROGRESS.COIN_HOLDER.HEIGHT)
 						:pos(0.5, 0)
 						:hgap(UI.SQUAD_SELECT.PROGRESS.COIN_HOLDER.HORIZONTAL_GAP)
 						:dynamicResize(false)
-						:addTo(squadProgressUi)
-					coinHolder.squadIndex = squadIndex
-					coinHolder.padt = UI.SQUAD_SELECT.PROGRESS.COIN_HOLDER.PADDING_TOP
-					coinHolder.draw = draw_if_squad_unlocked
+					:endUi()
 
-					for islandsSecured = 2, 4 do
-						buildMedal1xUi(squad_id, islandsSecured)
-							:addTo(medalHolder)
+				for islandsSecured = 2, 4 do
+					if false
+						or modApi:isModdedSquad(squad_id)
+						or modApi.medals:isRibbonOvervalued(squad_id, islandsSecured)
+					then
+						local pos = islandsSecured - 2
+
+						medalHolder
+							:beginUi()
+								:widthpx(UI.MEDAL.SMALL.WIDTH)
+								:heightpx(UI.MEDAL.SMALL.HEIGHT)
+								:setxpx(pos * (UI.MEDAL.SMALL.WIDTH_HITBOX + UI.SQUAD_SELECT.PROGRESS.MEDAL_HOLDER.HORIZONTAL_GAP))
+								-- Draw medal background and recreate two
+								-- lines covered by the solid background.
+								:decorate{
+									DecoSolid(deco.colors.framebg),
+									DecoDraw(
+										screen.drawrect,
+										deco.colors.buttonborder,
+										sdl.rect(0,7,UI.MEDAL.SMALL.WIDTH,2)
+									),
+									DecoAnchor(),
+									DecoDraw(
+										screen.drawrect,
+										deco.colors.buttonborder,
+										sdl.rect(0,16,UI.MEDAL.SMALL.WIDTH,2)
+									),
+								}
+								:add(buildMedal1xUi(squad_id, islandsSecured))
+							:endUi()
 					end
+				end
 
+				if modApi:isModdedSquad(squad_id) then
 					local squadAchievements = modApi.achievements:getSquadAchievements(squad_id)
 
 					if squadAchievements ~= nil then
@@ -642,6 +671,8 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 				end
 			end
 		end
+
+		flow:updatePosition()
 	end
 
 	modApi.events.onKeyPressed:subscribe(detectConsoleCommand)
