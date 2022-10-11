@@ -282,7 +282,7 @@ function utils.requireScanMovePawn()
 end
 
 function utils.cleanupScanMovePawn()
-	if Board then
+	if Board and scanMovePawnId then
 		local pawn = Board:GetPawn(scanMovePawnId)
 		if pawn then
 			pawn:SetHealth(0)
