@@ -7,7 +7,7 @@ local boardExists = utils.boardExists
 local randomCleanPoint = utils.randomCleanPoint
 local randomUniqueBuildingPoint = utils.randomUniqueBuildingPoint
 local randomNonUniqueBuildingPoint = utils.randomNonUniqueBuildingPoint
-local requireScanMovePawn = utils.requireScanMovePawn
+local requireScanMovePlayerPawn = utils.requireScanMovePlayerPawn
 local cleanupScanMovePawn = utils.cleanupScanMovePawn
 local scans = {}
 
@@ -126,7 +126,7 @@ scans.highlighted = inheritClass(Scan, {
 	end,
 	actions = {
 		function(self)
-			requireScanMovePawn()
+			local pawn, waitInstruction = requireScanMovePlayerPawn()
 
 			if self.iteration == 1 then
 				ScanMove:SetEvents{
@@ -135,7 +135,11 @@ scans.highlighted = inheritClass(Scan, {
 				}
 			end
 
-			self.instruction = "Hover tiles with the provided ScanPawn's Move skill"
+			if pawn then
+				self.instruction = "Hover tiles with the provided ScanPawn's Move skill"
+			else
+				self.instruction = waitInstruction
+			end
 		end
 	},
 	onMoveHighlighted = function(self, pawn, p1, p2)

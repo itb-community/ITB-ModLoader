@@ -281,6 +281,14 @@ function utils.requireScanMovePawn()
 	return scanMovePawn
 end
 
+function utils.requireScanMovePlayerPawn()
+	if Game:GetTeamTurn() == TEAM_PLAYER then
+		return utils.requireScanMovePawn()
+	else
+		return nil, "Wait for player turn"
+	end
+end
+
 function utils.cleanupScanMovePawn()
 	if Board and scanMovePawnId then
 		local pawn = Board:GetPawn(scanMovePawnId)

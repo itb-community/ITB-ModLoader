@@ -4,7 +4,7 @@ local Scan = require(rootpath.."scan")
 local utils = require(rootpath.."utils")
 local inheritClass = utils.inheritClass
 local boardExists = utils.boardExists
-local requireScanMovePawn = utils.requireScanMovePawn
+local requireScanMovePlayerPawn = utils.requireScanMovePlayerPawn
 local cleanupScanMovePawn = utils.cleanupScanMovePawn
 local scans = {}
 
@@ -23,7 +23,7 @@ scans.highlightedX = inheritClass(Scan, {
 	end,
 	actions = {
 		function(self)
-			requireScanMovePawn()
+			local pawn, waitInstruction = requireScanMovePlayerPawn()
 
 			if self.iteration == 1 then
 				ScanMove:SetEvents{
@@ -33,7 +33,11 @@ scans.highlightedX = inheritClass(Scan, {
 				}
 			end
 
-			self.instruction = "Hover tiles with the provided ScanPawn's Move skill"
+			if pawn then
+				self.instruction = "Hover tiles with the provided ScanPawn's Move skill"
+			else
+				self.instruction = waitInstruction
+			end
 		end
 	},
 	onMoveHighlighted = function(self, pawn, p1, p2)
@@ -60,7 +64,7 @@ scans.highlightedY = inheritClass(Scan, {
 	end,
 	actions = {
 		function(self)
-			requireScanMovePawn()
+			local pawn, waitInstruction = requireScanMovePlayerPawn()
 
 			if self.iteration == 1 then
 				ScanMove:SetEvents{
@@ -70,7 +74,11 @@ scans.highlightedY = inheritClass(Scan, {
 				}
 			end
 
-			self.instruction = "Hover tiles with the provided ScanPawn's Move skill"
+			if pawn then
+				self.instruction = "Hover tiles with the provided ScanPawn's Move skill"
+			else
+				self.instruction = waitInstruction
+			end
 		end
 	},
 	onMoveHighlighted = function(self, pawn, p1, p2)

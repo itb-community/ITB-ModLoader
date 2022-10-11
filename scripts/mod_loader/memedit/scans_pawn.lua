@@ -9,7 +9,7 @@ local boardExists = utils.boardExists
 local missionBoardExists = utils.missionBoardExists
 local cleanPoint = utils.cleanPoint
 local randomCleanPoint = utils.randomCleanPoint
-local requireScanMovePawn = utils.requireScanMovePawn
+local requireScanMovePlayerPawn = utils.requireScanMovePlayerPawn
 local cleanupScanMovePawn = utils.cleanupScanMovePawn
 local getMech = utils.getMech
 local scans = {}
@@ -481,7 +481,7 @@ scans.movementSpent = inheritClass(Scan, {
 		end
 	end,
 	action = function(self)
-		local pawn = requireScanMovePawn()
+		local pawn, waitInstruction = requireScanMovePlayerPawn()
 
 		if self.iteration == 1 then
 			ScanMove:SetEvents{
@@ -491,10 +491,14 @@ scans.movementSpent = inheritClass(Scan, {
 			}
 		end
 
-		if pawn:IsUndoPossible() then
-			self.instruction = "Undo move with the provided ScanPawn"
+		if pawn then
+			if pawn:IsUndoPossible() then
+				self.instruction = "Undo move with the provided ScanPawn"
+			else
+				self.instruction = "Move the provided ScanPawn"
+			end
 		else
-			self.instruction = "Move the provided ScanPawn"
+			self.instruction = waitInstruction
 		end
 	end,
 	onMoveTarget = function(self, pawn, p1, p2)
@@ -752,7 +756,7 @@ scans.undoX = inheritClass(Scan, {
 		end
 	end,
 	action = function(self)
-		requireScanMovePawn()
+		local pawn, waitInstruction = requireScanMovePlayerPawn()
 
 		if self.iteration == 1 then
 			ScanMove:SetEvents{
@@ -761,7 +765,11 @@ scans.undoX = inheritClass(Scan, {
 			}
 		end
 
-		self.instruction = "Move the provided ScanPawn"
+		if pawn then
+			self.instruction = "Move the provided ScanPawn"
+		else
+			self.instruction = waitInstruction
+		end
 	end,
 	afterMoveEffect = function(self, pawn, p1, p2)
 		self:searchPawn(pawn, p1.x)
@@ -786,7 +794,7 @@ scans.undoY = inheritClass(Scan, {
 		end
 	end,
 	action = function(self)
-		requireScanMovePawn()
+		local pawn, waitInstruction = requireScanMovePlayerPawn()
 
 		if self.iteration == 1 then
 			ScanMove:SetEvents{
@@ -795,7 +803,11 @@ scans.undoY = inheritClass(Scan, {
 			}
 		end
 
-		self.instruction = "Move the provided ScanPawn"
+		if pawn then
+			self.instruction = "Move the provided ScanPawn"
+		else
+			self.instruction = waitInstruction
+		end
 	end,
 	afterMoveEffect = function(self, pawn, p1, p2)
 		self:searchPawn(pawn, p1.y)
