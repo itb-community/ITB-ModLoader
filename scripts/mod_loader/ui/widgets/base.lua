@@ -122,6 +122,44 @@ function Ui:decorate(decorations)
 	return self
 end
 
+-- Adds a ui instance of class 'class' (or Ui if nil)
+-- to itself, and returns the new ui instance.
+-- Intended to be used in function chaining when
+-- setting up the Ui hierarchy.
+function Ui:beginUi(class, ...)
+	if class == nil then
+		class = Ui
+	end
+
+	if Class.instanceOf(class, class.__index) then
+		-- if 'class' is a ui instance
+		return class:addTo(self)
+	elseif Class.isSubclassOf(class, Ui) then
+		-- if 'class' is a ui class
+		return class(...):addTo(self)
+	end
+
+	Assert.Error("Invalid Argument #1")
+end
+
+-- Ends the current Ui instance when function chaining;
+-- returning its parent.
+function Ui:endUi()
+	return self.parent
+end
+
+-- Sets a variable in the ui table to the given value.
+function Ui:setVar(var, value)
+	self[var] = value
+	return self
+end
+
+-- Run a function fn(self, ...) to format the ui object in some way.
+function Ui:format(fn, ...)
+	fn(self, ...)
+	return self
+end
+
 function Ui:show()
 	self.visible = true
 	
