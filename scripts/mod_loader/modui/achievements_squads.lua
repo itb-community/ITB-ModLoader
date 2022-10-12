@@ -196,7 +196,7 @@ local ESCAPE_MEDALS = {
 	PADL = 28, -- left padding
 }
 
-local function formatHitboxDraw(self, hitboxDepth)
+local function drawIfAncestorContainsMouse(self, hitboxDepth)
 	local oldDrawFn = self.draw
 	self.draw = function(self, screen)
 		local hitbox = self
@@ -493,7 +493,7 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 						:decorate{ DecoSolid(deco.colors.framebg) }
 
 						:beginUi(buildMedal2xUi(squad_id, islandsSecured))
-							:format(formatHitboxDraw, 3)
+							:format(drawIfAncestorContainsMouse, 3)
 						:endUi()
 					:endUi()
 				:endUi()
@@ -517,7 +517,7 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 							:heightpx(ACHIEVEMENT.H)
 							:setxpx(ACHIEVEMENT.X)
 							:setypx(ACHIEVEMENT.Y)
-							:format(formatHitboxDraw, 1)
+							:format(drawIfAncestorContainsMouse, 1)
 
 							:beginUi(buildLargeCoinUi(achievement))
 								:setxpx(COIN_LARGE.X)
@@ -815,7 +815,7 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 							:heightpx(ACHIEVEMENT.H)
 							:setxpx(ACHIEVEMENT.X)
 							:setypx(ACHIEVEMENT.Y)
-							:format(formatHitboxDraw, 1)
+							:format(drawIfAncestorContainsMouse, 1)
 						:endUi()
 					:endUi()
 			end
@@ -837,7 +837,7 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 					:widthpx(MEDAL_LARGE.W_HITBOX)
 					:heightpx(MEDAL_LARGE.H_HITBOX)
 					:setxpx(pos * (MEDAL_LARGE.W_HITBOX + ESCAPE_MEDALS.X_GAP))
-					:format(formatHitboxDraw, 2)
+					:format(drawIfAncestorContainsMouse, 2)
 					:decorate{
 						-- Cover up vanilla medal and recreate medal background
 						DecoSolid(deco.colors.framebg),
@@ -862,7 +862,7 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 						),
 					}
 					:beginUi(buildMedal2xUi(squad_id, islandsSecured))
-						:format(formatHitboxDraw, 3)
+						:format(drawIfAncestorContainsMouse, 3)
 					:endUi()
 				:endUi()
 		end
