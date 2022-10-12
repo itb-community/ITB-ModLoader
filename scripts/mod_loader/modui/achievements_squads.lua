@@ -19,6 +19,7 @@ local SURFACES = {
 	}
 }
 
+local SQUAD_INDEX_SECRET = 11
 local SQUAD_INDICES = {
 	-- page 1: shows random, custom, and 1-6
 	{ -1, -1, 1, 2, 3, 4, 5, 6 },
@@ -67,18 +68,18 @@ local MEDAL_X_OFFSETS = {
 }
 
 local MEDAL_SMALL = {
-	W = 19,
-	H = 28,
-	W_HITBOX = 19,
-	H_HITBOX = 28,
+	W_SURFACE = 19, -- Size of sprite
+	H_SURFACE = 28,
+	W = 19, -- Size of ui object
+	H = 31,
 }
 
 local MEDAL_LARGE = {
-	W = 42,
-	H = 60,
-	W_HITBOX = 42,
-	H_HITBOX = 60,
-	X_HANGAR = -2,
+	W_SURFACE = 42, -- Size of sprite
+	H_SURFACE = 60,
+	W = 42, -- Size of ui object
+	H = 66,
+	X_HANGAR = -2, -- Adjustments from mouse sensitive hitbox in hangar
 	Y_HANGAR = -2,
 }
 
@@ -138,28 +139,38 @@ local HANGAR_COMMENDATIONS = {
 -- Box containing all squad commendations
 local SQUAD_SELECT = {
 	W = 635,
-	H = 332,
+	H = 331,
 	X = 285,
-	Y = 91,
+	Y = 93,
 	X_GAP = 315, -- x gap between squad commendations
-	Y_GAP = 68,  -- y gap between squad commendations
+	Y_GAP = 69,  -- y gap between squad commendations
 }
 
 -- Box containing both medals and coins
 local SQUAD_SELECT_COMMENDATIONS = {
 	W = 160,
-	H = 32,
+	H = 31,
+	H_FRAME = 11,
+	Y_FRAME = 7,
+	PADL = 8,
+	PADL = 50,
 }
 
 local SQUAD_SELECT_MEDALS = {
+	W = 65,
+	H = 31,
+	X = 8,
+	Y = 0,
+	X_CENTERED = 48, -- x pos when squad has no achievements
 	X_GAP = 4, -- x gap between each medal
-	PADL = 8, -- left padding
-	PADT = 2, -- top padding
 }
 
 local SQUAD_SELECT_COINS = {
+	W = 70,
+	H = 20,
+	X = 80,
+	Y = 2,
 	X_GAP = 5, -- x gap between each coin
-	PADT = 4, -- top padding
 }
 
 -- Escape Menu
@@ -250,10 +261,10 @@ local function buildMedalUi(surface_bucket, squad_id, islandsSecured)
 
 	if surface_bucket == "MEDALS_LARGE" then
 		offset_x = MEDAL_X_OFFSETS[difficulty] * 2 + 2 -- account for 2 pixel border
-		w, h = MEDAL_LARGE.W, MEDAL_LARGE.H
+		w, h = MEDAL_LARGE.W_SURFACE, MEDAL_LARGE.H_SURFACE
 	else
 		offset_x = MEDAL_X_OFFSETS[difficulty]
-		w, h = MEDAL_SMALL.W, MEDAL_SMALL.H
+		w, h = MEDAL_SMALL.W_SURFACE, MEDAL_SMALL.H_SURFACE
 	end
 
 	local medal = Ui()
@@ -482,9 +493,9 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 			medalHolder
 				:beginUi()
 					:setVar("ignoreMouse", true)
-					:widthpx(MEDAL_LARGE.W_HITBOX)
-					:heightpx(MEDAL_LARGE.H_HITBOX)
-					:setxpx(pos * (MEDAL_LARGE.W_HITBOX + HANGAR_MEDALS.X_GAP))
+					:widthpx(MEDAL_LARGE.W)
+					:heightpx(MEDAL_LARGE.H)
+					:setxpx(pos * (MEDAL_LARGE.W + HANGAR_MEDALS.X_GAP))
 
 					:beginUi()
 						:width(1):height(1)
@@ -635,7 +646,7 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 
 		for visualIndex, squadIndex in ipairs(indices) do
 			-- always added to ensure modded squads show in the right spot when vanilla squads exist
-			local squadProgressUi = Ui()
+			local squadCommendationsUi = Ui()
 				:widthpx(SQUAD_SELECT_COMMENDATIONS.W)
 				:heightpx(SQUAD_SELECT_COMMENDATIONS.H)
 				:addTo(flow)
@@ -643,32 +654,25 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 			-- -1 means random or custom
 			if squadIndex ~= -1 then
 				-- mod loader squad index is 2 less than the true index for secret squad and above
+
 				local modSquadIndex = squadIndex > 10 and squadIndex - 2 or squadIndex
 				local trueSquadIndex = modApi.squadIndices[modSquadIndex]
 				local squad_id = modApi.mod_squads[trueSquadIndex].id
 
 				local medalHolder = Ui()
 				medalHolder.squadIndex = squadIndex
-				medalHolder.padt = SQUAD_SELECT_MEDALS.PADT
-				medalHolder.padl = SQUAD_SELECT_MEDALS.PADL
 				medalHolder.draw = draw_if_squad_unlocked
 
 				local coinHolder = UiBoxLayout()
 				coinHolder.squadIndex = squadIndex
-				coinHolder.padt = SQUAD_SELECT_COINS.PADT
 				coinHolder.draw = draw_if_squad_unlocked
 
-				squadProgressUi
+				squadCommendationsUi
 					:beginUi(medalHolder)
-						:width(0.5)
-						:height(1)
-					:endUi()
-					:beginUi(coinHolder)
-						:width(0.5)
-						:height(1)
-						:pos(0.5, 0)
-						:hgap(SQUAD_SELECT_COINS.X_GAP)
-						:dynamicResize(false)
+						:widthpx(SQUAD_SELECT_MEDALS.W)
+						:heightpx(SQUAD_SELECT_MEDALS.H)
+						:setxpx(SQUAD_SELECT_MEDALS.X)
+						:setypx(SQUAD_SELECT_MEDALS.Y)
 					:endUi()
 
 				for islandsSecured = 2, 4 do
@@ -677,14 +681,19 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 						or modApi.medals:isVanillaScoreCorrected(squad_id, islandsSecured)
 					then
 						local pos = islandsSecured - 2
+						local medalUi = Ui()
 
-						medalHolder
-							:beginUi()
-								:widthpx(MEDAL_SMALL.W)
-								:heightpx(MEDAL_SMALL.H)
-								:setxpx(pos * (MEDAL_SMALL.W_HITBOX + SQUAD_SELECT_MEDALS.X_GAP))
+						medalUi
+							:widthpx(MEDAL_SMALL.W)
+							:heightpx(MEDAL_SMALL.H)
+							:setxpx(pos * (MEDAL_SMALL.W + SQUAD_SELECT_MEDALS.X_GAP))
+							:add(buildMedal1xUi(squad_id, islandsSecured))
+							:addTo(medalHolder)
+
+						if modApi:isVanillaSquad(squad_id) then
+							-- Cover up vanilla medal and recreate medal background
+							medalUi
 								:decorate{
-									-- Cover up vanilla medal and recreate medal background
 									DecoSolid(deco.colors.framebg),
 									DecoDraw(
 										screen.drawrect,
@@ -698,22 +707,51 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 										sdl.rect(0,16,MEDAL_SMALL.W,2)
 									),
 								}
-								:add(buildMedal1xUi(squad_id, islandsSecured))
-							:endUi()
+						end
 					end
+				end
+
+				if true
+					and modApi:isVanillaSquad(squad_id)
+					and squadIndex == SQUAD_INDEX_SECRET
+				then
+					-- Center medals for secret squad without achievements
+					medalHolder:setxpx(SQUAD_SELECT_MEDALS.X_CENTERED)
 				end
 
 				if modApi:isModdedSquad(squad_id) then
 					local squadAchievements = modApi.achievements:getSquadAchievements(squad_id)
 
-					if squadAchievements ~= nil then
+					if squadAchievements ~= nil and #squadAchievements > 0 then
+						coinHolder
+							:widthpx(SQUAD_SELECT_COINS.W)
+							:heightpx(SQUAD_SELECT_COINS.H)
+							:setxpx(SQUAD_SELECT_COINS.X)
+							:setypx(SQUAD_SELECT_COINS.Y)
+							:hgap(SQUAD_SELECT_COINS.X_GAP)
+							:dynamicResize(false)
+							:addTo(squadCommendationsUi)
+
 						for i, achievement in ipairs(squadAchievements) do
 							if i > 3 then break end
 
 							buildSmallCoinUi(achievement)
 								:addTo(coinHolder)
 						end
+					else
+						-- Center medals when the squad has no achievements
+						medalHolder:setxpx(SQUAD_SELECT_MEDALS.X_CENTERED)
 					end
+
+					-- Cover up all vanilla commendations
+					squadCommendationsUi
+						:decorate{ DecoSolid(deco.colors.framebg) }
+						:beginUi()
+							:widthpx(SQUAD_SELECT_COMMENDATIONS.W)
+							:heightpx(SQUAD_SELECT_COMMENDATIONS.H_FRAME)
+							:setypx(SQUAD_SELECT_COMMENDATIONS.Y_FRAME)
+							:decorate{ DecoFrame() }
+						:endUi()
 				end
 			end
 		end
@@ -834,9 +872,9 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 			medalHolder
 				:beginUi()
 					:setVar("ignoreMouse", true)
-					:widthpx(MEDAL_LARGE.W_HITBOX)
-					:heightpx(MEDAL_LARGE.H_HITBOX)
-					:setxpx(pos * (MEDAL_LARGE.W_HITBOX + ESCAPE_MEDALS.X_GAP))
+					:widthpx(MEDAL_LARGE.W)
+					:heightpx(MEDAL_LARGE.H)
+					:setxpx(pos * (MEDAL_LARGE.W + ESCAPE_MEDALS.X_GAP))
 					:format(drawIfAncestorContainsMouse, 2)
 					:decorate{
 						-- Cover up vanilla medal and recreate medal background
