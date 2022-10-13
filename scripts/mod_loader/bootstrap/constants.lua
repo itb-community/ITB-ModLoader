@@ -27,6 +27,7 @@ modApi.constants = {
   PILOT_CONFIG_POD_ADVANCED = 2,
   PILOT_CONFIG_RECRUIT = 4,
 
+  -- game squad index constants
   -- squads 0-7 are the first 8 vanilla squads
   -- 8 and 9 are random and custom
   -- squad 10 is secret, 11-15 are Advanced
@@ -34,4 +35,5 @@ modApi.constants = {
   SQUAD_INDEX_END = 15,
   SQUAD_INDEX_RANDOM = 8,
   SQUAD_INDEX_CUSTOM = 9,
+  SQUAD_INDEX_SECRET = 10,
 }
