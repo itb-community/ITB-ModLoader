@@ -85,3 +85,82 @@ function modApi:getModOptions(modId)
 	local modContent = mod_loader.currentModContent or mod_loader:getModConfig()
 	return modContent[modId].options
 end
+
+-- gameSquadIndex is the index the game uses to refer to squads:
+-- 0-7   -> non-ae-mechs
+-- 8-9   -> random/custom
+-- 10    -> secret
+-- 11-15 -> ae-mechs
+
+-- modLoaderSquadIndex is the index the mod loader uses to refer to squads:
+-- 1-8   -> non-ae-mechs
+-- 9     -> secret
+-- 10-14 -> ae-mechs
+
+-- modSquadIndex is the index the modded squad has in modApi.mod_squads
+-- Like modLoaderSquadIndex, it is 1-indexed. Vanilla squads are in the same indexes
+-- as for modLoaderSquadIndex, while mod squads are added from index 15 and onwards.
+-- This index can vary between ITB launches, but will remain constant until ITB closes.
+
+-- Converts gameSquadIndex to modLoaderSquadIndex
+function modApi:squadIndex_game2modLoader(gameSquadIndex)
+	if false
+		or gameSquadIndex == modApi.constants.SQUAD_INDEX_RANDOM
+		or gameSquadIndex == modApi.constants.SQUAD_INDEX_CUSTOM
+	then
+		Assert.Error("Invalid gameSquadIndex -> modLoaderSquadIndex conversion")
+	end
+
+	if gameSquadIndex > modApi.constants.SQUAD_INDEX_CUSTOM then
+		return gameSquadIndex - 1
+	else
+		return gameSquadIndex + 1
+	end
+end
+
+-- Converts modLoaderSquadIndex to gameSquadIndex
+function modApi:squadIndex_modLoader2game(modLoaderSquadIndex)
+	if modLoaderSquadIndex >= modApi.constants.SQUAD_INDEX_CUSTOM then
+		return modLoaderSquadIndex + 1
+	else
+		return modLoaderSquadIndex - 1
+	end
+end
+
+function modApi:getModSquadByModLoaderSquadIndex(modLoaderSquadIndex)
+	local modSquadIndex = modApi.squadIndices[modLoaderSquadIndex]
+	return modApi.mod_squads[modSquadIndex].id
+end
+
+function modApi:getModSquadIdByGameSquadIndex(gameSquadIndex)
+	local modLoaderSquadIndex = self:squadIndex_game2modLoader(gameSquadIndex)
+	return self:getModSquadByModLoaderSquadIndex(modLoaderSquadIndex)
+end
+
+-- Returns the modSquadIndex the squad id has, or -1 if none can be found.
+-- Each mod squad is assigned a modSquadIndex when it is added to the mod loader,
+-- and remains constant for the duration of the application.
+function modApi:getSquadsModSquadIndex(squadId)
+	for modSquadIndex, squadData in pairs(modApi.mod_squads) do
+		if squadData.id == squadId then
+			return modSquadIndex
+		end
+	end
+
+	return -1
+end
+
+-- Returns the current modLoaderSquadIndex for the squadId, or -1 if none can be found.
+-- Using the squad editor to change which squads are available in the hangar can change
+-- the modLoaderSquadIndex for a squad.
+function modApi:getSquadsCurrentModLoaderSquadIndex(squadId)
+	local modSquadIndex = self:getSquadsModSquadIndex(squadId)
+
+	for modLoaderSquadIndex, i in ipairs(modApi.squadIndices) do
+		if i == modSquadIndex then
+			return modLoaderSquadIndex
+		end
+	end
+
+	return -1
+end
