@@ -19,12 +19,14 @@ local SURFACES = {
 	}
 }
 
-local SQUAD_INDEX_SECRET = 11
+local NO_ACHIEVEMENTS_FONT = deco.fonts.labelfont
+local NO_ACHIEVEMENTS_TEXT_SETTINGS = deco.textset(deco.colors.buttonborder)
+
 local SQUAD_INDICES = {
-	-- page 1: shows random, custom, and 1-6
-	{ -1, -1, 1, 2, 3, 4, 5, 6 },
-	-- page 2: shows 7, 8, 12, 13, 14, 15, 16, and 11 (secret)
-	{ 7, 8, 12, 13, 14, 15, 16, 11 }
+	-- page 1: shows random, custom, and 0-5
+	{ -1, -1, 0, 1, 2, 3, 4, 5 },
+	-- page 2: shows 6, 7, 11, 12, 13, 14, 15, and 10 (secret)
+	{ 6, 7, 11, 12, 13, 14, 15, 10 }
 }
 
 modApi.events.onFtldatFinalized:subscribe(function()
@@ -123,6 +125,14 @@ local HANGAR_ACHIEVEMENTS = {
 	X = 185,
 	Y = 24,
 	X_GAP = 11, -- x gap between achievements
+}
+
+local HANGAR_NO_ACHIEVEMENTS = {
+	W_BG = 222,
+	W = 208,
+	H = 74,
+	X = 179,
+	Y = 18,
 }
 
 -- Box containing both medals/achievements
@@ -249,8 +259,8 @@ function decoDrawHoverable:draw(screen, widget)
 	DecoDraw.draw(self, screen, widget)
 end
 
-local function buildMedalUi(surface_bucket, squad_id, islandsSecured)
-	local medalData = modApi.medals:readData(squad_id)
+local function buildMedalUi(surface_bucket, squadId, islandsSecured)
+	local medalData = modApi.medals:readData(squadId)
 	local difficulty = medalData[islandsSecured.."islands"]
 	local w, h, offset_x
 	local decoSurface = DecoSurface()
@@ -277,12 +287,12 @@ local function buildMedalUi(surface_bucket, squad_id, islandsSecured)
 	return medal
 end
 
-local function buildMedal1xUi(squad_id, islandsSecured)
-	return buildMedalUi("MEDALS_SMALL", squad_id, islandsSecured)
+local function buildMedal1xUi(squadId, islandsSecured)
+	return buildMedalUi("MEDALS_SMALL", squadId, islandsSecured)
 end
 
-local function buildMedal2xUi(squad_id, islandsSecured)
-	return buildMedalUi("MEDALS_LARGE", squad_id, islandsSecured)
+local function buildMedal2xUi(squadId, islandsSecured)
+	return buildMedalUi("MEDALS_LARGE", squadId, islandsSecured)
 end
 
 local function buildCoinUi(surface_bucket, achievement)
@@ -302,8 +312,6 @@ local function buildCoinUi(surface_bucket, achievement)
 		:heightpx(h)
 		:decorate{ DecoAlign(-5, 0), DecoSurface(surface) }
 	coin.ignoreMouse = true
-	coin.clipRect = sdl.rect(0,0,0,0)
-	coin.draw = clipped_draw
 
 	return coin
 end
@@ -349,8 +357,6 @@ local function buildAchievementUi(achievement)
 			decoBorder
 		})
 	ui.ignoreMouse = true
-	ui.clipRect = sdl.rect(0,0,0,0)
-	ui.draw = clipped_draw
 
 	return ui
 end
@@ -361,8 +367,8 @@ local function resetMedalTooltipText()
 	modApi.modLoaderDictionary["Hangar_Island_Victory_4"] = nil
 end
 
-local function setMedalTooltipText(squad_id)
-	local medalData = modApi.medals:readData(squad_id) or {}
+local function setMedalTooltipText(squadId)
+	local medalData = modApi.medals:readData(squadId) or {}
 	for islandsSecured = 2, 4 do
 		local islandData = medalData[islandsSecured.."islands"]
 		local text = nil
@@ -387,25 +393,25 @@ local function resetAchievementTooltipText()
 	overriddenAchievementText = {}
 end
 
-local function setAchievementTooltipText(squad_id)
+local function setAchievementTooltipText(squadId)
 	resetAchievementTooltipText()
 
-	local squadAchievements = modApi.achievements:getSquadAchievements(squad_id)
-	local vanilla_squad_id = nil
+	local squadAchievements = modApi.achievements:getSquadAchievements(squadId)
+	local vanillaSquadId = nil
 
 	for squad_index, redirected_index in ipairs(modApi.squadIndices) do
-		if squad_id == modApi.mod_squads[redirected_index].id then
-			vanilla_squad_id = modApi.squadKeys[squad_index]
+		if squadId == modApi.mod_squads[redirected_index].id then
+			vanillaSquadId = modApi.squadKeys[squad_index]
 		end
 	end
 
-	Assert.NotEquals(nil, vanilla_squad_id)
+	Assert.NotEquals(nil, vanillaSquadId)
 
 	if squadAchievements ~= nil then
 		for i, achievement in ipairs(squadAchievements) do
 			if i > 3 then break end
 
-			local base = string.format("Ach_%s_%s", vanilla_squad_id, i)
+			local base = string.format("Ach_%s_%s", vanillaSquadId, i)
 			local title = base.."_Title"
 			local text = base.."_Text"
 			local progress = base.."_Progress"
@@ -436,10 +442,11 @@ local function destroyHangarMedalUi()
 	end
 end
 
-modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
+modApi.events.onHangarSquadSelected:subscribe(function(squadId)
 	destroyHangarMedalUi()
 
 	hangarMedalUi = Ui()
+	hangarMedalUi.draw = clipped_draw
 	local medalHolder = Ui()
 	local achievementHolder = UiBoxLayout()
 
@@ -485,8 +492,8 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 
 	for islandsSecured = 2, 4 do
 		if false
-			or modApi:isModdedSquad(squad_id)
-			or modApi.medals:isVanillaScoreCorrected(squad_id, islandsSecured)
+			or modApi:isModdedSquad(squadId)
+			or modApi.medals:isVanillaScoreCorrected(squadId, islandsSecured)
 		then
 			local pos = islandsSecured - 2
 
@@ -503,7 +510,7 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 						:setypx(MEDAL_LARGE.Y_HANGAR)
 						:decorate{ DecoSolid(deco.colors.framebg) }
 
-						:beginUi(buildMedal2xUi(squad_id, islandsSecured))
+						:beginUi(buildMedal2xUi(squadId, islandsSecured))
 							:format(drawIfAncestorContainsMouse, 3)
 						:endUi()
 					:endUi()
@@ -511,19 +518,35 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 		end
 	end
 
-	if modApi:isModdedSquad(squad_id) then
-		local squadAchievements = modApi.achievements:getSquadAchievements(squad_id)
-		if squadAchievements ~= nil then
+	if modApi:isModdedSquad(squadId) then
+		local squadAchievements = modApi.achievements:getSquadAchievements(squadId)
+		if squadAchievements ~= nil and #squadAchievements > 0 then
 			for i, achievement in ipairs(squadAchievements) do
 				if i > 3 then break end
+				local modLoaderSquadIndex = modApi:getSquadsCurrentModLoaderSquadIndex(squadId)
+				local gameSquadIndex = modApi:squadIndex_modLoader2game(modLoaderSquadIndex)
+				local isSecretSquadSlot = gameSquadIndex == modApi.constants.SQUAD_INDEX_SECRET
+
+				if isSecretSquadSlot then
+					hangarMedalUi
+						:beginUi()
+							:widthpx(HANGAR_NO_ACHIEVEMENTS.W_BG)
+							:heightpx(HANGAR_NO_ACHIEVEMENTS.H)
+							:setxpx(HANGAR_NO_ACHIEVEMENTS.X)
+							:setypx(HANGAR_NO_ACHIEVEMENTS.Y)
+							:decorate{ DecoSolid(deco.colors.framebg) }
+						:endUi()
+				end
 
 				achievementHolder
 					:beginUi()
-						:setVar("translucent", true)
+						:setVar("translucent", isSecretSquadSlot == false)
 						:widthpx(ACHIEVEMENT.W_HITBOX)
 						:heightpx(ACHIEVEMENT.H_HITBOX)
+						:settooltip(achievement:getTooltip(), achievement.name)
 
 						:beginUi(buildAchievementUi(achievement))
+							:setVar("ignoreMouse", true)
 							:widthpx(ACHIEVEMENT.W)
 							:heightpx(ACHIEVEMENT.H)
 							:setxpx(ACHIEVEMENT.X)
@@ -537,12 +560,36 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id)
 						:endUi()
 					:endUi()
 			end
+		else
+			hangarMedalUi
+				:beginUi()
+					:widthpx(HANGAR_NO_ACHIEVEMENTS.W_BG)
+					:heightpx(HANGAR_NO_ACHIEVEMENTS.H)
+					:setxpx(HANGAR_NO_ACHIEVEMENTS.X)
+					:setypx(HANGAR_NO_ACHIEVEMENTS.Y)
+					:decorate{ DecoSolid(deco.colors.framebg) }
+
+					:beginUi()
+						:widthpx(HANGAR_NO_ACHIEVEMENTS.W)
+						:height(1)
+						:decorate{
+							DecoFrame(),
+							DecoAlign(-3,-4),
+							DecoAlignedText(
+								"No Achievements",
+								NO_ACHIEVEMENTS_FONT,
+								NO_ACHIEVEMENTS_TEXT_SETTINGS,
+								"center", "center"
+							)
+						}
+					:endUi()
+				:endUi()
 		end
 
-		setAchievementTooltipText(squad_id)
+		setAchievementTooltipText(squadId)
 	end
 
-	setMedalTooltipText(squad_id)
+	setMedalTooltipText(squadId)
 	hangarMedalUi:updatePosition()
 end)
 
@@ -580,7 +627,7 @@ local function destroySquadSelectionMedalUi()
 end
 
 local function draw_if_squad_unlocked(self, screen)
-	self.visible = Profile.squads[self.squadIndex]
+	self.visible = Profile.squads[self.modLoaderSquadIndex]
 
 	if self.visible then
 		if Boxes.hangar_select_big.x == sdlext.CurrentWindowRect.x and Boxes.hangar_select_big.y == sdlext.CurrentWindowRect.y - 25 then
@@ -615,7 +662,7 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 		return Ui.mousedown(self, mx, my, button)
 	end
 
-	for squadPage, indices in ipairs(SQUAD_INDICES) do
+	for squadPage, gameSquadIndices in ipairs(SQUAD_INDICES) do
 		local flow = UiFlowLayout()
 
 		function flow:updatePosition()
@@ -644,7 +691,7 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 				:dynamicResize(false)
 			:endUi()
 
-		for visualIndex, squadIndex in ipairs(indices) do
+		for _, gameSquadIndex in ipairs(gameSquadIndices) do
 			-- always added to ensure modded squads show in the right spot when vanilla squads exist
 			local squadCommendationsUi = Ui()
 				:widthpx(SQUAD_SELECT_COMMENDATIONS.W)
@@ -652,19 +699,16 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 				:addTo(flow)
 
 			-- -1 means random or custom
-			if squadIndex ~= -1 then
-				-- mod loader squad index is 2 less than the true index for secret squad and above
-
-				local modSquadIndex = squadIndex > 10 and squadIndex - 2 or squadIndex
-				local trueSquadIndex = modApi.squadIndices[modSquadIndex]
-				local squad_id = modApi.mod_squads[trueSquadIndex].id
+			if gameSquadIndex ~= -1 then
+				local modLoaderSquadIndex = modApi:squadIndex_game2modLoader(gameSquadIndex)
+				local squadId = modApi:getModSquadIdByGameSquadIndex(gameSquadIndex)
 
 				local medalHolder = Ui()
-				medalHolder.squadIndex = squadIndex
+				medalHolder.modLoaderSquadIndex = modLoaderSquadIndex
 				medalHolder.draw = draw_if_squad_unlocked
 
 				local coinHolder = UiBoxLayout()
-				coinHolder.squadIndex = squadIndex
+				coinHolder.modLoaderSquadIndex = modLoaderSquadIndex
 				coinHolder.draw = draw_if_squad_unlocked
 
 				squadCommendationsUi
@@ -677,8 +721,8 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 
 				for islandsSecured = 2, 4 do
 					if false
-						or modApi:isModdedSquad(squad_id)
-						or modApi.medals:isVanillaScoreCorrected(squad_id, islandsSecured)
+						or modApi:isModdedSquad(squadId)
+						or modApi.medals:isVanillaScoreCorrected(squadId, islandsSecured)
 					then
 						local pos = islandsSecured - 2
 						local medalUi = Ui()
@@ -687,10 +731,10 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 							:widthpx(MEDAL_SMALL.W)
 							:heightpx(MEDAL_SMALL.H)
 							:setxpx(pos * (MEDAL_SMALL.W + SQUAD_SELECT_MEDALS.X_GAP))
-							:add(buildMedal1xUi(squad_id, islandsSecured))
+							:add(buildMedal1xUi(squadId, islandsSecured))
 							:addTo(medalHolder)
 
-						if modApi:isVanillaSquad(squad_id) then
+						if modApi:isVanillaSquad(squadId) then
 							-- Cover up vanilla medal and recreate medal background
 							medalUi
 								:decorate{
@@ -711,16 +755,12 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 					end
 				end
 
-				if true
-					and modApi:isVanillaSquad(squad_id)
-					and squadIndex == SQUAD_INDEX_SECRET
-				then
+				if squadId == "Secret" then
 					-- Center medals for secret squad without achievements
 					medalHolder:setxpx(SQUAD_SELECT_MEDALS.X_CENTERED)
-				end
 
-				if modApi:isModdedSquad(squad_id) then
-					local squadAchievements = modApi.achievements:getSquadAchievements(squad_id)
+				elseif modApi:isModdedSquad(squadId) then
+					local squadAchievements = modApi.achievements:getSquadAchievements(squadId)
 
 					if squadAchievements ~= nil and #squadAchievements > 0 then
 						coinHolder
@@ -785,7 +825,8 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 	escapeMenuMedalUi = Ui()
 	local achievementHolder = UiBoxLayout()
 	local medalHolder = Ui()
-	local squad_id = GAME.additionalSquadData.squad
+	local squadId = GAME.additionalSquadData.squad
+	local gameSquadIndex = GameData.current.squad
 
 	function escapeMenuMedalUi:updatePosition()
 		self:pospx(Boxes.escape_box.x + ESCAPE_MENU.X, Boxes.escape_box.y + ESCAPE_MENU.Y)
@@ -836,17 +877,24 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 			:endUi()
 		:endUi()
 
-	if modApi:isModdedSquad(squad_id) then
-		local squadAchievements = modApi.achievements:getSquadAchievements(squad_id)
-		if squadAchievements ~= nil then
+	if modApi:isModdedSquad(squadId) then
+		local squadAchievements = modApi.achievements:getSquadAchievements(squadId)
+		if squadAchievements ~= nil and #squadAchievements > 0 then
+
+			local isSecretSquadSlot = gameSquadIndex == modApi.constants.SQUAD_INDEX_SECRET
+			if isSecretSquadSlot then
+				achievementHolder:decorate{ DecoSolid(deco.colors.framebg) }
+			end
+
 			for i, achievement in ipairs(squadAchievements) do
 				if i > 3 then break end
 
 				achievementHolder
 					:beginUi()
-						:setVar("translucent", true)
+						:setVar("translucent", isSecretSquadSlot == false)
 						:widthpx(ACHIEVEMENT.W_HITBOX)
 						:heightpx(ACHIEVEMENT.H_HITBOX)
+						:settooltip(achievement:getTooltip(), achievement.name)
 
 						:beginUi(buildAchievementUi(achievement))
 							:widthpx(ACHIEVEMENT.W)
@@ -857,15 +905,27 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 						:endUi()
 					:endUi()
 			end
+		else
+			achievementHolder
+				:decorate{
+					DecoSolid(deco.colors.framebg),
+					DecoAlign(-2,-3),
+					DecoAlignedText(
+						"No Achievements",
+						NO_ACHIEVEMENTS_FONT,
+						NO_ACHIEVEMENTS_TEXT_SETTINGS,
+						"center", "center"
+					)
+				}
 		end
 
-		setAchievementTooltipText(squad_id)
+		setAchievementTooltipText(squadId)
 	end
 
 	for islandsSecured = 2, 4 do
 		if false
-			or modApi:isModdedSquad(squad_id)
-			or modApi.medals:isVanillaScoreCorrected(squad_id, islandsSecured)
+			or modApi:isModdedSquad(squadId)
+			or modApi.medals:isVanillaScoreCorrected(squadId, islandsSecured)
 		then
 			local pos = islandsSecured - 2
 
@@ -899,14 +959,14 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 							sdl.rect(0,39,MEDAL_LARGE.W,2)
 						),
 					}
-					:beginUi(buildMedal2xUi(squad_id, islandsSecured))
+					:beginUi(buildMedal2xUi(squadId, islandsSecured))
 						:format(drawIfAncestorContainsMouse, 3)
 					:endUi()
 				:endUi()
 		end
 	end
 
-	setMedalTooltipText(squad_id)
+	setMedalTooltipText(squadId)
 	escapeMenuMedalUi:updatePosition()
 end)
 
