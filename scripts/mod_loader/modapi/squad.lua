@@ -69,6 +69,49 @@ function modApi:addSquad(squad, name, desc, icon)
 	table.insert(self.squad_icon, icon or "resources/mods/squads/unknown.png")
 end
 
+-- Convert from how the mod loader indexes squads to how the game indexes squads
+function modApi:squadIndex2Choice(index)
+	Assert.Equals("table", type(self), "Check for . vs :")
+
+	if index > self.constants.SQUAD_INDEX_END then
+		LOG("WARNING: Invalid squad index -> choice conversion")
+		return -1
+	elseif index >= self.constants.SQUAD_INDEX_CUSTOM then
+		return index + 2
+	else
+		return index
+	end
+end
+
+-- Convert from how the game indexes squads to how the mod loader indexes squads
+function modApi:squadChoice2Index(choice)
+	Assert.Equals("table", type(self), "Check for . vs :")
+
+	if false
+		or choice == self.constants.SQUAD_CHOICE_RANDOM
+		or choice == self.constants.SQUAD_CHOICE_CUSTOM
+		or choice > self.constants.SQUAD_CHOICE_END
+	then
+		LOG("WARNING: Invalid squad choice -> index conversion")
+		return -1
+	end
+
+	if choice > self.constants.SQUAD_CHOICE_CUSTOM then
+		return choice - 1
+	else
+		return choice + 1
+	end
+end
+
+function modApi:getSquadForChoice(choice)
+	Assert.Equals("table", type(self), "Check for . vs :")
+	Assert.NotEquals(nil, self.squadIndices, "Squad order not loaded")
+
+	local index = self:squadChoice2Index(choice)
+
+	return self.mod_squads[self.squadIndices[index]]
+end
+
 local function onGameEntered()
 	local squadData = GAME.additionalSquadData
 	local squadId = squadData.squad
