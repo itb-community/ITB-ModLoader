@@ -1,47 +1,4 @@
 
-local function findVanillaSquads()
-	modApi.vanillaSquadsByIndex = {}
-	modApi.vanillaSquadsById = {}
-
-	for i = modApi.constants.SQUAD_INDEX_START, modApi.constants.SQUAD_INDEX_END do
-		if true
-			and i ~= modApi.constants.SQUAD_INDEX_RANDOM
-			and i ~= modApi.constants.SQUAD_INDEX_CUSTOM
-		then
-			local vanillaSquad = getStartingSquad(i)
-			local squadId = vanillaSquad[1]:match("Squad_(.+)")
-
-			-- For some reason the vanilla getStartingSquad returns a list:
-			-- { [1] = "name", [3] = "pawn1", [6] = "pawn2", [9] = "pawn3" }
-
-			-- The mod loader's getStartingSquad override returns a list:
-			-- { [1] = "name", [2] = "pawn1", [3] = "pawn2", [4] = "pawn3" }
-
-			-- If the game at some point changes its returned indices, the
-			-- following code will have to be updated.
-			modApi.vanillaSquadsByIndex[i] = {
-				id = squadId,
-				mechs = {
-					vanillaSquad[3],
-					vanillaSquad[6],
-					vanillaSquad[9]
-				}
-			}
-
-			modApi.vanillaSquadsById[squadId] = {
-				index = i,
-				mechs = {
-					vanillaSquad[3],
-					vanillaSquad[6],
-					vanillaSquad[9]
-				}
-			}
-		end
-	end
-end
-
-findVanillaSquads()
-
 local oldGetStartingSquad = getStartingSquad
 function getStartingSquad(choice)
 	if choice == 0 then

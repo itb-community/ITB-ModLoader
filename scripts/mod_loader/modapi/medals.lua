@@ -169,14 +169,10 @@ local function readMedalData(self, squad_id)
 end
 
 local function isVanillaSquad(squadIndex, mechs)
-	local vanillaSquad = modApi.vanillaSquadsByIndex[squadIndex]
-
-	if vanillaSquad == nil then
-		return false
-	end
+	local vanillaSquad = modApi.mod_squads[squadIndex+1]
 
 	for i, mech in ipairs(mechs) do
-		if vanillaSquad.mechs[i] ~= mech then
+		if vanillaSquad[i+1] ~= mech then
 			return false
 		end
 	end
@@ -217,7 +213,7 @@ local function updateVanillaRibbons(self)
 					or stats == statsPolluted
 					or isVanillaSquad(score.squad, score.mechs)
 				then
-					local squadId = modApi.vanillaSquadsByIndex[score.squad].id
+					local squadId = modApi.mod_squads[score.squad+1].id
 
 					stats[squadId] = stats[squadId] or {}
 					local squadRibbons = stats[squadId]
