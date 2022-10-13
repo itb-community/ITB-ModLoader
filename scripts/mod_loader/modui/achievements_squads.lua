@@ -704,12 +704,10 @@ modApi.events.onSquadSelectionWindowShown:subscribe(function()
 				local squadId = modApi:getModSquadIdByGameSquadIndex(gameSquadIndex)
 
 				local medalHolder = Ui()
-				medalHolder.modLoaderSquadIndex = modLoaderSquadIndex
-				medalHolder.draw = draw_if_squad_unlocked
-
 				local coinHolder = UiBoxLayout()
-				coinHolder.modLoaderSquadIndex = modLoaderSquadIndex
-				coinHolder.draw = draw_if_squad_unlocked
+
+				squadCommendationsUi.modLoaderSquadIndex = modLoaderSquadIndex
+				squadCommendationsUi.draw = draw_if_squad_unlocked
 
 				squadCommendationsUi
 					:beginUi(medalHolder)
