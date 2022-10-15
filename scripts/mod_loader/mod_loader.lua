@@ -171,14 +171,14 @@ function mod_loader:loadAdditionalSprites()
 	modApi:copyAsset("img/ui/hangar/victory_4.png", "img/ui/hangar/ml_victory_4.png")
 end
 
+local rootDirPath = Directory():path()
 function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 	local inputDir = Directory(dirPathRelativeToGameDir)
 	local dirs = inputDir:directories();
 	self.mod_dirs = {}
 
 	for _, dir in ipairs(dirs) do
-		dir = dir:name()
-		local modDirPath = inputDir:name().."/"..dir.."/"
+		local modDirPath = dir:path():gsub(rootDirPath, "")
 		table.insert(self.mod_dirs, modDirPath)
 
 		local err = ""
@@ -198,7 +198,9 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 			end
 
 			if #visibleDirectories == 1 then
-				modDirPath = modDirPath..visibleDirectories[1].."/"
+				local childDirPath = visibleDirectories[1]
+				dir = dir:directory(childDirPath)
+				modDirPath = modDirPath .. childDirPath .."/"
 				initFilePath = modDirPath .. "scripts/init.lua"
 			end
 		end
@@ -263,7 +265,7 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 		end
 
 		if ok then
-			data.dir = dir
+			data.dir = dir:name()
 			data.path = initFilePath
 			data.scriptPath = modDirPath .. "scripts/"
 			data.resourcePath = modDirPath
