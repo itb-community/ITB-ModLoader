@@ -66,11 +66,13 @@ function IsSecretPilotsUnlocked(profile)
 end
 
 local function isWindowOpen()
-	return sdlext.isSquadSelectionWindowVisible() or
-	       sdlext.isCustomizeSquadWindowVisible() or
-	       sdlext.isPilotSelectionWindowVisible() or
-	       sdlext.isDifficultySettingsWindowVisible() or
-	       sdlext.isMechColorWindowVisible()
+	return false
+		or sdlext.isSquadSelectionWindowVisible()
+		or sdlext.isCustomizeSquadWindowVisible()
+		or sdlext.isPilotSelectionWindowVisible()
+		or sdlext.isDifficultySettingsWindowVisible()
+		or sdlext.isMechColorWindowVisible()
+end
 
 local function isSquadSelectionOpen()
 	return false
@@ -281,10 +283,10 @@ local function overrideGetImages()
 			v.GetImage = function(self)
 				local isPrimaryCall = not wasPrimaryCallExecuted
 
-				if
-					isPrimaryCall             and
-					IsHangarWindowlessState() and
-					#fetchedMechs < 3
+				if true
+					and isPrimaryCall
+					and IsHangarWindowlessState()
+					and #fetchedMechs < 3
 				then
 					table.insert(fetchedMechs, k)
 
