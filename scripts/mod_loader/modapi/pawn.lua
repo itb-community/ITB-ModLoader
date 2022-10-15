@@ -463,6 +463,9 @@ local function initializeBoardPawn()
 	BoardPawn.IsPilotSkill = pawn.IsAbility
 	BoardPawn.GetPilotSkill = pawn.GetAbility
 
+	modApi.events.onPawnClassInitialized:dispatch(BoardPawn, pawn)
+	modApi.events.onPawnClassInitialized:unsubscribeAll()
+
 	pawn = nil
 	InitializeBoardPawn = nil
 end
