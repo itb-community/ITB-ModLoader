@@ -1,4 +1,14 @@
 
+-- Global constants
+FIRE_TYPE_NONE = 0
+FIRE_TYPE_NORMAL_FIRE = 1
+FIRE_TYPE_FOREST_FIRE = 2
+RUBBLE_BUILDING = 0
+RUBBLE_MOUNTAIN = 1
+PATH_JUMPER = 6
+PATH_TELEPORTER = 5
+
+
 function CreatePilotPersonality(label, name)
 	local t = PilotPersonality:new()
 
