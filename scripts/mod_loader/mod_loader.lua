@@ -51,6 +51,8 @@ function mod_loader:init()
 	self.mods = {}
 	self.mod_list = {}
 	self.mod_options = {}
+	self.extensions = {
+	}
 
 	self.unmountedMods = {} -- mods which had malformed init.lua
 	self.firsterror = nil
@@ -353,6 +355,20 @@ function mod_loader:initMod(id, mod_options)
 		return
 	end
 
+	if mod.extensions then
+		for i, extensionId in ipairs(mod.extensions) do
+			local extension = self:initExtension(extensionId)
+
+			if extension and not extension.loaded then
+				LOG(string.format(
+					"Initializing mod [%s] with id [%s] failed due to mod loader extension [%s] not loading properly",
+					mod.name, id, extensionId
+				))
+				return
+			end
+		end
+	end
+
 	local ok, err = xpcall(
 		function()
 			LOGF("Initializing mod [%s] with id [%s]...", mod.name, id)
@@ -407,6 +423,25 @@ function mod_loader:initMetadata(id)
 			LOG(err)
 		end
 	end
+end
+
+function mod_loader:initExtension(extensionId)
+	local extension = self.extensions[extensionId]
+	local extensionPath = extension
+
+	if type(extensionPath) == "string" then
+		LOGF("Initializing mod loader extension [%s]...", extensionId)
+		extension = require(rootPath..extensionPath)
+		self.extensions[extensionId] = extension
+		Assert.Equals("table", type(extension), "Extension did not return a table")
+		LOGF("Initialized mod loader extension [%s] successfully!", extensionId)
+	end
+
+	return extension
+end
+
+function mod_loader:hasExtension(extensionId)
+	return self.extensions[extensionId] ~= nil
 end
 
 function mod_loader:hasMod(id)
