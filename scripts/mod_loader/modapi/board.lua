@@ -91,14 +91,14 @@ BoardClass.GetString = BoardClass.GetLuaString
 
 BoardClass.IsMissionBoard = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
-	
-	return self.isMission == true
+
+	return self:GetSize() ~= Point(6,6)
 end
 
 BoardClass.IsTipImage = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
-	
-	return self.isMission == nil
+
+	return self:GetSize() == Point(6,6)
 end
 
 BoardClass.GetHighlighted = function(self)
