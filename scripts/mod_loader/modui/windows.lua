@@ -194,12 +194,6 @@ end
 local oldGetText = GetText
 -- TODO: should we be using GetLocalizedText instead?
 function GetText(id, r1, r2, ...)
-	local window = windows[id]
-	if window ~= nil then
-		showWindows[id] = true
-		visibleWindows[id] = window
-	end
-
 	-- detect squad selection page
 	-- for some odd reason, on the squad selection page something is calling `GetText("Upgrade_Page", 10, 10)`, so we have to filter to "Page N of 2"
 	-- if subset ever adds more than 2 pages this will need an update
@@ -208,14 +202,18 @@ function GetText(id, r1, r2, ...)
 		sdlext.squadSelectionPage = tonumber(r1)
 	end
 
+	local window = windows[id]
+	if window ~= nil then
+		showWindows[id] = true
+		visibleWindows[id] = window
+		window:show(id)
+	end
+
 	return oldGetText(id, r1, r2, ...)
 end
 
 modApi.events.onFrameDrawStart:subscribe(function()
 	for id, window in pairs(visibleWindows) do
-		if showWindows[id] then
-			window:show(id)
-		end
 		if not showWindows[id] then
 			visibleWindows[id] = nil
 			window:hide(id)
