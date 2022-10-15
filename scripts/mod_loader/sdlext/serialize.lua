@@ -169,6 +169,10 @@ writers = {
 			table.insert(buffer, "nil --[[thread]]\n");
 		end;
 	["userdata"] = function (buffer, item)
-			table.insert(buffer, "nil --[[userdata]]\n");
+			if type(item.GetString) == "function" then
+				table.insert(buffer, item:GetString());
+			else
+				table.insert(buffer, "nil --[[userdata]]\n");
+			end
 		end;
 }
