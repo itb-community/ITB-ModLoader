@@ -8,26 +8,21 @@ Placeholder_Personality = CreatePilotPersonality("NULL", "placeholder")
 local ProfileDataAffirmed = false
 
 function modApi:getProfileList()
-	
 	local result = {}
-	local path_savedata = GetSavedataLocation()
-	local directory = io.popen(string.format("dir %q /B /AD", path_savedata))
-	
-	for dir_profile in directory:lines() do
-		if dir_profile:match("^profile_") then
-			
-			local path_profile = string.format("%s%s/profile.lua", path_savedata, dir_profile)
-			
-			if self:fileExists(path_profile) then
-				local profile = self:loadIntoEnv(path_profile).Profile
-				
+
+	local savedataDir = Directory.savedata()
+	for _, profileDir in ipairs(savedataDir:directories()) do
+		if profileDir:name():match("^profile_") then
+			local profileFile = profileDir:file("profile.lua")
+
+			if profileFile:exists() then
+				local profile = self:loadIntoEnv(profileFile:path()).Profile
+
 				table.insert(result, profile)
 			end
 		end
 	end
-	
-	directory:close()
-	
+
 	return result
 end
 

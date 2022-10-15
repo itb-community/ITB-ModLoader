@@ -1,8 +1,10 @@
 local scripts = {
+	"security",
 	"assert",
+	"classes",
+	"itb_io",
 	"io",
 	"utils",
-	"classes",
 	"event",
 	"modApi",
 	"constants",

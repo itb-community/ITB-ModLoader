@@ -9,17 +9,12 @@
 	regex capture groups.
 --]]
 local function replaceFileContent(filePath, regex, replacementText)
-	local file = assert(io.open(filePath, "r"), "Failed to open file: "..filePath)
-	local content = file:read("*all")
-	file:close()
-	file = nil
+	local file = File(filePath)
+	local content = file:read_to_string()
 
 	content, _ = string.gsub(content, regex, replacementText)
 
-	file = assert(io.open(filePath, "w"), "Failed to open file: "..filePath)
-	file:write(content)
-	file:close()
-	file = nil
+	file:write_string(content)
 end
 
 --[[

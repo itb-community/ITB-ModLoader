@@ -56,7 +56,7 @@ function mod_loader:init()
 	self.firsterror = nil
 
 	LOGD("Enumerating mods...")
-	self:enumerateMods("mods/")
+	self:enumerateMods("mods")
 	LOGD("Done!")
 
 	if MOD_API_DRAW_HOOK then
@@ -171,12 +171,17 @@ function mod_loader:loadAdditionalSprites()
 	modApi:copyAsset("img/ui/hangar/victory_4.png", "img/ui/hangar/ml_victory_4.png")
 end
 
+local rootDirPath = Directory():path()
 function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
-	self.mod_dirs = self:enumerateDirectoriesIn(dirPathRelativeToGameDir)
+	local inputDir = Directory(dirPathRelativeToGameDir)
+	local dirs = inputDir:directories();
+	self.mod_dirs = {}
 
-	for i, dir in pairs(self.mod_dirs) do
+	for _, dir in ipairs(dirs) do
+		local modDirPath = dir:path():gsub(rootDirPath, "")
+		table.insert(self.mod_dirs, modDirPath)
+
 		local err = ""
-		local modDirPath = dirPathRelativeToGameDir..dir.."/"
 		local initFilePath = modDirPath .. "scripts/init.lua"
 
 		if not modApi:fileExists(initFilePath) then
@@ -193,7 +198,9 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 			end
 
 			if #visibleDirectories == 1 then
-				modDirPath = modDirPath..visibleDirectories[1].."/"
+				local childDirPath = visibleDirectories[1]
+				dir = dir:directory(childDirPath)
+				modDirPath = modDirPath .. childDirPath .."/"
 				initFilePath = modDirPath .. "scripts/init.lua"
 			end
 		end
@@ -258,7 +265,7 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 		end
 
 		if ok then
-			data.dir = dir
+			data.dir = dir:name()
 			data.path = initFilePath
 			data.scriptPath = modDirPath .. "scripts/"
 			data.resourcePath = modDirPath
@@ -303,46 +310,30 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 		end
 		
 		if not ok then
-			LOG(string.format("Unable to mount mod at [%s]: %s",dir,err))
+			LOG(string.format("Unable to mount mod at [%s]: %s", dir,err))
 			self.unmountedMods[dir] = err
 		end
 	end
 end
 
 function mod_loader:enumerateFilesIn(dirPathRelativeToGameDir)
-	dirPathRelativeToGameDir = dirPathRelativeToGameDir:gsub("/", "\\")
+	local r = {}
 
-	if os and os.listfiles then
-		return os.listfiles(dirPathRelativeToGameDir)
-	else
-		local result = {}
-		local directory = io.popen(string.format([[dir ".\%s\" /B /A-D]], dirPathRelativeToGameDir))
-		for file in directory:lines() do
-			table.insert(result, file)
-		end
-
-		directory:close()
+	for _, file in ipairs(Directory(dirPathRelativeToGameDir):files()) do
+		table.insert(r, file:path())
 	end
 
-	return result
+	return r
 end
 
 function mod_loader:enumerateDirectoriesIn(dirPathRelativeToGameDir)
-	dirPathRelativeToGameDir = dirPathRelativeToGameDir:gsub("/", "\\")
+	local r = {}
 
-	if os and os.listdirs then
-		return os.listdirs(dirPathRelativeToGameDir)
-	else
-		local directories = {}
-		local cmdResult = io.popen(string.format([[dir ".\%s\" /B /AD]], dirPathRelativeToGameDir))
-		for dir in cmdResult:lines() do
-			table.insert(directories, dir)
-		end
-
-		cmdResult:close()
-
-		return directories
+	for _, dir in ipairs(Directory(dirPathRelativeToGameDir):directories()) do
+		table.insert(r, dir:path())
 	end
+
+	return r
 end
 
 function mod_loader:initMod(id, mod_options)

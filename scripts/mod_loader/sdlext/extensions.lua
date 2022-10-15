@@ -114,15 +114,23 @@ function sdlext.squadPalettes()
 end
 
 function sdlext.config(filename, func)
-	local path = GetSavedataLocation()
-	os.mkdir(path)
+	local path = nil
+	if type(filename) == "string" then
+		local file = Directory.savedata():file(filename)
+		path = file:path()
+	elseif type(filename) == "table" and Class.instanceOf(filename, File) then
+		local file = filename
+		path = file:path()
+	else
+		error("Invalid argument #1 to sdlext.config: must be either a string or a File")
+	end
 
-	local obj = persistence.load(path..filename)
+	local obj = persistence.load(path)
 	obj = obj or {}
 	
 	func(obj)
 	
-	persistence.store(path..filename, obj)
+	persistence.store(path, obj)
 end
 
 function sdlext.totalWidth(textSurface)
