@@ -1,10 +1,13 @@
 -- TODO: a lot of these are constants now, can cleanup code
 local SURFACE_PLATFORM = sdlext.getSurface({path = "img/strategy/hangar_platform_L.png"})
 local SURFACE_MEDAL = sdlext.getSurface({path = "img/ui/hangar/victory_2.png"})
+local SURFACE_ACHIEVEMENT_RANDOM = sdlext.getSurface({path = "img/achievements/Random_1.png"})
+local SURFACE_ACHIEVEMENT_CUSTOM = sdlext.getSurface({path = "img/achievements/Custom_1.png"})
 
 local isSecretSquadUnlocked = false
 local isSecretPilotsUnlocked = false
-local isRandomOrCustomSquad = false
+local isRandomSquad = false
+local isCustomSquad = false
 local secretPilots = {
 	"Pilot_Mantis",
 	"Pilot_Rock",
@@ -35,7 +38,15 @@ function HangarIsSecretPilotsUnlocked()
 end
 
 function HangarIsRandomOrCustomSquad()
-	return isRandomOrCustomSquad
+	return isRandomSquad or isCustomSquad
+end
+
+function HangarIsRandomSquad()
+	return isRandomSquad
+end
+
+function HangarIsCustomSquad()
+	return isCustomSquad
 end
 
 function IsSecretPilotsUnlocked(profile)
@@ -60,6 +71,11 @@ local function isWindowOpen()
 	       sdlext.isPilotSelectionWindowVisible() or
 	       sdlext.isDifficultySettingsWindowVisible() or
 	       sdlext.isMechColorWindowVisible()
+
+local function isSquadSelectionOpen()
+	return false
+		or sdlext.isSquadSelectionWindowVisible()
+		or sdlext.isCustomizeSquadWindowVisible()
 end
 
 --[[
@@ -104,6 +120,8 @@ end
 -- //////////////////////////////////////////////////////////////////////
 -- Current mech detection
 
+local selectedSquadIndex = nil
+local selectedSquadChoice = nil
 local selectedSquad = nil
 local selectedMechs = {}
 local fetchedMechs = {}
@@ -118,14 +136,18 @@ end
 
 local function clearSelectedMechs()
 	local clearedSquad = selectedSquad
+	local clearedSquadChoice = selectedSquadChoice
+	local clearedSquadIndex = selectedSquadIndex
 	local clearedMechs = copy_table(selectedMechs)
 
+	selectedSquadIndex = nil
+	selectedSquadChoice = nil
 	selectedSquad = nil
 	for i = #selectedMechs, 1, -1 do
 		selectedMechs[i] = nil
 	end
 
-	modApi.events.onHangarSquadCleared:dispatch(clearedSquad)
+	modApi.events.onHangarSquadCleared:dispatch(clearedSquad, clearedSquadChoice, clearedSquadIndex)
 	modApi.events.onHangarMechsCleared:dispatch(clearedMechs)
 end
 
@@ -140,8 +162,19 @@ local function populateSelectedMechs(fetchedMechs)
 
 	modApi.events.onHangarMechsSelected:dispatch(HangarGetSelectedMechs())
 
-	if HangarIsRandomOrCustomSquad() or #fetchedMechs < 3 then
-		-- Random or Custom squads have no associated squad id
+	local randomOrCustomSquadId = false
+		or isRandomSquad and "Random"
+		or isCustomSquad and "Custom"
+
+	if randomOrCustomSquadId then
+		selectedSquadIndex = -1
+		selectedSquadChoice = false
+			or isRandomSquad and modApi.constants.SQUAD_CHOICE_RANDOM
+			or isCustomSquad and modApi.constants.SQUAD_CHOICE_CUSTOM
+			or -1
+
+		selectedSquad = randomOrCustomSquadId
+		modApi.events.onHangarSquadSelected:dispatch(selectedSquad, selectedSquadChoice, selectedSquadIndex)
 		return
 	end
 
@@ -155,11 +188,65 @@ local function populateSelectedMechs(fetchedMechs)
 			if i == 3 then
 				-- Found a squad with 3 matching mech ids
 				selectedSquad = squad_id
-				modApi.events.onHangarSquadSelected:dispatch(squad_id)
+
+				-- Find corresponding squad index
+				for index, squadData in ipairs(modApi.mod_squads) do
+					if squadData.id == squad_id then
+						selectedSquadIndex = index
+						break
+					end
+				end
+
+				-- Find corresponding squad choice
+				for index, redirectedIndex in ipairs(modApi.squadIndices) do
+					if redirectedIndex == selectedSquadIndex then
+						selectedSquadChoice = modApi:squadIndex2Choice(index)
+						break
+					end
+				end
+
+				modApi.events.onHangarSquadSelected:dispatch(selectedSquad, selectedSquadChoice, selectedSquadIndex)
 				return
 			end
 		end
 	end
+end
+
+local function conditionalPopulateMechs()
+	modApi:conditionalHook(
+		function()
+			-- Conditional hooks are dispatched from an
+			-- onFrameDrawHook that updates before the
+			-- onFrameDrawnHook that updates isCustomSquad
+			-- and isRandomSquad. Update them before continuing.
+			isRandomSquad = SURFACE_ACHIEVEMENT_RANDOM:wasDrawn()
+			isCustomSquad = SURFACE_ACHIEVEMENT_CUSTOM:wasDrawn()
+
+			return false
+				-- Remove hook if not in the hangar
+				or not sdlext.isHangar()
+				or #fetchedMechs == 3
+				-- Custom squad might not have 3 fetched mechs, so
+				-- check if its achievement surface was drawn.
+				-- If the custom squad has mechs selected, two
+				-- events will be dispatched. One with an empty
+				-- mech table, and then another one with the
+				-- correct mechs.
+				or isCustomSquad
+		end,
+		function()
+			if true
+				and sdlext.isHangar()
+				and isSquadSelectionOpen() == false
+				-- If selectedMechs is populated, this means the
+				-- GetImage overrides has already found 3 mechs
+				-- and a squad.
+				and #selectedMechs == 0
+			then
+				populateSelectedMechs(fetchedMechs)
+			end
+		end
+	)
 end
 
 local function defaultGetImage(self)
@@ -233,6 +320,14 @@ function HangarGetSelectedSquad()
 	return selectedSquad
 end
 
+function HangarGetSelectedSquadIndex()
+	return selectedSquadIndex
+end
+
+function HangarGetSelectedSquadChoice()
+	return selectedSquadChoice
+end
+
 -- Associated entries in Buttons global are not updated to reflect changing dimensions,
 -- need to hardcode them.
 local languageRectsMap
@@ -297,24 +392,9 @@ modApi.events.onHangarLeaving:subscribe(function()
 	restoreGetImages()
 end)
 
-local function isIrregularMedalHeight()
-	-- if victory medals are drawn at y coordinate 186
-	-- relative to hangar origin, we know that we have
-	-- selected Random or Custom squad.
-	-- If this value changes with a game update,
-	-- we will default to guessing that we are looking
-	-- at a regular squad until the mod loader can
-	-- be updated as well.
-	if SURFACE_MEDAL:wasDrawn() then
-		return SURFACE_MEDAL.y - GetHangarOrigin().y == 186
-	end
-
-	return false
-end
-
 local function onMechSelectionHidden()
-	isRandomOrCustomSquad = isIrregularMedalHeight()
 	clearSelectedMechs()
+	conditionalPopulateMechs()
 
 	modApi:scheduleHook(50, function()
 		Profile = modApi:loadProfile()
@@ -352,11 +432,16 @@ local function trackPlatformMovement()
 	end
 end
 
+local function updateIsRandomOrCustomSquad()
+	isRandomSquad = SURFACE_ACHIEVEMENT_RANDOM:wasDrawn()
+	isCustomSquad = SURFACE_ACHIEVEMENT_CUSTOM:wasDrawn()
+end
+
 modApi.events.onHangarUiShown:subscribe(function()
 	platform_height = nil
 	isLeavingHangar = false
 
-	isRandomOrCustomSquad = isIrregularMedalHeight()
+	conditionalPopulateMechs()
 
 	-- Clear fetchedMechs every frame in order to let the
 	-- game populate the 3 first indices with the 3 first
@@ -364,10 +449,14 @@ modApi.events.onHangarUiShown:subscribe(function()
 	-- the mechs we have selected.
 	modApi.events.onFrameDrawn:subscribe(clearFetchedMechs)
 	modApi.events.onFrameDrawn:subscribe(trackPlatformMovement)
+	modApi.events.onFrameDrawn:subscribe(updateIsRandomOrCustomSquad)
 end)
 
 modApi.events.onHangarUiHidden:subscribe(function()
 	clearSelectedMechs()
+
+	isRandomSquad = false
+	isCustomSquad = false
 
 	if not isLeavingHangar then
 		local isStartingGame = false
@@ -378,4 +467,6 @@ modApi.events.onHangarUiHidden:subscribe(function()
 	Assert.True(unsubscribe_successful, "Unsubscribe clearFetchedMechs")
 	local unsubscribe_successful = modApi.events.onFrameDrawn:unsubscribe(trackPlatformMovement)
 	Assert.True(unsubscribe_successful, "Unsubscribe trackPlatformMovement")
+	local unsubscribe_successful = modApi.events.onFrameDrawn:unsubscribe(updateIsRandomOrCustomSquad)
+	Assert.True(unsubscribe_successful, "Unsubscribe updateIsRandomOrCustomSquad")
 end)
