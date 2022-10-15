@@ -17,7 +17,7 @@ local VANILLA_PILOTS
 local function filterDeck(enabledFunction, deckConfig, firstBit, secondBit)
 	local deck = {}
 	for id, enabled in pairs(deckConfig) do
-		if is_bit_set(enabled, firstBit) or (secondBit ~= nil and is_bit_set(enabled, secondBit)) and enabledFunction(id) then
+		if (is_bit_set(enabled, firstBit) or (secondBit ~= nil and is_bit_set(enabled, secondBit))) and enabledFunction(id) then
 			table.insert(deck, id)
 		end
 	end
