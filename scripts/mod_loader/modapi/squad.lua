@@ -79,7 +79,9 @@ function modApi:squadIndex2Choice(index)
 	then
 		LOG("WARNING: Invalid squad index -> choice conversion")
 		return -1
-	elseif index >= self.constants.SQUAD_INDEX_SECRET then
+	end
+
+	if index >= self.constants.SQUAD_INDEX_SECRET then
 		return index + 1
 	else
 		return index - 1
@@ -109,10 +111,21 @@ end
 
 function modApi:getSquadForChoice(choice)
 	Assert.Equals("table", type(self), "Check for . vs :")
-	Assert.NotEquals(nil, self.squadIndices, "Squad order not loaded")
+
+	if false
+		or choice == self.constants.SQUAD_CHOICE_RANDOM
+		or choice == self.constants.SQUAD_CHOICE_CUSTOM
+		or choice < self.constants.SQUAD_CHOICE_START
+		or choice > self.constants.SQUAD_CHOICE_END
+	then
+		Assert.Error("Invalid squad choice")
+	end
+
+	if self.squadIndices == nil then
+		loadSquadSelection()
+	end
 
 	local index = self:squadChoice2Index(choice)
-
 	return self.mod_squads[self.squadIndices[index]]
 end
 
