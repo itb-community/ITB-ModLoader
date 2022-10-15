@@ -24,13 +24,10 @@ function getStartingSquad(choice)
 			modApi.squad_text[2 * (redirectedIndex - 1) + 2]
 		)
 
-		-- Create a copy of the squad table, and remove 'id'
-		-- from it before returning, in order for the game
-		-- not to mistake the entry for a mech.
-		local squad = copy_table(modApi:getSquadForChoice(choice))
-		squad.id = nil
+		local squad = modApi:getSquadForChoice(choice)
 
-		return squad
+		-- Return the squad in a flat list as the game expects
+		return { squad.name, squad.mechs[1], squad.mechs[2], squad.mechs[3] }
 	else
 		return oldGetStartingSquad(choice)
 	end

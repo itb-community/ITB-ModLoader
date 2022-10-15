@@ -126,7 +126,17 @@ function modApi:getSquadForChoice(choice)
 	end
 
 	local index = self:squadChoice2Index(choice)
-	return self.mod_squads[self.squadIndices[index]]
+	local squad_flat = self.mod_squads[self.squadIndices[index]]
+
+	return {
+		name = squad_flat[1],
+		id = squad_flat.id,
+		mechs = {
+			squad_flat[2],
+			squad_flat[3],
+			squad_flat[4],
+		}
+	}
 end
 
 local function onGameEntered()
