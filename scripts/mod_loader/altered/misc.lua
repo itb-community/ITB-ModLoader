@@ -208,6 +208,14 @@ function SaveGame()
 	return oldSaveGame()
 end
 
+oldSetBoard = SetBoard
+function SetBoard(board)
+	if board and board:IsTipImage() then
+		LastTipImageBoard = board
+	end
+	oldSetBoard(board)
+end
+
 local oldCreateEffect = CreateEffect
 function CreateEffect(data)
 	local effect = oldCreateEffect(data)
