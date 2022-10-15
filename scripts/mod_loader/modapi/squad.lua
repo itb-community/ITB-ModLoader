@@ -73,13 +73,16 @@ end
 function modApi:squadIndex2Choice(index)
 	Assert.Equals("table", type(self), "Check for . vs :")
 
-	if index > self.constants.SQUAD_INDEX_END then
+	if false
+		or index < self.constants.SQUAD_INDEX_START
+		or index > self.constants.SQUAD_INDEX_END
+	then
 		LOG("WARNING: Invalid squad index -> choice conversion")
 		return -1
-	elseif index >= self.constants.SQUAD_INDEX_CUSTOM then
-		return index + 2
+	elseif index >= self.constants.SQUAD_INDEX_SECRET then
+		return index + 1
 	else
-		return index
+		return index - 1
 	end
 end
 
@@ -90,13 +93,14 @@ function modApi:squadChoice2Index(choice)
 	if false
 		or choice == self.constants.SQUAD_CHOICE_RANDOM
 		or choice == self.constants.SQUAD_CHOICE_CUSTOM
+		or choice < self.constants.SQUAD_CHOICE_START
 		or choice > self.constants.SQUAD_CHOICE_END
 	then
 		LOG("WARNING: Invalid squad choice -> index conversion")
 		return -1
 	end
 
-	if choice > self.constants.SQUAD_CHOICE_CUSTOM then
+	if choice >= self.constants.SQUAD_CHOICE_SECRET then
 		return choice - 1
 	else
 		return choice + 1
