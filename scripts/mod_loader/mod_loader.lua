@@ -310,8 +310,8 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 		end
 		
 		if not ok then
-			LOG(string.format("Unable to mount mod at [%s]: %s", dir,err))
-			self.unmountedMods[dir] = err
+			LOG(string.format("Unable to mount mod at [%s]: %s", modDirPath,err))
+			self.unmountedMods[modDirPath] = err
 		end
 	end
 end
