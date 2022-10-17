@@ -268,6 +268,12 @@ function Ui:setTranslucent(translucent, cascade)
 	return self
 end
 
+function Ui:setCustomTooltip(ui)
+	Assert.True(Ui.instanceOf(ui, Ui), "Argument #1")
+	self.customTooltip = ui
+	return self
+end
+
 local function handleMouseEvent(self, mx, my, func, ...)
 	for _, child in ipairs(self.children) do
 		if child.visible and child.containsMouse and not child.ignoreMouse then
