@@ -178,16 +178,6 @@ function UiRoot:updateHoveredState()
 	return false
 end
 
-function UiRoot:updateTooltipState()
-	self.tooltip_static = false
-	self.tooltip_title = ""
-	self.tooltip = ""
-
-	if self.hoveredchild then
-		self.hoveredchild:updateTooltipState()
-	end
-end
-
 function UiRoot:updateDraggedState(mx, my)
 	if self.draggedchild then
 		self.draggedchild:dragMove(mx, my)
@@ -201,7 +191,6 @@ function UiRoot:updateStates()
 	self:updateHoveredState()
 	self:updateDraggedState(mx, my)
 	self:updateAnimations()
-	self:updateTooltipState()
 	self:updateState()
 end
 

@@ -383,13 +383,6 @@ function Ui:updateAnimations()
 	end
 end
 
-function Ui:updateTooltipState()
-	if self.root == nil then return end
-	self.root.tooltip_title = self.tooltip_title
-	self.root.tooltip = self.tooltip
-	self.root.tooltip_static = self.draggable and self.dragged
-end
-
 -- update is called for all element after everything has been
 -- relayed out, and every state has been updated.
 -- elements can override this function for additional updates.
