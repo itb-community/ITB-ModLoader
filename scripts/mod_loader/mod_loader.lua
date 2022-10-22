@@ -341,7 +341,7 @@ function mod_loader:initMod(id, mod_options)
 
 	-- Process version in init, so that mods that are not enabled don't
 	-- trigger the warning dialog.
-	if mod.modApiVersion and not modApi:isVersion(mod.modApiVersion) then
+	if mod.modApiVersion and modApi:isVersionAbove(mod.modApiVersion, modApi.version) then
 		mod.initialized = false
 		mod.installed = false
 		mod.outOfDate = true
