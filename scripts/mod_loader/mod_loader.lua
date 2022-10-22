@@ -252,18 +252,22 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 			ok = false
 			err = "Missing name"
 		end
-		
-		--Proper version control could be handy, but there's no standardized format atm so whatever, each mod can use what they want
-		
-		--[[if ok and type(data.version) ~= "string" then
-			ok = false
-			err = "Missing version"
+
+		-- Optional fields, give a warning if they're undefined or invalid
+		if ok and not modApi:isValidVersion(data.version) then
+			data.version = "0"
+			LOGWF("mod [%s] - Invalid version", data.id)
 		end
-		
-		if ok and not version.parseVersion(data.version) then
-			ok = false
-			err = "Invalid version format"
-		end]]
+
+		if ok and not modApi:isValidVersion(data.modApiVersion) then
+			data.modApiVersion = modApi.version
+			LOGWF("mod [%s] - Invalid modApiVersion", data.id)
+		end
+
+		if ok and not modApi:isValidVersion(data.gameVersion) then
+			data.gameVersion = modApi.gameVersion
+			LOGWF("mod [%s] - Invalid gameVersion", data.id)
+		end
 
 		-- Optional fields, just verify the type if they're defined
 		if ok and data.icon and type(data.icon) ~= "string" then
