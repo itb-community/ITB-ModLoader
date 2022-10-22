@@ -241,6 +241,6 @@ return {
 	["Palette_Name_Bombermechs"] = "Bombermechs Gold",
 	["Palette_Name_Arachnophiles"] = "Arachnophiles Pink",
 	["Palette_Name_Mist_Eaters"] = "Mist Eaters Cyan",
-	["Palette_Name_Heat Sinkers"] = "Heat Sinkers Green",
+	["Palette_Name_Heat_Sinkers"] = "Heat Sinkers Green",
 	["Palette_Name_Cataclysm"] = "Cataclysm Orange",
 }
