@@ -15,6 +15,7 @@ local function createUi()
 	local cboxScrollableLogger = nil
 	local ddLogLevel = nil
 	local cboxDebugLogs = nil
+	local cboxWarningLogs = nil
 	local ddCaller = nil
 	local cboxClearLogs = nil
 	local cboxDevelopmentMode = nil
@@ -34,6 +35,7 @@ local function createUi()
 			scrollableLogger      = cboxScrollableLogger.checked,
 			logLevel              = ddLogLevel.value,
 			debugLogs             = cboxDebugLogs.checked,
+			warningLogs           = cboxWarningLogs.checked,
 			printCallerInfo       = ddCaller.value,
 			clearLogFileOnStartup = cboxClearLogs.checked,
 			developmentMode       = cboxDevelopmentMode.checked,
@@ -61,6 +63,7 @@ local function createUi()
 		ddLogLevel.value                   = config.logLevel
 		ddLogLevel.choice                  = ddLogLevel.value + 1
 		cboxDebugLogs.checked              = config.debugLogs
+		cboxWarningLogs.checked            = config.warningLogs
 		ddCaller.value                     = config.printCallerInfo
 		cboxClearLogs.checked              = config.clearLogFileOnStartup
 		cboxDevelopmentMode.checked        = config.developmentMode
@@ -224,10 +227,15 @@ local function createUi()
 		:addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
-		-- Debug logs
+		-- Debug/Warning logs
 		cboxDebugLogs = createCheckboxOption(
 				GetText("ModLoaderConfig_Text_DebugLogs"),
 				GetText("ModLoaderConfig_Tooltip_DebugLogs")
+		):addTo(layout)
+
+		cboxWarningLogs = createCheckboxOption(
+				GetText("ModLoaderConfig_Text_WarningLogs"),
+				GetText("ModLoaderConfig_Tooltip_WarningLogs")
 		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////

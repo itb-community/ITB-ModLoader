@@ -5,6 +5,7 @@ function CurrentModLoaderConfig()
 	data.scrollableLogger    = mod_loader.scrollableLogger
 	data.logLevel            = mod_loader.logger:getLoggingLevel()
 	data.debugLogs           = modApi.debugLogs
+	data.warningLogs         = modApi.warningLogs
 	data.printCallerInfo     = mod_loader.logger:getPrintCallerInfo()
 	data.developmentMode     = modApi.developmentMode
 
@@ -59,6 +60,7 @@ function DefaultModLoaderConfig()
 		scrollableLogger      = false,
 		logLevel              = 2, -- log to console and file by default
 		debugLogs             = false,
+		warningLogs           = false,
 		printCallerInfo       = 2, -- log to file only by default
 		clearLogFileOnStartup = true,
 
@@ -146,6 +148,7 @@ function ApplyModLoaderConfig(config)
 	mod_loader.logger:setClearLogFileOnStartup(config.clearLogFileOnStartup)
 
 	modApi.debugLogs              = config.debugLogs
+	modApi.warningLogs            = config.warningLogs
 	modApi.developmentMode        = config.developmentMode
 
 	modApi.floatyTooltips         = config.floatyTooltips

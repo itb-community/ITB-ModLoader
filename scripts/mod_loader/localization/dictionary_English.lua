@@ -132,6 +132,9 @@ return {
 	["ModLoaderConfig_Text_DebugLogs"] = "Print Debug Logs",
 	["ModLoaderConfig_Tooltip_DebugLogs"] = "Show more fine-grained logging messages during mod loader startup for debugging.",
 
+	["ModLoaderConfig_Text_WarningLogs"] = "Print Warning Logs",
+	["ModLoaderConfig_Tooltip_WarningLogs"] = "Show warning logs for debugging.",
+
 	["ModLoaderConfig_Text_Caller"] = "Print Caller Information",
 	["ModLoaderConfig_Tooltip_Caller"] = "Include timestamp and stacktrace in LOG messages.",
 	["ModLoaderConfig_DD_Caller_0"] = "Do not include",

@@ -46,6 +46,18 @@ function LOGDF(...)
 	end
 end
 
+function LOGW(...)
+	if modApi.warningLogs then
+		baseLog(2, "Warning:", ...)
+	end
+end
+
+function LOGWF(...)
+	if modApi.warningLogs then
+		baseLog(2, "Warning:", string.format(...))
+	end
+end
+
 function mod_loader:init()
 	self.mod_dirs = {}
 	self.mods = {}
