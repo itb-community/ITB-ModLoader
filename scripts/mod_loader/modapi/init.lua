@@ -245,7 +245,7 @@ function modApi:getGameVersion()
 		end
 	end
 
-	LOG("WARNING: Unable to get game version!")
+	LOGW("Unable to get game version!")
 end
 
 modApi.events.onSettingsChanged:subscribe(function(old, neu)
