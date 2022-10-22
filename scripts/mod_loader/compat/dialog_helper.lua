@@ -71,6 +71,8 @@ function sdlext.showButtonDialog(title, text, responseFn, buttons, tooltips, com
 			maxW = w,
 			maxH = h
 		}
+	else
+		options = compatArg1
 	end
 
 	return newShowButtonDialog(title, text, responseFn, buttons, tooltips, options)
