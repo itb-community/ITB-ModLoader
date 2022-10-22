@@ -5,6 +5,7 @@ local ScrollableLogger = require("scripts/mod_loader/logger_scrollable")
 
 local BasicLoggerImpl = require("scripts/mod_loader/logger_basic")
 local BufferedLoggerImpl = require("scripts/mod_loader/logger_buffered")
+local isDependenciesInitialized
 
 mod_loader.scrollableLogger = false
 if mod_loader.scrollableLogger then
@@ -285,6 +286,8 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 			data.path = initFilePath
 			data.scriptPath = modDirPath .. "scripts/"
 			data.resourcePath = modDirPath
+			data.requirements = data.requirements or {}
+			data.dependencies = data.dependencies or {}
 			
 			data.initialized = false
 			data.installed = false
@@ -297,16 +300,41 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 				enabled = data.enabled == nil and true or data.enabled,
 				version = data.version,
 			}
+
+			if data.dependencies then
+				-- Format all entries as id = version
+				for i = #data.dependencies, 1, -1 do
+					local id = data.dependencies[i]
+
+					if data.dependencies[id] == nil then
+						data.dependencies[id] = ""
+					end
+
+					data.dependencies[i] = nil
+				end
+
+				-- Initialize and load dependencies before this mod
+				-- by adding them to the requirements table
+				for id, version in pairs(data.dependencies) do
+					if not list_contains(data.requirements, id) then
+						table.insert(data.requirements, id)
+					end
+				end
+			end
 			
 			if parentMod then
 				table.insert(parentMod.children, data.id)
 				data.parent = parentMod.id
 				
-				data.requirements = data.requirements or {}
-				
 				-- Initialize and load parent mod before submods
 				if not list_contains(data.requirements, parentMod.id) then
 					table.insert(data.requirements, parentMod.id)
+				end
+
+				-- Make this mod depend on parent, so it doesn't init
+				-- if parent fails to init
+				if data.dependencies[parentMod.id] == nil then
+					data.dependencies[parentMod.id] = ""
 				end
 			end
 			
@@ -369,18 +397,26 @@ function mod_loader:initMod(id, mod_options)
 		return
 	end
 
-	local ok, err = xpcall(
-		function()
-			LOGF("Initializing mod [%s] with id [%s]...", mod.name, id)
-			mod.init(mod, mod_options[id].options)
-		end,
-		function(e)
-			return string.format(
-				"Initializing mod [%s] with id [%s] failed:\n%s\n\n%s",
-				mod.name, id, e, debug.traceback("", 2)
-			)
-		end
-	)
+	if isDependenciesInitialized(mod) then
+		ok, err = xpcall(
+			function()
+				LOGF("Initializing mod [%s] with id [%s]...", mod.name, id)
+				mod.init(mod, mod_options[id].options)
+			end,
+			function(e)
+				return string.format(
+					"Initializing mod [%s] with id [%s] failed:\n%s\n\n%s",
+					mod.name, id, e, debug.traceback("", 2)
+				)
+			end
+		)
+	else
+		ok = false
+		err = string.format(
+			"Initializing mod [%s] with id [%s] failed:\nMissing dependencies: %s",
+			mod.name, id, table.concat(mod.uninitializedDependencies, ", ")
+		)
+	end
 
 	if ok then
 		mod.initialized = true
@@ -522,6 +558,29 @@ local function requireMod(self, options, ordered, traversed, id)
 		options[id] = nil
 		table.insert(ordered, id)
 	end
+end
+
+function isDependenciesInitialized(mod)
+	if type(mod.dependencies) ~= "table" then
+		return true
+	end
+
+	local uninitedDependencies = {}
+	mod.uninitializedDependencies = uninitedDependencies
+
+	for id, version in pairs(mod.dependencies) do
+		local mod = mod_loader.mods[id]
+
+		if false
+			or mod == nil
+			or mod.initialized ~= true
+			or modApi:isVersionBelow(mod.version, version)
+		then
+			table.insert(uninitedDependencies, version == "" and id or id.." "..version)
+		end
+	end
+
+	return #uninitedDependencies == 0
 end
 
 function mod_loader:orderMods(options, savedOrder)
