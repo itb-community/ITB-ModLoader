@@ -20,7 +20,7 @@ function BinarySearch(key, array, approximation, arg4, arg5)
 		setmetatable(array, array_mt)
 	end
 
-	if high <= low then
+	if high < low then
 		return nil
 	end
 
