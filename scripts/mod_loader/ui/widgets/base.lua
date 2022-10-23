@@ -148,6 +148,18 @@ function Ui:endUi()
 	return self.parent
 end
 
+-- Sets a variable in the ui table to the given value.
+function Ui:setVar(var, value)
+	self[var] = value
+	return self
+end
+
+-- Run a function fn(self, ...) to format the ui object in some way.
+function Ui:format(fn, ...)
+	fn(self, ...)
+	return self
+end
+
 function Ui:show()
 	self.visible = true
 	
