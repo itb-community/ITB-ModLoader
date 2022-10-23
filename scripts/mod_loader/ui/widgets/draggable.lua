@@ -255,6 +255,8 @@ function Ui:registerDragMove()
 	registerDragFunctions(self)
 	self.draggable   = true
 	self.dragMovable = true
+
+	return self
 end
 
 function Ui:registerDragResize(resizeHandleSize, minSize)
@@ -263,13 +265,19 @@ function Ui:registerDragResize(resizeHandleSize, minSize)
 	self.dragResizable = true
 	self.__resizeHandle = resizeHandleSize or self.__resizeHandle
 	self.__minSize = minSize or self.__minSize
+
+	return self
 end
 
 function Ui:registerDropTarget(target)
 	self.dropTargets = self:getDropTargets() or {}
 	table.insert(self.dropTargets, target)
+
+	return self
 end
 
 function Ui:clearDropTargets()
 	self.dropTargets = nil
+
+	return self
 end
