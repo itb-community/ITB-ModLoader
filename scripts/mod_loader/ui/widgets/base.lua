@@ -329,6 +329,18 @@ function Ui:keyup(keycode)
 	return false
 end
 
+function Ui:onGameWindowResized(screen, oldSize)
+	-- overridable method
+end
+
+function Ui:gameWindowResized(screen, oldSize)
+	self:onGameWindowResized(screen, oldSize)
+
+	for _, child in ipairs(self.children) do
+		child:gameWindowResized(screen, oldSize)
+	end
+end
+
 -- calling this function will update containsMouse
 -- for this element and its children, and call
 -- mouseEntered and mouseExited when applicable.

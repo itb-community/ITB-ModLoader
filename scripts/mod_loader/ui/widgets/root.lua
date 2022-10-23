@@ -194,6 +194,10 @@ function UiRoot:updateStates()
 	self:updateState()
 end
 
+function UiRoot:onGameWindowResized(screen, oldSize)
+	self:widthpx(screen:w()):heightpx(screen:h())
+end
+
 function UiRoot:event(eventloop)
 	if not self.visible then return false end
 	
