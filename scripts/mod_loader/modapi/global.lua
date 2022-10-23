@@ -274,3 +274,69 @@ function stablesort(list, comp)
 		n = n - 1
 	end
 end
+
+-- Clears a table of all entries
+function clear_table(list)
+	for i, _ in pairs(list) do
+		list[i] = nil
+	end
+end
+
+-- Merges the template into list
+function merge_table(list, template)
+	for i, v in pairs(template) do
+		list[i] = v
+	end
+end
+
+-- Returns a filtered array containing
+-- only elements from the input array
+-- where filter(i, v) == true
+function filter_array(array, filter)
+	local result = {}
+
+	for i, v in ipairs(array) do
+		if filter(i, v) then
+			result[#result+1] = v
+		end
+	end
+
+	return result
+end
+
+-- Returns a filtered table containing
+-- only elements from the input table
+-- where filter(k, v) == true
+function filter_table(tbl, predicate)
+	local result = {}
+
+	for k, v in pairs(tbl) do
+		if predicate(k, v) then
+			result[k] = v
+		end
+	end
+
+	return result
+end
+
+-- Returns an array with all elements
+-- from input table.
+-- Element's keys are discarded
+function to_array(tbl)
+	local result = {}
+
+	for _, obj in pairs(tbl) do
+		result[#result+1] = obj
+	end
+
+	return result
+end
+
+-- Returns an array with all elements
+-- from input table, sorted with sortFunc.
+-- Element's keys are discarded
+function to_sorted_array(tbl, sortFunc)
+	local list = to_array(tbl)
+	table.sort(list, sortFunc)
+	return list
+end
