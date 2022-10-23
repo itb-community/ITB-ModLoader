@@ -26,4 +26,8 @@ modApi.constants = {
   PILOT_CONFIG_POD_NORMAL = 1,
   PILOT_CONFIG_POD_ADVANCED = 2,
   PILOT_CONFIG_RECRUIT = 4,
+
+  -- ui constants
+  ORIENTATION_HORIZONTAL = true,
+  ORIENTATION_VERTICAL = false,
 }
