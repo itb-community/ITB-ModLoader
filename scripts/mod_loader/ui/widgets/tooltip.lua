@@ -37,8 +37,8 @@ function UiTooltip.updatePosition(tooltipManager, tooltip, hoveredUi)
 	local screen_h = tooltipManager.h
 	local tooltip_w = tooltip.w
 	local tooltip_h = tooltip.h
-	local x = hoveredUi.x
-	local y = hoveredUi.y
+	local x = hoveredUi.screenx
+	local y = hoveredUi.screeny
 	local left = x - offset
 	local top = y - offset
 	local right = x + hoveredUi.w + offset
