@@ -23,6 +23,7 @@ local scripts = {
 	"widgets/weightlayout",
 	"widgets/wrappedtext",
 	"widgets/tooltip",
+	"widgets/tooltipmanager",
 	"widgets/root",
 	"widgets/scrollarea",
 	"widgets/checkbox",

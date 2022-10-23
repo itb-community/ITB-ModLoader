@@ -268,6 +268,12 @@ function Ui:setTranslucent(translucent, cascade)
 	return self
 end
 
+function Ui:setCustomTooltip(ui)
+	Assert.True(Ui.instanceOf(ui, Ui), "Argument #1")
+	self.customTooltip = ui
+	return self
+end
+
 local function handleMouseEvent(self, mx, my, func, ...)
 	for _, child in ipairs(self.children) do
 		if child.visible and child.containsMouse and not child.ignoreMouse then
@@ -375,13 +381,6 @@ function Ui:updateAnimations()
 	for _, child in ipairs(self.children) do
 		child:updateAnimations()
 	end
-end
-
-function Ui:updateTooltipState()
-	if self.root == nil then return end
-	self.root.tooltip_title = self.tooltip_title
-	self.root.tooltip = self.tooltip
-	self.root.tooltip_static = self.draggable and self.dragged
 end
 
 -- update is called for all element after everything has been
