@@ -225,6 +225,12 @@ function Ui:size(w, h)
 	return self
 end
 
+function Ui:sizepx(w, h)
+	self.w = w
+	self.h = h
+	return self
+end
+
 function Ui:width(w)
 	self.wPercent = w
 	return self
