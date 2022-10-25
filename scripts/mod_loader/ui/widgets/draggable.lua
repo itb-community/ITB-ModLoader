@@ -16,10 +16,11 @@ function UiDraggable:isEdge(mx, my)
 	end
 
 	local resizeHandle = self.__resizeHandle
-	return mx < self.screenx + resizeHandle          or
-	       my < self.screeny + resizeHandle          or
-	       mx > self.screenx + self.w - resizeHandle or
-	       my > self.screeny + self.h - resizeHandle
+	return false
+		or my <= self.screeny + resizeHandle
+		or mx <= self.screenx + resizeHandle
+		or mx >= self.screenx + self.w - resizeHandle
+		or my >= self.screeny + self.h - resizeHandle
 end
 
 local RESIZE_DIR_TOPLEFT  = 0
@@ -37,21 +38,21 @@ local function getResizeDirection(self, mx, my)
 	-- use double the resize handle size to make corners easier to click
 	local rh2 = resizeHandle * 2
 
-	if     ox < rh2          and oy < rh2          then
+	if     ox <= rh2          and oy <= rh2          then
 		return RESIZE_DIR_TOPLEFT
-	elseif ox > self.w - rh2 and oy < rh2          then
+	elseif ox >= self.w - rh2 and oy <= rh2          then
 		return RESIZE_DIR_TOPRIGHT
-	elseif ox > self.w - rh2 and oy > self.h - rh2 then
+	elseif ox >= self.w - rh2 and oy >= self.h - rh2 then
 		return RESIZE_DIR_BOTRIGHT
-	elseif ox < rh2          and oy > self.h - rh2 then
+	elseif ox <= rh2          and oy >= self.h - rh2 then
 		return RESIZE_DIR_BOTLEFT
-	elseif oy < resizeHandle          then
+	elseif oy <= resizeHandle          then
 		return RESIZE_DIR_TOP
-	elseif oy > self.h - resizeHandle then
+	elseif oy >= self.h - resizeHandle then
 		return RESIZE_DIR_BOT
-	elseif ox < resizeHandle          then
+	elseif ox <= resizeHandle          then
 		return RESIZE_DIR_LEFT
-	elseif ox > self.w - resizeHandle then
+	elseif ox >= self.w - resizeHandle then
 		return RESIZE_DIR_RIGHT
 	end
 
