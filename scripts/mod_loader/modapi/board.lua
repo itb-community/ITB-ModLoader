@@ -49,9 +49,11 @@ BoardClass.SetShield = function(self, loc, shield)
 	Assert.TypePoint(loc, "Argument #1")
 	Assert.Equals("boolean", type(shield), "Argument #2")
 
-	local dmg = SpaceDamage(loc)
-	dmg.iShield = shield and EFFECT_CREATE or -1
-	self:DamageSpace(dmg)
+	if shield then
+		self:AddShield(loc)
+	else
+		self:RemoveShield(loc)
+	end
 end
 
 -- gets the currently active psion on the board, returns a value from the LEADER globals if found, nil if not
