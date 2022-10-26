@@ -697,7 +697,6 @@ function mod_loader:loadModContent(mod_options,savedOrder)
 	
 	--For helping with the standardized mod API--
 	modApi:resetModContent()
-	modApi:loadLanguage(modApi:getLanguageIndex())
 	
 	Assert.Traceback = false
 	

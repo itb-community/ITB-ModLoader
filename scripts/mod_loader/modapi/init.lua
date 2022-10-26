@@ -149,7 +149,6 @@ end
 -- Maintain sanity
 -- Update as new API functions are added
 function modApi:resetModContent()
-	self.dictionary = {}
 
 	self.mod_squads = {
 		-- normal

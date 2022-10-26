@@ -60,6 +60,7 @@ t.onProfileChanged = Event()
 t.onProfileCreated = Event()
 t.onProfileDeleted = Event()
 t.onDifficultyChanged = Event()
+t.onLanguageChanged = Event()
 
 t.onHangarUiShown = Event()
 t.onHangarUiHidden = Event()
