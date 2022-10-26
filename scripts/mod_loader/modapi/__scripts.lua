@@ -25,6 +25,7 @@ local scripts = {
 	"hotkey",
 	"board",
 	"pawn",
+	"game",
 	"localization",
 	"compat",
 	"deployment",
