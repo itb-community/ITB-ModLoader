@@ -5,7 +5,7 @@ local ScrollableLogger = require("scripts/mod_loader/logger_scrollable")
 
 local BasicLoggerImpl = require("scripts/mod_loader/logger_basic")
 local BufferedLoggerImpl = require("scripts/mod_loader/logger_buffered")
-local isDependenciesInitialized
+local getUninitializedDependencies
 
 mod_loader.scrollableLogger = false
 if mod_loader.scrollableLogger then
@@ -68,6 +68,13 @@ function mod_loader:init()
 	self.unmountedMods = {} -- mods which had malformed init.lua
 	self.firsterror = nil
 
+	LOGD("Enumerating extensions...")
+	self:enumerateMods("scripts/mod_loader/extensions")
+	self:enumerateMods("extensions")
+	LOGD("Done!")
+
+	self.extensionsEnumerated = true
+
 	LOGD("Enumerating mods...")
 	self:enumerateMods("mods")
 	LOGD("Done!")
@@ -93,6 +100,32 @@ function mod_loader:init()
 	
 	Assert.Traceback = false
 
+	local mod_options = self:getModConfig()
+	local orderedMods = self:orderMods(mod_options, self:getSavedModOrder())
+
+	-- Recreate mod_list, sorted by current known init order
+	self.mod_list = {}
+
+	-- Fill enabled mods
+	local remainingMods = shallow_copy(self.mods)
+	for i, id in ipairs(orderedMods) do
+		table.insert(self.mod_list, self.mods[id])
+	end
+
+	-- Find remaining disabled mods
+	local remainingMods = shallow_copy(self.mods)
+	for i, mod in ipairs(self.mod_list) do
+		remainingMods[mod.id] = nil
+	end
+
+	-- Fill mod_list with remaining mods
+	for id, mod in pairs(remainingMods) do
+		table.insert(self.mod_list, mod)
+	end
+
+	-- Sort extensions first
+	stablesort(self.mod_list, function(a,b) return a.isExtension and not b.isExtension end)
+
 	-- Process all mods for metadata first.
 	-- orderMods only returns a list with enabled mods, so we iterate over the
 	-- list of all mods here.
@@ -104,7 +137,7 @@ function mod_loader:init()
 	while i <= #self.mod_list do
 		local id = self.mod_list[i].id
 		modApi:setCurrentMod(id)
-		self:initMetadata(id)
+		self:initMetadata(id, mod_options)
 		i = i + 1
 		modApi.events.onModMetadataDone:dispatch(id)
 	end
@@ -187,8 +220,11 @@ end
 local rootDirPath = Directory():path()
 function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 	local inputDir = Directory(dirPathRelativeToGameDir)
-	local dirs = inputDir:directories();
-	self.mod_dirs = {}
+	if not inputDir:exists() then
+		return
+	end
+
+	local dirs = inputDir:directories()
 
 	for _, dir in ipairs(dirs) do
 		local modDirPath = dir:path():gsub(rootDirPath, "")
@@ -254,6 +290,16 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 			err = "Missing name"
 		end
 
+		if ok and not self.extensionsEnumerated and not data.isExtension then
+			ok = false
+			err = string.format("Mods should be placed in [%s]", Directory("mods"):path())
+		end
+
+		if ok and data.isExtension and self.extensionsEnumerated then
+			ok = false
+			err = string.format("Extension should be placed in [%s]", Directory("extensions"):path())
+		end
+
 		-- Optional fields, give a warning if they're undefined or invalid
 		if ok and not modApi:isValidVersion(data.version) then
 			data.version = "0"
@@ -301,26 +347,28 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 				version = data.version,
 			}
 
-			if data.dependencies then
-				-- Format all entries as id = version
-				for i = #data.dependencies, 1, -1 do
-					local id = data.dependencies[i]
+			-- Format all entries as id = version
+			local function formatAsIdVersionTable(list)
+				for i = #list, 1, -1 do
+					local id = list[i]
 
-					if data.dependencies[id] == nil then
-						data.dependencies[id] = ""
+					if list[id] == nil then
+						list[id] = ""
 					end
 
-					data.dependencies[i] = nil
+					list[i] = nil
 				end
 
-				-- Initialize and load dependencies before this mod
-				-- by adding them to the requirements table
-				for id, version in pairs(data.dependencies) do
+				-- Initialize and load dependencies before this
+				-- mod by adding them to the requirements table
+				for id, version in pairs(list) do
 					if not list_contains(data.requirements, id) then
 						table.insert(data.requirements, id)
 					end
 				end
 			end
+
+			formatAsIdVersionTable(data.dependencies)
 			
 			if parentMod then
 				table.insert(parentMod.children, data.id)
@@ -382,6 +430,7 @@ end
 
 function mod_loader:initMod(id, mod_options)
 	local mod = self.mods[id]
+	local ok, err = true, ""
 
 	-- Process version in init, so that mods that are not enabled don't
 	-- trigger the warning dialog.
@@ -397,7 +446,16 @@ function mod_loader:initMod(id, mod_options)
 		return
 	end
 
-	if isDependenciesInitialized(mod) then
+	local uninitializedDependencies = getUninitializedDependencies(mod.dependencies)
+	if ok and uninitializedDependencies ~= nil then
+		ok = false
+		err = string.format(
+			"Initializing mod [%s] with id [%s] failed:\nMissing dependencies: %s",
+			mod.name, id, table.concat(uninitializedDependencies, ", ")
+		)
+	end
+
+	if ok then
 		ok, err = xpcall(
 			function()
 				LOGF("Initializing mod [%s] with id [%s]...", mod.name, id)
@@ -409,12 +467,6 @@ function mod_loader:initMod(id, mod_options)
 					mod.name, id, e, debug.traceback("", 2)
 				)
 			end
-		)
-	else
-		ok = false
-		err = string.format(
-			"Initializing mod [%s] with id [%s] failed:\nMissing dependencies: %s",
-			mod.name, id, table.concat(mod.uninitializedDependencies, ", ")
 		)
 	end
 
@@ -430,11 +482,22 @@ function mod_loader:initMod(id, mod_options)
 	end
 end
 
-function mod_loader:initMetadata(id)
+function mod_loader:initMetadata(id, mod_options)
 	local mod = self.mods[id]
 
 	if mod.icon then
 		mod.icon = mod.resourcePath .. mod.icon
+	end
+
+	-- Request dependencies enabled
+	if mod_options[id].enabled then
+		for id, version in pairs(mod.dependencies) do
+			dependency = self.mod_options[id]
+
+			if dependency then
+				dependency.requested = true
+			end
+		end
 	end
 
 	if mod.metadata then
@@ -492,7 +555,7 @@ function mod_loader:getModConfig()
 	local copyOptionsFn = function(from, to)
 		for id, mod in pairs(from) do
 			if to[id] then
-				to[id].enabled = mod.enabled
+				to[id].enabled = mod.enabled or self.mod_options[id].requested
 				for i, option in pairs(mod.options) do
 					if to[id].options[i] then
 						to[id].options[i] = mod.options[i]
@@ -560,27 +623,28 @@ local function requireMod(self, options, ordered, traversed, id)
 	end
 end
 
-function isDependenciesInitialized(mod)
-	if type(mod.dependencies) ~= "table" then
-		return true
+function getUninitializedDependencies(dependencies)
+	if type(dependencies) ~= "table" then
+		return nil
 	end
 
 	local uninitedDependencies = {}
-	mod.uninitializedDependencies = uninitedDependencies
 
-	for id, version in pairs(mod.dependencies) do
-		local mod = mod_loader.mods[id]
+	for id, version in pairs(dependencies) do
+		local dependency = mod_loader.mods[id]
 
 		if false
-			or mod == nil
-			or mod.initialized ~= true
-			or modApi:isVersionBelow(mod.version, version)
+			or dependency == nil
+			or dependency.initialized ~= true
+			or modApi:isVersionBelow(dependency.version, version)
 		then
 			table.insert(uninitedDependencies, version == "" and id or id.." "..version)
 		end
 	end
 
-	return #uninitedDependencies == 0
+	if #uninitedDependencies > 0 then
+		return uninitedDependencies
+	end
 end
 
 function mod_loader:orderMods(options, savedOrder)
@@ -616,6 +680,13 @@ function mod_loader:orderMods(options, savedOrder)
 		requireMod(self,options,ordered,traversed,id)
 	end
 	
+	-- Sort extensions first
+	stablesort(ordered, function(a,b)
+		local modA = self.mods[a]
+		local modB = self.mods[b]
+		return modA.isExtension and not modB.isExtension
+	end)
+
 	return ordered
 end
 
