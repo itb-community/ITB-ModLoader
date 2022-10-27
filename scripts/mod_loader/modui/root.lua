@@ -147,7 +147,7 @@ modApi.events.onKeyReleasing:subscribe(function(keycode)
 end)
 
 modApi.events.onGameWindowResized:subscribe(function(screen, oldSize)
-	sdlext.getUiRoot():widthpx(screen:w()):heightpx(screen:h())
+	sdlext:getUiRoot():gameWindowResized(screen, oldSize)
 end)
 
 -- //////////////////////////////////////////////////////////////////////

@@ -18,7 +18,7 @@ function UiRoot:new()
 	self.focuschild = self
 	self.translucent = true
 	self.priorityUi = PriorityUi():addTo(self)
-	self.tooltipUi = UiTooltip():addTo(self.priorityUi)
+	self.tooltipUi = UiTooltipManager():addTo(self.priorityUi)
 	self.draggableUi = PriorityUi():addTo(self.priorityUi)
 	self.dropdownUi = PriorityUi():addTo(self.priorityUi)
 end
@@ -178,16 +178,6 @@ function UiRoot:updateHoveredState()
 	return false
 end
 
-function UiRoot:updateTooltipState()
-	self.tooltip_static = false
-	self.tooltip_title = ""
-	self.tooltip = ""
-
-	if self.hoveredchild then
-		self.hoveredchild:updateTooltipState()
-	end
-end
-
 function UiRoot:updateDraggedState(mx, my)
 	if self.draggedchild then
 		self.draggedchild:dragMove(mx, my)
@@ -201,8 +191,11 @@ function UiRoot:updateStates()
 	self:updateHoveredState()
 	self:updateDraggedState(mx, my)
 	self:updateAnimations()
-	self:updateTooltipState()
 	self:updateState()
+end
+
+function UiRoot:onGameWindowResized(screen, oldSize)
+	self:widthpx(screen:w()):heightpx(screen:h())
 end
 
 function UiRoot:event(eventloop)

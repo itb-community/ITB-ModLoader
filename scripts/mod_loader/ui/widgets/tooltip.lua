@@ -20,37 +20,63 @@ function UiTooltip:new()
 	self.title = nil
 	self.text = nil
 	self.visible = false
-	self.tooltipOffset = 10
 
 	self.ui_title = title
 	self.ui_text = text
-
-	self.ignoreMouse = true
 end
 
---[[
-	Compute aligned position for the specified axis (horizontal/vertical).
+function UiTooltip.updatePosition(tooltipManager, tooltip, hoveredUi)
+	local staticTooltip = false
+		or not modApi.floatyTooltips
+		or tooltip.tooltip_static
+		or hoveredUi.tooltip_static
+		or hoveredUi.draggable and hoveredUi.dragged
 
-	Returns coordinate value positioning the 'self' argument aligned with the
-	target widget's origin. If this would result in 'self' clipping outside of
-	the screen bounds, this function instead returns coordinate value positioning
-	'self' aligned with the target widget's end.
---]]
-local function computeAlignedPos(self, widget, horizontal)
-	if horizontal then
-		return (widget.screenx + self.w <= ScreenSizeX())
-			and widget.screenx
-			or  (widget.screenx + widget.w - self.w)
+	local offset = tooltip.tooltipOffset or tooltipManager.tooltipOffset
+	local screen_w = tooltipManager.w
+	local screen_h = tooltipManager.h
+	local tooltip_w = tooltip.w
+	local tooltip_h = tooltip.h
+	local x = hoveredUi.screenx
+	local y = hoveredUi.screeny
+	local left = x - offset
+	local top = y - offset
+	local right = x + hoveredUi.w + offset
+	local bot = y + hoveredUi.h + offset
+
+	if staticTooltip then
+		if right + tooltip_w <= screen_w then
+			-- Draw tooltip to the right of the element
+			x = right
+
+		elseif left - tooltip_w >= 0 then
+			-- Draw tooltip to the left of the element
+			x = left - tooltip_w
+
+		elseif bot + tooltip_h <= screen_h then
+			-- Draw tooltip below the element
+			y = bot
+		else
+			-- Draw tooltip above the element
+			y = top - tooltip_h
+		end
 	else
-		return (widget.screeny + self.h <= ScreenSizeY())
-			and widget.screeny
-			or  (widget.screeny + widget.h - self.h)
+		-- Attach the tooltip to the mouse cursor.
+		x = sdl.mouse.x() + offset
+		y = sdl.mouse.y()
+
+		if x + tooltip_w > screen_w then
+			x = x - tooltip_w - 2 * offset
+		end
 	end
+
+	tooltip.x = x
+	tooltip.y = y
 end
 
-function UiTooltip:updateText()
-	local title = self.root.tooltip_title or ""
-	local text = self.root.tooltip or ""
+function UiTooltip:onTooltipShown(hoveredUi)
+	local title = hoveredUi.tooltip_title or ""
+	local text = hoveredUi.tooltip or ""
 	local isTitle = title ~= ""
 	local isText = text ~= ""
 
@@ -71,70 +97,4 @@ function UiTooltip:updateText()
 	self.ui_title.visible = isTitle
 	self.ui_text.visible = isText
 	self.visible = isTitle or isText
-end
-
-function UiTooltip:relayout()
-	self:updateText()
-	UiBoxLayout.relayout(self)
-
-	-- adjust the position of the tooltip
-	if modApi.floatyTooltips and not self.root.tooltip_static then
-		-- Attach to the mouse cursor
-		local x = sdl.mouse.x()
-		local y = sdl.mouse.y()
-
-		if x + self.tooltipOffset + self.w <= ScreenSizeX() then
-			self.x = x + self.tooltipOffset
-		else
-			self.x = x - self.w
-		end
-
-		if y + self.h <= ScreenSizeY() then
-			self.y = y
-		else
-			self.y = y - self.h
-		end
-
-		self.screenx = self.x
-		self.screeny = self.y
-	else
-		-- Attach to the widget the user is currently hovering over, like
-		-- ItB's own tooltips do
-		local c = self.root.hoveredchild
-
-		if not c then return end
-
-		local x = 0
-		local y = 0
-
-		if c.screenx + self.tooltipOffset + c.w + self.w <= ScreenSizeX() then
-			x = c.screenx + self.tooltipOffset + c.w
-			y = computeAlignedPos(self, c, false)
-		elseif c.screenx - self.tooltipOffset - self.w >= 0 then
-			x = c.screenx - self.tooltipOffset - self.w
-			y = computeAlignedPos(self, c, false)
-		else
-			-- Can't fit the tooltip on either horizontal side
-			-- of the widget, try vertical alignment
-			x = computeAlignedPos(self, c, true)
-
-			if c.screeny + self.tooltipOffset + c.h + self.h <= ScreenSizeY() then
-				y = c.screeny + self.tooltipOffset + c.h
-			elseif c.screeny - self.tooltipOffset - self.h >= 0 then
-				y = c.screeny - self.tooltipOffset - self.h
-			else
-				-- Can't fit the tooltip anywhere outside of the widget.
-				-- Give up, we'll just cover a part of it.
-				y = computeAlignedPos(self, c, false)
-			end
-		end
-
-		self.x = x
-		self.y = y
-		self.screenx = self.x
-		self.screeny = self.y
-	end
-
-	-- relayout again to update children positions
-	UiBoxLayout.relayout(self)
 end

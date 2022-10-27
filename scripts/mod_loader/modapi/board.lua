@@ -49,9 +49,11 @@ BoardClass.SetShield = function(self, loc, shield)
 	Assert.TypePoint(loc, "Argument #1")
 	Assert.Equals("boolean", type(shield), "Argument #2")
 
-	local dmg = SpaceDamage(loc)
-	dmg.iShield = shield and EFFECT_CREATE or -1
-	self:DamageSpace(dmg)
+	if shield then
+		self:AddShield(loc)
+	else
+		self:RemoveShield(loc)
+	end
 end
 
 -- gets the currently active psion on the board, returns a value from the LEADER globals if found, nil if not
@@ -92,13 +94,13 @@ BoardClass.GetString = BoardClass.GetLuaString
 BoardClass.IsMissionBoard = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	
-	return self.isMission == true
+	return self:GetSize() ~= Point(6,6)
 end
 
 BoardClass.IsTipImage = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	
-	return self.isMission == nil
+	return self:GetSize() == Point(6,6)
 end
 
 BoardClass.GetHighlighted = function(self)
@@ -186,4 +188,33 @@ BoardClass.__ipairs = function(self, ...)
 			return index, p
 		end
 	end
+end
+
+
+local boardClass = BoardClass
+local boardInitialized = false
+
+local function initializeBoardClass(board)
+	boardInitialized = true
+
+
+	-- Override existing Board class functions here
+
+
+	modApi.events.onBoardClassInitialized:dispatch(boardClass, board)
+	modApi.events.onBoardClassInitialized:unsubscribeAll()
+
+	boardClass = nil
+end
+
+local oldSetBoard = SetBoard
+function SetBoard(board)
+	if true
+		and board ~= nil
+		and boardInitialized == false
+	then
+		initializeBoardClass(board)
+	end
+
+	oldSetBoard(board)
 end

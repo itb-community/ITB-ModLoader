@@ -133,7 +133,7 @@ local function addDamageListMetadata(damageList, metadataTable, addToPrevious)
     if addToPrevious then
         damageToModify = damageList:back()
         if damageToModify.sScript ~= "" then
-            LOG("Warning: unable to save metadata from skill effect. Metadata \n" + save_table(metadataTable))
+            LOGW("unable to save metadata from skill effect. Metadata \n" + save_table(metadataTable))
             return
         end
         metadataTable.storedInSourceDamage = true

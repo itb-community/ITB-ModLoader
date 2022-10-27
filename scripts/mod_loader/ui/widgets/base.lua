@@ -122,6 +122,44 @@ function Ui:decorate(decorations)
 	return self
 end
 
+-- Adds a ui instance of class 'class' (or Ui if nil)
+-- to itself, and returns the new ui instance.
+-- Intended to be used in function chaining when
+-- setting up the Ui hierarchy.
+function Ui:beginUi(class, ...)
+	if class == nil then
+		class = Ui
+	end
+
+	if Class.instanceOf(class, class.__index) then
+		-- if 'class' is a ui instance
+		return class:addTo(self)
+	elseif Class.isSubclassOf(class, Ui) then
+		-- if 'class' is a ui class
+		return class(...):addTo(self)
+	end
+
+	Assert.Error("Invalid Argument #1")
+end
+
+-- Ends the current Ui instance when function chaining;
+-- returning its parent.
+function Ui:endUi()
+	return self.parent
+end
+
+-- Sets a variable in the ui table to the given value.
+function Ui:setVar(var, value)
+	self[var] = value
+	return self
+end
+
+-- Run a function fn(self, ...) to format the ui object in some way.
+function Ui:format(fn, ...)
+	fn(self, ...)
+	return self
+end
+
 function Ui:show()
 	self.visible = true
 	
@@ -225,6 +263,12 @@ function Ui:size(w, h)
 	return self
 end
 
+function Ui:sizepx(w, h)
+	self.w = w
+	self.h = h
+	return self
+end
+
 function Ui:width(w)
 	self.wPercent = w
 	return self
@@ -265,6 +309,12 @@ function Ui:setTranslucent(translucent, cascade)
 		end
 	end
 	
+	return self
+end
+
+function Ui:setCustomTooltip(ui)
+	Assert.True(Ui.instanceOf(ui, Ui), "Argument #1")
+	self.customTooltip = ui
 	return self
 end
 
@@ -315,6 +365,18 @@ function Ui:keyup(keycode)
 	end
 
 	return false
+end
+
+function Ui:onGameWindowResized(screen, oldSize)
+	-- overridable method
+end
+
+function Ui:gameWindowResized(screen, oldSize)
+	self:onGameWindowResized(screen, oldSize)
+
+	for _, child in ipairs(self.children) do
+		child:gameWindowResized(screen, oldSize)
+	end
 end
 
 -- calling this function will update containsMouse
@@ -375,13 +437,6 @@ function Ui:updateAnimations()
 	for _, child in ipairs(self.children) do
 		child:updateAnimations()
 	end
-end
-
-function Ui:updateTooltipState()
-	if self.root == nil then return end
-	self.root.tooltip_title = self.tooltip_title
-	self.root.tooltip = self.tooltip
-	self.root.tooltip_static = self.draggable and self.dragged
 end
 
 -- update is called for all element after everything has been

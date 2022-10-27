@@ -22,3 +22,6 @@ Testsuites.vector = require(rootpath.."vector")
 Testsuites.text = require(rootpath.."text")
 Testsuites.deque = require(rootpath.."deque")
 Testsuites.binarySearch = require(rootpath.."binarySearch")
+
+modApi.events.onTestsuitesCreated:dispatch()
+modApi.events.onTestsuitesCreated:unsubscribeAll()

@@ -48,4 +48,8 @@ modApi.constants = {
   SQUAD_INDEX_START = 1,
   SQUAD_INDEX_END = 14,
   SQUAD_INDEX_SECRET = 9,
+
+  -- ui constants
+  ORIENTATION_HORIZONTAL = true,
+  ORIENTATION_VERTICAL = false,
 }

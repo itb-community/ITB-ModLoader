@@ -247,7 +247,7 @@ function testsuite.testsuite_StatusTooltips.test_Current_NonExistingKey()
 
 	Assert.True(result ~= nil)
 	Assert.Equals(key, result[1])
-	Assert.Equals("NOT FOUND", result[2])
+	Assert.Equals("no text found", result[2])
 
 	return true
 end

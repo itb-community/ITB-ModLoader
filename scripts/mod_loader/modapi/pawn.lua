@@ -446,7 +446,7 @@ local function initializeBoardPawn()
 
 	local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 	
-	local oldSetNeutral = pawn.SetNeutral
+	BoardPawn.SetNeutralVanilla = pawn.SetNeutral
 	BoardPawn.SetNeutral = function(self, neutral)
 		Assert.Equals("userdata", type(self), "Argument #0")
 		Assert.Equals("boolean", type(neutral), "Argument #1")
@@ -462,6 +462,9 @@ local function initializeBoardPawn()
 
 	BoardPawn.IsPilotSkill = pawn.IsAbility
 	BoardPawn.GetPilotSkill = pawn.GetAbility
+
+	modApi.events.onPawnClassInitialized:dispatch(BoardPawn, pawn)
+	modApi.events.onPawnClassInitialized:unsubscribeAll()
 
 	pawn = nil
 	InitializeBoardPawn = nil

@@ -437,7 +437,7 @@ end
 local function detectAchievementLibrary()
 	-- let all mods have the opportunity to take control of lmn_achievements.
 	-- once they do, we redirect all of their api functions to mod loader equivalents.
-	if not modApi:isVersion(lmn_achievements.version, "0") then
+	if modApi:isVersionAbove(lmn_achievements.version, "0") then
 		LOGF("Legacy achievement library detected for mod [%s] - redirecting functions to mod loader equivalents.", modApi.currentMod)
 
 		migrateAchievements()

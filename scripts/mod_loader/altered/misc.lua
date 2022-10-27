@@ -1,6 +1,10 @@
 
 -- modified vanilla save_table with optional 'depth' parameter
 function save_table(target, depth)
+	if target.GetLuaString ~= nil then
+		return target:GetLuaString()
+	end
+
 	local ret = "{"
 	for i, v in pairs(target) do
 		local value = ""

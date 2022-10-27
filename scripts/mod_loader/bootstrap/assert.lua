@@ -43,6 +43,13 @@ function Assert.Error(msg)
 	error(msg..traceback())
 end
 
+function Assert.ShouldError(func, args, msg)
+	msg = (msg and msg .. ": ") or ""
+
+	local ok = xpcall(function() func(unpack(args)) end, function(err) end)
+	assert(not ok, msg)
+end
+
 function Assert.Equals(expected, actual, msg)
 	msg = (msg and msg .. ": ") or ""
 	msg = msg .. string.format("Expected %s, but was '%s'%s", get_string(expected), tostring(actual), traceback())

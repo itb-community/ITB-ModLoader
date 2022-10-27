@@ -149,7 +149,6 @@ end
 -- Maintain sanity
 -- Update as new API functions are added
 function modApi:resetModContent()
-	self.dictionary = {}
 
 	self.mod_squads = {
 		-- normal
@@ -237,10 +236,7 @@ function modApi:getGameVersion()
 
 	local logPath = GetSavedataLocation() .. "log.txt"
 	if modApi:fileExists(logPath) then
-		local file = assert(io.open(logPath, "r"), "Failed to open file: " .. logPath)
-		local content = file:read(200)
-		file:close()
-
+		local content = File(logPath):read_to_string()
 		local version = string.match(content, "Into the Breach: (%S+)")
 		if version then
 			modApi.gameVersion = version
@@ -248,7 +244,7 @@ function modApi:getGameVersion()
 		end
 	end
 
-	LOG("WARNING: Unable to get game version!")
+	LOGW("Unable to get game version!")
 end
 
 modApi.events.onSettingsChanged:subscribe(function(old, neu)

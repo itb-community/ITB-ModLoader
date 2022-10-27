@@ -11,6 +11,7 @@ local currentSelectedOptions = nil
 local scrollContent = nil
 local openDropdowns = nil
 local sortMods = nil
+local entriesByModId = nil
 
 local SORT_BY_NAME = 1
 local SORT_BY_ID = 2
@@ -334,6 +335,7 @@ local function buildModEntry(mod, parentModEntry)
 		})
 		:addTo(entryHeaderHolder)
 	
+	entriesByModId[mod.id] = modEntry
 	entryBoxHolder.mod = mod
 	entryBoxHolder.modEntry = modEntry
 	modEntry.checked = entry_editable.enabled
@@ -393,6 +395,16 @@ local function buildModEntry(mod, parentModEntry)
 			if modHasParent then
 				parentModEntry:updateParentCheckedState()
 			end
+			
+			if self.checked then
+				for id, version in pairs(mod.dependencies) do
+					local dependencyEntry = entriesByModId[id]
+					if not dependencyEntry.checked then
+						dependencyEntry.checked = true
+						dependencyEntry:onclicked(button)
+					end
+				end
+			end
 		end
 		
 		return false
@@ -433,6 +445,7 @@ end
 local function buildModConfigContent(scroll)
 	
 	openDropdowns = {}
+	entriesByModId = {}
 	
 	scrollContent = UiBoxLayout()
 		:vgap(5)

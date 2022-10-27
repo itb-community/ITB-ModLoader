@@ -176,12 +176,9 @@ function FtlDat:extract_file(innerPath, destinationPath)
 	Assert.Equals("string", type(destinationPath))
 
 	try(function()
-		local content = self.entry_content_byte_array(innerPath)
+		local content = self:entry_content_byte_array(innerPath)
 		content = utf8_from(content)
-
-		local f = assert(io.open(destinationPath, "wb"), destinationPath)
-		f:write(content)
-		f:close()
+		modApi:writeFile(destinationPath, content)
 	end)
 	:catch(function(err)
 		error(string.format(

@@ -104,3 +104,10 @@ function modApi:setupVanillaTexts()
 		t["Squad_Description_" .. v] = GetVanillaText("TipText_" .. v)
 	end
 end
+
+modApi.events.onSettingsChanged:subscribe(function(newSettings, oldSettings)
+	if newSettings.language ~= oldSettings.language then
+		modApi:loadLanguage(newSettings.language)
+		modApi.events.onLanguageChanged:dispatch(newSettings.language, oldSettings.language)
+	end
+end)
