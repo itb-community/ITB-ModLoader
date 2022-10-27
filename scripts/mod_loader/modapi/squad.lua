@@ -69,6 +69,76 @@ function modApi:addSquad(squad, name, desc, icon)
 	table.insert(self.squad_icon, icon or "resources/mods/squads/unknown.png")
 end
 
+-- Convert from how the mod loader indexes squads to how the game indexes squads
+function modApi:squadIndex2Choice(index)
+	Assert.Equals("table", type(self), "Check for . vs :")
+
+	if false
+		or index < self.constants.SQUAD_INDEX_START
+		or index > self.constants.SQUAD_INDEX_END
+	then
+		LOGW("Invalid squad index -> choice conversion")
+		return -1
+	end
+
+	if index >= self.constants.SQUAD_INDEX_SECRET then
+		return index + 1
+	else
+		return index - 1
+	end
+end
+
+-- Convert from how the game indexes squads to how the mod loader indexes squads
+function modApi:squadChoice2Index(choice)
+	Assert.Equals("table", type(self), "Check for . vs :")
+
+	if false
+		or choice == self.constants.SQUAD_CHOICE_RANDOM
+		or choice == self.constants.SQUAD_CHOICE_CUSTOM
+		or choice < self.constants.SQUAD_CHOICE_START
+		or choice > self.constants.SQUAD_CHOICE_END
+	then
+		LOGW("Invalid squad choice -> index conversion")
+		return -1
+	end
+
+	if choice >= self.constants.SQUAD_CHOICE_SECRET then
+		return choice - 1
+	else
+		return choice + 1
+	end
+end
+
+function modApi:getSquadForChoice(choice)
+	Assert.Equals("table", type(self), "Check for . vs :")
+
+	if false
+		or choice == self.constants.SQUAD_CHOICE_RANDOM
+		or choice == self.constants.SQUAD_CHOICE_CUSTOM
+		or choice < self.constants.SQUAD_CHOICE_START
+		or choice > self.constants.SQUAD_CHOICE_END
+	then
+		Assert.Error("Invalid squad choice")
+	end
+
+	if self.squadIndices == nil then
+		loadSquadSelection()
+	end
+
+	local index = self:squadChoice2Index(choice)
+	local squad_flat = self.mod_squads[self.squadIndices[index]]
+
+	return {
+		name = squad_flat[1],
+		id = squad_flat.id,
+		mechs = {
+			squad_flat[2],
+			squad_flat[3],
+			squad_flat[4],
+		}
+	}
+end
+
 local function onGameEntered()
 	local squadData = GAME.additionalSquadData
 	local squadId = squadData.squad

@@ -27,6 +27,28 @@ modApi.constants = {
   PILOT_CONFIG_POD_ADVANCED = 2,
   PILOT_CONFIG_RECRUIT = 4,
 
+  -- squad choice constants
+  -- how the game arranges squads
+  -- 0-indexed
+  -- squads 0-7 are the first 8 vanilla squads
+  -- 8 and 9 are random and custom
+  -- squad 10 is secret, 11-15 are Advanced
+  SQUAD_CHOICE_START = 0,
+  SQUAD_CHOICE_END = 15,
+  SQUAD_CHOICE_RANDOM = 8,
+  SQUAD_CHOICE_CUSTOM = 9,
+  SQUAD_CHOICE_SECRET = 10,
+
+  -- squad index constants
+  -- how the mod loader arranges squads
+  -- 1-indexed
+  -- 1-8 are the first 8 vanilla squads
+  -- random and custom are excluded
+  -- 9 is secret, 10-14 are Advanced
+  SQUAD_INDEX_START = 1,
+  SQUAD_INDEX_END = 14,
+  SQUAD_INDEX_SECRET = 9,
+
   -- ui constants
   ORIENTATION_HORIZONTAL = true,
   ORIENTATION_VERTICAL = false,
