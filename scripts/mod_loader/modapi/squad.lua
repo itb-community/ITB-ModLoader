@@ -77,7 +77,7 @@ function modApi:squadIndex2Choice(index)
 		or index < self.constants.SQUAD_INDEX_START
 		or index > self.constants.SQUAD_INDEX_END
 	then
-		LOG("WARNING: Invalid squad index -> choice conversion")
+		LOGW("Invalid squad index -> choice conversion")
 		return -1
 	end
 
@@ -98,7 +98,7 @@ function modApi:squadChoice2Index(choice)
 		or choice < self.constants.SQUAD_CHOICE_START
 		or choice > self.constants.SQUAD_CHOICE_END
 	then
-		LOG("WARNING: Invalid squad choice -> index conversion")
+		LOGW("Invalid squad choice -> index conversion")
 		return -1
 	end
 
