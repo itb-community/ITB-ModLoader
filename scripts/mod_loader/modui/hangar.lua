@@ -297,6 +297,7 @@ modApi.events.onHangarLeaving:subscribe(function()
 	restoreGetImages()
 end)
 
+local expectedMedalOffsets = { 186, 209 }
 local function isIrregularMedalHeight()
 	-- if victory medals are drawn at y coordinate 186
 	-- relative to hangar origin, we know that we have
@@ -306,7 +307,13 @@ local function isIrregularMedalHeight()
 	-- at a regular squad until the mod loader can
 	-- be updated as well.
 	if SURFACE_MEDAL:wasDrawn() then
-		return SURFACE_MEDAL.y - GetHangarOrigin().y == 186
+		local medalOffset = SURFACE_MEDAL.y - GetHangarOrigin().y
+
+		if not list_contains(expectedMedalOffsets, medalOffset) then
+			LOGF("Unexpected medal offset %s detected - Notify mod loader maintainers", medalOffset)
+		end
+
+		return medalOffset == 186
 	end
 
 	return false
