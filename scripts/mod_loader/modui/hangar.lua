@@ -2,57 +2,7 @@
 local SURFACE_PLATFORM = sdlext.getSurface({path = "img/strategy/hangar_platform_L.png"})
 local SURFACE_MEDAL = sdlext.getSurface({path = "img/ui/hangar/victory_2.png"})
 
-local isSecretSquadUnlocked = false
-local isSecretPilotsUnlocked = false
 local isRandomOrCustomSquad = false
-local secretPilots = {
-	"Pilot_Mantis",
-	"Pilot_Rock",
-	"Pilot_Zoltan"
-}
-
-Hangar_lastProfileHadSecretPilots = false
-
-function modApi:isSecretSquadAvailable()
-	-- TODO: always available in AE, is this still needed?
-	-- if not Profile then return false end
-	--
-	-- for i = 1, 8 do
-	-- 	if Profile.squads[i] == false then
-	-- 		return false
-	-- 	end
-	-- end
-
-	return true
-end
-
-function HangarIsSecretSquadUnlocked()
-	return isSecretSquadUnlocked
-end
-
-function HangarIsSecretPilotsUnlocked()
-	return isSecretPilotsUnlocked
-end
-
-function HangarIsRandomOrCustomSquad()
-	return isRandomOrCustomSquad
-end
-
-function IsSecretPilotsUnlocked(profile)
-	profile = profile or Profile
-
-	if profile == nil then
-		return false
-	end
-
-	for i, v in ipairs(secretPilots) do
-		if list_contains(Profile.pilots, v) then
-			return true
-		end
-	end
-
-	return false
-end
 
 local function isWindowOpen()
 	return sdlext.isSquadSelectionWindowVisible() or
@@ -62,12 +12,15 @@ local function isWindowOpen()
 	       sdlext.isMechColorWindowVisible()
 end
 
+local hangar = {}
+modApi.hangar = hangar
+
 --[[
 	If this returns true, it means that there is some sort of window
 	open (pilots, squads, acievements, custom squad edit), and normal
 	hangar UI is not accessible.
 --]]
-function IsHangarWindowState()
+function hangar:isWindowState()
 	return sdlext.isHangar() and isWindowOpen()
 end
 
@@ -76,11 +29,11 @@ end
 	and the player can interact with normal hangar UI
 	(back/start game buttons, color picker, mech skill icons, etc.)
 --]]
-function IsHangarWindowlessState()
+function hangar:isWindowlessState()
 	return sdlext.isHangar() and not isWindowOpen()
 end
 
-function GetHangarOrigin()
+function hangar:getOrigin()
 	local origin = GetScreenCenter()
 
 	-- Hangar UI is drawn at a different offset when
@@ -225,11 +178,11 @@ local function overrideGetImages()
 	end
 end
 
-function HangarGetSelectedMechs()
+function hangar:getSelectedMechs()
 	return copy_table(selectedMechs)
 end
 
-function HangarGetSelectedSquad()
+function hangar:getSelectedSquad()
 	return selectedSquad
 end
 
@@ -276,11 +229,11 @@ local function GetLanguageButton(name, languageIndex)
 	return buttons[languageIndex] or buttons[Languages.English]
 end
 
-function GetBackButtonRect(languageIndex)
+function hangar:getBackButtonRect()
 	return GetLanguageButton("btnBack", languageIndex)
 end
 
-function GetStartButtonRect(languageIndex)
+function hangar:getStartButtonRect()
 	return GetLanguageButton("btnStart", languageIndex)
 end
 

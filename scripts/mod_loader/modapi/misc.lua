@@ -62,3 +62,33 @@ function modApi:getModOptions(modId)
 	local modContent = mod_loader.currentModContent or mod_loader:getModConfig()
 	return modContent[modId].options
 end
+
+function modApi:isSecretSquadAvailable()
+	return true
+end
+
+function modApi:isSecretSquadUnlocked()
+	return Profile and Profile.squads[11] or false
+end
+
+local secretPilots = {
+	"Pilot_Mantis",
+	"Pilot_Rock",
+	"Pilot_Zoltan"
+}
+
+function modApi:isSecretPilotsUnlocked(profile)
+	profile = profile or Profile
+
+	if profile == nil then
+		return false
+	end
+
+	for i, v in ipairs(secretPilots) do
+		if list_contains(Profile.pilots, v) then
+			return true
+		end
+	end
+
+	return false
+end

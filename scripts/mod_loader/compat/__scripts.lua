@@ -6,6 +6,7 @@ local scripts = {
 	"achievement",
 	"dialog_helper",
 	"difficulty",
+	"hangar",
 	"nuke",
 }
 
