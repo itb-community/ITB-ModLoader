@@ -25,6 +25,10 @@ local CLASS_ORDER = {
 	TechnoVek = 4,
 }
 
+local RESERVED_SQUAD_ID = {
+	"Custom",
+}
+
 function modApi:addSquad(squad, name, desc, icon)
 	Assert.ModInitializingOrLoading()
 
@@ -36,6 +40,7 @@ function modApi:addSquad(squad, name, desc, icon)
 
 	squad.id = squad.id or buildSquadId(squad)
 	Assert.Equals(nil, modApi.mod_squads_by_id[squad.id], string.format("Squad with id %q already exists", squad.id))
+	Assert.NotEquals(RESERVED_SQUAD_ID, squad.id, string.format("Squad id %s is reserved", squad.id))
 
 	-- sort the squad name first
 	local mechOrder = {[squad[1]] = -1}
