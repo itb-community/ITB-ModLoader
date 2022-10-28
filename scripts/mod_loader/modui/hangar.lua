@@ -1,6 +1,11 @@
 -- TODO: a lot of these are constants now, can cleanup code
-local SURFACE_PLATFORM = sdlext.getSurface({path = "img/strategy/hangar_platform_L.png"})
-local SURFACE_MEDAL = sdlext.getSurface({path = "img/ui/hangar/victory_2.png"})
+local SURFACE_PLATFORM
+local SURFACE_MEDAL
+
+modApi.events.onFtldatFinalized:subscribe(function()
+	SURFACE_PLATFORM = sdlext.surface("img/strategy/hangar_platform_L.png")
+	SURFACE_MEDAL = sdlext.surface("img/ui/hangar/victory_2.png")
+end)
 
 local isRandomOrCustomSquad = false
 local isMechlessCustomSquad = false
