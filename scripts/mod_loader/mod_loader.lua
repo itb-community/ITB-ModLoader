@@ -210,6 +210,8 @@ function mod_loader:loadAdditionalSprites()
 	ANIMS.placeholder_mech = ANIMS.SingleImage:new{Image = "units/placeholder_mech.png"}
 	ANIMS.placeholder_enemy = ANIMS.SingleImage:new{Image = "units/placeholder_enemy.png"}
 
+	-- Fix incorrect offset of the 2 island Unfair victory medal.
+	modApi:appendAsset("img/ui/hangar/victory_2.png", "resources/mods/ui/victory_2.png")
 	-- Duplicate victory medal pngs for use by the mod loader
 	-- so its ui won't trigger wasDrawn for vanilla medals.
 	modApi:copyAsset("img/ui/hangar/victory_2.png", "img/ui/hangar/ml_victory_2.png")
