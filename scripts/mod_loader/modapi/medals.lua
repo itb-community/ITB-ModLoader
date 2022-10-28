@@ -149,10 +149,9 @@ end
 
 -- reads medal data.
 local function readMedalData(self, squad_id)
-	if
-		not modApi:isProfilePath()         or
-		not modApi:isModdedSquad(squad_id)
-	then
+	if modApi:isVanillaSquad(squad_id) then
+		return self.correctedVanillaStats[squad_id]
+	elseif modApi:isProfilePath() ~= true then
 		return nil
 	end
 
@@ -169,16 +168,109 @@ local function readMedalData(self, squad_id)
 	return self.cachedData[squad_id]
 end
 
+local function isVanillaSquad(squadIndex, mechs)
+	local vanillaSquad = modApi.mod_squads[squadIndex+1]
+
+	for i, mech in ipairs(mechs) do
+		if vanillaSquad[i+1] ~= mech then
+			return false
+		end
+	end
+
+	return true
+end
+
+local function updateVanillaRibbons(self)
+
+	local currentProfile = modApi:getCurrentProfile()
+	local profileStatistics = modApi:getProfileStatistics(currentProfile)
+
+	if profileStatistics == nil then
+		return
+	end
+
+	local stat_tracker = profileStatistics.stat_tracker
+	local i = 0
+	local score = stat_tracker["score"..i]
+	local statsVanilla = {}
+	local statsPolluted = {}
+	local statsCorrected = {}
+
+	while score do
+		if true
+			and score.victory == true
+			and score.islands ~= nil
+			and score.squad ~= modApi.constants.SQUAD_INDEX_RANDOM
+			and score.squad ~= modApi.constants.SQUAD_INDEX_CUSTOM
+		then
+			local islandsSecured = ISLANDS[score.islands - 1]
+			local difficulty = DIFFICULTIES[score.difficulty + 2]
+
+			-- statsPolluted contains all scores.
+			-- statsVanilla contains only scores completed with a vanilla squad.
+			for _, stats in ipairs{ statsVanilla, statsPolluted } do
+				if false
+					or stats == statsPolluted
+					or isVanillaSquad(score.squad, score.mechs)
+				then
+					local squadId = modApi.mod_squads[score.squad+1].id
+
+					stats[squadId] = stats[squadId] or {}
+					local squadRibbons = stats[squadId]
+
+					local currentCompletedDifficulty = squadRibbons[islandsSecured] or DIFFICULTIES[1]
+					squadRibbons[islandsSecured] = getGreaterDifficulty(difficulty, currentCompletedDifficulty)
+				end
+			end
+		end
+
+		i = i + 1
+		score = stat_tracker["score".. i]
+	end
+
+	for squadId, polluted in pairs(statsPolluted) do
+		local corrected = {}
+		local vanilla = statsVanilla[squadId] or {}
+
+		for _, islands in ipairs(ISLANDS) do
+			if polluted[islands] ~= vanilla[islands] then
+				corrected[islands] = vanilla[islands] or DIFFICULTIES[1]
+			end
+		end
+
+		statsCorrected[squadId] = corrected
+	end
+
+	self.correctedVanillaStats = statsCorrected
+end
+
+function isVanillaScoreCorrected(self, squadId, islands)
+	if self.correctedVanillaStats == nil then
+		self:updateVanillaRibbons()
+	end
+
+	islands = ISLANDS[islands - 1]
+
+	return true
+		and self.correctedVanillaStats[squadId] ~= nil
+		and self.correctedVanillaStats[squadId][islands] ~= nil
+end
+
 modApi.events.onGameVictory:subscribe(function(difficulty, islandsSecured, squad_id)
 	modApi.medals:writeData(squad_id, difficulty, islandsSecured)
+	modApi.medals.correctedVanillaStats = nil
 end)
 
 modApi.events.onProfileChanged:subscribe(function()
 	modApi.medals.cachedData = nil
+	modApi.medals.correctedVanillaStats = nil
 end)
 
 modApi.medals = {
 	cachedData = nil,
+	correctedVanillaStats = nil,
 	writeData = writeMedalData,
 	readData = readMedalData,
+	updateVanillaRibbons = updateVanillaRibbons,
+	isVanillaScoreCorrected = isVanillaScoreCorrected,
 }
