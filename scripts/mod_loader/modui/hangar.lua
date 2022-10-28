@@ -306,7 +306,7 @@ local function isIrregularMedalHeight()
 	-- at a regular squad until the mod loader can
 	-- be updated as well.
 	if SURFACE_MEDAL:wasDrawn() then
-		local medalOffset = SURFACE_MEDAL.y - GetHangarOrigin().y
+		local medalOffset = SURFACE_MEDAL.y - hangar:getOrigin().y
 
 		if not list_contains(expectedMedalOffsets, medalOffset) then
 			LOGF("Unexpected medal offset %s detected - Notify mod loader maintainers", medalOffset)
