@@ -56,33 +56,34 @@ local windows = {
 	create_profile = "New_Profile_Title"
 }
 
-local function updateProfile(window)
-	local oldSettings = Settings
-	Settings = modApi:loadSettings()
+local function scheduleUpdateProfile(window)
+	modApi:scheduleHook(50, function()
+		local oldSettings = Settings
+		Settings = modApi:loadSettings()
 
-	if window == windows.delete_profile then
-		if Settings.last_profile == nil or Settings.last_profile == "" then
-			modApi.events.onProfileDeleted:dispatch(oldSettings.last_profile)
-		end
-	end
-
-	if oldSettings.last_profile ~= Settings.last_profile then
-		if window == windows.create_profile then
-			modApi.events.onProfileCreated:dispatch(Settings.last_profile)
+		if window == windows.delete_profile then
+			if Settings.last_profile == nil or Settings.last_profile == "" then
+				modApi.events.onProfileDeleted:dispatch(oldSettings.last_profile)
+			end
 		end
 
-		Hangar_lastProfileHadSecretPilots = IsSecretPilotsUnlocked()
-		Profile = modApi:loadProfile()
+		if oldSettings.last_profile ~= Settings.last_profile then
+			if window == windows.create_profile then
+				modApi.events.onProfileCreated:dispatch(Settings.last_profile)
+			end
 
-		modApi.events.onProfileChanged:dispatch(oldSettings.last_profile, Settings.last_profile)
-		modApi.events.onSettingsChanged:dispatch(oldSettings, Settings)
+			Hangar_lastProfileHadSecretPilots = IsSecretPilotsUnlocked()
+			Profile = modApi:loadProfile()
 
-	end
+			modApi.events.onProfileChanged:dispatch(oldSettings.last_profile, Settings.last_profile)
+			modApi.events.onSettingsChanged:dispatch(oldSettings, Settings)
+		end
+	end)
 end
 
-modApi.events.onProfileSelectionWindowHidden:subscribe(updateProfile)
-modApi.events.onCreateProfileConfirmationWindowHidden:subscribe(updateProfile)
-modApi.events.onDeleteProfileConfirmationWindowHidden:subscribe(updateProfile)
+modApi.events.onProfileSelectionWindowHidden:subscribe(scheduleUpdateProfile)
+modApi.events.onCreateProfileConfirmationWindowHidden:subscribe(scheduleUpdateProfile)
+modApi.events.onDeleteProfileConfirmationWindowHidden:subscribe(scheduleUpdateProfile)
 
 modApi.events.onOptionsWindowHidden:subscribe(function()
 	local oldSettings = Settings
