@@ -207,6 +207,11 @@ local ESCAPE_ACHIEVEMENTS = {
 	STRIDE = 67,
 }
 
+local ESCAPE_ACHIEVEMENT_TOOLTIP = {
+	X = 250,
+	Y = 0,
+}
+
 -- Box containing medals
 local ESCAPE_MEDALS = {
 	W = ESCAPE_MENU.W,
@@ -227,13 +232,19 @@ function AchievementTooltip:new()
 	self.decorations[1].color = sdl.rgba(13, 15, 23, 240)
 end
 
-function AchievementTooltip.updatePosition(tooltipManager, tooltip, hoveredUi)
+local achievementTooltipHangar = AchievementTooltip()
+local achievementTooltipEscape = AchievementTooltip()
+
+function achievementTooltipHangar.updatePosition(tooltipManager, tooltip, hoveredUi)
 	local hangarOrigin = modApi.hangar:getOrigin()
 	tooltip.x = hangarOrigin.x + HANGAR_ACHIEVEMENT_TOOLTIP.X - tooltip.w
 	tooltip.y = hangarOrigin.y + HANGAR_ACHIEVEMENT_TOOLTIP.Y
 end
 
-local achievementTooltip = AchievementTooltip()
+function achievementTooltipEscape.updatePosition(tooltipManager, tooltip, hoveredUi)
+	tooltip.x = hoveredUi.parent.screenx + ESCAPE_ACHIEVEMENT_TOOLTIP.X
+	tooltip.y = hoveredUi.parent.screeny + ESCAPE_ACHIEVEMENT_TOOLTIP.Y
+end
 
 local function drawIfAncestorContainsMouse(self, hitboxDepth)
 	local oldDrawFn = self.draw
@@ -566,7 +577,7 @@ modApi.events.onHangarSquadSelected:subscribe(function(squad_id, squadChoice, sq
 						:widthpx(ACHIEVEMENT.W_HITBOX)
 						:heightpx(ACHIEVEMENT.H_HITBOX)
 						:setxpx(pos * HANGAR_ACHIEVEMENTS.STRIDE)
-						:setCustomTooltip(achievementTooltip)
+						:setCustomTooltip(achievementTooltipHangar)
 						:settooltip(achievement:getTooltip(), achievement.name)
 
 						:beginUi(buildAchievementUi(achievement))
@@ -917,6 +928,7 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 						:widthpx(ACHIEVEMENT.W_HITBOX)
 						:heightpx(ACHIEVEMENT.H_HITBOX)
 						:setxpx(pos * ESCAPE_ACHIEVEMENTS.STRIDE)
+						:setCustomTooltip(achievementTooltipEscape)
 						:settooltip(achievement:getTooltip(), achievement.name)
 
 						:beginUi(buildAchievementUi(achievement))
