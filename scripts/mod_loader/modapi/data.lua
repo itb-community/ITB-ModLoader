@@ -74,6 +74,10 @@ function modApi:getCurrentProfilePath()
 	return "profile_"..Settings.last_profile.."/"
 end
 
+function modApi:getCurrentProfile()
+	return Settings.last_profile
+end
+
 function modApi:writeProfileData(id, obj)
 	if not self:isProfilePath() then
 		return
