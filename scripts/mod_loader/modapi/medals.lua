@@ -168,8 +168,9 @@ local function readMedalData(self, squad_id)
 	return self.cachedData[squad_id]
 end
 
-local function isVanillaSquad(squadIndex, mechs)
-	local vanillaSquad = modApi.mod_squads[squadIndex+1]
+local function isVanillaSquad(squadChoice, mechs)
+	local squadIndex = modApi:squadChoice2Index(squadChoice)
+	local vanillaSquad = modApi.mod_squads[squadIndex]
 
 	for i, mech in ipairs(mechs) do
 		if vanillaSquad[i+1] ~= mech then
@@ -200,8 +201,8 @@ local function updateVanillaRibbons(self)
 		if true
 			and score.victory == true
 			and score.islands ~= nil
-			and score.squad ~= modApi.constants.SQUAD_INDEX_RANDOM
-			and score.squad ~= modApi.constants.SQUAD_INDEX_CUSTOM
+			and score.squad ~= modApi.constants.SQUAD_CHOICE_RANDOM
+			and score.squad ~= modApi.constants.SQUAD_CHOICE_CUSTOM
 		then
 			local islandsSecured = ISLANDS[score.islands - 1]
 			local difficulty = DIFFICULTIES[score.difficulty + 2]
@@ -213,7 +214,8 @@ local function updateVanillaRibbons(self)
 					or stats == statsPolluted
 					or isVanillaSquad(score.squad, score.mechs)
 				then
-					local squadId = modApi.mod_squads[score.squad+1].id
+					local squadIndex = modApi:squadChoice2Index(score.squad)
+					local squadId = modApi.mod_squads[squadIndex].id
 
 					stats[squadId] = stats[squadId] or {}
 					local squadRibbons = stats[squadId]
