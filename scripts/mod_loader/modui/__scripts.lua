@@ -5,6 +5,7 @@ local scripts = {
 	"windows",
 	"mainmenu",
 	"hangar",
+	"final",
 	"version_string",
 
 	"popup_version",
