@@ -318,6 +318,23 @@ function Ui:setCustomTooltip(ui)
 	return self
 end
 
+function Ui:setGroupOwner(groupOwner)
+	self.groupOwner = groupOwner
+	return self
+end
+
+function Ui:getGroupOwner()
+	return self.groupOwner or self
+end
+
+function Ui:isGroupHovered()
+	return self:getGroupOwner().groupHovered
+end
+
+function Ui:isGroupDragHovered()
+	return self:getGroupOwner().groupDragHovered
+end
+
 local function handleMouseEvent(self, mx, my, func, ...)
 	for _, child in ipairs(self.children) do
 		if child.visible and child.containsMouse and not child.ignoreMouse then
@@ -444,6 +461,23 @@ function Ui:updateDragHoverState()
 	end
 
 	return self.dragHovered
+end
+
+function Ui:updateGroupHoverState()
+	self.groupHovered = false
+	self.groupDragHovered = false
+
+	if self.hovered then
+		self:getGroupOwner().groupHovered = true
+	end
+
+	if self.dragHovered then
+		self:getGroupOwner().groupDragHovered = true
+	end
+
+	for _, child in ipairs(self.children) do
+		child:updateGroupHoverState()
+	end
 end
 
 function Ui:updateAnimations()

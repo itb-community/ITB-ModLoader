@@ -211,6 +211,7 @@ function UiRoot:updateStates()
 	self:updateHoveredState()
 	self:updateDraggedState(mx, my)
 	self:updateDragHoverState()
+	self:updateGroupHoverState()
 	self:updateAnimations()
 	self:updateState()
 end
