@@ -146,6 +146,18 @@ function UiRoot:setDraggedChild(child)
 	end
 end
 
+function UiRoot:setDragHoveredChild(child)
+	if self.draghoveredchild then
+		self.draghoveredchild.dragHovered = false
+	end
+
+	self.draghoveredchild = child
+
+	if child then
+		child.dragHovered = true
+	end
+end
+
 function UiRoot:updatePressedState(mx, my)
 	local draggedchild = self.draggedchild
 	local pressedchild = self.pressedchild
@@ -184,12 +196,21 @@ function UiRoot:updateDraggedState(mx, my)
 	end
 end
 
+-- While dragging a ui element, hoveredchild == draggedchild
+-- This update step finds the first hovered element that is
+-- not the draggedchild and sets it dragHovered
+function UiRoot:updateDragHoverState()
+	self:setDragHoveredChild(nil)
+	Ui.updateDragHoverState(self)
+end
+
 function UiRoot:updateStates()
 	local mx, my = sdl.mouse.x(), sdl.mouse.y()
 	self:updateContainsMouse(mx, my)
 	self:updatePressedState(mx, my)
 	self:updateHoveredState()
 	self:updateDraggedState(mx, my)
+	self:updateDragHoverState()
 	self:updateAnimations()
 	self:updateState()
 end

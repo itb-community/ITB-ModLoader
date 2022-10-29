@@ -423,6 +423,29 @@ function Ui:updateHoveredState()
 	return self.hovered
 end
 
+function Ui:updateDragHoverState()
+	if false
+		or self.visible ~= true
+		or self.ignoreMouse == true
+		or self.containsMouse ~= true
+		or self.root.draggedchild == self
+	then
+		return false
+	end
+
+	if not self.translucent then
+		self.root:setDragHoveredChild(self)
+	end
+
+	for _, child in ipairs(self.children) do
+		if child:updateDragHoverState() then
+			return true
+		end
+	end
+
+	return self.dragHovered
+end
+
 function Ui:updateAnimations()
 	if not self.visible then
 		return
