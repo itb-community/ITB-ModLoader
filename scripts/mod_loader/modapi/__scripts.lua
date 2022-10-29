@@ -30,6 +30,7 @@ local scripts = {
 	"compat",
 	"deployment",
 	"gameState",
+	"tileset",
 }
 
 local rootpath = GetParentPath(...)
