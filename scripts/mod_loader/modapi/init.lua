@@ -207,14 +207,9 @@ function modApi:resetModContent()
 
 	modApi.events.onModContentReset:dispatch()
 
-	self:conditionalHook(
-		function()
-			return Game ~= nil and modApi.delayedInit ~= nil
-		end,
-		function()
-			modApi:delayedInit()
-		end
-	)
+	if modApi.delayedInit then
+		modApi:delayedInit()
+	end
 end
 
 function modApi:setCurrentMod(mod)

@@ -441,9 +441,6 @@ BoardPawn.GetString = BoardPawn.GetLuaString
 
 
 local function initializeBoardPawn()
-	-- Overrides of existing functions need to be added at later time, since in
-	-- order to grab a reference to original functions, we require a pawn instance.
-
 	local pawn = PAWN_FACTORY:CreatePawn("PunchMech")
 	
 	BoardPawn.SetNeutralVanilla = pawn.SetNeutral
