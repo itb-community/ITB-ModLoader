@@ -860,7 +860,7 @@ modApi.events.onEscapeMenuWindowShown:subscribe(function()
 	local achievementHolder = Ui()
 	local medalHolder = Ui()
 	local squad_id = GAME.additionalSquadData.squad
-	local squadChoice = GameData.current.squad
+	local squadChoice = GAME.additionalSquadData.squadChoice
 
 	function escapeMenuMedalUi:updatePosition()
 		self:pospx(Boxes.escape_box.x + ESCAPE_MENU.X, Boxes.escape_box.y + ESCAPE_MENU.Y)

@@ -143,8 +143,10 @@ function startNewGame()
 	end
 
 	GAME.additionalSquadData = {
-		squad = HangarGetSelectedSquad(),
-		mechs = HangarGetSelectedMechs()
+		squad = modApi.hangar:getSelectedSquad(),
+		squadChoice = modApi.hangar:getSelectedSquadChoice(),
+		squadIndex = modApi.hangar:getSelectedSquadIndex(),
+		mechs = modApi.hangar:getSelectedMechs()
 	}
 
 	-- Schedule execution to happen in 50ms
