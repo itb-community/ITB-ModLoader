@@ -378,7 +378,6 @@ BoardPawn.IsWeaponPowered = function(self, weapon)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	Assert.Equals("string", type(weapon), "Argument #1")
 
-	local ptable = self:GetPawnTable()
 	local poweredWeapons = self:GetPoweredWeapons()
 
 	return
