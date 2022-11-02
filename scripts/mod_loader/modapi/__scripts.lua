@@ -13,6 +13,7 @@ local scripts = {
 	"text",
 	"personalities",
 	"personalities_csv",
+	"assets",
 	"achievement",
 	"medals",
 	"palette",
