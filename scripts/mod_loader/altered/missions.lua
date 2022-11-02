@@ -255,39 +255,28 @@ function Mission:BaseStart(suppressHooks)
 	self.Initialized = true
 end
 
-local modLoaderHooksFired = false
 local oldApplyEnvironmentEffect = Mission.ApplyEnvironmentEffect
 function Mission:ApplyEnvironmentEffect()
-	if not modLoaderHooksFired then
+	if not self.LiveEnvironment.eventDispatched then
+		self.LiveEnvironment.eventDispatched = true
+
 		modApi:firePreEnvironmentHooks(self)
 	end
-	
-	-- ApplyEnvironmentEffect() is supposed to return true once
-	-- it's done applying its effects, but the game's own environments
-	-- don't follow this rule...
-	local isDone = false
+
+	-- While ApplyEnvironmentEffect() returns true,
+	-- there are more environment effects to come.
+	local continue = false
 	if self.LiveEnvironment:IsEffect() then
-		isDone = oldApplyEnvironmentEffect(self)
+		continue = oldApplyEnvironmentEffect(self)
 	end
-	
-	if not modLoaderHooksFired then
-		-- Schedule the post hooks to fire once the board is no longer busy
-		modApi:conditionalHook(
-			BuildIsBoardBusyPredicate(Board),
-			function()
-				modLoaderHooksFired = false
-				if not Game or not GAME or not Board then
-					return
-				end
-				
-				modApi:firePostEnvironmentHooks(self)
-			end
-		)
-		
-		modLoaderHooksFired = true
+
+	if not continue then
+		self.LiveEnvironment.eventDispatched = nil
+
+		modApi:firePostEnvironmentHooks(self)
 	end
-	
-	return isDone
+
+	return continue
 end
 
 function Mission:IsEnvironmentEffect()
