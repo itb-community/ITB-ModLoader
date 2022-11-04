@@ -1,0 +1,3 @@
+[submodule "scripts/mod_loader/extensions/memedit"]
+	path = scripts/mod_loader/extensions/memedit
+	url = git@github.com:itb-community/memedit.git
