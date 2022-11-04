@@ -59,6 +59,18 @@ function File:path()
 	return self.instance:path()
 end
 
+--- Returns string representation of the path to this file
+-- relative to the ITB directory or the save data directory
+function File:relative_path()
+	Assert.Equals("table", type(self), "Check for . vs :")
+	local path = self.instance:path()
+	local relative_path = nil
+		or path:match("^"..Directory():path().."(.*)")
+		or path:match("^"..Directory.savedata():path().."(.*)")
+
+	return relative_path
+end
+
 --- Returns name of this file, including extension
 function File:name()
 	Assert.Equals("table", type(self), "Check for . vs :")
@@ -323,6 +335,18 @@ end
 function Directory:path()
 	Assert.Equals("table", type(self), "Check for . vs :")
 	return self.instance:path()
+end
+
+--- Returns string representation of the path to this directory
+--- relative to the ITB directory or the save data directory
+function Directory:relative_path()
+	Assert.Equals("table", type(self), "Check for . vs :")
+	local path = self.instance:path()
+	local relative_path = nil
+		or path:match("^"..Directory():path().."(.*)")
+		or path:match("^"..Directory.savedata():path().."(.*)")
+
+	return relative_path
 end
 
 --- Returns name of this directory
