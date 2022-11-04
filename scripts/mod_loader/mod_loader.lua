@@ -414,7 +414,7 @@ function mod_loader:enumerateFilesIn(dirPathRelativeToGameDir)
 	local r = {}
 
 	for _, file in ipairs(Directory(dirPathRelativeToGameDir):files()) do
-		table.insert(r, file:path())
+		table.insert(r, file:name())
 	end
 
 	return r
@@ -424,7 +424,7 @@ function mod_loader:enumerateDirectoriesIn(dirPathRelativeToGameDir)
 	local r = {}
 
 	for _, dir in ipairs(Directory(dirPathRelativeToGameDir):directories()) do
-		table.insert(r, dir:path())
+		table.insert(r, dir:name())
 	end
 
 	return r
