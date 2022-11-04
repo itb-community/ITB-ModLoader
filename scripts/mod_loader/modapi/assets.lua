@@ -1,23 +1,19 @@
 
-local function relpath(dir)
-	return dir:path():gsub("^"..Directory():path(), "")
-end
-
-function modApi:appendAssets(gameRoot, modPath, prefix)
+function modApi:appendAssets(appendPath, path_relativeToMod, prefix)
 	Assert.Equals("table", type(self), "Check for . vs :")
 	Assert.ResourceDatIsOpen("Unable to append assets after init")
-	Assert.Equals("string", type(gameRoot), "Argument #1")
-	Assert.Equals("string", type(modPath), "Argument #2")
+	Assert.Equals("string", type(appendPath), "Argument #1")
+	Assert.Equals("string", type(path_relativeToMod), "Argument #2")
 	Assert.Equals({"nil", "string"}, type(prefix), "Argument #3")
 
 	prefix = prefix or ""
 
-	local modDir = Directory(self:getCurrentMod().resourcePath, modPath)
-	local modRoot = relpath(modDir)
-	for _, file in ipairs(modDir:files()) do
+	local dir = Directory(self:getCurrentMod().resourcePath, path_relativeToMod)
+	local path_relativeToITB = dir:relative_path()
+	for _, file in ipairs(dir:files()) do
 		local filename = file:name()
 		if filename:find(".png$") then
-			self:appendAsset(gameRoot..prefix..filename, modRoot..filename)
+			self:appendAsset(appendPath..prefix..filename, path_relativeToITB..filename)
 		end
 	end
 end
