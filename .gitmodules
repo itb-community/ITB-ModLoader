@@ -4,3 +4,6 @@
 [submodule "scripts/mod_loader/extensions/modApiExt"]
 	path = scripts/mod_loader/extensions/modApiExt
 	url = git@github.com:itb-community/ITB-ModUtils.git
+[submodule "scripts/mod_loader/extensions/easyEdit"]
+	path = scripts/mod_loader/extensions/easyEdit
+	url = git@github.com:itb-community/ITB-Easy-Edit.git
