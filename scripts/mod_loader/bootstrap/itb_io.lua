@@ -1,3 +1,8 @@
+-- Cache references to commonly used directories for internal use,
+-- so that the API's memory footprint is kept constant and low.
+local root_directory
+local savedata_directory
+
 local factory
 local function lazy_load()
 	if factory ~= nil then
@@ -536,3 +541,6 @@ function Directory:GetLuaString()
 	return string.format("Directory(%q)", self:path())
 end
 Directory.GetString = Directory.GetLuaString
+
+root_directory = Directory()
+savedata_directory = Directory.savedata()
