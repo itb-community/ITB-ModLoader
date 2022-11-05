@@ -372,6 +372,29 @@ function Directory:parent()
 	return result
 end
 
+--- Relativizes the specified path relative to this directory. More generally, returns a string
+--- that can later be used to navigate to the specified path by invoking `directory` or `file`
+--- functions on this Directory instance.
+--- Example:
+---   Directory("some/path"):relativize("some/path/test") -- returns "test"
+---   Directory("some/path/test"):relativize("some/path") -- returns ".."
+function Directory:relativize(path)
+	Assert.Equals("table", type(self), "Check for . vs :")
+	Assert.Equals("string", type(path))
+
+	local result
+	try(function()
+		result = self.instance:relativize(path)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to relativize path %q to %q: %s",
+				path, self:path(), tostring(err)
+		))
+	end)
+	return result
+end
+
 function Directory:file(...)
 	Assert.Equals("table", type(self), "Check for . vs :")
 	local args = { ... }
@@ -471,6 +494,25 @@ function Directory:exists()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
 	return self.instance:exists()
+end
+
+--- Returns true if the specified path starts with this directory's path
+function Directory:is_ancestor(path)
+	Assert.Equals("table", type(self), "Check for . vs :")
+	Assert.Equals("string", type(path))
+
+	local result
+	try(function()
+		-- *technically* it can fail...
+		result = self.instance:is_ancestor(path)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to create directories for %q: %s",
+				self:path(), tostring(err)
+		))
+	end)
+	return result
 end
 
 --- Deletes this directory and all its contents
