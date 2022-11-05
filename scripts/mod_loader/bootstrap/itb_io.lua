@@ -65,15 +65,17 @@ function File:path()
 end
 
 --- Returns string representation of the path to this file
--- relative to the ITB directory or the save data directory
+--- relative to the ITB directory or the save data directory
 function File:relative_path()
 	Assert.Equals("table", type(self), "Check for . vs :")
-	local path = self.instance:path()
-	local relative_path = nil
-		or path:match("^"..Directory():path().."(.*)")
-		or path:match("^"..Directory.savedata():path().."(.*)")
 
-	return relative_path
+	local path = self.instance:path()
+
+	if root_directory:is_ancestor(path) then
+		return root_directory:relativize(path)
+	elseif savedata_directory:is_ancestor(path) then
+		return savedata_directory:relativize(path)
+	end
 end
 
 --- Returns name of this file, including extension
@@ -346,12 +348,14 @@ end
 --- relative to the ITB directory or the save data directory
 function Directory:relative_path()
 	Assert.Equals("table", type(self), "Check for . vs :")
-	local path = self.instance:path()
-	local relative_path = nil
-		or path:match("^"..Directory():path().."(.*)")
-		or path:match("^"..Directory.savedata():path().."(.*)")
 
-	return relative_path
+	local path = self.instance:path()
+
+	if root_directory:is_ancestor(path) then
+		return root_directory:relativize(path)
+	elseif savedata_directory:is_ancestor(path) then
+		return savedata_directory:relativize(path)
+	end
 end
 
 --- Returns name of this directory
