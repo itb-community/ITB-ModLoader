@@ -113,6 +113,24 @@ function File:parent()
 	return result
 end
 
+--- Returns the root directory of this file (either the game installation
+--- directory, or save data directory)
+function File:root()
+	Assert.Equals("table", type(self), "Check for . vs :")
+
+	local result
+	try(function()
+		result = Directory.of(self.instance:root())
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to access root directory of %q: %s",
+				self:path(), tostring(err)
+		))
+	end)
+	return result
+end
+
 --- Returns contents of the file as string
 function File:read_to_string()
 	Assert.Equals("table", type(self), "Check for . vs :")
@@ -375,6 +393,24 @@ function Directory:parent()
 	:catch(function(err)
 		error(string.format(
 				"Failed to access parent of %q: %s",
+				self:path(), tostring(err)
+		))
+	end)
+	return result
+end
+
+--- Returns the root directory of this directory (either the game installation
+--- directory, or save data directory)
+function Directory:root()
+	Assert.Equals("table", type(self), "Check for . vs :")
+
+	local result
+	try(function()
+		result = Directory.of(self.instance:root())
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to access root directory of %q: %s",
 				self:path(), tostring(err)
 		))
 	end)
