@@ -229,7 +229,7 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 	local dirs = inputDir:directories()
 
 	for _, dir in ipairs(dirs) do
-		local modDirPath = dir:path():gsub(rootDirPath, "")
+		local modDirPath = dir:relative_path()
 		table.insert(self.mod_dirs, modDirPath)
 
 		local err = ""

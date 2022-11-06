@@ -1,3 +1,4 @@
+local magic = "([%^%$%(%)%%%.%[%]%*%+%-%?])"
 local factory
 local function lazy_load()
 	if factory ~= nil then
@@ -65,8 +66,8 @@ function File:relative_path()
 	Assert.Equals("table", type(self), "Check for . vs :")
 	local path = self.instance:path()
 	local relative_path = nil
-		or path:match("^"..Directory():path().."(.*)")
-		or path:match("^"..Directory.savedata():path().."(.*)")
+		or path:match("^"..Directory():path():gsub(magic, "%%%1").."(.*)")
+		or path:match("^"..Directory.savedata():path():gsub(magic, "%%%1").."(.*)")
 
 	return relative_path
 end
@@ -343,8 +344,8 @@ function Directory:relative_path()
 	Assert.Equals("table", type(self), "Check for . vs :")
 	local path = self.instance:path()
 	local relative_path = nil
-		or path:match("^"..Directory():path().."(.*)")
-		or path:match("^"..Directory.savedata():path().."(.*)")
+		or path:match("^"..Directory():path():gsub(magic, "%%%1").."(.*)")
+		or path:match("^"..Directory.savedata():path():gsub(magic, "%%%1").."(.*)")
 
 	return relative_path
 end
