@@ -548,13 +548,12 @@ function Directory:is_ancestor(path)
 
 	local result
 	try(function()
-		-- *technically* it can fail...
 		result = self.instance:is_ancestor(path)
 	end)
 	:catch(function(err)
 		error(string.format(
-				"Failed to create directories for %q: %s",
-				self:path(), tostring(err)
+				"Failed to see if %q is ancestor of %q: %s",
+				self:path(), path, tostring(err)
 		))
 	end)
 	return result
