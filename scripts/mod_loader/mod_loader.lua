@@ -493,13 +493,18 @@ function mod_loader:initMetadata(id, mod_options)
 
 	-- Request dependencies enabled
 	if mod_options[id].enabled then
-		for id, version in pairs(mod.dependencies) do
-			dependency = self.mod_options[id]
+		local function enableDependencies(mod)
+			for id, version in pairs(mod.dependencies) do
+				dependency = self.mod_options[id]
 
-			if dependency then
-				dependency.requested = true
+				if dependency and not dependency.requested then
+					dependency.requested = true
+					enableDependencies(self.mods[id])
+				end
 			end
 		end
+
+		enableDependencies(mod)
 	end
 
 	if mod.metadata then
