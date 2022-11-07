@@ -229,7 +229,7 @@ function mod_loader:enumerateMods(dirPathRelativeToGameDir, parentMod)
 	local dirs = inputDir:directories()
 
 	for _, dir in ipairs(dirs) do
-		local modDirPath = dir:path():gsub(rootDirPath, "")
+		local modDirPath = dir:relative_path()
 		table.insert(self.mod_dirs, modDirPath)
 
 		local err = ""
@@ -493,13 +493,18 @@ function mod_loader:initMetadata(id, mod_options)
 
 	-- Request dependencies enabled
 	if mod_options[id].enabled then
-		for id, version in pairs(mod.dependencies) do
-			dependency = self.mod_options[id]
+		local function enableDependencies(mod)
+			for id, version in pairs(mod.dependencies) do
+				dependency = self.mod_options[id]
 
-			if dependency then
-				dependency.requested = true
+				if dependency and not dependency.requested then
+					dependency.requested = true
+					enableDependencies(self.mods[id])
+				end
 			end
 		end
+
+		enableDependencies(mod)
 	end
 
 	if mod.metadata then
