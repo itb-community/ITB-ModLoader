@@ -1,8 +1,3 @@
--- Cache references to commonly used directories for internal use,
--- so that the API's memory footprint is kept constant and low.
-local root_directory
-local savedata_directory
-
 local factory
 local function lazy_load()
 	if factory ~= nil then
@@ -69,13 +64,17 @@ end
 function File:relative_path()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
-	local path = self.instance:path()
-
-	if root_directory:is_ancestor(path) then
-		return root_directory:relativize(path)
-	elseif savedata_directory:is_ancestor(path) then
-		return savedata_directory:relativize(path)
-	end
+	local result
+	try(function()
+		result = self.instance:relative_path(path)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to retrieve relative path of %q: %s",
+				path, self:path(), tostring(err)
+		))
+	end)
+	return result
 end
 
 --- Returns name of this file, including extension
@@ -367,13 +366,17 @@ end
 function Directory:relative_path()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
-	local path = self.instance:path()
-
-	if root_directory:is_ancestor(path) then
-		return root_directory:relativize(path)
-	elseif savedata_directory:is_ancestor(path) then
-		return savedata_directory:relativize(path)
-	end
+	local result
+	try(function()
+		result = self.instance:relative_path(path)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to retrieve relative path of %q: %s",
+				path, self:path(), tostring(err)
+		))
+	end)
+	return result
 end
 
 --- Returns name of this directory
@@ -580,6 +583,3 @@ function Directory:GetLuaString()
 	return string.format("Directory(%q)", self:path())
 end
 Directory.GetString = Directory.GetLuaString
-
-root_directory = Directory()
-savedata_directory = Directory.savedata()
