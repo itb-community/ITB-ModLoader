@@ -28,6 +28,42 @@ end
 
 modApi.deployment = {}
 
+local function isValidDeployment(p)
+	local terrain = Board:GetTerrain(p)
+
+	return true
+		and terrain ~= TERRAIN_MOUNTAIN
+		and terrain ~= TERRAIN_BUILDING
+		and not Board:IsPod(p)
+		and not Board:IsDangerous(p)
+		and not Board:IsDangerousItem(p)
+		and not Board:IsSpawning(p)
+		and not Board:IsAcid(p)
+		-- should check if tile has been spawn blocked,
+		-- but the information is not readily available
+end
+
+-- returns the deployment zone.
+function modApi.deployment.getDeploymentZone()
+	Assert.True(Board ~= nil, "Board does not exist")
+
+	local deploymentZone = extract_table(Board:GetZone("deployment"))
+
+	if #deploymentZone == 0 then
+		for x = 1, 3 do
+			for y = 1, 6 do
+				local curr = Point(x, y)
+
+				if isValidDeployment(curr) then
+					table.insert(deploymentZone, curr)
+				end
+			end
+		end
+	end
+
+	return deploymentZone
+end
+
 function modApi.deployment.isDeploymentPhase(self)
 	local mission = GetCurrentMission()
 	if mission == nil then return false end
