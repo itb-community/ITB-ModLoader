@@ -340,3 +340,21 @@ function to_sorted_array(tbl, sortFunc)
 	table.sort(list, sortFunc)
 	return list
 end
+
+-- Returns the point associated with an index, where
+-- index 1             -> Point(0, 0)
+-- index size.x        -> Point(size.x-1, 0)
+-- index size.x*size.x -> Point(size.x-1, size.x-1)
+function index2point(index)
+	local size = Board:GetSize()
+	return Point((index-1) % size.x, math.floor((index-1) / size.x))
+end
+
+-- Returns the index associated with a point, where
+-- Point(0, 0)               -> index 1
+-- Point(size.x-1, 0)        -> index size.x
+-- Point(size.x-1, size.x-1) -> index size.x*size.x
+function point2index(p)
+	local size = Board:GetSize()
+	return p.y * size.x + p.x + 1
+end
