@@ -301,6 +301,16 @@ SkillEffect.AddQueuedSafeDamage = function(self, spaceDamage)
     addSafeDamage(self.q_effect, spaceDamage)
 end
 
+SkillEffect.AddImpactSound = function(self, loc, sound)
+	self:AddSound(sound)
+	self.effect:back().loc = loc
+end
+
+SkillEffect.AddQueuedImpactSound = function(self, loc, sound)
+	self:AddQueuedSound(sound)
+	self.q_effect:back().loc = loc
+end
+
 
 -- //////////////////////////////////////////////////////////////////////////
 -- Adds missing queued functions to SkillEffect, by Lemonymous
