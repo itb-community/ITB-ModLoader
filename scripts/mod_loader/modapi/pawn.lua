@@ -432,6 +432,34 @@ BoardPawn.GetQueuedWeapon = function(self)
 	return nil
 end
 
+-- A tile can have multiple units.
+-- Actions that only affects a single unit
+-- on a tile, will affect the bottom-most unit.
+-- The unit at the bottom will be the unit that
+-- was placed there first; and every new unit
+-- placed on the tile will be stacked on top.
+-- This function moves our current unit down to
+-- the bottom of the stack.
+BoardPawn.MoveToBottom = function(self)
+	local pawnId = self:GetId()
+	local loc = self:GetSpace()
+
+	if not Board:IsValid(loc) then
+		return
+	end
+
+	repeat
+		local other = Board:GetPawn(loc)
+		local otherId = other:GetId()
+
+		if pawnId == otherId then
+			break
+		end
+
+		other:SetSpace(loc)
+	until false
+end
+
 BoardPawn.GetLuaString = function(self)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	return string.format("BoardPawn [id = %s, space = %s, name = %s]", self:GetId(), self:GetSpace():GetLuaString(), self:GetMechName())
