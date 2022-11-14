@@ -207,9 +207,7 @@ end
 function UiRoot:updateStates()
 	local mx, my = sdl.mouse.x(), sdl.mouse.y()
 	self:updateContainsMouse(mx, my)
-	self:updatePressedState(mx, my)
 	self:updateHoveredState()
-	self:updateDraggedState(mx, my)
 	self:updateDragHoverState()
 	self:updateGroupHoverState()
 	self:updateAnimations()
@@ -228,6 +226,10 @@ function UiRoot:event(eventloop)
 	local my = sdl.mouse.y()
 	
 	if type == sdl.events.mousewheel then
+		self:updateContainsMouse(mx, my)
+		self:updateHoveredState()
+		self:updateState()
+
 		local wheel = eventloop:wheel()
 		local pressedchild = self.pressedchild
 		local draggedchild = self.draggedchild
@@ -247,6 +249,13 @@ function UiRoot:event(eventloop)
 	end
 
 	if type == sdl.events.mousebuttondown then
+		self:updatePressedState(mx, my)
+		self:updateHoveredState()
+		self:updateDraggedState(mx, my)
+		self:updateDragHoverState()
+		self:updateGroupHoverState()
+		self:updateState()
+
 		local button = eventloop:mousebutton()
 		local pressedchild = self.pressedchild
 		local hoveredchild = self.hoveredchild
@@ -287,6 +296,13 @@ function UiRoot:event(eventloop)
 	end
 	
 	if type == sdl.events.mousebuttonup then
+		self:updatePressedState(mx, my)
+		self:updateHoveredState()
+		self:updateDraggedState(mx, my)
+		self:updateDragHoverState()
+		self:updateGroupHoverState()
+		self:updateState()
+
 		local button = eventloop:mousebutton()
 		local pressedchild = self.pressedchild
 		local consumeEvent = self:mouseup(mx, my, button)
@@ -312,6 +328,9 @@ function UiRoot:event(eventloop)
 	end
 	
 	if type == sdl.events.mousemotion then
+		self:updateContainsMouse(mx, my)
+		self:updateState()
+
 		local pressedchild = self.pressedchild
 		local draggedchild = self.draggedchild
 		local consumeEvent = self:mousemove(mx, my)
