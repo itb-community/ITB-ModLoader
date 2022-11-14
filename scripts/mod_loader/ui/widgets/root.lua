@@ -227,7 +227,6 @@ function UiRoot:event(eventloop)
 	
 	if type == sdl.events.mousewheel then
 		self:updateContainsMouse(mx, my)
-		self:updateHoveredState()
 		self:updateState()
 
 		local wheel = eventloop:wheel()
