@@ -26,6 +26,7 @@ modApi.constants = {
   PILOT_CONFIG_POD_NORMAL = 1,
   PILOT_CONFIG_POD_ADVANCED = 2,
   PILOT_CONFIG_RECRUIT = 4,
+  PILOT_CONFIG_POD_FTL = 8,
 
   -- squad choice constants
   -- how the game arranges squads
