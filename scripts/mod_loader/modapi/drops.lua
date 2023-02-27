@@ -306,13 +306,12 @@ modApi.events.onModsFirstLoaded:subscribe(function()
 
 	-- copy in modded pilots
 	for _, id in ipairs(PilotListExtended) do
-	local isftl = _G[id].FTL or false
 		if DEFAULT_PILOTS[id] == nil and _G[id] ~= nil and _G[id].Rarity ~= 0 then
 			modApi:addPilotDrop{
 				id = id,
-				pod = list_contains(New_PilotList, id) and "advanced" or (not isftl),
+				pod = list_contains(New_PilotList, id) and "advanced" or true,
 				recruit = list_contains(Pilot_Recruits, id),
-				ftl = isftl,
+				ftl = false,
 			}
 		end
 	end
