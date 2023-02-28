@@ -1,0 +1,1 @@
+require("scripts/mod_loader/__scripts")
