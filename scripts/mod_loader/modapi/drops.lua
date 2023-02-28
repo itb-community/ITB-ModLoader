@@ -155,6 +155,10 @@ function modApi:compactPilotConfig(config)
 	if config.recruit == true then
 		compact = compact + modApi.constants.PILOT_CONFIG_RECRUIT
 	end
+	-- true means both, string to filter
+	if config.ftl == true then
+		compact = compact + modApi.constants.PILOT_CONFIG_POD_FTL
+	end
 
 	return compact
 end
@@ -171,18 +175,18 @@ function modApi:addPilotDrop(config)
 	DEFAULT_PILOTS[config.id] = value
 end
 
--- checks if a weapon ID should show in time pods
+-- checks if a pilot ID should show in time pods
 local function isPilotEnabled(id)
 	local pilot = _G[id]
 	return type(pilot) == "table" and (pilot.IsEnabled == nil or pilot:IsEnabled())
 end
 
---- gets a list of all possible shop weapons
+--- gets a list of all possible pilots
 function modApi:getFullPilotDeck()
 	return filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.PILOT_CONFIG_POD_NORMAL, modApi.constants.PILOT_CONFIG_POD_ADVANCED)
 end
 
---- gets a list of all possible shop weapons
+--- gets a list of all recruit pilots
 function modApi:getStarterPilotDeck()
 	local deck = filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.PILOT_CONFIG_RECRUIT)
 	-- bad config?
@@ -192,31 +196,42 @@ function modApi:getStarterPilotDeck()
 	return deck
 end
 
---- Gets the list of pilots for the shop
+--- gets a list of all secret pod pilots
+local oldGetFTLPilots = GetFTLPilots
+function GetFTLPilots()
+	local deck = filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.PILOT_CONFIG_POD_FTL)
+	-- bad config?
+	if #deck == 0 then
+		return { "Pilot_Mantis", "Pilot_Rock", "Pilot_Zoltan" }
+	end
+	return deck
+end
+
+--- Gets the list of pilots
 function modApi:getPilotDeck(advanced)
-	-- nil: return all weapons
+	-- nil: return all pilots
 	if advanced == nil then
 		advanced = IsNewEquipment()
 	end
 	-- true: anything enabled in advanced
 	if advanced then
-		return filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.WEAPON_CONFIG_SHOP_ADVANCED)
+		return filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.PILOT_CONFIG_POD_ADVANCED)
 	end
 	-- false: anything enabled when not advanced
-	return filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.WEAPON_CONFIG_SHOP_NORMAL)
+	return filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.PILOT_CONFIG_POD_NORMAL)
 end
 
---- gets the default value for the given weapon, as a compact integer
+--- gets the default value for the given pilot, as a compact integer
 function modApi:getDefaultPilotConfig(id)
 	return DEFAULT_PILOTS[id] or 0
 end
 
---- gets the vanilla value for the given weapon, as a compact integer
+--- gets the vanilla value for the given pilot, as a compact integer
 function modApi:getVanillaPilotConfig(id)
 	return VANILLA_PILOTS[id] or 0
 end
 
---- gets the vanilla value for the given weapon, as a compact integer
+--- gets the vanilla value for the given pilot, as a compact integer
 function modApi:isVanillaPilot(id)
 	return VANILLA_PILOTS[id] ~= nil
 end
@@ -272,7 +287,7 @@ for _, id in ipairs(New_PilotList) do
 	VANILLA_PILOTS[id] = modApi.constants.PILOT_CONFIG_POD_ADVANCED
 end
 populateVanilla(VANILLA_PILOTS, Pilot_Recruits, modApi.constants.PILOT_CONFIG_RECRUIT)
-populateVanilla(VANILLA_PILOTS, {"Pilot_Mantis", "Pilot_Rock", "Pilot_Zoltan"}, 0)
+populateVanilla(VANILLA_PILOTS, {"Pilot_Mantis", "Pilot_Rock", "Pilot_Zoltan"}, modApi.constants.PILOT_CONFIG_POD_FTL)
 DEFAULT_PILOTS = copy_table(VANILLA_PILOTS)
 modApi.pilotDeck = copy_table(VANILLA_PILOTS)
 
@@ -295,7 +310,8 @@ modApi.events.onModsFirstLoaded:subscribe(function()
 			modApi:addPilotDrop{
 				id = id,
 				pod = list_contains(New_PilotList, id) and "advanced" or true,
-				recruit = list_contains(Pilot_Recruits, id)
+				recruit = list_contains(Pilot_Recruits, id),
+				ftl = false,
 			}
 		end
 	end
@@ -304,7 +320,7 @@ modApi.events.onModsFirstLoaded:subscribe(function()
 		if DEFAULT_PILOTS[id] == nil then
 			modApi:addPilotDrop{
 				id = id,
-				recruit = true
+				recruit = true,
 			}
 		end
 	end
