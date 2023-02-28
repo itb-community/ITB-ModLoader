@@ -204,7 +204,7 @@ local function validateEnabled(enabledMap)
 		-- need at least one pilot in either deck
 		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_POD_NORMAL)   then pod_normal   = false end
 		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_POD_ADVANCED) then pod_advanced = false end
-		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_POD_FTL) then pod_ftl = false end
+		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_POD_FTL)      then pod_ftl      = false end
 		-- must have at least 2 recruits or the game crashes
 		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_RECRUIT)      then recruits = recruits + 1 end
 	end
@@ -224,7 +224,7 @@ local function validateEnabled(enabledMap)
 			local default = modApi:getVanillaPilotConfig(id)
 			enabledMap[id] = copyBit(pod_normal,   enabledMap[id], default, modApi.constants.PILOT_CONFIG_POD_NORMAL)
 			enabledMap[id] = copyBit(pod_advanced, enabledMap[id], default, modApi.constants.PILOT_CONFIG_POD_ADVANCED)
-			enabledMap[id] = copyBit(pod_ftl, enabledMap[id], default, modApi.constants.PILOT_CONFIG_POD_FTL)
+			enabledMap[id] = copyBit(pod_ftl,      enabledMap[id], default, modApi.constants.PILOT_CONFIG_POD_FTL)
 			enabledMap[id] = copyBit(need_recuits, enabledMap[id], default, modApi.constants.PILOT_CONFIG_RECRUIT)
 		end
 	end
@@ -236,7 +236,7 @@ local PILOT_DECK_CONFIG = {
 	deckHeight = 122,
 	showTitleOnButton = false,
 	apiKey = "pilotDeck",
-	configKey = "pilotDeck",
+	configKey = "pilotDeckEntries",
 	presetKey = "pilotDeckPresets",
 	enabledValue = 15,
 	disabledValue = 0,
@@ -250,6 +250,23 @@ local PILOT_DECK_CONFIG = {
 	getClassList = getClassList,
 	getDeckColor = getDeckColor,
 	validateEnabled = validateEnabled,
+	beforeLoadConfig = function(config)
+		if config.pilotDeck ~= nil then
+			if config.pilotDeckEntries == nil then
+				config.pilotDeckEntries = {}
+				for id, bits in pairs(config.pilotDeck) do
+					-- if the bit is not set, but its set in the default value, then set it
+					-- means the FTL deck is properly populated even if you made your config before that existed
+					if not is_bit_set(bits, modApi.constants.PILOT_CONFIG_POD_FTL)
+							and is_bit_set(modApi:getDefaultPilotConfig(id), modApi.constants.PILOT_CONFIG_POD_FTL) then
+						bits = bits + modApi.constants.PILOT_CONFIG_POD_FTL
+					end
+					config.pilotDeckEntries[id] = bits
+				end
+			end
+			config.pilotDeck = nil
+		end
+	end,
 	onExit = function(id)
 		Pilot_Recruits = modApi:getStarterPilotDeck()
 	end,
