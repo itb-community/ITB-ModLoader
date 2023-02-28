@@ -475,7 +475,7 @@ local function initializeBoardPawn()
 		Assert.Equals("userdata", type(self), "Argument #0")
 		Assert.Equals("boolean", type(neutral), "Argument #1")
 
-		oldSetNeutral(self, neutral)
+		BoardPawn.SetNeutralVanilla(self, neutral)
 
 		if not Board or GetCurrentMission() == nil then
 			return
