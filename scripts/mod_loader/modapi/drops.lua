@@ -197,8 +197,7 @@ function modApi:getStarterPilotDeck()
 end
 
 --- gets a list of all secret pod pilots
-local oldGetFTLPilots = GetFTLPilots
-function GetFTLPilots()
+function modApi:getFTLPilots()
 	local deck = filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.PILOT_CONFIG_POD_FTL)
 	-- bad config?
 	if #deck == 0 then
