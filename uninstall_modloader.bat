@@ -18,7 +18,7 @@ ECHO Restoring original game files...
 REN lua5.1-original.dll lua5.1.dll
 REN SDL2-original.dll SDL2.dll
 IF EXIST resources\resource.dat.bak REN resources\resource.dat.bak resource.dat
-REN scripts\scripts.lua.bak scripts.lua
+REN scripts\modloader.lua.bak modloader.lua
 ECHO Done.
 
 REM Delete the batch file itself
