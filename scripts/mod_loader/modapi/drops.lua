@@ -151,13 +151,17 @@ function modApi:compactPilotConfig(config)
 	elseif config.pod == "advanced" then
 		compact = compact + modApi.constants.PILOT_CONFIG_POD_ADVANCED
 	end
-	-- true means both, string to filter
+	-- recruit does not support normal vs advanced as it loads before that checkbox
 	if config.recruit == true then
 		compact = compact + modApi.constants.PILOT_CONFIG_RECRUIT
 	end
 	-- true means both, string to filter
 	if config.ftl == true then
-		compact = compact + modApi.constants.PILOT_CONFIG_POD_FTL
+		compact = compact + modApi.constants.PILOT_CONFIG_FTL_NORMAL + modApi.constants.PILOT_CONFIG_FTL_ADVANCED
+	elseif config.ftl == "normal" then
+		compact = compact + modApi.constants.PILOT_CONFIG_FTL_NORMAL
+	elseif config.ftl == "advanced" then
+		compact = compact + modApi.constants.PILOT_CONFIG_FTL_ADVANCED
 	end
 
 	return compact
@@ -197,8 +201,13 @@ function modApi:getStarterPilotDeck()
 end
 
 --- gets a list of all secret pod pilots
-function modApi:getFTLPilots()
-	local deck = filterDeck(isPilotEnabled, modApi.pilotDeck, modApi.constants.PILOT_CONFIG_POD_FTL)
+function modApi:getFTLPilots(advanced)
+	-- if nil, call the vanilla function
+	if advanced == nil then
+		advanced = IsNewEquipment()
+	end
+	local key = advanced and modApi.constants.PILOT_CONFIG_FTL_ADVANCED or modApi.constants.PILOT_CONFIG_FTL_NORMAL
+	local deck = filterDeck(isPilotEnabled, modApi.pilotDeck, key)
 	-- bad config?
 	if #deck == 0 then
 		return { "Pilot_Mantis", "Pilot_Rock", "Pilot_Zoltan" }
@@ -208,7 +217,7 @@ end
 
 --- Gets the list of pilots
 function modApi:getPilotDeck(advanced)
-	-- nil: return all pilots
+	-- if nil, call the vanilla function
 	if advanced == nil then
 		advanced = IsNewEquipment()
 	end
@@ -286,7 +295,7 @@ for _, id in ipairs(New_PilotList) do
 	VANILLA_PILOTS[id] = modApi.constants.PILOT_CONFIG_POD_ADVANCED
 end
 populateVanilla(VANILLA_PILOTS, Pilot_Recruits, modApi.constants.PILOT_CONFIG_RECRUIT)
-populateVanilla(VANILLA_PILOTS, {"Pilot_Mantis", "Pilot_Rock", "Pilot_Zoltan"}, modApi.constants.PILOT_CONFIG_POD_FTL)
+populateVanilla(VANILLA_PILOTS, {"Pilot_Mantis", "Pilot_Rock", "Pilot_Zoltan"}, modApi.constants.PILOT_CONFIG_FTL_NORMAL + modApi.constants.PILOT_CONFIG_FTL_ADVANCED)
 DEFAULT_PILOTS = copy_table(VANILLA_PILOTS)
 modApi.pilotDeck = copy_table(VANILLA_PILOTS)
 

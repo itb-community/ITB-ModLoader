@@ -31,7 +31,8 @@ local function packConfig(table)
 	local packed = 0
 	if table.pod_normal   then packed = packed + modApi.constants.PILOT_CONFIG_POD_NORMAL   end
 	if table.pod_advanced then packed = packed + modApi.constants.PILOT_CONFIG_POD_ADVANCED end
-	if table.pod_ftl   	  then packed = packed + modApi.constants.PILOT_CONFIG_POD_FTL      end
+	if table.ftl_normal   then packed = packed + modApi.constants.PILOT_CONFIG_FTL_NORMAL   end
+	if table.ftl_advanced then packed = packed + modApi.constants.PILOT_CONFIG_FTL_ADVANCED end
 	if table.recruit      then packed = packed + modApi.constants.PILOT_CONFIG_RECRUIT      end
 	return packed
 end
@@ -44,7 +45,8 @@ local function unpackConfig(value)
 	return {
 		pod_normal   = is_bit_set(value, modApi.constants.PILOT_CONFIG_POD_NORMAL),
 		pod_advanced = is_bit_set(value, modApi.constants.PILOT_CONFIG_POD_ADVANCED),
-		pod_ftl      = is_bit_set(value, modApi.constants.PILOT_CONFIG_POD_FTL),
+		ftl_normal   = is_bit_set(value, modApi.constants.PILOT_CONFIG_FTL_NORMAL),
+		ftl_advanced = is_bit_set(value, modApi.constants.PILOT_CONFIG_FTL_ADVANCED),
 		recruit      = is_bit_set(value, modApi.constants.PILOT_CONFIG_RECRUIT),
 	}
 end
@@ -109,22 +111,25 @@ local function buildDropdowns(dropdownLayout, updateButtons, currentFilter)
 	local updateDropdown = function()
 		-- if recruit is selected, hide normal/advanced dropdown
 		if dropdownDeck.value == 2 then
-			currentFilter.pod_normal = false
+			currentFilter.pod_normal   = false
 			currentFilter.pod_advanced = false
-			currentFilter.pod_ftl = false
-			currentFilter.recruit = true
+			currentFilter.ftl_normal   = false
+			currentFilter.ftl_advanced = false
+			currentFilter.recruit      = true
 			dropdownMode.visible = false
 		elseif dropdownDeck.value == 3 then
-			currentFilter.pod_normal = false
+			currentFilter.pod_normal   = false
 			currentFilter.pod_advanced = false
-			currentFilter.pod_ftl = true
-			currentFilter.recruit = false
-			dropdownMode.visible = false
+			currentFilter.ftl_normal   = dropdownMode.value ~= 3
+			currentFilter.ftl_advanced = dropdownMode.value ~= 2
+			currentFilter.recruit      = false
+			dropdownMode.visible = true
 		else
-			currentFilter.pod_normal    = dropdownMode.value ~= 3
-			currentFilter.pod_advanced  = dropdownMode.value ~= 2
-			currentFilter.pod_ftl       = false
-			currentFilter.recruit       = false
+			currentFilter.pod_normal   = dropdownMode.value ~= 3
+			currentFilter.pod_advanced = dropdownMode.value ~= 2
+			currentFilter.ftl_normal   = false
+			currentFilter.ftl_advanced = false
+			currentFilter.recruit      = false
 			dropdownMode.visible = true
 		end
 		updateButtons()
@@ -136,7 +141,7 @@ end
 local function getDeckColor(id)
 	if modApi:isVanillaPilot(id) then
 		local vanillaConfig = modApi:getVanillaPilotConfig(id)
-		if is_bit_set(vanillaConfig, modApi.constants.PILOT_CONFIG_POD_FTL) then
+		if is_bit_set(vanillaConfig, modApi.constants.PILOT_CONFIG_FTL_ADVANCED) then
 			return FTL_COLOR
 		end
 		-- recruits shouldn't be another type
@@ -198,13 +203,15 @@ end
 local function validateEnabled(enabledMap)
 	local pod_normal = true
 	local pod_advanced = true
-	local pod_ftl = true
+	local ftl_normal = true
+	local ftl_advanced = true
 	local recruits = 0
 	for id, enabled in pairs(enabledMap) do
 		-- need at least one pilot in either deck
 		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_POD_NORMAL)   then pod_normal   = false end
 		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_POD_ADVANCED) then pod_advanced = false end
-		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_POD_FTL)      then pod_ftl      = false end
+		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_FTL_NORMAL)   then ftl_normal   = false end
+		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_FTL_ADVANCED) then ftl_advanced = false end
 		-- must have at least 2 recruits or the game crashes
 		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_RECRUIT)      then recruits = recruits + 1 end
 	end
@@ -219,12 +226,13 @@ local function validateEnabled(enabledMap)
 
 	-- not enough pilots? just fill with default
 	local need_recuits = recruits < 2
-	if pod_normal or pod_advanced or pod_ftl or need_recuits then
+	if pod_normal or pod_advanced or ftl_normal or ftl_advanced or need_recuits then
 		for id, enabled in pairs(enabledMap) do
 			local default = modApi:getVanillaPilotConfig(id)
 			enabledMap[id] = copyBit(pod_normal,   enabledMap[id], default, modApi.constants.PILOT_CONFIG_POD_NORMAL)
 			enabledMap[id] = copyBit(pod_advanced, enabledMap[id], default, modApi.constants.PILOT_CONFIG_POD_ADVANCED)
-			enabledMap[id] = copyBit(pod_ftl,      enabledMap[id], default, modApi.constants.PILOT_CONFIG_POD_FTL)
+			enabledMap[id] = copyBit(ftl_normal,   enabledMap[id], default, modApi.constants.PILOT_CONFIG_FTL_NORMAL)
+			enabledMap[id] = copyBit(ftl_advanced, enabledMap[id], default, modApi.constants.PILOT_CONFIG_FTL_ADVANCED)
 			enabledMap[id] = copyBit(need_recuits, enabledMap[id], default, modApi.constants.PILOT_CONFIG_RECRUIT)
 		end
 	end
@@ -238,7 +246,7 @@ local PILOT_DECK_CONFIG = {
 	apiKey = "pilotDeck",
 	configKey = "pilotDeckEntries",
 	presetKey = "pilotDeckPresets",
-	enabledValue = 15,
+	enabledValue = 31,
 	disabledValue = 0,
 
   packConfig = packConfig,
@@ -257,10 +265,9 @@ local PILOT_DECK_CONFIG = {
 				for id, bits in pairs(config.pilotDeck) do
 					-- if the bit is not set, but its set in the default value, then set it
 					-- means the FTL deck is properly populated even if you made your config before that existed
-					if not is_bit_set(bits, modApi.constants.PILOT_CONFIG_POD_FTL)
-							and is_bit_set(modApi:getDefaultPilotConfig(id), modApi.constants.PILOT_CONFIG_POD_FTL) then
-						bits = bits + modApi.constants.PILOT_CONFIG_POD_FTL
-					end
+					local default = modApi:getDefaultPilotConfig(id)
+					bits = copyBit(true, bits, default, modApi.constants.PILOT_CONFIG_FTL_NORMAL)
+					bits = copyBit(true, bits, default, modApi.constants.PILOT_CONFIG_FTL_ADVANCED)
 					config.pilotDeckEntries[id] = bits
 				end
 			end
