@@ -200,6 +200,14 @@ local function getClassList(oldConfig)
 	}
 end
 
+-- copy a bit if the boolean is set
+local function copyBit(condition, value, default, bit)
+	if condition and is_bit_set(default, bit) and not is_bit_set(value, bit) then
+		return value + bit
+	end
+	return value
+end
+
 local function validateEnabled(enabledMap)
 	local pod_normal = true
 	local pod_advanced = true
@@ -214,14 +222,6 @@ local function validateEnabled(enabledMap)
 		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_FTL_ADVANCED) then ftl_advanced = false end
 		-- must have at least 2 recruits or the game crashes
 		if is_bit_set(enabled, modApi.constants.PILOT_CONFIG_RECRUIT)      then recruits = recruits + 1 end
-	end
-
-	-- copy a bit if the boolean is set
-	local function copyBit(condition, value, default, bit)
-		if condition and is_bit_set(default, bit) and not is_bit_set(value, bit) then
-			return value + bit
-		end
-		return value
 	end
 
 	-- not enough pilots? just fill with default
