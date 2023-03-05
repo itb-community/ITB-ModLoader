@@ -5,7 +5,7 @@ return {
 	version = "1.0.1",
 	modApiVersion = "2.8.4",
 	gameVersion = "1.2.88",
-	icon = "img/icon.png",
+	icon = "icon.png",
 	isExtension = true,
 	enabled = false,
 	submodFolders = {"mods/"},
