@@ -29,7 +29,7 @@ jobs:
           COPY /V SDL2-original.dll release\SDL2-original.dll
           COPY /V ftldat.dll release\ftldat.dll
           COPY /V itb_io.dll release\itb_io.dll
-          COPY /V uninstall.bat release\uninstall.bat
+          COPY /V uninstall_modloader.bat release\uninstall_modloader.bat
           XCOPY mods release\mods /s /e /i
           XCOPY scripts release\scripts /s /e /i
           XCOPY resources release\resources /s /e /i
