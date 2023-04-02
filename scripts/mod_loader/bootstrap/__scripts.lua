@@ -2,6 +2,7 @@ local scripts = {
 	"security",
 	"assert",
 	"classes",
+	"itb_lua_rs",
 	"itb_io",
 	"io",
 	"utils",

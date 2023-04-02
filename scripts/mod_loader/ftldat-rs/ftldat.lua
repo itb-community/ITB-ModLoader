@@ -1,23 +1,12 @@
 local ftldat_rs = nil
-
 local function lazy_load()
 	if ftldat_rs ~= nil then
 		return
 	end
 
-	try(function()
-		LOG("Loading ftldat.dll...")
-		package.loadlib("ftldat.dll", "luaopen_ftldat")()
-		ftldat_rs = ftldat
-		ftldat = nil
-		LOG("Successfully loaded ftldat.dll!")
-	end)
-	:catch(function(err)
-		error(string.format(
-				"Failed to load ftldat.dll: %s",
-				tostring(err)
-		))
-	end)
+	local itb_rs_lua = load_itb_rs_lua_bridge()
+	ftldat_rs = itb_rs_lua.ftldat
+	assert(ftldat_rs, "Failed to find ftldat module in itb_rs_lua")
 end
 
 -- Use a class to serve as a wrapper around the Package userdata returned by ftldat-rs,
@@ -45,7 +34,15 @@ end
 
 function FtlDat:remove_all_files()
 	Assert.Equals("table", type(self), "Check for . vs :")
-	self.package:clear()
+	try (function()
+		self.package:clear()
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to remove all files from package\n%s",
+				tostring(err)
+		))
+	end)
 end
 
 function FtlDat:write(outputPath)
@@ -111,10 +108,22 @@ function FtlDat:put_entry_file(innerPath, sourcePath)
 	end)
 end
 
-function FtlDat:file_exists(name)
+function FtlDat:file_exists(innerPath)
 	Assert.Equals("table", type(self), "Check for . vs :")
-	Assert.Equals("string", type(name))
-	return self.package:exists(name)
+	Assert.Equals("string", type(innerPath))
+
+	local result
+	try(function()
+		result = self.package:exists(innerPath)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to check if file '%s' exists in package\n%s",
+				innerPath, tostring(err)
+		))
+	end)
+
+	return result
 end
 
 --- Returns content of the specified file, interpreted as text.
@@ -157,7 +166,19 @@ end
 
 function FtlDat:inner_paths()
 	Assert.Equals("table", type(self), "Check for . vs :")
-	return self.package:inner_paths()
+
+	local result
+	try (function()
+		result = self.package:inner_paths()
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to list inner paths of package\n%s",
+				tostring(err)
+		))
+	end)
+
+	return result
 end
 
 local function utf8_from(t)
@@ -189,6 +210,7 @@ function FtlDat:extract_file(innerPath, destinationPath)
 end
 
 function FtlDat:destroy()
+	self.package:destroy()
 	self.package = nil
 	collectgarbage()
 end
