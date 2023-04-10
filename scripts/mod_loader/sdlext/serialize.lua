@@ -134,9 +134,17 @@ writers = {
 				-- Table with multiple references
 				table.insert(buffer, "multiRefObjects["..refIdx.."]");
 			else
+				-- Sort keys alphabetically
+				local sortedKeys = {}
+				for k in pairs(item) do
+					table.insert(sortedKeys, k)
+				end
+				table.sort(sortedKeys)
+
 				-- Single use table
 				table.insert(buffer, "{\n");
-				for k, v in pairs(item) do
+				for _, k in ipairs(sortedKeys) do
+					local v = item[k]
 					writeIndent(buffer, level+1);
 					table.insert(buffer, "[");
 					write(buffer, k, level+1, objRefNames);
