@@ -1,11 +1,21 @@
+local function pack2(...)
+	return { n = select('#', ...), ... }
+end
+local function unpack2(t)
+	return unpack(t, 1, t.n)
+end
 
 Subscription = Class.new()
 
-function Subscription:new(event)
+function Subscription:new(event, listenerFn, creator)
 	Assert.Equals("table", type(event), "Subscription.new: first argument must be a table")
 	Assert.True(Class.instanceOf(event, Event), "Subscription.new: first argument must be an Event")
+	Assert.Equals("function", type(listenerFn), "Subscription.new: second argument must be a function")
+	Assert.Equals("string", type(creator), "Subscription.new: third argument must be a string")
 
 	self.event = event
+	self.listenerFn = listenerFn
+	self.creator = creator
 end
 
 --- Unsubscribes this Subscription. Returns true if it was successfully unsubscibed,
@@ -17,11 +27,18 @@ end
 --- Adds a teardown function to this subscription, which will be executed when
 --- this subscription is unsubscribed from its event.
 function Subscription:addTeardown(fn)
-	Assert.Equals("function", type(fn), "Subscription.addTeardown: first argument must be a function")
+	Assert.Equals(
+			"function", type(fn),
+			"Subscription.addTeardown: first argument must be a function"
+	)
 	self.teardownFns = self.teardownFns or {}
 	table.insert(self.teardownFns, fn)
 
 	return self
+end
+
+local function buildErrorMessage(creator, message)
+	return string.format("%s (subscription created at '%s')", tostring(message), creator)
 end
 
 --- Fires teardown functions, and removes them once completed.
@@ -34,6 +51,21 @@ function Subscription:executeTeardown()
 		teardownFn()
 	end
 	self.teardownFns = nil
+end
+
+function Subscription:notify(args)
+	if not self.listenerFn then
+		error(buildErrorMessage(self.creator, "Subscription is closed"))
+	end
+
+	local ok, errorOrResult = pcall(function()
+		return self.listenerFn(unpack2(args))
+	end)
+	if ok then
+		return ok, errorOrResult
+	else
+		return ok, buildErrorMessage(self.creator, errorOrResult)
+	end
 end
 
 --- Unsubscribes this Subscription the next time the event passed in argument
@@ -98,11 +130,19 @@ function Event:new(options)
 	end
 end
 
+local function getCallerString()
+	local info = debug.getinfo(3, "Sl");
+	if info then
+		local path = info.short_src:gsub("\\", "/")
+		return string.format("%s:%d", path, info.currentline)
+	end
+	return "<unknown>"
+end
+
 --- Subscribes a function to this event; this call is analogous to modApi:add__Hook() in old hooks API.
 function Event:subscribe(fn)
 	Assert.Equals("function", type(fn), "Event.subscribe: first argument must be a function")
-	local sub = Subscription(self)
-	sub.fn = fn
+	local sub = Subscription(self, fn, getCallerString())
 
 	table.insert(self.subscribers, sub)
 
@@ -111,7 +151,10 @@ end
 
 --- Returns true if the specified object is subscribed to this Event. False otherwise.
 function Event:isSubscribed(subscription)
-	Assert.Equals({"function", "table"}, type(subscription), "Event.isSubscribed: first argument must be a function or a table")
+	Assert.Equals(
+			{ "function", "table" }, type(subscription),
+			"Event.isSubscribed: first argument must be a function or a table"
+	)
 
 	if type(subscription) == "table" and Class.instanceOf(subscription, Subscription) then
 		if subscription:isClosed() then
@@ -121,7 +164,7 @@ function Event:isSubscribed(subscription)
 		return list_contains(self.subscribers, subscription)
 	elseif type(subscription) == "function" then
 		for _, sub in ipairs(self.subscribers) do
-			if sub.fn == subscription then
+			if sub.listenerFn == subscription then
 				return true
 			end
 		end
@@ -134,7 +177,10 @@ end
 --- of the event being fired.
 --- Returns true if successfully unsubscribed, false otherwise.
 function Event:unsubscribe(subscription)
-	Assert.Equals({"function", "table"}, type(subscription), "Event.isSubscribed: first argument must be a function or a table")
+	Assert.Equals(
+			{ "function", "table" }, type(subscription),
+			"Event.isSubscribed: first argument must be a function or a table"
+	)
 
 	if not self:isSubscribed(subscription) then
 		return false
@@ -142,7 +188,7 @@ function Event:unsubscribe(subscription)
 
 	if type(subscription) == "function" then
 		for _, sub in ipairs(self.subscribers) do
-			if sub.fn == subscription then
+			if sub.listenerFn == subscription then
 				subscription = sub
 				break
 			end
@@ -154,7 +200,10 @@ function Event:unsubscribe(subscription)
 		end
 	end
 
-	Assert.True(Class.instanceOf(subscription, Subscription), "Event.unsubscribe: first argument must be a Subscription")
+	Assert.True(
+			Class.instanceOf(subscription, Subscription),
+			"Event.unsubscribe: first argument must be a Subscription"
+	)
 
 	if subscription:isClosed() then
 		return false
@@ -183,9 +232,6 @@ local function isStackOverflowError(err)
 	return string.find(err, "C stack overflow")
 end
 
-local function pack2(...) return {n=select('#', ...), ...} end
-local function unpack2(t) return unpack(t, 1, t.n) end
-
 --- Fires this event, notifying all subscribers and passing all arguments
 ---	that have been passed to this function to them.
 ---	Arguments are passed as-is without any cloning or protection, so if you
@@ -194,14 +240,16 @@ local function unpack2(t) return unpack(t, 1, t.n) end
 function Event:dispatch(...)
 	local args = pack2(...)
 	local snapshot = shallow_copy(self.subscribers)
+	local caller = getCallerString()
+
 	for _, sub in ipairs(snapshot) do
-		local ok, errorOrResult = pcall(function() return sub.fn(unpack2(args)) end)
+		local ok, errorOrResult = sub:notify(args)
 
 		if not ok and errorOrResult then
 			if isStackOverflowError(errorOrResult) then
-				error(errorOrResult)
+				error(string.format("%s (dispatched at '%s')", errorOrResult, caller))
 			else
-				LOG("An event callback failed: ", errorOrResult)
+				LOGF("An event callback failed (dispatched at '%s'): %s", caller, errorOrResult)
 			end
 		elseif ok then
 			if errorOrResult and self.options[Event.SHORTCIRCUIT] then
