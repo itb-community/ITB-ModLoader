@@ -156,7 +156,7 @@ function BasicLoggerImpl:preprocessInput(...)
 
 	local message = table.concat(arg, " ")
 
-	return message
+	return message:gsub("\t", "    ")
 end
 
 local delimiter = "\n"
