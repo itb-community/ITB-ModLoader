@@ -2,6 +2,7 @@ local scripts = {
 	"security",
 	"assert",
 	"classes",
+	"try_catch",
 	"itb_io",
 	"io",
 	"utils",
