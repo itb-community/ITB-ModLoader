@@ -128,6 +128,9 @@ t.onPawnUndeployed = Event()
 t.onPawnLanding = Event()
 t.onPawnLanded = Event()
 
+t.onBoardAddEffect = Event()
+t.onBoardDamageSpace = Event()
+
 t.onShiftToggled = Event()
 t.onAltToggled = Event()
 t.onCtrlToggled = Event()

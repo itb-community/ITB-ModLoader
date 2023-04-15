@@ -198,7 +198,24 @@ local function initializeBoardClass(board)
 
 
 	-- Override existing Board class functions here
+	BoardClass.AddEffectVanilla = board.AddEffect
+	BoardClass.AddEffect = function(self, effect)
+		Assert.Equals("userdata", type(self), "Argument #0")
+		Assert.Equals("userdata", type(effect), "Argument #1")
+		
+		modApi.events.onBoardAddEffect:dispatch(effect)
+		self:AddEffectVanilla(effect)
+	end
+	
+	BoardClass.DamageSpaceVanilla = board.DamageSpace
+	BoardClass.DamageSpace = function(self, spaceDamage)
+		Assert.Equals("userdata", type(self), "Argument #0")
+		Assert.Equals("userdata", type(spaceDamage), "Argument #1")
 
+		modApi.events.onBoardDamageSpace:dispatch(spaceDamage)
+		self:DamageSpaceVanilla(spaceDamage)
+	end
+	
 
 	modApi.events.onBoardClassInitialized:dispatch(boardClass, board)
 	modApi.events.onBoardClassInitialized:unsubscribeAll()
