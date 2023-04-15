@@ -25,6 +25,55 @@ function CreatePilot(data)
 	end
 end
 
+function CreateStructure(structure)
+	Assert.ResourceDatIsOpen("Structures must be created on init")
+	Assert.Equals('table', type(structure), "Argument #1")
+
+	local id = structure.Id
+	local name = structure.Name
+	local path = structure.Path
+	local image = structure.Image
+	local imageOffset = structure.ImageOffset
+	local reward = structure.Reward
+
+	Assert.Equals('string', type(id), "Id")
+	Assert.Equals('nil', type(_G[id]), string.format("Structure with id %q already exists", structure.Id))
+	Assert.Equals('string', type(name), "Name")
+	Assert.Equals('string', type(path), "Path")
+	Assert.Equals('string', type(image), "Image")
+	Assert.TypePoint(imageOffset, "ImageOffset")
+	Assert.Equals('number', type(reward), "Reward")
+	Assert.Range(0, 2, reward, "Reward")
+
+	local resourcePath = modApi:getCurrentMod().resourcePath
+	local image_on = image.."_on.png"
+	local image_broken = image.."_broken.png"
+	local file_on = File(resourcePath, path..image_on)
+	local file_broken = File(resourcePath, path..image_broken)
+	local assetsRoot = "img/combat/structures/"
+	local assetpath_on = assetsRoot..image_on
+	local assetpath_broken= assetsRoot..image_broken
+	local textId = id.."_Name"
+
+	Assert.True(file_on:exists())
+	Assert.True(file_broken:exists())
+	Assert.False(modApi:assetExists(assetpath_on), "Asset '"..assetpath_on.."' already exists")
+	Assert.False(modApi:assetExists(assetpath_broken), "Asset '"..assetpath_broken.."' already exists")
+	Assert.Equals('nil', type(Mission_Texts[textId]), "Mission Text '"..textId.."' already exists")
+
+	modApi:appendAsset(assetpath_on, file_on:relative_path())
+	modApi:appendAsset(assetpath_broken, file_broken:relative_path())
+	Location[assetpath_on:sub(5,-1)] = imageOffset
+	Location[assetpath_broken:sub(5,-1)] = imageOffset
+	Mission_Texts[textId] = name
+
+	_G[structure.Id] = {
+		Name = name,
+		Image = image,
+		Reward = reward
+	}
+end
+
 function IsTestMechScenario()
 	if not Game then return false end
 
@@ -339,4 +388,22 @@ function to_sorted_array(tbl, sortFunc)
 	local list = to_array(tbl)
 	table.sort(list, sortFunc)
 	return list
+end
+
+-- Returns the point associated with an index, where
+-- index 1             -> Point(0, 0)
+-- index size.x        -> Point(size.x-1, 0)
+-- index size.x*size.x -> Point(size.x-1, size.x-1)
+function index2point(index)
+	local size = Board:GetSize()
+	return Point((index-1) % size.x, math.floor((index-1) / size.x))
+end
+
+-- Returns the index associated with a point, where
+-- Point(0, 0)               -> index 1
+-- Point(size.x-1, 0)        -> index size.x
+-- Point(size.x-1, size.x-1) -> index size.x*size.x
+function point2index(p)
+	local size = Board:GetSize()
+	return p.y * size.x + p.x + 1
 end

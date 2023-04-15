@@ -8,7 +8,8 @@ DEL /q lua5.1.dll
 DEL /q opengl32.dll
 DEL /q SDL2.dll
 DEL /q ftldat.dll
-DEL /q scripts\scripts.lua
+DEL /q itb_io.dll
+DEL /q scripts\modloader.lua
 IF EXIST resources\resource.dat.bak DEL /q resources\resource.dat
 RMDIR /q /s resources\mods
 RMDIR /q /s scripts\mod_loader
@@ -18,7 +19,7 @@ ECHO Restoring original game files...
 REN lua5.1-original.dll lua5.1.dll
 REN SDL2-original.dll SDL2.dll
 IF EXIST resources\resource.dat.bak REN resources\resource.dat.bak resource.dat
-REN scripts\scripts.lua.bak scripts.lua
+REN scripts\modloader.lua.bak modloader.lua
 ECHO Done.
 
 REM Delete the batch file itself

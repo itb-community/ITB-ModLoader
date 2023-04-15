@@ -69,6 +69,11 @@ function getPilotDrop()
 	return drop
 end
 
+-- simply redirect to the modApi function
+function GetFTLPilots()
+	return modApi:getFTLPilots()
+end
+
 -- Determines if a skill is available in the shop
 function Skill:GetUnlocked()
   if self.Unlocked == nil then

@@ -183,9 +183,8 @@ BoardClass.__ipairs = function(self, ...)
 	local size = self:GetSize()
 	return function()
 		if index < size.x * size.y then
-			local p = Point(index % size.x, math.floor(index / size.x))
 			index = index + 1
-			return index, p
+			return index, index2point(index)
 		end
 	end
 end

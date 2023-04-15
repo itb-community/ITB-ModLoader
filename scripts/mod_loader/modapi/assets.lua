@@ -54,6 +54,22 @@ function modApi:appendPassiveWeaponAssets(path, prefix)
 	self:appendAssets("img/weapons/passives/", path, prefix)
 end
 
+function modApi:appendEnemyPortraitAssets(path, prefix)
+	self:appendAssets("img/portraits/enemy/", path, prefix)
+end
+
+function modApi:appendPilotPortraitAssets(path, prefix)
+	self:appendAssets("img/portraits/pilots/", path, prefix)
+end
+
+function modApi:appendNpcPortraitAssets(path, prefix)
+	self:appendAssets("img/portraits/npcs/", path, prefix)
+end
+
+function modApi:appendCeoPortraitAssets(path, prefix)
+	self:appendAssets("img/portraits/ceo/", path, prefix)
+end
+
 modApi.appendMechAssets = modApi.appendPlayerUnitAssets
 modApi.appendVekAssets = modApi.appendEnemyUnitAssets
 modApi.appendBotAssets = modApi.appendBotUnitAssets
