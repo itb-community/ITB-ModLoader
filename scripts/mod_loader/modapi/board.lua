@@ -208,14 +208,19 @@ local function initializeBoardClass(board)
 	end
 	
 	BoardClass.DamageSpaceVanilla = board.DamageSpace
-	BoardClass.DamageSpace = function(self, spaceDamage)
+	BoardClass.DamageSpace = function(self, spaceDamage, damage)
 		Assert.Equals("userdata", type(self), "Argument #0")
 		Assert.Equals("userdata", type(spaceDamage), "Argument #1")
+		Assert.Equals({"nil", "number"}, type(damage), "Argument #2")
 
+		if damage then
+			local point = spaceDamage
+			spaceDamage = SpaceDamage(point, damage)
+		end
+		
 		modApi.events.onBoardDamageSpace:dispatch(spaceDamage)
 		self:DamageSpaceVanilla(spaceDamage)
-	end
-	
+	end	
 
 	modApi.events.onBoardClassInitialized:dispatch(boardClass, board)
 	modApi.events.onBoardClassInitialized:unsubscribeAll()
