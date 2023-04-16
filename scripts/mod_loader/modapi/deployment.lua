@@ -208,11 +208,16 @@ local function updateDeploymentListener(mission)
 			end
 		end
 
+		local anyMechIsBusy = false
+			or pwn0:IsBusy()
+			or pwn1:IsBusy()
+			or pwn2:IsBusy()
+
 		local isAllDeployed = true
+			and anyMechIsBusy
 			and mechs[0].state == STATE_DEPLOYED
 			and mechs[1].state == STATE_DEPLOYED
 			and mechs[2].state == STATE_DEPLOYED
-			and pwn0:IsBusy()
 
 		if isAllDeployed then
 			deployment.phase = PHASE_LANDING

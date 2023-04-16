@@ -1,5 +1,3 @@
-local magic = "([%^%$%(%)%%%.%[%]%*%+%-%?])"
-
 local itb_io
 local function lazy_load()
 	if itb_io ~= nil then
@@ -52,15 +50,21 @@ function File:path()
 end
 
 --- Returns string representation of the path to this file
--- relative to the ITB directory or the save data directory
+--- relative to the ITB directory or the save data directory
 function File:relative_path()
 	Assert.Equals("table", type(self), "Check for . vs :")
-	local path = self.instance:path()
-	local relative_path = nil
-		or path:match("^"..Directory():path():gsub(magic, "%%%1").."(.*)")
-		or path:match("^"..Directory.savedata():path():gsub(magic, "%%%1").."(.*)")
 
-	return relative_path
+	local result
+	try(function()
+		result = self.instance:relative_path(path)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to retrieve relative path of %q: %s",
+				path, self:path(), tostring(err)
+		))
+	end)
+	return result
 end
 
 --- Returns name of this file, including extension
@@ -92,6 +96,24 @@ function File:parent()
 	:catch(function(err)
 		error(string.format(
 				"Failed to access parent of %q: %s",
+				self:path(), tostring(err)
+		))
+	end)
+	return result
+end
+
+--- Returns the root directory of this file (either the game installation
+--- directory, or save data directory)
+function File:root()
+	Assert.Equals("table", type(self), "Check for . vs :")
+
+	local result
+	try(function()
+		result = Directory.of(self.instance:root())
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to access root directory of %q: %s",
 				self:path(), tostring(err)
 		))
 	end)
@@ -333,12 +355,18 @@ end
 --- relative to the ITB directory or the save data directory
 function Directory:relative_path()
 	Assert.Equals("table", type(self), "Check for . vs :")
-	local path = self.instance:path()
-	local relative_path = nil
-		or path:match("^"..Directory():path():gsub(magic, "%%%1").."(.*)")
-		or path:match("^"..Directory.savedata():path():gsub(magic, "%%%1").."(.*)")
 
-	return relative_path
+	local result
+	try(function()
+		result = self.instance:relative_path(path)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to retrieve relative path of %q: %s",
+				path, self:path(), tostring(err)
+		))
+	end)
+	return result
 end
 
 --- Returns name of this directory
@@ -359,6 +387,47 @@ function Directory:parent()
 		error(string.format(
 				"Failed to access parent of %q: %s",
 				self:path(), tostring(err)
+		))
+	end)
+	return result
+end
+
+--- Returns the root directory of this directory (either the game installation
+--- directory, or save data directory)
+function Directory:root()
+	Assert.Equals("table", type(self), "Check for . vs :")
+
+	local result
+	try(function()
+		result = Directory.of(self.instance:root())
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to access root directory of %q: %s",
+				self:path(), tostring(err)
+		))
+	end)
+	return result
+end
+
+--- Relativizes the specified path relative to this directory. More generally, returns a string
+--- that can later be used to navigate to the specified path by invoking `directory` or `file`
+--- functions on this Directory instance.
+--- Example:
+---   Directory("some/path"):relativize("some/path/test") -- returns "test"
+---   Directory("some/path/test"):relativize("some/path") -- returns ".."
+function Directory:relativize(path)
+	Assert.Equals("table", type(self), "Check for . vs :")
+	Assert.Equals("string", type(path))
+
+	local result
+	try(function()
+		result = self.instance:relativize(path)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to relativize path %q to %q: %s",
+				path, self:path(), tostring(err)
 		))
 	end)
 	return result
@@ -463,6 +532,24 @@ function Directory:exists()
 	Assert.Equals("table", type(self), "Check for . vs :")
 
 	return self.instance:exists()
+end
+
+--- Returns true if the specified path starts with this directory's path
+function Directory:is_ancestor(path)
+	Assert.Equals("table", type(self), "Check for . vs :")
+	Assert.Equals("string", type(path))
+
+	local result
+	try(function()
+		result = self.instance:is_ancestor(path)
+	end)
+	:catch(function(err)
+		error(string.format(
+				"Failed to see if %q is ancestor of %q: %s",
+				self:path(), path, tostring(err)
+		))
+	end)
+	return result
 end
 
 --- Deletes this directory and all its contents
