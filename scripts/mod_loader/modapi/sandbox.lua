@@ -13,7 +13,7 @@ function modApi:loadIntoEnv(scriptPath, envTable)
 
 	setmetatable(envTable, { __index = _G })
 	assert(pcall(setfenv(
-		assert(loadfile(scriptPath)),
+		assert(loadstring(File(scriptPath):read_to_string())),
 		envTable
 	)))
 	setmetatable(envTable, nil)
