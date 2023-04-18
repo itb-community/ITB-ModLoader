@@ -1,4 +1,5 @@
 local scripts = {
+	"userdataType",
 	"vector",
 	"init",
 	"global",
