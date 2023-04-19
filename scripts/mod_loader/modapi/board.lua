@@ -198,7 +198,45 @@ local function initializeBoardClass(board)
 
 
 	-- Override existing Board class functions here
+	BoardClass.AddEffectVanilla = board.AddEffect
+	BoardClass.AddEffect = function(self, effect)
+		Assert.Equals("userdata", type(self), "Argument #0")
+		Assert.Equals("userdata", type(effect), "Argument #1")
+		
+		if GetUserdataType(effect) == "SpaceDamage" then
+			local damage = effect
+			effect = SkillEffect()
+			effect:AddDamage(damage)
+		end
+		
+		if GetUserdataType(effect) == "SkillEffect" then
+			modApi.events.onBoardAddEffect:dispatch(effect)
+		else
+			LOG("Board:AddEffect argument must be a SkillEffect or SpaceDamage object")
+		end
+		
+		self:AddEffectVanilla(effect)
+	end
+	
+	BoardClass.DamageSpaceVanilla = board.DamageSpace
+	BoardClass.DamageSpace = function(self, spaceDamage, damage)
+		Assert.Equals("userdata", type(self), "Argument #0")
+		Assert.Equals("userdata", type(spaceDamage), "Argument #1")
+		Assert.Equals({"nil", "number"}, type(damage), "Argument #2")
 
+		if damage and GetUserdataType(spaceDamage) == "Point" then
+			local point = spaceDamage
+			spaceDamage = SpaceDamage(point, damage)
+		end
+		
+		if GetUserdataType(spaceDamage) == "SpaceDamage" then
+			modApi.events.onBoardDamageSpace:dispatch(spaceDamage)
+		else
+			LOG("Board:DamageSpace argument must be a SpaceDamage object or Point/Int pair")
+		end
+		
+		self:DamageSpaceVanilla(spaceDamage)
+	end	
 
 	modApi.events.onBoardClassInitialized:dispatch(boardClass, board)
 	modApi.events.onBoardClassInitialized:unsubscribeAll()
