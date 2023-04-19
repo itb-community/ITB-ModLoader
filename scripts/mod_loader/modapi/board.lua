@@ -203,7 +203,18 @@ local function initializeBoardClass(board)
 		Assert.Equals("userdata", type(self), "Argument #0")
 		Assert.Equals("userdata", type(effect), "Argument #1")
 		
-		modApi.events.onBoardAddEffect:dispatch(effect)
+		if GetUserdataType(effect) == "SpaceDamage" then
+			local damage = effect
+			effect = SkillEffect()
+			effect:AddDamage(damage)
+		end
+		
+		if GetUserdataType(effect) == "SkillEffect" then
+			modApi.events.onBoardAddEffect:dispatch(effect)
+		else
+			LOG("Board:AddEffect argument must be a SkillEffect or SpaceDamage object")
+		end
+		
 		self:AddEffectVanilla(effect)
 	end
 	
@@ -213,12 +224,17 @@ local function initializeBoardClass(board)
 		Assert.Equals("userdata", type(spaceDamage), "Argument #1")
 		Assert.Equals({"nil", "number"}, type(damage), "Argument #2")
 
-		if damage then
+		if damage and GetUserdataType(spaceDamage) == "Point" then
 			local point = spaceDamage
 			spaceDamage = SpaceDamage(point, damage)
 		end
 		
-		modApi.events.onBoardDamageSpace:dispatch(spaceDamage)
+		if GetUserdataType(spaceDamage) == "SpaceDamage" then
+			modApi.events.onBoardDamageSpace:dispatch(spaceDamage)
+		else
+			LOG("Board:DamageSpace argument must be a SpaceDamage object or Point/Int pair")
+		end
+		
 		self:DamageSpaceVanilla(spaceDamage)
 	end	
 
