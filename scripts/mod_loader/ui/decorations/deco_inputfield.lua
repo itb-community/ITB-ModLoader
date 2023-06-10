@@ -5,12 +5,23 @@
 
 	UiInputField.registerAsInputField(arbitraryUiObject)
 --]]
+local function isEqualColor(color1, color2)
+	if true
+		and color1.r == color2.r
+		and color1.g == color2.g
+		and color1.b == color2.b
+		and color1.a == color2.a
+	then
+		return true
+	end
+
+	return false
+end
+
 local nullsurface = sdl.surface("")
 local surfaceFonts = {}
+local comparerFont = {}
 SurfaceFont = {
-	_surfaces = {},
-	font,
-	textset,
 	get = function(self, s)
 		-- omit for speed
 		--Assert.Equals('string', type(s))
@@ -31,48 +42,55 @@ SurfaceFont = {
 		return surfaces[s]
 	end,
 	__eq = function(a, b)
-		if not a.font ~= not b.font then
-			return false
+		if true
+			and a.font == b.font
+			and a.textset.antialias == b.textset.antialias
+			and a.textset.outlineWidth == b.textset.outlineWidth
+			and isEqualColor(a.textset.color, b.textset.color)
+			and isEqualColor(a.textset.outlineColor, b.textset.outlineColor)
+		then
+			return true
 		end
 
-		if not a.textset ~= not b.textset then
-			return false
-		end
-
-		if a.font then
-			if
-				a.font.name ~= b.font.name or
-				a.font.size ~= b.font.size
-			then
-				return false
-			end
-		end
-
-		if a.textset then
-			if 
-				a.textset.outlineColor ~= b.textset.outlineColor or
-				a.textset.outlineWidth ~= b.textset.outlineWidth or
-				a.textset.antialias ~= b.textset.antialias
-			then
-				return false
-			end
-		end
-
-		return true
+		return false
 	end
 }
 
 SurfaceFont.__index = SurfaceFont
+setmetatable(comparerFont, SurfaceFont)
 
 function SurfaceFont:getOrCreate(font, textset)
+	comparerFont.font = font
+	comparerFont.textset = textset
+
 	for i, surfaceFont in ipairs(surfaceFonts) do
-		if surfaceFont:__eq{font = font, set = textset} then
+		if surfaceFont == comparerFont then
 			return surfaceFont
 		end
 	end
 
-	local surfaceFont = {font = font, textset = textset}
+	local surfaceFont = {
+		_surfaces = {},
+		font = font,
+		textset = deco.textset(
+			sdl.rgba(
+				textset.color.r,
+				textset.color.g,
+				textset.color.b,
+				textset.color.a
+			),
+			sdl.rgba(
+				textset.outlineColor.r,
+				textset.outlineColor.g,
+				textset.outlineColor.b,
+				textset.outlineColor.a
+			),
+			textset.outlineWidth,
+			textset.antialias
+		)
+	}
 	setmetatable(surfaceFont, SurfaceFont)
+	table.insert(surfaceFonts, surfaceFont)
 
 	return surfaceFont
 end
