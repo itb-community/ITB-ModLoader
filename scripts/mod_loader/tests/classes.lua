@@ -27,4 +27,80 @@ function testsuite.test_Instance()
 	return true
 end
 
+function testsuite.test_IterateInstanceAndParents_Vanilla_Class()
+	local Object = {
+		weight = 10,
+		color = "Brown",
+	}
+	CreateClass(Object)
+
+	local LivingBeing = Object:new{
+		breathes = true,
+		walks = true,
+	}
+
+	local Animal = LivingBeing:new{
+		name = "Animal",
+		sound = "Roar",
+	}
+
+	local output = {}
+	local expected = {
+		weight = 10,
+		color = "Brown",
+		breathes = true,
+		walks = true,
+		name = "Animal",
+		sound = "Roar",
+	}
+
+	for key, value in iterateInstanceAndParents(Animal:new()) do
+		output[key] = value
+	end
+
+	Assert.TableEquals(output, expected)
+
+	return true
+end
+
+function testsuite.test_IterateInstanceAndParents_ModLoader_Class()
+	local Object = Class.new()
+	function Object:new()
+		self.weight = 10
+		self.color = "Brown"
+	end
+
+	local LivingBeing = Class.inherit(Object)
+	function LivingBeing:new()
+		Object.new(self)
+		self.breathes = true
+		self.walks = true
+	end
+
+	local Animal = Class.inherit(LivingBeing)
+	function Animal:new()
+		LivingBeing.new(self)
+		self.name = "Animal"
+		self.sound = "Roar"
+	end
+
+	local output = {}
+	local expected = {
+		weight = 10,
+		color = "Brown",
+		breathes = true,
+		walks = true,
+		name = "Animal",
+		sound = "Roar",
+	}
+
+	for key, value in iterateInstanceAndParents(Animal()) do
+		output[key] = value
+	end
+
+	Assert.TableEquals(output, expected)
+
+	return true
+end
+
 return testsuite
