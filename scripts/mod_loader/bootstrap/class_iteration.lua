@@ -91,6 +91,8 @@ function iterateInstanceAndParents(instance)
 				if not exceptions(k, v) then
 					-- Check if the key has already been seen in the derived class
 					if not seenKeys[k] then
+						-- Add the key to the seen keys
+						seenKeys[k] = true
 						-- Yield the key-value pair
 						coroutine.yield(k, v)
 					end
