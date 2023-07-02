@@ -86,6 +86,12 @@ modApi.events.onIslandLeft:subscribe(function()
 	setGameState(GAME_STATE.MAP)
 end)
 
+modApi.events.onPreMissionAvailable:subscribe(function(mission)
+	if mission.ID == "Mission_Final" then
+		setGameState(GAME_STATE.MAP)
+	end
+end)
+
 modApi.events.onMissionChanged:subscribe(function(mission, oldMission)
 	if mission == Mission_Test then
 		setGameState(GAME_STATE.MISSION_TEST)
