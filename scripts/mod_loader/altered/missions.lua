@@ -255,33 +255,96 @@ function Mission:BaseStart(suppressHooks)
 	self.Initialized = true
 end
 
-local oldApplyEnvironmentEffect = Mission.ApplyEnvironmentEffect
-function Mission:ApplyEnvironmentEffect()
+
+-- Create a table that will hold all custom environments by some unique id.
+Mission.CustomEnv = {}
+
+
+-- The game will call this function to apply environment effects.
+-- The function applies a single environment effect per call.
+-- The game will continue to call this function as long as it returns true,
+-- which indicates that there are more environment effects yet to process.
+-- The mod loader modifies the function in two ways:
+    -- Dispatch events for when environment effects begin and end
+	-- Process custom added environments
+Mission.ApplyEnvironmentEffectVanilla = Mission.ApplyEnvironmentEffect
+Mission.ApplyEnvironmentEffect = function(self)
 	if not self.LiveEnvironment.eventDispatched then
 		self.LiveEnvironment.eventDispatched = true
 
+		-- Dispatch pre-environment event
 		modApi:firePreEnvironmentHooks(self)
 	end
 
-	-- While ApplyEnvironmentEffect() returns true,
-	-- there are more environment effects to come.
-	local continue = false
-	if self.LiveEnvironment:IsEffect() then
-		continue = oldApplyEnvironmentEffect(self)
+	if not self.LiveEnvironment.processed then
+		if self.LiveEnvironment:IsEffect() then
+			self.LiveEnvironment.processed = not self:ApplyEnvironmentEffectVanilla()
+		else
+			self.LiveEnvironment.processed = true
+		end
 	end
 
-	if not continue then
+	if self.LiveEnvironment.processed then
+		for _, env in pairs(self.CustomEnv) do
+			if not env.processed then
+				if env:IsEffect() then
+					env.processed = not env:ApplyEffect()
+					break
+				else
+					env.processed = true
+				end
+			end
+		end
+	end
+
+	-- Check if there are any remaining environments
+	-- that has not completed processing.
+	if not self:IsEnvironmentEffect() then
+		-- Reset all temporary variables
 		self.LiveEnvironment.eventDispatched = nil
+		self.LiveEnvironment.processed = nil
 
+		for _, env in pairs(self.CustomEnv) do
+			env.processed = nil
+		end
+
+		-- Dispatch post-environment event
 		modApi:firePostEnvironmentHooks(self)
+
+		-- All environments have been processed
+		return false
 	end
 
-	return continue
-end
-
-function Mission:IsEnvironmentEffect()
+	-- Continue applying more environment effects
 	return true
 end
+
+-- This function returns true while environments are not fully processed.
+-- The vanilla function checks this with LiveEnvironment:IsEffect()
+-- The mod loader wants ApplyEnvironmentEffect to be called at least once
+-- to dispatch environment effect events, so we add additional logic.
+-- 
+-- We will use an additional 'processed' flag to handle this logic in
+-- Mission:IsEnvironmentEffect and Mission:ApplyEnvironmentEffect
+Mission.IsEnvironmentEffectVanilla = Mission.IsEnvironmentEffect
+Mission.IsEnvironmentEffect = function(self)
+	for _, env in pairs(self.CustomEnv) do
+		if not env.processed then
+			return true
+		end
+	end
+
+	return not self.LiveEnvironment.processed
+end
+
+
+-- Mark the board for custom environment effects
+modApi.events.onMissionUpdate:subscribe(function(mission)
+	for _, env in pairs(mission.CustomEnv) do
+		env:MarkBoard()
+	end
+end)
+
 
 function Mission:GetSaveData()
 	if GAME == nil then
