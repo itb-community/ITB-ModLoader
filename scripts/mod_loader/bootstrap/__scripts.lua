@@ -10,6 +10,7 @@ local scripts = {
 	"modApi",
 	"constants",
 	"binarySearch",
+	"class_iteration",
 }
 
 local rootpath = GetParentPath(...)
