@@ -265,7 +265,7 @@ Mission.CustomEnv = {}
 -- The game will continue to call this function as long as it returns true,
 -- which indicates that there are more environment effects yet to process.
 -- The mod loader modifies the function in two ways:
-    -- Dispatch events for when environment effects begin and end
+	-- Dispatch events for when environment effects begin and end
 	-- Process custom added environments
 Mission.ApplyEnvironmentEffectVanilla = Mission.ApplyEnvironmentEffect
 Mission.ApplyEnvironmentEffect = function(self)
