@@ -342,6 +342,10 @@ local function conditionalPopulateSelectedMechs()
 end
 
 local function populateSelectedSquad()
+	if not sdlext.isHangar() then
+		return
+	end
+
 	isRandomOrCustomSquad = isIrregularMedalHeight()
 	isMechlessCustomSquad = SURFACE_PLATFORM:wasDrawn() == false
 
