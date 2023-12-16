@@ -23,9 +23,9 @@ function UiDropDown:new(values,strings,value,tooltips)
 	self.open = false
 
 	self.optionSelected = Event()
-	
+
 	local items = {}
-	
+
 	local max_w = 32
 	for i, v in ipairs(self.values) do
 		local txt = DecoRAlignedText(self.strings[i] or tostring(v))
@@ -34,7 +34,7 @@ function UiDropDown:new(values,strings,value,tooltips)
 		if w > max_w then
 			max_w = w
 		end
-		
+
 		local item = Ui()
 			:width(1):heightpx(40)
 			:decorate({
@@ -48,7 +48,7 @@ function UiDropDown:new(values,strings,value,tooltips)
 		end
 
 		table.insert(items, item)
-		
+
 		item.onclicked = function(btn, button)
 			if button == 1 then
 				local oldChoice = self.choice
@@ -65,13 +65,13 @@ function UiDropDown:new(values,strings,value,tooltips)
 			return false
 		end
 	end
-	
+
 	local function destroyDropDown()
 		self:destroyDropDown()
 	end
-	
+
 	local function mousedown(dropdown, mx, my, button)
-		
+
 		if
 			button == 1                      and
 			self.open                        and
@@ -79,14 +79,14 @@ function UiDropDown:new(values,strings,value,tooltips)
 			not dropdown.containsMouse
 		then
 			self:destroyDropDown()
-			
+
 		elseif button == 3 and self.open then
 			self:destroyDropDown()
 		end
-		
+
 		return Ui.mousedown(dropdown, mx, my, button)
 	end
-	
+
 	local ddw = math.max(max_w + 8, 210)
 	self.dropdown = Ui()
 		:pospx(
@@ -98,7 +98,7 @@ function UiDropDown:new(values,strings,value,tooltips)
 	self.dropdown.owner = self
 	self.dropdown.destroyDropDown = destroyDropDown
 	self.dropdown.mousedown = mousedown
-	
+
 	local scrollarea = UiScrollArea()
 		:width(1):height(1)
 		:addTo(self.dropdown)
@@ -106,9 +106,9 @@ function UiDropDown:new(values,strings,value,tooltips)
 	local layout = UiBoxLayout()
 		:width(1):height(1)
 		:vgap(0)
-		:dynamicResize(false)
+		--:dynamicResize(false) Breaks the Scroll Area
 		:addTo(scrollarea)
-	
+
 	for i, item in ipairs(items) do
 		layout:add(item)
 	end
@@ -132,11 +132,11 @@ function UiDropDown:createDropDown()
 		if self.dropdown.parent ~= self.root.dropDownUi then
 			self.dropdown:detach()
 		end
-		
+
 		if self.dropdown.parent == nil then
 			self.dropdown:addTo(self.root.dropdownUi)
 		end
-		
+
 		local max_w = 32
 		local ddw = math.max(max_w + 8, 210)
 		self.open = true
@@ -147,7 +147,7 @@ function UiDropDown:createDropDown()
 end
 
 function UiDropDown:mousedown(mx, my, button)
-	
+
 	if
 		button == 1                      and
 		self.open                        and
@@ -155,11 +155,11 @@ function UiDropDown:mousedown(mx, my, button)
 		not self.dropdown.containsMouse
 	then
 		self:destroyDropDown()
-		
+
 	elseif button == 3 and self.open then
 		self:destroyDropDown()
 	end
-	
+
 	return Ui.mousedown(self, mx, my, button)
 end
 
@@ -171,7 +171,7 @@ function UiDropDown:clicked(button)
 			self:createDropDown()
 		end
 	end
-	
+
 	return Ui.clicked(self, button)
 end
 
