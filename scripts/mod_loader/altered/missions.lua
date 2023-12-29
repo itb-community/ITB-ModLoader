@@ -301,16 +301,18 @@ function Mission:GetSaveData()
 		return nil
 	end
 
-	local i = 0
-	repeat
-		local regionData = RegionData["region"..i]
-		i = i + 1
-
-		if regionData and GAME:GetMissionId(regionData.mission) == mission_id then
-			return regionData.player
-		end
-	until regionData == nil
-
+	if RegionData then
+		local i = 0
+		repeat
+			local regionData = RegionData["region"..i]
+			i = i + 1
+	
+			if regionData and GAME:GetMissionId(regionData.mission) == mission_id then
+				return regionData.player
+			end
+		until regionData == nil
+	end
+	
 	return nil
 end
 
