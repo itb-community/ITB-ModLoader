@@ -8,24 +8,30 @@ BoardClass.MovePawnsFromTile = function(self, loc)
 
 	-- In case there are multiple pawns on the same tile
 	local pawnStack = DequeList()
+	local pawnLocs = DequeList()
 	local point = Point(-1, -1)
 
 	while self:IsPawnSpace(loc) do
 		local pawn = self:GetPawn(loc)
 		pawnStack:pushLeft(pawn)
+		pawnLocs:pushLeft(pawn:GetSpace())
 		pawn:SetSpace(point)
 	end
 
-	return pawnStack
+	return pawnStack, pawnLocs
 end
 
-BoardClass.RestorePawnsToTile = function(self, loc, pawnStack)
+BoardClass.RestorePawnsToTile = function(self, loc, pawnStack, pawnLocs)
 	Assert.Equals("userdata", type(self), "Argument #0")
 	Assert.TypePoint(loc, "Argument #1")
 	Assert.Equals("table", type(pawnStack), "Argument #2")
+	Assert.Equals({"table", "nil"}, type(pawnLocs), "Argument #3")
 
 	while not pawnStack:isEmpty() do
 		local pawn = pawnStack:popLeft()
+		if pawnLocs then
+			loc = pawnLocs:popLeft()
+		end
 		pawn:SetSpace(loc)
 	end
 end
@@ -35,13 +41,13 @@ BoardClass.SetFire = function(self, loc, fire)
 	Assert.TypePoint(loc, "Argument #1")
 	Assert.Equals("boolean", type(fire), "Argument #2")
 
-	local pawnStack = self:MovePawnsFromTile(loc)
+	local pawnStack, pawnLocs = self:MovePawnsFromTile(loc)
 
 	local dmg = SpaceDamage(loc)
 	dmg.iFire = fire and EFFECT_CREATE or EFFECT_REMOVE
 	self:DamageSpace(dmg)
 
-	self:RestorePawnsToTile(loc, pawnStack)
+	self:RestorePawnsToTile(loc, pawnStack, pawnLocs)
 end
 
 BoardClass.SetShield = function(self, loc, shield)
