@@ -149,6 +149,11 @@ return {
 	["ModLoaderConfig_Tooltip_DevMode"] = "Enable debug mod loader features. May disrupt normal gameplay.\n\n"..
 	                                      "You shouldn't enable this, unless you're a mod creator or mod loader maintainer.",
 
+	["ModLoaderConfig_Text_DebugMode"] = "Debug mode",
+	["ModLoaderConfig_Tooltip_DebugMode"] = "Enhances mod stability by enabling assertions, which are checks used during development to catch bugs. "..
+	                                        "This mode prioritizes thorough error detection and troubleshooting capabilities, "..
+	                                        "ideal during development and testing phases to ensure robust functionality and identify potential issues early on.",
+
 	["ModLoaderConfig_Text_FloatyTooltips"] = "Attach Tooltips To Mouse Cursor",
 	["ModLoaderConfig_Tooltip_FloatyTooltips_On"] = "Tooltips follow the mouse cursor around.",
 	["ModLoaderConfig_Tooltip_FloatyTooltips_Off"] = "Tooltips show to the side of the UI element that spawned them, similar to the game's own tooltips.",

@@ -19,6 +19,7 @@ local function createUi()
 	local ddCaller = nil
 	local cboxClearLogs = nil
 	local cboxDevelopmentMode = nil
+	local cboxDebugMode = nil
 	local cboxFloatyTooltips = nil
 	local cboxProfileConfig = nil
 	local cboxErrorFrame = nil
@@ -39,6 +40,7 @@ local function createUi()
 			printCallerInfo       = ddCaller.value,
 			clearLogFileOnStartup = cboxClearLogs.checked,
 			developmentMode       = cboxDevelopmentMode.checked,
+			debugMode             = cboxDebugMode.checked,
 			floatyTooltips        = cboxFloatyTooltips.checked,
 			profileConfig         = cboxProfileConfig.checked,
 
@@ -67,6 +69,7 @@ local function createUi()
 		ddCaller.value                     = config.printCallerInfo
 		cboxClearLogs.checked              = config.clearLogFileOnStartup
 		cboxDevelopmentMode.checked        = config.developmentMode
+		cboxDebugMode.checked              = config.debugMode
 		cboxFloatyTooltips.checked         = config.floatyTooltips
 		cboxProfileConfig.checked          = config.profileConfig
 
@@ -282,6 +285,13 @@ local function createUi()
 		cboxDevelopmentMode = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_DevMode"),
 			GetText("ModLoaderConfig_Tooltip_DevMode")
+		):addTo(layout)
+
+		-- ////////////////////////////////////////////////////////////////////////
+		-- Debug Mode
+		cboxDebugMode = createCheckboxOption(
+			GetText("ModLoaderConfig_Text_DebugMode"),
+			GetText("ModLoaderConfig_Tooltip_DebugMode")
 		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////

@@ -8,6 +8,7 @@ function CurrentModLoaderConfig()
 	data.warningLogs         = modApi.warningLogs
 	data.printCallerInfo     = mod_loader.logger:getPrintCallerInfo()
 	data.developmentMode     = modApi.developmentMode
+	data.debugMode           = modApi.debugMode
 
 	data.profileConfig       = modApi.profileConfig
 	data.floatyTooltips      = modApi.floatyTooltips
@@ -65,6 +66,7 @@ function DefaultModLoaderConfig()
 		clearLogFileOnStartup = true,
 
 		developmentMode     = false,
+		debugMode           = false,
 
 		floatyTooltips      = true,
 		profileConfig       = false,
@@ -150,6 +152,7 @@ function ApplyModLoaderConfig(config)
 	modApi.debugLogs              = config.debugLogs
 	modApi.warningLogs            = config.warningLogs
 	modApi.developmentMode        = config.developmentMode
+	modApi.debugMode              = config.debugMode
 
 	modApi.floatyTooltips         = config.floatyTooltips
 	modApi.profileConfig          = config.profileConfig
