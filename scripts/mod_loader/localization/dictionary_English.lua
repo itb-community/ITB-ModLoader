@@ -150,9 +150,8 @@ return {
 	                                      "You shouldn't enable this, unless you're a mod creator or mod loader maintainer.",
 
 	["ModLoaderConfig_Text_DebugMode"] = "Debug mode",
-	["ModLoaderConfig_Tooltip_DebugMode"] = "Enhances mod stability by enabling assertions, which are checks used during development to catch bugs. "..
-	                                        "This mode prioritizes thorough error detection and troubleshooting capabilities, "..
-	                                        "ideal during development and testing phases to ensure robust functionality and identify potential issues early on.",
+	["ModLoaderConfig_Tooltip_DebugMode"] = "Enables assertions for catching bugs, allowing code to deliberately halt a program early, when an assertion has failed.\n\n"..
+	                                        "Recommended when developing/testing/debugging a mod or crash.",
 
 	["ModLoaderConfig_Text_FloatyTooltips"] = "Attach Tooltips To Mouse Cursor",
 	["ModLoaderConfig_Tooltip_FloatyTooltips_On"] = "Tooltips follow the mouse cursor around.",
