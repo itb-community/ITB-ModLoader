@@ -4,6 +4,12 @@
 --]]
 
 local news = {
+"New Mode - Debug Mode\n"..
+"Enables assertions for catching bugs, allowing code to deliberately halt a program early, when an assertion has failed.\n\n"..
+"- Recommended when developing/testing/debugging a mod or crash.\n"..
+"- Defaults to off to optimize for playing finished mods.\n"..
+"- Previous mod loader versions used to run unoptimized.\n"..
+"- Change it via [Mod Content] > [Configure Mod Loader] > [Debug Mode]",
 }
 
 local function responseFn(btnIndex)
