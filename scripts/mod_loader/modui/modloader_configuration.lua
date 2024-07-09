@@ -30,6 +30,7 @@ local function createUi()
 	local cboxPilotRestartReminder = nil
 	local cboxPaletteRestartReminder = nil
 	local cboxProfileFrame = nil
+	local cboxNewsFrame = nil
 
 	local onExit = function(self)
 		local data = {
@@ -51,7 +52,8 @@ local function createUi()
 			showRestartReminder = cboxRestartReminder.checked,
 			showPilotRestartReminder   = cboxPilotRestartReminder.checked,
 			showPaletteRestartReminder = cboxPaletteRestartReminder.checked,
-			showProfileSettingsFrame   = cboxProfileFrame.checked
+			showProfileSettingsFrame   = cboxProfileFrame.checked,
+			showNewsAboveVersion       = cboxNewsFrame.checked and "0" or modApi.version,
 		}
 
 		ApplyModLoaderConfig(data)
@@ -81,6 +83,7 @@ local function createUi()
 		cboxPilotRestartReminder.checked   = config.showPilotRestartReminder
 		cboxPaletteRestartReminder.checked = config.showPaletteRestartReminder
 		cboxProfileFrame.checked           = config.showProfileSettingsFrame
+		cboxNewsFrame.checked              = modApi:isVersionBelow(config.showNewsAboveVersion, modApi.version)
 
 		local t = cboxFloatyTooltips.root.tooltip
 		modApi.floatyTooltips = config.floatyTooltips
@@ -375,6 +378,11 @@ local function createUi()
 		cboxProfileFrame = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_ProfileFrame"),
 			GetText("ModLoaderConfig_Tooltip_ProfileFrame")
+		):addTo(popupsGroup.content)
+
+		cboxNewsFrame = createCheckboxOption(
+			GetText("ModLoaderConfig_Text_NewsFrame"),
+			GetText("ModLoaderConfig_Tooltip_NewsFrame")
 		):addTo(popupsGroup.content)
 
 		uiSetSettings(LoadModLoaderConfig())

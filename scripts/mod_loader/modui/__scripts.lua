@@ -13,6 +13,7 @@ local scripts = {
 	"popup_resource-error",
 	"popup_profile-config",
 	"popup_gamepad-warning",
+	"popup_news",
 
 	"modcontent",
 	"repair_icon_replace",

@@ -188,6 +188,9 @@ return {
 	["ModLoaderConfig_Text_ProfileFrame"] = "Show Profile Settings Change Popup",
 	["ModLoaderConfig_Tooltip_ProfileFrame"] = "Show a popup reminding to restart the game when switching profiles with Profile-Specific Configuration enabled.",
 
+	["ModLoaderConfig_Text_NewsFrame"] = "Show Mod Loader News Popup",
+	["ModLoaderConfig_Tooltip_NewsFrame"] = "Show a popup of mod loader news on startup. Will automatically turn on when updating the mod loader to a new version.",
+
 	["ScriptError_FrameTitle"] = "Script Error",
 	["ScriptError_FrameText_Mount"] = "Unable to mount mod at [%s]:\n%s",
 
@@ -196,6 +199,8 @@ return {
 
 	["PaletteRestartRequired_FrameTitle"] = "Restart Required",
 	["PaletteRestartRequired_FrameText"] = "Order of squad palettes has been changed. You must restart the game for the changes to take effect.",
+
+	["ModLoaderNews_FrameTitle"] = "News",
 
 	["OldVersion_FrameTitle"] = "Mod Loader Outdated",
 	["OldVersion_FrameText"] = "The following mods could not be loaded, because they require a newer version of the mod loader:\n\n%s\nYour installed version: %s",

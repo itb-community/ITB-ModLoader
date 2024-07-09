@@ -21,6 +21,7 @@ function CurrentModLoaderConfig()
 	data.showPilotRestartReminder   = modApi.showPilotRestartReminder
 	data.showPaletteRestartReminder = modApi.showPaletteRestartReminder
 	data.showProfileSettingsFrame   = modApi.showProfileSettingsFrame
+	data.showNewsAboveVersion       = modApi.showNewsAboveVersion
 
 	return data
 end
@@ -78,7 +79,8 @@ function DefaultModLoaderConfig()
 		showRestartReminder = true,
 		showPilotRestartReminder   = true,
 		showPaletteRestartReminder = true,
-		showProfileSettingsFrame   = true
+		showProfileSettingsFrame   = true,
+		showNewsAboveVersion       = "0",
 	}
 end
 
@@ -165,6 +167,7 @@ function ApplyModLoaderConfig(config)
 	modApi.showPilotRestartReminder   = config.showPilotRestartReminder
 	modApi.showPaletteRestartReminder = config.showPaletteRestartReminder
 	modApi.showProfileSettingsFrame   = config.showProfileSettingsFrame
+	modApi.showNewsAboveVersion       = config.showNewsAboveVersion
 end
 
 modApi.events.onSettingsChanged:subscribe(function(old, neu)
