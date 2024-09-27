@@ -1,22 +1,12 @@
-local factory
+local itb_io
 local function lazy_load()
-	if factory ~= nil then
+	if itb_io ~= nil then
 		return
 	end
 
-	try(function()
-		LOG("Loading itb_io.dll...")
-		package.loadlib("itb_io.dll", "luaopen_itb_io")()
-		factory = itb_io
-		itb_io = nil
-		LOG("Successfully loaded itb_io.dll!")
-	end)
-	:catch(function(err)
-		error(string.format(
-				"Failed to load itb_io.dll: %s",
-				tostring(err)
-		))
-	end)
+	local itb_rs_lua = load_itb_rs_lua_bridge()
+	itb_io = itb_rs_lua.io
+	assert(itb_io, "Failed to find io module in itb_rs_lua")
 end
 
 File = Class.new();
@@ -31,7 +21,7 @@ function File:new(...)
 	local path = table.concat({...}, "/");
 
 	try(function()
-		self.instance = factory.file(path)
+		self.instance = itb_io.file(path)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -315,7 +305,7 @@ function Directory:new(...)
 	end
 
 	try(function()
-		self.instance = factory.directory(path)
+		self.instance = itb_io.directory(path)
 	end)
 	:catch(function(err)
 		error(string.format(
@@ -342,7 +332,7 @@ function Directory.savedata()
 	if savedata == null then
 		lazy_load()
 		try(function()
-			savedata = factory.save_data_directory();
+			savedata = itb_io.save_data_directory();
 		end)
 		:catch(function(err)
 			error(string.format(
