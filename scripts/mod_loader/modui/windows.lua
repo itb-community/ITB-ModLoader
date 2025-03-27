@@ -1,8 +1,10 @@
 
 local showWindows = {}
 local visibleWindows = {}
-local lastSquadPage = nil
-sdlext.squadSelectionPage = nil
+local lastSquadPageInStatistics = nil
+local lastSquadPageInHangar = nil
+sdlext.squadSelectionPageInStatistics = nil
+sdlext.squadSelectionPageInHangar = nil
 
 local Window = {}
 CreateClass(Window)
@@ -158,14 +160,6 @@ local windows = {
 	},
 }
 
--- fire the squad page change event when the squad select page opens, to simplify code
-function windows.Hangar_Select:show(id)
-	if self.visible then return end
-
-	Window.show(self, id)
-	modApi.events.onSquadSelectionPageChanged:dispatch(sdlext.squadSelectionPage, lastSquadPage, false)
-end
-
 sdlext.isEscapeMenuWindowVisible = buildIsWindowVisibleFunction(windows.Escape_Title)
 sdlext.isHangarUiVisible = buildIsWindowVisibleFunction(windows.Button_Hangar_Start)
 sdlext.isSquadSelectionWindowVisible = buildIsWindowVisibleFunction(windows.Hangar_Select)
@@ -188,19 +182,40 @@ sdlext.isMapEditor = buildIsWindowVisibleFunction(windows.Button_Editor_Exit)
 
 -- gets the current page on the squad selection page, or nil if on none
 function sdlext.getSquadSelectionPage()
-	return sdlext.isSquadSelectionWindowVisible() and sdlext.squadSelectionPage or nil
+	if not sdlext.isSquadSelectionWindowVisible() then
+		return nil
+	end
+
+	if sdlext.isHangar() then
+		return lastSquadPageInHangar
+	else
+		return lastSquadPageInStatistics
+	end
+end
+
+local function detectSquadSelectionPage(id, r1, r2)
+	if id ~= "Upgrade_Page" then
+		return
+	end
+
+	-- for some odd reason, on the squad selection page something is calling `GetText("Upgrade_Page", 10, 10)`, so we have to filter it out.
+	-- if subset ever adds 10 pages, this will need an update
+	-- note, r1 and r2 are passed as strings
+	if r1 == "10" and r2 == "10" then
+		return
+	end
+
+	if sdlext.isHangar() then
+		sdlext.squadSelectionPageInHangar = tonumber(r1)
+	else
+		sdlext.squadSelectionPageInStatistics = tonumber(r1)
+	end
 end
 
 local oldGetText = GetText
 -- TODO: should we be using GetLocalizedText instead?
 function GetText(id, r1, r2, ...)
-	-- detect squad selection page
-	-- for some odd reason, on the squad selection page something is calling `GetText("Upgrade_Page", 10, 10)`, so we have to filter to "Page N of 2"
-	-- if subset ever adds more than 2 pages this will need an update
-	-- note, r1 and r2 are passed as strings
-	if id == "Upgrade_Page" and r2 == "2" then
-		sdlext.squadSelectionPage = tonumber(r1)
-	end
+	detectSquadSelectionPage(id, r1, r2)
 
 	local window = windows[id]
 	if window ~= nil then
@@ -220,13 +235,34 @@ modApi.events.onFrameDrawStart:subscribe(function()
 		end
 	end
 
-	-- update page if it changes
-	if sdlext.squadSelectionPage ~= lastSquadPage then
-		modApi.events.onSquadSelectionPageChanged:dispatch(sdlext.squadSelectionPage, lastSquadPage, true)
-		lastSquadPage = sdlext.squadSelectionPage
-	end
-
 	if next(showWindows) ~= nil then
 		showWindows = {}
+	end
+end)
+
+-- Update squad selection page if it changes.
+modApi.events.onFrameDrawStart:subscribe(function()
+	if not sdlext.isSquadSelectionWindowVisible() then
+		return
+	end
+
+	if sdlext.isHangar() and sdlext.squadSelectionPageInHangar ~= lastSquadPageInHangar then
+		modApi.events.onSquadSelectionPageChanged:dispatch(sdlext.squadSelectionPageInHangar, lastSquadPageInHangar)
+		lastSquadPageInHangar = sdlext.squadSelectionPageInHangar
+
+	elseif sdlext.squadSelectionPageInStatistics ~= lastSquadPageInStatistics then
+		modApi.events.onSquadSelectionPageChanged:dispatch(sdlext.squadSelectionPageInStatistics, lastSquadPageInStatistics)
+		lastSquadPageInStatistics = sdlext.squadSelectionPageInStatistics
+	end
+end)
+
+-- Ensure we don't trigger onSquadSelectionPageChanged when opening the squad selection screen.
+modApi.events.onSquadSelectionWindowShown:subscribe(function()
+	if sdlext.isHangar() then
+		sdlext.squadSelectionPageInHangar = lastSquadPageInHangar or 1
+		lastSquadPageInHangar = sdlext.squadSelectionPageInHangar
+	else
+		sdlext.squadSelectionPageInStatistics = lastSquadPageInStatistics or 1
+		lastSquadPageInStatistics = sdlext.squadSelectionPageInStatistics
 	end
 end)
