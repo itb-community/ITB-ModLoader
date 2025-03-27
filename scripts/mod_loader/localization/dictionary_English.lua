@@ -149,6 +149,10 @@ return {
 	["ModLoaderConfig_Tooltip_DevMode"] = "Enable debug mod loader features. May disrupt normal gameplay.\n\n"..
 	                                      "You shouldn't enable this, unless you're a mod creator or mod loader maintainer.",
 
+	["ModLoaderConfig_Text_DebugMode"] = "Debug mode",
+	["ModLoaderConfig_Tooltip_DebugMode"] = "Enables assertions for catching bugs, allowing code to deliberately halt a program early, when an assertion has failed.\n\n"..
+	                                        "Recommended when developing/testing/debugging a mod or crash.",
+
 	["ModLoaderConfig_Text_FloatyTooltips"] = "Attach Tooltips To Mouse Cursor",
 	["ModLoaderConfig_Tooltip_FloatyTooltips_On"] = "Tooltips follow the mouse cursor around.",
 	["ModLoaderConfig_Tooltip_FloatyTooltips_Off"] = "Tooltips show to the side of the UI element that spawned them, similar to the game's own tooltips.",
@@ -184,6 +188,9 @@ return {
 	["ModLoaderConfig_Text_ProfileFrame"] = "Show Profile Settings Change Popup",
 	["ModLoaderConfig_Tooltip_ProfileFrame"] = "Show a popup reminding to restart the game when switching profiles with Profile-Specific Configuration enabled.",
 
+	["ModLoaderConfig_Text_NewsFrame"] = "Show Mod Loader News Popup",
+	["ModLoaderConfig_Tooltip_NewsFrame"] = "Show a popup of mod loader news on startup. Will automatically turn on when updating the mod loader to a new version.",
+
 	["ScriptError_FrameTitle"] = "Script Error",
 	["ScriptError_FrameText_Mount"] = "Unable to mount mod at [%s]:\n%s",
 
@@ -192,6 +199,8 @@ return {
 
 	["PaletteRestartRequired_FrameTitle"] = "Restart Required",
 	["PaletteRestartRequired_FrameText"] = "Order of squad palettes has been changed. You must restart the game for the changes to take effect.",
+
+	["ModLoaderNews_FrameTitle"] = "News",
 
 	["OldVersion_FrameTitle"] = "Mod Loader Outdated",
 	["OldVersion_FrameText"] = "The following mods could not be loaded, because they require a newer version of the mod loader:\n\n%s\nYour installed version: %s",

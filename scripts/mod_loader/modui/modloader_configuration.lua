@@ -19,6 +19,7 @@ local function createUi()
 	local ddCaller = nil
 	local cboxClearLogs = nil
 	local cboxDevelopmentMode = nil
+	local cboxDebugMode = nil
 	local cboxFloatyTooltips = nil
 	local cboxProfileConfig = nil
 	local cboxErrorFrame = nil
@@ -29,6 +30,7 @@ local function createUi()
 	local cboxPilotRestartReminder = nil
 	local cboxPaletteRestartReminder = nil
 	local cboxProfileFrame = nil
+	local cboxNewsFrame = nil
 
 	local onExit = function(self)
 		local data = {
@@ -39,6 +41,7 @@ local function createUi()
 			printCallerInfo       = ddCaller.value,
 			clearLogFileOnStartup = cboxClearLogs.checked,
 			developmentMode       = cboxDevelopmentMode.checked,
+			debugMode             = cboxDebugMode.checked,
 			floatyTooltips        = cboxFloatyTooltips.checked,
 			profileConfig         = cboxProfileConfig.checked,
 
@@ -49,7 +52,8 @@ local function createUi()
 			showRestartReminder = cboxRestartReminder.checked,
 			showPilotRestartReminder   = cboxPilotRestartReminder.checked,
 			showPaletteRestartReminder = cboxPaletteRestartReminder.checked,
-			showProfileSettingsFrame   = cboxProfileFrame.checked
+			showProfileSettingsFrame   = cboxProfileFrame.checked,
+			showNewsAboveVersion       = cboxNewsFrame.checked and "0" or modApi.version,
 		}
 
 		ApplyModLoaderConfig(data)
@@ -67,6 +71,7 @@ local function createUi()
 		ddCaller.value                     = config.printCallerInfo
 		cboxClearLogs.checked              = config.clearLogFileOnStartup
 		cboxDevelopmentMode.checked        = config.developmentMode
+		cboxDebugMode.checked              = config.debugMode
 		cboxFloatyTooltips.checked         = config.floatyTooltips
 		cboxProfileConfig.checked          = config.profileConfig
 
@@ -78,6 +83,7 @@ local function createUi()
 		cboxPilotRestartReminder.checked   = config.showPilotRestartReminder
 		cboxPaletteRestartReminder.checked = config.showPaletteRestartReminder
 		cboxProfileFrame.checked           = config.showProfileSettingsFrame
+		cboxNewsFrame.checked              = modApi:isVersionBelow(config.showNewsAboveVersion, modApi.version)
 
 		local t = cboxFloatyTooltips.root.tooltip
 		modApi.floatyTooltips = config.floatyTooltips
@@ -285,6 +291,13 @@ local function createUi()
 		):addTo(layout)
 
 		-- ////////////////////////////////////////////////////////////////////////
+		-- Debug Mode
+		cboxDebugMode = createCheckboxOption(
+			GetText("ModLoaderConfig_Text_DebugMode"),
+			GetText("ModLoaderConfig_Tooltip_DebugMode")
+		):addTo(layout)
+
+		-- ////////////////////////////////////////////////////////////////////////
 		-- Floaty tooltips
 		cboxFloatyTooltips = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_FloatyTooltips"),
@@ -365,6 +378,11 @@ local function createUi()
 		cboxProfileFrame = createCheckboxOption(
 			GetText("ModLoaderConfig_Text_ProfileFrame"),
 			GetText("ModLoaderConfig_Tooltip_ProfileFrame")
+		):addTo(popupsGroup.content)
+
+		cboxNewsFrame = createCheckboxOption(
+			GetText("ModLoaderConfig_Text_NewsFrame"),
+			GetText("ModLoaderConfig_Tooltip_NewsFrame")
 		):addTo(popupsGroup.content)
 
 		uiSetSettings(LoadModLoaderConfig())
