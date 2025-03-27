@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -23,7 +23,7 @@ jobs:
           CALL _release.bat
 
       - name: Upload artifact 
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ITB-ModLoader-${{ github.event.inputs.version }}.zip
           path: release/*
