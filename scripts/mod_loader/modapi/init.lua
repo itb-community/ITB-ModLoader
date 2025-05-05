@@ -43,7 +43,7 @@ function modApi:init()
 	else
 		if not self:fileExists("resources/resource.dat.bak") then
 			LOGD("Backing up resource.dat...")
-			modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
+			modApi:copyFile("resources/resource.dat", "resources/resource.dat.bak")
 			LOGD("Done!")
 		else
 			local instance = nil
@@ -53,19 +53,21 @@ function modApi:init()
 				LOGD("Done!")
 			end)
 			:catch(function(err)
+				LOG("Failed to create FTLDat instance from resource.dat:", err)
+			end)
+			:finally(function()
 				if instance ~= nil then
 					instance:destroy()
 				end
-				LOG("Failed to create FTLDat instance from resource.dat:", err)
 			end)
 
 			if instance and not instance.signature then
 				LOGD("resource.dat has been updated since last launch, re-acquiring backup...")
-				modApi:copyFileOS("resources/resource.dat", "resources/resource.dat.bak")
+				modApi:copyFile("resources/resource.dat", "resources/resource.dat.bak")
 				LOGD("Done!")
 			else
 				LOGD("Restoring resource.dat...")
-				modApi:copyFileOS("resources/resource.dat.bak", "resources/resource.dat")
+				modApi:copyFile("resources/resource.dat.bak", "resources/resource.dat")
 				LOGD("Done!")
 			end
 		end

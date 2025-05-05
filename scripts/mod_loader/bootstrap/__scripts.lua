@@ -3,6 +3,7 @@ local scripts = {
 	"assert",
 	"classes",
 	"try_catch",
+	"itb_lua_rs",
 	"itb_io",
 	"io",
 	"utils",

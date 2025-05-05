@@ -4,11 +4,15 @@ IF EXIST modloader.log DEL /q modloader.log
 IF EXIST error.txt DEL /q error.txt
 IF EXIST log.txt DEL /q log.txt
 IF EXIST MODLOADER_README.txt DEL /q MODLOADER_README.txt
+
+REM Old .dll files present in earlier releases of the modloader
+IF EXIST ftldat.dll DEL /q ftldat.dll
+IF EXIST itb_io.dll DEL /q itb_io.dll
+
 DEL /q lua5.1.dll
 DEL /q opengl32.dll
 DEL /q SDL2.dll
-DEL /q ftldat.dll
-DEL /q itb_io.dll
+DEL /q itb_rs_lua.dll
 DEL /q scripts\modloader.lua
 IF EXIST resources\resource.dat.bak DEL /q resources\resource.dat
 RMDIR /q /s resources\mods
