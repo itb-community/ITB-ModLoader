@@ -87,12 +87,12 @@ function UiDropDown:new(values,strings,value,tooltips)
 		return Ui.mousedown(dropdown, mx, my, button)
 	end
 
-	local ddw = math.max(max_w + 8, 210)
+	self.ddw = math.max(max_w + 28, 210)
 	self.dropdown = Ui()
 		:pospx(
-			self.rect.x + self.w - ddw,
+			self.rect.x + self.w - self.ddw,
 			self.rect.y + self.h + 2)
-		:widthpx(ddw)
+		:widthpx(self.ddw)
 		:heightpx(math.min(2 + #self.values * 40, 210))
 		:decorate({ DecoFrame(nil, nil, 1) })
 	self.dropdown.owner = self
@@ -137,11 +137,9 @@ function UiDropDown:createDropDown()
 			self.dropdown:addTo(self.root.dropdownUi)
 		end
 
-		local max_w = 32
-		local ddw = math.max(max_w + 8, 210)
 		self.open = true
 		self.dropdown.visible = true
-		self.dropdown.x = self.rect.x + self.w - ddw
+		self.dropdown.x = self.rect.x + self.w - self.ddw
 		self.dropdown.y = self.rect.y + self.h + 2
 	end
 end
