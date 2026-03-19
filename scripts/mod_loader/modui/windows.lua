@@ -163,6 +163,11 @@ local windows = {
 		event_hide = modApi.events.onPerfectIslandWindowHidden,
 		find_rect = getRectFromShadowSurfaces
 	},
+	Store_SellTitle = Window:new{
+		event_show = modApi.events.onStoreWindowShown,
+		event_hide = modApi.events.onStoreWindowHidden,
+		find_rect = getRectFromShadowSurfaces
+	},
 	Button_Editor_Exit = Window:new{
 		event_show = modApi.events.onMapEditorTestEntered,
 		event_hide = modApi.events.onMapEditorTestExited,
@@ -190,6 +195,7 @@ sdlext.isAbandonTimelineWindowVisible = buildIsWindowVisibleFunction(windows.Aba
 sdlext.isStatusTooltipWindowVisible = buildIsWindowVisibleFunction(windows.Unit_Status_Title)
 sdlext.isPodWindowVisible = buildIsWindowVisibleFunction(windows.Pod_Title)
 sdlext.isPerfectIslandWindowVisible = buildIsWindowVisibleFunction(windows.Reward_Title)
+sdlext.isStoreWindowVisible = buildIsWindowVisibleFunction(windows.Store_SellTitle)
 sdlext.isMapEditor = buildIsWindowVisibleFunction(windows.Button_Editor_Exit)
 
 -- gets the current page on the squad selection page, or nil if on none
