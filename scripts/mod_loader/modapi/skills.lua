@@ -100,7 +100,9 @@ local function addSafeDamage(damageList, spaceDamage)
     end
 
     if isCracked then
-        Board:SetCracked(loc,false)
+        local removeCrack = SpaceDamage(loc)
+        removeCrack.sScript = "Board:SetCracked("..loc:GetString()..",false)"
+        damageList:push_back(removeCrack)
     end
     local isDamaged = Board:IsDamaged(loc)
     if isDamaged then
