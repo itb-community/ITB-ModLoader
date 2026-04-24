@@ -16,132 +16,145 @@ modApi.events = {}
 setmetatable(modApi.events, events_mt)
 
 local t = modApi.events
-t.onModMetadataDone = Event()
-t.onModsMetadataDone = Event()
-t.onModInitialized = Event()
-t.onModsInitialized = Event()
-t.onModLoaded = Event()
-t.onModsLoaded = Event()
-t.onModsFirstLoaded = Event()
-t.onInitialLoadingFinished = Event()
-t.onFtldatFinalized = Event()
-t.onModContentReset = Event()
-t.onTestsuitesCreated = Event()
-
-t.onBoardClassInitialized = Event()
-t.onPawnClassInitialized = Event()
-t.onGameClassInitialized = Event()
-
-t.onUiRootCreating = Event()
-t.onUiRootCreated = Event()
-t.onGameWindowResized = Event()
-t.onConsoleToggled = Event()
-t.onFrameDrawStart = Event()
-t.onFrameDrawn = Event()
-t.onWindowVisible = Event()
-
-t.onMainMenuEntered = Event()
-t.onMainMenuExited = Event()
-t.onMainMenuLeaving = Event()
-t.onHangarEntered = Event()
-t.onHangarExited = Event()
-t.onHangarLeaving = Event()
-t.onHangarMechsSelected = Event()
-t.onHangarMechsCleared = Event()
-t.onHangarSquadSelected = Event()
-t.onHangarSquadCleared = Event()
-t.onGameEntered = Event()
-t.onGameExited = Event()
-t.onNewGameClicked = Event()
-t.onContinueClicked = Event()
-t.onSettingsChanged = Event()
-t.onSettingsInitialized = Event()
-t.onProfileChanged = Event()
-t.onProfileCreated = Event()
-t.onProfileDeleted = Event()
-t.onDifficultyChanged = Event()
-t.onLanguageChanged = Event()
-
-t.onHangarUiShown = Event()
-t.onHangarUiHidden = Event()
-t.onEscapeMenuWindowShown = Event()
-t.onEscapeMenuWindowHidden = Event()
-t.onSquadSelectionWindowShown = Event()
+modApi.eventNames = {
+	"onModMetadataDone",
+	"onModsMetadataDone",
+	"onModInitialized",
+	"onModsInitialized",
+	"onModLoaded",
+	"onModsLoaded",
+	"onModsFirstLoaded",
+	"onInitialLoadingFinished",
+	"onFtldatFinalized",
+	"onModContentReset",
+	"onTestsuitesCreated",
+	
+	"onBoardClassInitialized",
+	"onPawnClassInitialized",
+	"onGameClassInitialized",
+	
+	"onUiRootCreating",
+	"onUiRootCreated",
+	"onGameWindowResized",
+	"onConsoleToggled",
+	"onFrameDrawStart",
+	"onFrameDrawn",
+	"onWindowVisible",
+	
+	"onMainMenuEntered",
+	"onMainMenuExited",
+	"onMainMenuLeaving",
+	"onHangarEntered",
+	"onHangarExited",
+	"onHangarLeaving",
+	"onHangarMechsSelected",
+	"onHangarMechsCleared",
+	"onHangarSquadSelected",
+	"onHangarSquadCleared",
+	"onGameEntered",
+	"onGameExited",
+	"onNewGameClicked",
+	"onContinueClicked",
+	"onSettingsChanged",
+	"onSettingsInitialized",
+	"onProfileChanged",
+	"onProfileCreated",
+	"onProfileDeleted",
+	"onDifficultyChanged",
+	"onLanguageChanged",
+	
+	"onHangarUiShown",
+	"onHangarUiHidden",
+	"onEscapeMenuWindowShown",
+	"onEscapeMenuWindowHidden",
+	"onSquadSelectionWindowShown",
 -- arguments: newPage, lastPage, wasOpen
-t.onSquadSelectionPageChanged = Event()
-t.onSquadSelectionWindowHidden = Event()
-t.onCustomizeSquadWindowShown = Event()
-t.onCustomizeSquadWindowHidden = Event()
-t.onPilotSelectionWindowShown = Event()
-t.onPilotSelectionWindowHidden = Event()
-t.onDifficultySettingsWindowShown = Event()
-t.onDifficultySettingsWindowHidden = Event()
-t.onMechColorWindowShown = Event()
-t.onMechColorWindowHidden = Event()
-t.onAchievementsWindowShown = Event()
-t.onAchievementsWindowHidden = Event()
-t.onOptionsWindowShown = Event()
-t.onOptionsWindowHidden = Event()
-t.onLanguageSelectionWindowShown = Event()
-t.onLanguageSelectionWindowHidden = Event()
-t.onHotkeyConfigurationWindowShown = Event()
-t.onHotkeyConfigurationWindowHidden = Event()
-t.onProfileSelectionWindowShown = Event()
-t.onProfileSelectionWindowHidden = Event()
-t.onCreateProfileConfirmationWindowShown = Event()
-t.onCreateProfileConfirmationWindowHidden = Event()
-t.onDeleteProfileConfirmationWindowShown = Event()
-t.onDeleteProfileConfirmationWindowHidden = Event()
-t.onStatisticsWindowShown = Event()
-t.onStatisticsWindowHidden = Event()
-t.onNewGameWindowShown = Event()
-t.onNewGameWindowHidden = Event()
-t.onAbandonTimelineWindowShown = Event()
-t.onAbandonTimelineWindowHidden = Event()
-t.onStatusTooltipWindowShown = Event()
-t.onStatusTooltipWindowHidden = Event()
-t.onMapEditorTestEntered = Event()
-t.onMapEditorTestExited = Event()
-t.onPodWindowShown = Event()
-t.onPodWindowHidden = Event()
-t.onPerfectIslandWindowShown = Event()
-t.onPerfectIslandWindowHidden = Event()
-t.onWindowShown = Event()
-t.onWindowHidden = Event()
+	"onSquadSelectionPageChanged",
+	"onSquadSelectionWindowHidden",
+	"onCustomizeSquadWindowShown",
+	"onCustomizeSquadWindowHidden",
+	"onPilotSelectionWindowShown",
+	"onPilotSelectionWindowHidden",
+	"onDifficultySettingsWindowShown",
+	"onDifficultySettingsWindowHidden",
+	"onMechColorWindowShown",
+	"onMechColorWindowHidden",
+	"onAchievementsWindowShown",
+	"onAchievementsWindowHidden",
+	"onOptionsWindowShown",
+	"onOptionsWindowHidden",
+	"onLanguageSelectionWindowShown",
+	"onLanguageSelectionWindowHidden",
+	"onHotkeyConfigurationWindowShown",
+	"onHotkeyConfigurationWindowHidden",
+	"onProfileSelectionWindowShown",
+	"onProfileSelectionWindowHidden",
+	"onCreateProfileConfirmationWindowShown",
+	"onCreateProfileConfirmationWindowHidden",
+	"onDeleteProfileConfirmationWindowShown",
+	"onDeleteProfileConfirmationWindowHidden",
+	"onStatisticsWindowShown",
+	"onStatisticsWindowHidden",
+	"onNewGameWindowShown",
+	"onNewGameWindowHidden",
+	"onAbandonTimelineWindowShown",
+	"onAbandonTimelineWindowHidden",
+	"onStatusTooltipWindowShown",
+	"onStatusTooltipWindowHidden",
+	"onMapEditorTestEntered",
+	"onMapEditorTestExited",
+	"onPodWindowShown",
+	"onPodWindowHidden",
+	"onPerfectIslandWindowShown",
+	"onPerfectIslandWindowHidden",
+	"onWindowShown",
+	"onWindowHidden",
+	
+	"onMissionChanged",
+	"onMissionDismissed",
+	"onIslandLeft",
+	"onGameStateChanged",
+	"onGameVictory",
+	"onSquadEnteredGame",
+	"onSquadExitedGame",
+	"onTilesetChanged",
+	"onFinalIslandHighlighted",
+	"onFinalIslandUnhighlighted",
+	"onFinalIslandSelected",
+	"onFinalIslandDeselected",
+	
+	"onDeploymentPhaseStart",
+	"onLandingPhaseStart",
+	"onDeploymentPhaseEnd",
+	"onPawnUnselectedForDeployment",
+	"onPawnSelectedForDeployment",
+	"onPawnDeployed",
+	"onPawnUndeployed",
+	"onPawnLanding",
+	"onPawnLanded",
+	
+	"onBoardAddEffect",
+	"onBoardDamageSpace",
+	
+	"onShiftToggled",
+	"onAltToggled",
+	"onCtrlToggled",
+}
 
-t.onMissionChanged = Event()
-t.onMissionDismissed = Event()
-t.onIslandLeft = Event()
-t.onGameStateChanged = Event()
-t.onGameVictory = Event()
-t.onSquadEnteredGame = Event()
-t.onSquadExitedGame = Event()
-t.onTilesetChanged = Event()
-t.onFinalIslandHighlighted = Event()
-t.onFinalIslandUnhighlighted = Event()
-t.onFinalIslandSelected = Event()
-t.onFinalIslandDeselected = Event()
+for _, event in ipairs(modApi.eventNames) do
+	t[event] = Event({ eventName = event })
+end
 
-t.onDeploymentPhaseStart = Event()
-t.onLandingPhaseStart = Event()
-t.onDeploymentPhaseEnd = Event()
-t.onPawnUnselectedForDeployment = Event()
-t.onPawnSelectedForDeployment = Event()
-t.onPawnDeployed = Event()
-t.onPawnUndeployed = Event()
-t.onPawnLanding = Event()
-t.onPawnLanded = Event()
+modApi.shortcutEventNames = {
+	"onKeyPressing",
+	"onKeyPressed",
+	"onKeyReleasing",
+	"onKeyReleased",
+}
 
-t.onBoardAddEffect = Event()
-t.onBoardDamageSpace = Event()
-
-t.onShiftToggled = Event()
-t.onAltToggled = Event()
-t.onCtrlToggled = Event()
-t.onKeyPressing = Event({ [Event.SHORTCIRCUIT] = true })
-t.onKeyPressed = Event({ [Event.SHORTCIRCUIT] = true })
-t.onKeyReleasing = Event({ [Event.SHORTCIRCUIT] = true })
-t.onKeyReleased = Event({ [Event.SHORTCIRCUIT] = true })
+for _, event in ipairs(modApi.shortcutEventNames) do
+	t[event] = Event({ eventName = event, [Event.SHORTCIRCUIT] = true })
+end
 
 -- //////////////////////////////////////////////////////////////////////////////
 -- Hooks
