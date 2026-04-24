@@ -91,12 +91,19 @@ local function addSafeDamage(damageList, spaceDamage)
     local loc = spaceDamage.loc
 
     local terrain = Board:GetTerrain(loc)
+    local isCracked = Board:IsCracked(loc)
+    
     if terrain == TERRAIN_BUILDING then
         -- buildings don't reset health when re-setting iterrain 
         -- but they shouldn't overlap with units anyway
         return
     end
 
+    if isCracked then
+        local removeCrack = SpaceDamage(loc)
+        removeCrack.sScript = "Board:SetCracked("..loc:GetString()..",false)"
+        damageList:push_back(removeCrack)
+    end
     local isDamaged = Board:IsDamaged(loc)
     if isDamaged then
         -- damaged ice/mountains are healed BEFORE we attack
@@ -126,7 +133,13 @@ local function addSafeDamage(damageList, spaceDamage)
         spaceDamage.iTerrain = terrain
     end
     damageList:push_back(spaceDamage)
-    
+
+    if isCracked then
+        local restoreCrack = SpaceDamage(loc)
+        restoreCrack.iCrack = EFFECT_CREATE
+        damageList:push_back(restoreCrack)
+    end
+
     local dmg = SpaceDamage(loc)
     if
         not Board:IsFire(loc) and (
