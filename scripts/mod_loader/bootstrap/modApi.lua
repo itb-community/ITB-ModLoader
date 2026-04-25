@@ -106,6 +106,8 @@ t.onPodWindowShown = Event()
 t.onPodWindowHidden = Event()
 t.onPerfectIslandWindowShown = Event()
 t.onPerfectIslandWindowHidden = Event()
+t.onStoreWindowShown = Event()
+t.onStoreWindowHidden = Event()
 t.onWindowShown = Event()
 t.onWindowHidden = Event()
 
