@@ -341,24 +341,47 @@ Mission.PlanEnvironment = function(self, ...)
 	local turn = Game:GetTurnCount()
 
 	-- The first time this is called each turn, fire the
-	-- pre plan hooks and return true which causes the game
-	-- to re-call this function after allowing a break for
-	-- events and such to run
+	-- vek spawning hooks and return true to give the game a
+	-- chance to process before we fire the pre env planned hooks
+	-- and signal that we are on the second pass now so we will
+	-- fire the post env planned hooks next time
 	if self.envPlanHooksTurn ~= turn then
 		self.envPlanHooksTurn = turn
+		self.envPlanSecondPass = true
 		modApi:fireVekSpawningEndHooks(self)
-		modApi:firePreEnvPlannedHooks(self)
 		return true
 	end
 
+	-- If this is the second pass, fire the post env planned hooks 
+	-- and return true giving the game a chance to process anything
+	-- before it gets into actual planning
+	if self.envPlanSecondPass then
+		modApi:firePreEnvPlannedHooks(self)
+		self.envPlanSecondPass = false
+		return true
+	end
+
+	-- If this was the extra last pass (determined below), fire the 
+	-- post env planned hooks and return false to stop the game from 
+	-- calling this again
+	if self.envPlanLastPass then
+		modApi:firePostEnvPlannedHooks(self)
+		self.envPlanLastPass = false
+		return false
+	end
+
+	-- If its not the first two or the last pass, call the vanilla plan environment
+	-- repeating as many times as its true until the time it returns false
 	local result = self:PlanEnvironmentVanilla(...)
 
 	-- If false is returned the game will not call this again
-	-- so the environment planning is complete
+	-- so the environment planning is complete but instead return
+	-- true and process one more time to call the end hooks with
+	-- allowing the game space to process the last env plan
 	if not result then
-		modApi:firePostEnvPlannedHooks(self)
+		self.envPlanLastPass = true
 	end
-	return result
+	return true
 end
 
 
