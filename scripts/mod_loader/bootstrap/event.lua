@@ -50,13 +50,24 @@ end
 
 function Subscription:notify(args)
 	if not self.listenerFn then
-		error("Subscription is closed")
-	end
+        error("Subscription is closed")
+    end
 
-	return pcall(function()
-		return self.listenerFn(unpack2(args))
-	end)
+    local ok, result = xpcall(
+        function()
+            return self.listenerFn(unpack2(args))
+        end,
+        function(e)
+            -- Capture and return the stack trace of the xpcall
+			-- 2 makes it start a frame higher so it doesn't include
+			-- this error handling fn
+            return debug.traceback(tostring(e), 2)
+        end
+    )
+
+    return ok, result
 end
+
 
 --- Unsubscribes this Subscription the next time the event passed in argument
 --- is triggered.
@@ -116,6 +127,9 @@ function Event:new(options)
 	if options then
 		if options[Event.SHORTCIRCUIT] then
 			self.options[Event.SHORTCIRCUIT] = true
+		end
+		if options.eventName then
+			self.eventName = options.eventName
 		end
 	end
 end
@@ -209,17 +223,64 @@ function Event:unsubscribeAll()
 	end
 end
 
-local function isStackOverflowError(err)
+function Event.isStackOverflowError(err)
 	return string.find(err, "C stack overflow")
 end
 
-local function buildErrorMessage(headerMessage, subscriptionCaller, dispatchCaller)
+function Event.splitTrace(trace)
+    local firstLine, rest = trace:match("([^\n]+)\n?(.*)")
+    return firstLine, rest
+end
+
+function Event.stripAfterXpcall(trace)
+    local out = {}
+    for line in trace:gmatch("[^\n]+") do
+        if line:find("%[C%]: in function 'xpcall'") then
+            break
+        end
+        out[#out+1] = line
+    end
+    return table.concat(out, "\n")
+end
+
+function Event.tryExtractFireXxxxHooks(line)
+    -- captures: fire + anything + Hooks
+    return line:match("in function '(fire.*Hooks)'")
+end
+
+function Event.findFireXxxxHooks(trace)
+    for line in trace:gmatch("[^\n]+") do
+        local fn = Event.tryExtractFireXxxxHooks(line)
+        if fn then
+            return fn
+        end
+    end
+    return nil
+end
+
+function Event.buildErrorMessage(headerMessage, errorOrResult, fireFnName, subscriptionCaller, dispatchCaller)
+	fireFnName = fireFnName or Event.findFireXxxxHooks(dispatchCaller) or "<unable to determine>"
+	local firstLine, rest = Event.splitTrace(errorOrResult)
 	return string.format(
-			"%s\n- Subscribed at: %s\n- Dispatched at: %s",
+			"%s%s\n- Event\\Hook: %s\n- Call trace: \n    %s\n- Subscribed at: %s\n- Dispatched at: %s",
 			headerMessage,
+			firstLine,
+			fireFnName,
+			string.gsub(Event.stripAfterXpcall(rest), "\n", "\n    "),
 			string.gsub(subscriptionCaller, "\n", "\n    "),
 			string.gsub(dispatchCaller, "\n", "\n    ")
 	)
+end
+
+function Event:handleFailure(errorOrResult, creator, caller)
+	errorOrResult = errorOrResult or "<unspecified error>"
+	local message = self.buildErrorMessage("An event callback failed: ", errorOrResult, 
+			self.eventName, creator, caller)
+	if Event.isStackOverflowError(errorOrResult) then
+		error(message)
+	else
+		LOG(message)
+	end
 end
 
 --- Fires this event, notifying all subscribers and passing all arguments
@@ -235,13 +296,8 @@ function Event:dispatch(...)
 	for _, sub in ipairs(snapshot) do
 		local ok, errorOrResult = sub:notify(args)
 
-		if not ok and errorOrResult then
-			local message = buildErrorMessage("An event callback failed: " .. errorOrResult, sub.creator, caller)
-			if isStackOverflowError(errorOrResult) then
-				error(message)
-			else
-				LOG(message)
-			end
+		if not ok then
+			self:handleFailure(errorOrResult, sub.creator, caller)
 		elseif ok then
 			if errorOrResult and self.options[Event.SHORTCIRCUIT] then
 				return true
