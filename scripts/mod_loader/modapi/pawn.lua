@@ -456,7 +456,7 @@ BoardPawn.MoveToBottom = function(self)
 			break
 		end
 
-		other:SetSpace(loc)
+		other:SetSpace(other:GetSpace())
 	until false
 end
 
