@@ -393,10 +393,9 @@ BoardPawn.GetArmedWeapon = function(self)
 
 	if armedWeaponId == 0 then
 		return "Move"
-	elseif armedWeaponId == 1 then
-		return getPoweredWeapon(ptable, "primary")
-	elseif armedWeaponId == 2 then
-		return getPoweredWeapon(ptable, "secondary")
+	elseif armedWeaponId == 1 or armedWeaponId == 2 then
+		local poweredWeapons = self:GetPoweredWeapons()
+		return poweredWeapons[armedWeaponId]
 	elseif armedWeaponId == 50 then
 		return "Skill_Repair"
 	end
@@ -421,10 +420,9 @@ BoardPawn.GetQueuedWeapon = function(self)
 
 	if queuedWeaponId == 0 then
 		return "Move"
-	elseif queuedWeaponId == 1 then
-		return getPoweredWeapon(ptable, "primary")
-	elseif queuedWeaponId == 2 then
-		return getPoweredWeapon(ptable, "secondary")
+	elseif queuedWeaponId == 1 or queuedWeaponId == 2 then
+		local poweredWeapons = self:GetPoweredWeapons()
+		return poweredWeapons[queuedWeaponId]
 	elseif queuedWeaponId == 50 then
 		return "Skill_Repair"
 	end
