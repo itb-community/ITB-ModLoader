@@ -63,7 +63,10 @@ end
 
 function modApi:setText(id, text)
 	assert(type(id) == "string", "ID must be a string")
-	assert(text == nil or type(text) == "string", "Text must be a string")
+	assert(
+		text == nil or type(text) == "string" or type(text) == "function",
+		"Text must be a string or a function"
+	)
 
 	self.dictionary[id] = text
 end

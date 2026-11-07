@@ -14,6 +14,12 @@ function GetText(id, r1, r2, r3)
 	end
 
 	if text then
+		if type(text) == "function" then
+			text, r1, r2, r3 = text(id, r1, r2, r3)
+		end
+	end
+
+	if text then
 		-- Expand variables
 		if r1 ~= nil and r1 ~= "" then
 			text = string.gsub(text,"$1", r1)
