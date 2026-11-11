@@ -81,14 +81,23 @@ function testsuite.testsuite_modApiTexts.test_DynamicFunction()
 	end)
 	local result = GetText(key)
 	local resultSubstituted = GetText(key, "arg")
+	local resultKeepsCallerR1 = GetText(key, "kept")
+
+	modApi:setText(key .. "_SUB", function(id, r1)
+		return "Still $1"
+	end)
+	local resultCallerSub = GetText(key .. "_SUB", "kept")
 
 	-- Cleanup
 	modApi:setText(key, nil)
+	modApi:setText(key .. "_SUB", nil)
 
 	-- Check
-	Assert.Equals(2, calls)
+	Assert.Equals(3, calls)
 	Assert.Equals("Hello context", result)
 	Assert.Equals("Hello world", resultSubstituted)
+	Assert.Equals("Hello context", resultKeepsCallerR1)
+	Assert.Equals("Still kept", resultCallerSub)
 
 	return true
 end

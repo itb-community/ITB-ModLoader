@@ -15,7 +15,17 @@ function GetText(id, r1, r2, r3)
 
 	if text then
 		if type(text) == "function" then
-			text, r1, r2, r3 = text(id, r1, r2, r3)
+			local fnText, fnR1, fnR2, fnR3 = text(id, r1, r2, r3)
+			text = fnText
+			if fnR1 ~= nil then
+				r1 = fnR1
+			end
+			if fnR2 ~= nil then
+				r2 = fnR2
+			end
+			if fnR3 ~= nil then
+				r3 = fnR3
+			end
 		end
 	end
 
