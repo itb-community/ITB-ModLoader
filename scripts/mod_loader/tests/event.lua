@@ -227,4 +227,26 @@ function testsuite.test_EventOpenUntil_Unsubscribe()
 	return true
 end
 
+function testsuite.test_EventInvokeListener_HookListContinuesAfterFailure()
+	local event = Event({ eventName = "test" })
+	local secondRan = false
+	local hooks = {
+		function()
+			error("first hook failed")
+		end,
+		function()
+			secondRan = true
+		end,
+	}
+	local caller = debug.traceback("")
+
+	for _, fn in ipairs(hooks) do
+		event:invokeListenerAndReport(fn, "testHooks", caller)
+	end
+
+	Assert.True(secondRan, "Event.invokeListener() hook loop did not run the second hook after the first failed")
+
+	return true
+end
+
 return testsuite

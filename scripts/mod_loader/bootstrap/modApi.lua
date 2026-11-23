@@ -28,11 +28,11 @@ modApi.eventNames = {
 	"onFtldatFinalized",
 	"onModContentReset",
 	"onTestsuitesCreated",
-	
+
 	"onBoardClassInitialized",
 	"onPawnClassInitialized",
 	"onGameClassInitialized",
-	
+
 	"onUiRootCreating",
 	"onUiRootCreated",
 	"onGameWindowResized",
@@ -40,7 +40,7 @@ modApi.eventNames = {
 	"onFrameDrawStart",
 	"onFrameDrawn",
 	"onWindowVisible",
-	
+
 	"onMainMenuEntered",
 	"onMainMenuExited",
 	"onMainMenuLeaving",
@@ -62,7 +62,7 @@ modApi.eventNames = {
 	"onProfileDeleted",
 	"onDifficultyChanged",
 	"onLanguageChanged",
-	
+
 	"onHangarUiShown",
 	"onHangarUiHidden",
 	"onEscapeMenuWindowShown",
@@ -111,7 +111,7 @@ modApi.eventNames = {
 	"onStoreWindowHidden",
 	"onWindowShown",
 	"onWindowHidden",
-	
+
 	"onMissionChanged",
 	"onMissionDismissed",
 	"onIslandLeft",
@@ -124,7 +124,7 @@ modApi.eventNames = {
 	"onFinalIslandUnhighlighted",
 	"onFinalIslandSelected",
 	"onFinalIslandDeselected",
-	
+
 	"onDeploymentPhaseStart",
 	"onLandingPhaseStart",
 	"onDeploymentPhaseEnd",
@@ -134,10 +134,10 @@ modApi.eventNames = {
 	"onPawnUndeployed",
 	"onPawnLanding",
 	"onPawnLanded",
-	
+
 	"onBoardAddEffect",
 	"onBoardDamageSpace",
-	
+
 	"onShiftToggled",
 	"onAltToggled",
 	"onCtrlToggled",
@@ -170,7 +170,8 @@ function modApi:AddHook(name)
 	table.insert(self.hooks, name)
 	self[name .."Hooks"] = {}
 	local eventName = "on".. Name
-	self.events[eventName] = Event({ eventName = eventName })
+	local event = Event({ eventName = eventName })
+	self.events[eventName] = event
 
 	self["add".. Name .."Hook"] = function(self, fn)
 		assert(type(fn) == "function")
@@ -185,9 +186,11 @@ function modApi:AddHook(name)
 		self.events[eventName]:dispatch(...)
 	end
 
-	self.events[eventName]:subscribe(function(...)
-		for _, fn in ipairs(self[name .."Hooks"]) do
-			fn(...)
+	local hooksField = name .. "Hooks"
+	event:subscribe(function(...)
+		local caller = debug.traceback("")
+		for _, fn in ipairs(self[hooksField]) do
+			event:invokeListenerAndReport(fn, hooksField, caller, ...)
 		end
 	end)
 end
