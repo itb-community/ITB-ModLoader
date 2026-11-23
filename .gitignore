@@ -11,6 +11,8 @@ resources/
 shadersOGL/
 mods/*
 !mods/put_mods_here
+extensions/*
+!extensions/put_extensions_here
 scripts/*
 !scripts/mod_loader.lua
 !scripts/mod_loader.lua.bak

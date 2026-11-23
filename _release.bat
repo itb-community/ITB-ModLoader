@@ -15,5 +15,6 @@ COPY /V itb_io.dll release\itb_io.dll
 COPY /V README.md release\MODLOADER_README.txt
 COPY /V uninstall_modloader.bat release\uninstall_modloader.bat
 XCOPY mods release\mods /s /e /i
+XCOPY extensions release\extensions /s /e /i
 XCOPY scripts release\scripts /s /e /i
 XCOPY resources release\resources /s /e /i
