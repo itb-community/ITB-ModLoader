@@ -57,12 +57,7 @@ function Subscription:notify(args)
         function()
             return self.listenerFn(unpack2(args))
         end,
-        function(e)
-            -- Capture and return the stack trace of the xpcall
-			-- 2 makes it start a frame higher so it doesn't include
-			-- this error handling fn
-            return debug.traceback(tostring(e), 2)
-        end
+        Event.listenerTraceback
     )
 
     return ok, result
@@ -272,15 +267,43 @@ function Event.buildErrorMessage(headerMessage, errorOrResult, fireFnName, subsc
 	)
 end
 
+function Event.listenerTraceback(e)
+	-- Capture and return the stack trace of the xpcall
+	-- 2 makes it start a frame higher so it doesn't include
+	-- this error handling fn
+	return debug.traceback(tostring(e), 2)
+end
+
+function Event.invokeListener(fn, ...)
+	local args = pack2(...)
+	local ok, result = xpcall(function()
+		if args.n == 0 then
+			return fn()
+		end
+		return fn(unpack2(args))
+	end, Event.listenerTraceback)
+	return ok, result
+end
+
 function Event:handleFailure(errorOrResult, creator, caller)
 	errorOrResult = errorOrResult or "<unspecified error>"
-	local message = self.buildErrorMessage("An event callback failed: ", errorOrResult, 
+	local message = self.buildErrorMessage("An event callback failed: ", errorOrResult,
 			self.eventName, creator, caller)
 	if Event.isStackOverflowError(errorOrResult) then
 		error(message)
 	else
 		LOG(message)
 	end
+end
+
+-- Used to invoke modApi hook lists to keep one failure from causing
+-- other hooks not to run so behavior is consistent with Events
+function Event:invokeListenerAndReport(fn, creator, dispatchCaller, ...)
+	local ok, result = Event.invokeListener(fn, ...)
+	if not ok then
+		self:handleFailure(result, creator, dispatchCaller)
+	end
+	return ok, result
 end
 
 --- Fires this event, notifying all subscribers and passing all arguments
